@@ -1,0 +1,38 @@
+{
+	"iisSettings": {
+		"iisExpress": {
+			"applicationUrl": "http://localhost:61354",
+			"sslPort": 44305
+		}
+	},
+	"profiles": {
+		"http": {
+			"applicationUrl": "http://localhost:5130",
+			"commandName": "Project",
+			"environmentVariables": {
+				"ASPNETCORE_ENVIRONMENT": "Development"
+			},
+			"launchBrowser": true
+		},
+		"https": {
+			"applicationUrl": "https://localhost:7292;http://localhost:5130",
+			"commandName": "Project",
+			"environmentVariables": {
+				"ASPNETCORE_ENVIRONMENT": "Development"
+			},
+			"launchBrowser": true
+		},
+		"IIS Express": {
+			"commandName": "IISExpress",
+			"environmentVariables": {
+				"ASPNETCORE_ENVIRONMENT": "Development"
+			},
+			"launchBrowser": true
+		},
+		"Docker": {
+			"commandName": "Docker",
+			"launchBrowser": true,
+			"launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}"
+		}
+	}
+}
