@@ -3,13 +3,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
 using Utal.Icc.Sgm.Data;
+using Utal.Icc.Sgm.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Environment.IsDevelopment() ? builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.") : Environment.GetEnvironmentVariable("CONNECTION_STRING_DEFAULT_CONNECTION");
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 _ = builder.Environment.IsDevelopment() ?
-	builder.Services.AddDefaultIdentity<IdentityUser>(options => {
+	builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options => {
 		options.Lockout.DefaultLockoutTimeSpan = TimeSpan.Zero;
 		options.Password.RequireDigit = false;
 		options.Password.RequiredLength = 0;
@@ -17,8 +18,8 @@ _ = builder.Environment.IsDevelopment() ?
 		options.Password.RequireNonAlphanumeric = false;
 		options.Password.RequireUppercase = false;
 		options.Password.RequireLowercase = false;
-	}).AddEntityFrameworkStores<ApplicationDbContext>()
-	: builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<ApplicationDbContext>();
+	}).AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultUI().AddDefaultTokenProviders()
+	: builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultUI().AddDefaultTokenProviders();
 builder.Services.AddControllersWithViews().AddNewtonsoftJson();
 
 var app = builder.Build();
