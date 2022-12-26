@@ -90,6 +90,13 @@ public class RegisterModel : PageModel {
 		[Display(Name = "Confirmar contraseña")]
 		[Compare("Password", ErrorMessage = "La contraseñas proporcionadas no coinciden.")]
 		public string ConfirmPassword { get; set; }
+
+		[Required]
+		[Display(Name = "Nombre")]
+		public string FirstName { get; set; }
+		[Required]
+		[Display(Name = "Apellido")]
+		public string LastName { get; set; }
 	}
 
 
@@ -103,6 +110,9 @@ public class RegisterModel : PageModel {
 		ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 		if (ModelState.IsValid) {
 			var user = CreateUser();
+
+			user.FirstName = Input.FirstName;
+			user.LastName = Input.LastName;
 
 			await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
 			await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
