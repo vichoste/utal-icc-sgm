@@ -1,4 +1,6 @@
-﻿namespace Utal.Icc.Sgm.Models;
+﻿using Microsoft.AspNetCore.Identity;
+
+namespace Utal.Icc.Sgm.Models;
 
 public enum Roles {
 	Administrator,
