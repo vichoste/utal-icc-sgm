@@ -30,5 +30,46 @@ public class UserRolesController : Controller {
 		}
 		return View(userRolesViewModel);
 	}
+
+	public async Task<IActionResult> Manage(string userId) {
+		ViewBag.userId = userId;
+		var user = await _userManager.FindByIdAsync(userId);
+		if (user == null) {
+			ViewBag.ErrorMessage = $"No se encuentra el usuario con el id {userId}.";
+			return View("NotFound");
+		}
+		ViewBag.UserName = user.UserName;
+		var model = new List<ManageUserRolesViewModel>();
+		foreach (var role in _roleManager.Roles.ToList()) {
+			var userRolesViewModel = new ManageUserRolesViewModel {
+				RoleId = role.Id,
+				RoleName = role.Name,
+				Selected = await _userManager.IsInRoleAsync(user, role.Name!)
+			};
+			model.Add(userRolesViewModel);
+		}
+		return View(model);
+	}
+
+	[HttpPost]
+	public async Task<IActionResult> Manage(List<ManageUserRolesViewModel> model, string userId) {
+		var user = await _userManager.FindByIdAsync(userId);
+		if (user == null) {
+			return View();
+		}
+		var roles = await _userManager.GetRolesAsync(user);
+		var result = await _userManager.RemoveFromRolesAsync(user, roles);
+		if (!result.Succeeded) {
+			ModelState.AddModelError("", "No se puede(n) remover el(los) rol(es).");
+			return View(model);
+		}
+		result = await _userManager.AddToRolesAsync(user, model.Where(x => x.Selected).Select(y => y.RoleName).ToList()!);
+		if (!result.Succeeded) {
+			ModelState.AddModelError("", "No se puede(n) añadir el(los) rol(es) al usuario.");
+			return View(model);
+		}
+		return RedirectToAction("Index");
+	}
+
 	private async Task<List<string>> GetUserRoles(ApplicationUser user) => new List<string>(await _userManager.GetRolesAsync(user));
 }
