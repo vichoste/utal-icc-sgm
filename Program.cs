@@ -32,6 +32,7 @@ if (app.Environment.IsDevelopment()) {
 _ = app.UseHttpsRedirection();
 _ = app.UseStaticFiles();
 _ = app.UseRouting();
+_ = app.UseAuthentication();
 _ = app.UseAuthorization();
 _ = app.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
 _ = app.MapRazorPages();
