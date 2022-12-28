@@ -13,20 +13,22 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 
+using Utal.Icc.Sgm.Models;
+
 namespace Utal.Icc.Sgm.Areas.Identity.Pages.Account;
 
 public class RegisterModel : PageModel {
-	private readonly SignInManager<IdentityUser> _signInManager;
-	private readonly UserManager<IdentityUser> _userManager;
-	private readonly IUserStore<IdentityUser> _userStore;
-	private readonly IUserEmailStore<IdentityUser> _emailStore;
+	private readonly SignInManager<ApplicationUser> _signInManager;
+	private readonly UserManager<ApplicationUser> _userManager;
+	private readonly IUserStore<ApplicationUser> _userStore;
+	private readonly IUserEmailStore<ApplicationUser> _emailStore;
 	private readonly ILogger<RegisterModel> _logger;
 	private readonly IEmailSender _emailSender;
 
 	public RegisterModel(
-		UserManager<IdentityUser> userManager,
-		IUserStore<IdentityUser> userStore,
-		SignInManager<IdentityUser> signInManager,
+		UserManager<ApplicationUser> userManager,
+		IUserStore<ApplicationUser> userStore,
+		SignInManager<ApplicationUser> signInManager,
 		ILogger<RegisterModel> logger,
 		IEmailSender emailSender) {
 		_userManager = userManager;
@@ -88,6 +90,13 @@ public class RegisterModel : PageModel {
 		[Display(Name = "Confirmar contraseña")]
 		[Compare("Password", ErrorMessage = "La contraseñas proporcionadas no coinciden.")]
 		public string ConfirmPassword { get; set; }
+
+		[Required]
+		[Display(Name = "Nombre")]
+		public string FirstName { get; set; }
+		[Required]
+		[Display(Name = "Apellido")]
+		public string LastName { get; set; }
 	}
 
 
@@ -101,6 +110,9 @@ public class RegisterModel : PageModel {
 		ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 		if (ModelState.IsValid) {
 			var user = CreateUser();
+
+			user.FirstName = Input.FirstName;
+			user.LastName = Input.LastName;
 
 			await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
 			await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
@@ -137,18 +149,18 @@ public class RegisterModel : PageModel {
 		return Page();
 	}
 
-	private IdentityUser CreateUser() {
+	private ApplicationUser CreateUser() {
 		try {
-			return Activator.CreateInstance<IdentityUser>();
+			return Activator.CreateInstance<ApplicationUser>();
 		} catch {
-			throw new InvalidOperationException($"No se puede crear una instancia de '{nameof(IdentityUser)}'. " +
-				$"Asegúrate de que '{nameof(IdentityUser)}' no es una clase abstracta y que tiene un constructor sin parámetros, o bien sobrescribe la página de inicio de sesión externa en /Areas/Identity/Pages/Account/ExternalLogin.cshtml");
+			throw new InvalidOperationException($"No se puede crear una instancia de '{nameof(ApplicationUser)}'. " +
+				$"Asegúrate de que '{nameof(ApplicationUser)}' no es una clase abstracta y que tiene un constructor sin parámetros, o bien sobrescribe la página de inicio de sesión externa en /Areas/Identity/Pages/Account/ExternalLogin.cshtml");
 		}
 	}
 
-	private IUserEmailStore<IdentityUser> GetEmailStore() {
+	private IUserEmailStore<ApplicationUser> GetEmailStore() {
 		return !_userManager.SupportsUserEmail
 			? throw new NotSupportedException("La UI por defecto requiere un guardado de usuario con correo electrónico.")
-			: (IUserEmailStore<IdentityUser>)_userStore;
+			: (IUserEmailStore<ApplicationUser>)_userStore;
 	}
 }
