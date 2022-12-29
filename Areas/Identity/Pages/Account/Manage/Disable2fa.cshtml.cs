@@ -17,8 +17,8 @@ public class Disable2faModel : PageModel {
 	public Disable2faModel(
 		UserManager<ApplicationUser> userManager,
 		ILogger<Disable2faModel> logger) {
-		_userManager = userManager;
-		_logger = logger;
+		this._userManager = userManager;
+		this._logger = logger;
 	}
 
 	/// <summary>
@@ -29,26 +29,26 @@ public class Disable2faModel : PageModel {
 	public string StatusMessage { get; set; }
 
 	public async Task<IActionResult> OnGet() {
-		var user = await _userManager.GetUserAsync(User);
+		var user = await this._userManager.GetUserAsync(this.User);
 		return user == null
-			? NotFound($"No se pudo cargar el usuario con el ID '{_userManager.GetUserId(User)}'.")
-			: !await _userManager.GetTwoFactorEnabledAsync(user)
+			? this.NotFound($"No se pudo cargar el usuario con el ID '{this._userManager.GetUserId(this.User)}'.")
+			: !await this._userManager.GetTwoFactorEnabledAsync(user)
 			? throw new InvalidOperationException($"No se puede deshabilitar la autenticación en dos pasos (2FA), ya que el usuario no la tiene activada.")
-			: (IActionResult)Page();
+			: (IActionResult)this.Page();
 	}
 
 	public async Task<IActionResult> OnPostAsync() {
-		var user = await _userManager.GetUserAsync(User);
+		var user = await this._userManager.GetUserAsync(this.User);
 		if (user == null) {
-			return NotFound($"No se pudo cargar el usuario con el ID '{_userManager.GetUserId(User)}'.");
+			return this.NotFound($"No se pudo cargar el usuario con el ID '{this._userManager.GetUserId(this.User)}'.");
 		}
-		var disable2faResult = await _userManager.SetTwoFactorEnabledAsync(user, false);
+		var disable2faResult = await this._userManager.SetTwoFactorEnabledAsync(user, false);
 		if (!disable2faResult.Succeeded) {
 			throw new InvalidOperationException($"Ocurrió un error inesperado al deshabilitar la autenticación en dos pasos (2FA).");
 		}
 
-		_logger.LogInformation("El usuario con ID '{UserId}' ha deshabilitado la autenticación en dos pasos (2FA).", _userManager.GetUserId(User));
-		StatusMessage = "La autenticación en dos pasos (2FA) ha sido deshabilitada. Si deseas habilitarla nuevamente, usa tu aplicación autenticadora.";
-		return RedirectToPage("./TwoFactorAuthentication");
+		this._logger.LogInformation("El usuario con ID '{UserId}' ha deshabilitado la autenticación en dos pasos (2FA).", this._userManager.GetUserId(this.User));
+		this.StatusMessage = "La autenticación en dos pasos (2FA) ha sido deshabilitada. Si deseas habilitarla nuevamente, usa tu aplicación autenticadora.";
+		return this.RedirectToPage("./TwoFactorAuthentication");
 	}
 }

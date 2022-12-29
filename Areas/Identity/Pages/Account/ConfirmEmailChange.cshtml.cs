@@ -18,8 +18,8 @@ public class ConfirmEmailChangeModel : PageModel {
 	private readonly SignInManager<ApplicationUser> _signInManager;
 
 	public ConfirmEmailChangeModel(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager) {
-		_userManager = userManager;
-		_signInManager = signInManager;
+		this._userManager = userManager;
+		this._signInManager = signInManager;
 	}
 
 	/// <summary>
@@ -31,31 +31,31 @@ public class ConfirmEmailChangeModel : PageModel {
 
 	public async Task<IActionResult> OnGetAsync(string userId, string email, string code) {
 		if (userId == null || email == null || code == null) {
-			return RedirectToPage("/Index");
+			return this.RedirectToPage("/Index");
 		}
 
-		var user = await _userManager.FindByIdAsync(userId);
+		var user = await this._userManager.FindByIdAsync(userId);
 		if (user == null) {
-			return NotFound($"No se pudo cargar el usuario con el ID '{userId}'.");
+			return this.NotFound($"No se pudo cargar el usuario con el ID '{userId}'.");
 		}
 
 		code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code));
-		var result = await _userManager.ChangeEmailAsync(user, email, code);
+		var result = await this._userManager.ChangeEmailAsync(user, email, code);
 		if (!result.Succeeded) {
-			StatusMessage = "Error al cambiar tu correo electrónico.";
-			return Page();
+			this.StatusMessage = "Error al cambiar tu correo electrónico.";
+			return this.Page();
 		}
 
 		// In our UI email and user name are one and the same, so when we update the email
 		// we need to update the user name.
-		var setUserNameResult = await _userManager.SetUserNameAsync(user, email);
+		var setUserNameResult = await this._userManager.SetUserNameAsync(user, email);
 		if (!setUserNameResult.Succeeded) {
-			StatusMessage = "Error al cambiar tu nombre de usuario.";
-			return Page();
+			this.StatusMessage = "Error al cambiar tu nombre de usuario.";
+			return this.Page();
 		}
 
-		await _signInManager.RefreshSignInAsync(user);
-		StatusMessage = "Gracias por confirmar el cambio de tu correo electrónico.";
-		return Page();
+		await this._signInManager.RefreshSignInAsync(user);
+		this.StatusMessage = "Gracias por confirmar el cambio de tu correo electrónico.";
+		return this.Page();
 	}
 }

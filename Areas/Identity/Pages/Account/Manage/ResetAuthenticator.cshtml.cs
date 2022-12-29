@@ -19,9 +19,9 @@ public class ResetAuthenticatorModel : PageModel {
 		UserManager<ApplicationUser> userManager,
 		SignInManager<ApplicationUser> signInManager,
 		ILogger<ResetAuthenticatorModel> logger) {
-		_userManager = userManager;
-		_signInManager = signInManager;
-		_logger = logger;
+		this._userManager = userManager;
+		this._signInManager = signInManager;
+		this._logger = logger;
 	}
 
 	/// <summary>
@@ -32,24 +32,24 @@ public class ResetAuthenticatorModel : PageModel {
 	public string StatusMessage { get; set; }
 
 	public async Task<IActionResult> OnGet() {
-		var user = await _userManager.GetUserAsync(User);
-		return user == null ? NotFound($"No se pudo cargar el usuario con el ID '{_userManager.GetUserId(User)}'.") : Page();
+		var user = await this._userManager.GetUserAsync(this.User);
+		return user == null ? this.NotFound($"No se pudo cargar el usuario con el ID '{this._userManager.GetUserId(this.User)}'.") : this.Page();
 	}
 
 	public async Task<IActionResult> OnPostAsync() {
-		var user = await _userManager.GetUserAsync(User);
+		var user = await this._userManager.GetUserAsync(this.User);
 		if (user == null) {
-			return NotFound($"No se pudo cargar el usuario con el ID '{_userManager.GetUserId(User)}'.");
+			return this.NotFound($"No se pudo cargar el usuario con el ID '{this._userManager.GetUserId(this.User)}'.");
 		}
 
-		await _userManager.SetTwoFactorEnabledAsync(user, false);
-		await _userManager.ResetAuthenticatorKeyAsync(user);
-		var userId = await _userManager.GetUserIdAsync(user);
-		_logger.LogInformation("El usuario con el ID '{UserId}' ha reestablecido su llave de autenticación de dos pasos.", user.Id);
+		_ = await this._userManager.SetTwoFactorEnabledAsync(user, false);
+		_ = await this._userManager.ResetAuthenticatorKeyAsync(user);
+		_ = await this._userManager.GetUserIdAsync(user);
+		this._logger.LogInformation("El usuario con el ID '{UserId}' ha reestablecido su llave de autenticación de dos pasos.", user.Id);
 
-		await _signInManager.RefreshSignInAsync(user);
-		StatusMessage = "Tu llave de autenticación ha sido reestablecida, deberás configurar tu aplicación utilizando la nueva llave.";
+		await this._signInManager.RefreshSignInAsync(user);
+		this.StatusMessage = "Tu llave de autenticación ha sido reestablecida, deberás configurar tu aplicación utilizando la nueva llave.";
 
-		return RedirectToPage("./EnableAuthenticator");
+		return this.RedirectToPage("./EnableAuthenticator");
 	}
 }

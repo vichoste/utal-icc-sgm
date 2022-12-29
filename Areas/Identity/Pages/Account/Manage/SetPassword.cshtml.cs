@@ -19,8 +19,8 @@ public class SetPasswordModel : PageModel {
 	public SetPasswordModel(
 		UserManager<ApplicationUser> userManager,
 		SignInManager<ApplicationUser> signInManager) {
-		_userManager = userManager;
-		_signInManager = signInManager;
+		this._userManager = userManager;
+		this._signInManager = signInManager;
 	}
 
 	/// <summary>
@@ -63,37 +63,37 @@ public class SetPasswordModel : PageModel {
 	}
 
 	public async Task<IActionResult> OnGetAsync() {
-		var user = await _userManager.GetUserAsync(User);
+		var user = await this._userManager.GetUserAsync(this.User);
 		if (user == null) {
-			return NotFound($"No se pudo cargar el usuario con el ID '{_userManager.GetUserId(User)}'.");
+			return this.NotFound($"No se pudo cargar el usuario con el ID '{this._userManager.GetUserId(this.User)}'.");
 		}
 
-		var hasPassword = await _userManager.HasPasswordAsync(user);
+		var hasPassword = await this._userManager.HasPasswordAsync(user);
 
-		return hasPassword ? RedirectToPage("./ChangePassword") : Page();
+		return hasPassword ? this.RedirectToPage("./ChangePassword") : this.Page();
 	}
 
 	public async Task<IActionResult> OnPostAsync() {
-		if (!ModelState.IsValid) {
-			return Page();
+		if (!this.ModelState.IsValid) {
+			return this.Page();
 		}
 
-		var user = await _userManager.GetUserAsync(User);
+		var user = await this._userManager.GetUserAsync(this.User);
 		if (user == null) {
-			return NotFound($"No se pudo cargar el usuario con el ID '{_userManager.GetUserId(User)}'.");
+			return this.NotFound($"No se pudo cargar el usuario con el ID '{this._userManager.GetUserId(this.User)}'.");
 		}
 
-		var addPasswordResult = await _userManager.AddPasswordAsync(user, Input.NewPassword);
+		var addPasswordResult = await this._userManager.AddPasswordAsync(user, this.Input.NewPassword);
 		if (!addPasswordResult.Succeeded) {
 			foreach (var error in addPasswordResult.Errors) {
-				ModelState.AddModelError(string.Empty, error.Description);
+				this.ModelState.AddModelError(string.Empty, error.Description);
 			}
-			return Page();
+			return this.Page();
 		}
 
-		await _signInManager.RefreshSignInAsync(user);
-		StatusMessage = "Se estableció tu contraseña.";
+		await this._signInManager.RefreshSignInAsync(user);
+		this.StatusMessage = "Se estableció tu contraseña.";
 
-		return RedirectToPage();
+		return this.RedirectToPage();
 	}
 }

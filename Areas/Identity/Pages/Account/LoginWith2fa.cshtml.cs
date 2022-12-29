@@ -20,9 +20,9 @@ public class LoginWith2faModel : PageModel {
 		SignInManager<ApplicationUser> signInManager,
 		UserManager<ApplicationUser> userManager,
 		ILogger<LoginWith2faModel> logger) {
-		_signInManager = signInManager;
-		_userManager = userManager;
-		_logger = logger;
+		this._signInManager = signInManager;
+		this._userManager = userManager;
+		this._logger = logger;
 	}
 
 	/// <summary>
@@ -69,46 +69,46 @@ public class LoginWith2faModel : PageModel {
 
 	public async Task<IActionResult> OnGetAsync(bool rememberMe, string returnUrl = null) {
 		// Ensure the user has gone through the username & password screen first
-		var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
+		var user = await this._signInManager.GetTwoFactorAuthenticationUserAsync();
 
 		if (user == null) {
 			throw new InvalidOperationException($"No se pudo cargar el usuario con autenticación en dos pasos (2FA).");
 		}
 
-		ReturnUrl = returnUrl;
-		RememberMe = rememberMe;
+		this.ReturnUrl = returnUrl;
+		this.RememberMe = rememberMe;
 
-		return Page();
+		return this.Page();
 	}
 
 	public async Task<IActionResult> OnPostAsync(bool rememberMe, string returnUrl = null) {
-		if (!ModelState.IsValid) {
-			return Page();
+		if (!this.ModelState.IsValid) {
+			return this.Page();
 		}
 
-		returnUrl = returnUrl ?? Url.Content("~/");
+		returnUrl ??= this.Url.Content("~/");
 
-		var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
+		var user = await this._signInManager.GetTwoFactorAuthenticationUserAsync();
 		if (user == null) {
 			throw new InvalidOperationException($"No se pudo cargar el usuario con autenticación en dos pasos (2FA).");
 		}
 
-		var authenticatorCode = Input.TwoFactorCode.Replace(" ", string.Empty).Replace("-", string.Empty);
+		var authenticatorCode = this.Input.TwoFactorCode.Replace(" ", string.Empty).Replace("-", string.Empty);
 
-		var result = await _signInManager.TwoFactorAuthenticatorSignInAsync(authenticatorCode, rememberMe, Input.RememberMachine);
+		var result = await this._signInManager.TwoFactorAuthenticatorSignInAsync(authenticatorCode, rememberMe, this.Input.RememberMachine);
 
-		var userId = await _userManager.GetUserIdAsync(user);
+		_ = await this._userManager.GetUserIdAsync(user);
 
 		if (result.Succeeded) {
-			_logger.LogInformation("Usuario con ID '{UserId}' ha iniciado sesión mediante autenticación en dos pasos (2FA).", user.Id);
-			return LocalRedirect(returnUrl);
+			this._logger.LogInformation("Usuario con ID '{UserId}' ha iniciado sesión mediante autenticación en dos pasos (2FA).", user.Id);
+			return this.LocalRedirect(returnUrl);
 		} else if (result.IsLockedOut) {
-			_logger.LogWarning("El usuario con ID '{UserId}' tiene la cuenta bloqueada.", user.Id);
-			return RedirectToPage("./Lockout");
+			this._logger.LogWarning("El usuario con ID '{UserId}' tiene la cuenta bloqueada.", user.Id);
+			return this.RedirectToPage("./Lockout");
 		} else {
-			_logger.LogWarning("Código del autenticador inválido para el usuario con ID '{UserId}'.", user.Id);
-			ModelState.AddModelError(string.Empty, "Código del autenticador inválido.");
-			return Page();
+			this._logger.LogWarning("Código del autenticador inválido para el usuario con ID '{UserId}'.", user.Id);
+			this.ModelState.AddModelError(string.Empty, "Código del autenticador inválido.");
+			return this.Page();
 		}
 	}
 }

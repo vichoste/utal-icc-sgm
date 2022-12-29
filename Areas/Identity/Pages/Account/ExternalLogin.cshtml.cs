@@ -33,12 +33,12 @@ public class ExternalLoginModel : PageModel {
 		IUserStore<ApplicationUser> userStore,
 		ILogger<ExternalLoginModel> logger,
 		IEmailSender emailSender) {
-		_signInManager = signInManager;
-		_userManager = userManager;
-		_userStore = userStore;
-		_emailStore = GetEmailStore();
-		_logger = logger;
-		_emailSender = emailSender;
+		this._signInManager = signInManager;
+		this._userManager = userManager;
+		this._userStore = userStore;
+		this._emailStore = this.GetEmailStore();
+		this._logger = logger;
+		this._emailSender = emailSender;
 	}
 
 	/// <summary>
@@ -81,98 +81,98 @@ public class ExternalLoginModel : PageModel {
 		public string Email { get; set; }
 	}
 
-	public IActionResult OnGet() => RedirectToPage("./Login");
+	public IActionResult OnGet() => this.RedirectToPage("./Login");
 
 	public IActionResult OnPost(string provider, string returnUrl = null) {
 		// Request a redirect to the external login provider.
-		var redirectUrl = Url.Page("./ExternalLogin", pageHandler: "Callback", values: new { returnUrl });
-		var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
+		var redirectUrl = this.Url.Page("./ExternalLogin", pageHandler: "Callback", values: new { returnUrl });
+		var properties = this._signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
 		return new ChallengeResult(provider, properties);
 	}
 
 	public async Task<IActionResult> OnGetCallbackAsync(string returnUrl = null, string remoteError = null) {
-		returnUrl = returnUrl ?? Url.Content("~/");
+		returnUrl ??= this.Url.Content("~/");
 		if (remoteError != null) {
-			ErrorMessage = $"Error desde el proveedor externo: {remoteError}";
-			return RedirectToPage("./Login", new { ReturnUrl = returnUrl });
+			this.ErrorMessage = $"Error desde el proveedor externo: {remoteError}";
+			return this.RedirectToPage("./Login", new { ReturnUrl = returnUrl });
 		}
-		var info = await _signInManager.GetExternalLoginInfoAsync();
+		var info = await this._signInManager.GetExternalLoginInfoAsync();
 		if (info == null) {
-			ErrorMessage = "Error al cargar la información de inicio de sesión externa.";
-			return RedirectToPage("./Login", new { ReturnUrl = returnUrl });
+			this.ErrorMessage = "Error al cargar la información de inicio de sesión externa.";
+			return this.RedirectToPage("./Login", new { ReturnUrl = returnUrl });
 		}
 
 		// Sign in the user with this external login provider if the user already has a login.
-		var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
+		var result = await this._signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
 		if (result.Succeeded) {
-			_logger.LogInformation("{Name} ha iniciado sesión mediante el proveedor {LoginProvider}.", info.Principal.Identity.Name, info.LoginProvider);
-			return LocalRedirect(returnUrl);
+			this._logger.LogInformation("{Name} ha iniciado sesión mediante el proveedor {LoginProvider}.", info.Principal.Identity.Name, info.LoginProvider);
+			return this.LocalRedirect(returnUrl);
 		}
 		if (result.IsLockedOut) {
-			return RedirectToPage("./Lockout");
+			return this.RedirectToPage("./Lockout");
 		} else {
 			// If the user does not have an account, then ask the user to create an account.
-			ReturnUrl = returnUrl;
-			ProviderDisplayName = info.ProviderDisplayName;
+			this.ReturnUrl = returnUrl;
+			this.ProviderDisplayName = info.ProviderDisplayName;
 			if (info.Principal.HasClaim(c => c.Type == ClaimTypes.Email)) {
-				Input = new InputModel {
+				this.Input = new InputModel {
 					Email = info.Principal.FindFirstValue(ClaimTypes.Email)
 				};
 			}
-			return Page();
+			return this.Page();
 		}
 	}
 
 	public async Task<IActionResult> OnPostConfirmationAsync(string returnUrl = null) {
-		returnUrl = returnUrl ?? Url.Content("~/");
+		returnUrl ??= this.Url.Content("~/");
 		// Get the information about the user from the external login provider
-		var info = await _signInManager.GetExternalLoginInfoAsync();
+		var info = await this._signInManager.GetExternalLoginInfoAsync();
 		if (info == null) {
-			ErrorMessage = "Error al cargar la información de inicio de sesión externa durante la confirmación.";
-			return RedirectToPage("./Login", new { ReturnUrl = returnUrl });
+			this.ErrorMessage = "Error al cargar la información de inicio de sesión externa durante la confirmación.";
+			return this.RedirectToPage("./Login", new { ReturnUrl = returnUrl });
 		}
 
-		if (ModelState.IsValid) {
-			var user = CreateUser();
+		if (this.ModelState.IsValid) {
+			var user = this.CreateUser();
 
-			await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
-			await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
+			await this._userStore.SetUserNameAsync(user, this.Input.Email, CancellationToken.None);
+			await this._emailStore.SetEmailAsync(user, this.Input.Email, CancellationToken.None);
 
-			var result = await _userManager.CreateAsync(user);
+			var result = await this._userManager.CreateAsync(user);
 			if (result.Succeeded) {
-				result = await _userManager.AddLoginAsync(user, info);
+				result = await this._userManager.AddLoginAsync(user, info);
 				if (result.Succeeded) {
-					_logger.LogInformation("El usuario ha creado una cuenta usando el proveedor {Name}.", info.LoginProvider);
+					this._logger.LogInformation("El usuario ha creado una cuenta usando el proveedor {Name}.", info.LoginProvider);
 
-					var userId = await _userManager.GetUserIdAsync(user);
-					var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+					var userId = await this._userManager.GetUserIdAsync(user);
+					var code = await this._userManager.GenerateEmailConfirmationTokenAsync(user);
 					code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-					var callbackUrl = Url.Page(
+					var callbackUrl = this.Url.Page(
 						"/Account/ConfirmEmail",
 						pageHandler: null,
 						values: new { area = "Identity", userId, code },
-						protocol: Request.Scheme);
+						protocol: this.Request.Scheme);
 
-					await _emailSender.SendEmailAsync(Input.Email, "Confirma tu correo electrónico",
+					await this._emailSender.SendEmailAsync(this.Input.Email, "Confirma tu correo electrónico",
 						$"Por favor, haz <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>click aquí</a> para confirmar tu correo electrónico.");
 
 					// If account confirmation is required, we need to show the link if we don't have a real email sender
-					if (_userManager.Options.SignIn.RequireConfirmedAccount) {
-						return RedirectToPage("./RegisterConfirmation", new { Email = Input.Email });
+					if (this._userManager.Options.SignIn.RequireConfirmedAccount) {
+						return this.RedirectToPage("./RegisterConfirmation", new { this.Input.Email });
 					}
 
-					await _signInManager.SignInAsync(user, isPersistent: false, info.LoginProvider);
-					return LocalRedirect(returnUrl);
+					await this._signInManager.SignInAsync(user, isPersistent: false, info.LoginProvider);
+					return this.LocalRedirect(returnUrl);
 				}
 			}
 			foreach (var error in result.Errors) {
-				ModelState.AddModelError(string.Empty, error.Description);
+				this.ModelState.AddModelError(string.Empty, error.Description);
 			}
 		}
 
-		ProviderDisplayName = info.ProviderDisplayName;
-		ReturnUrl = returnUrl;
-		return Page();
+		this.ProviderDisplayName = info.ProviderDisplayName;
+		this.ReturnUrl = returnUrl;
+		return this.Page();
 	}
 
 	private ApplicationUser CreateUser() {
@@ -185,8 +185,8 @@ public class ExternalLoginModel : PageModel {
 	}
 
 	private IUserEmailStore<ApplicationUser> GetEmailStore() {
-		return !_userManager.SupportsUserEmail
+		return !this._userManager.SupportsUserEmail
 			? throw new NotSupportedException("La UI por defecto requiere un guardado de usuario con correo electrónico.")
-			: (IUserEmailStore<ApplicationUser>)_userStore;
+			: (IUserEmailStore<ApplicationUser>)this._userStore;
 	}
 }

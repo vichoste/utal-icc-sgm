@@ -13,13 +13,11 @@ namespace Utal.Icc.Sgm.Areas.Identity.Pages.Account.Manage;
 public class TwoFactorAuthenticationModel : PageModel {
 	private readonly UserManager<ApplicationUser> _userManager;
 	private readonly SignInManager<ApplicationUser> _signInManager;
-	private readonly ILogger<TwoFactorAuthenticationModel> _logger;
 
 	public TwoFactorAuthenticationModel(
-		UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, ILogger<TwoFactorAuthenticationModel> logger) {
-		_userManager = userManager;
-		_signInManager = signInManager;
-		_logger = logger;
+		UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager) {
+		this._userManager = userManager;
+		this._signInManager = signInManager;
 	}
 
 	/// <summary>
@@ -55,27 +53,27 @@ public class TwoFactorAuthenticationModel : PageModel {
 	public string StatusMessage { get; set; }
 
 	public async Task<IActionResult> OnGetAsync() {
-		var user = await _userManager.GetUserAsync(User);
+		var user = await this._userManager.GetUserAsync(this.User);
 		if (user == null) {
-			return NotFound($"No se pudo cargar el usuario con el ID '{_userManager.GetUserId(User)}'.");
+			return this.NotFound($"No se pudo cargar el usuario con el ID '{this._userManager.GetUserId(this.User)}'.");
 		}
 
-		HasAuthenticator = await _userManager.GetAuthenticatorKeyAsync(user) != null;
-		Is2faEnabled = await _userManager.GetTwoFactorEnabledAsync(user);
-		IsMachineRemembered = await _signInManager.IsTwoFactorClientRememberedAsync(user);
-		RecoveryCodesLeft = await _userManager.CountRecoveryCodesAsync(user);
+		this.HasAuthenticator = await this._userManager.GetAuthenticatorKeyAsync(user) != null;
+		this.Is2faEnabled = await this._userManager.GetTwoFactorEnabledAsync(user);
+		this.IsMachineRemembered = await this._signInManager.IsTwoFactorClientRememberedAsync(user);
+		this.RecoveryCodesLeft = await this._userManager.CountRecoveryCodesAsync(user);
 
-		return Page();
+		return this.Page();
 	}
 
 	public async Task<IActionResult> OnPostAsync() {
-		var user = await _userManager.GetUserAsync(User);
+		var user = await this._userManager.GetUserAsync(this.User);
 		if (user == null) {
-			return NotFound($"No se pudo cargar el usuario con el ID '{_userManager.GetUserId(User)}'.");
+			return this.NotFound($"No se pudo cargar el usuario con el ID '{this._userManager.GetUserId(this.User)}'.");
 		}
 
-		await _signInManager.ForgetTwoFactorClientAsync();
-		StatusMessage = "El explorador Web ha sido olvidao. Durante el próximo inicio de sesión, será requerido el código de autenticación en dos pasos (2FA).";
-		return RedirectToPage();
+		await this._signInManager.ForgetTwoFactorClientAsync();
+		this.StatusMessage = "El explorador Web ha sido olvidao. Durante el próximo inicio de sesión, será requerido el código de autenticación en dos pasos (2FA).";
+		return this.RedirectToPage();
 	}
 }

@@ -31,12 +31,12 @@ public class RegisterModel : PageModel {
 		SignInManager<ApplicationUser> signInManager,
 		ILogger<RegisterModel> logger,
 		IEmailSender emailSender) {
-		_userManager = userManager;
-		_userStore = userStore;
-		_emailStore = GetEmailStore();
-		_signInManager = signInManager;
-		_logger = logger;
-		_emailSender = emailSender;
+		this._userManager = userManager;
+		this._userStore = userStore;
+		this._emailStore = this.GetEmailStore();
+		this._signInManager = signInManager;
+		this._logger = logger;
+		this._emailSender = emailSender;
 	}
 
 	/// <summary>
@@ -99,54 +99,53 @@ public class RegisterModel : PageModel {
 		public string LastName { get; set; }
 	}
 
-
 	public async Task OnGetAsync(string returnUrl = null) {
-		ReturnUrl = returnUrl;
-		ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+		this.ReturnUrl = returnUrl;
+		this.ExternalLogins = (await this._signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 	}
 
 	public async Task<IActionResult> OnPostAsync(string returnUrl = null) {
-		returnUrl ??= Url.Content("~/");
-		ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
-		if (ModelState.IsValid) {
-			var user = CreateUser();
+		returnUrl ??= this.Url.Content("~/");
+		this.ExternalLogins = (await this._signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+		if (this.ModelState.IsValid) {
+			var user = this.CreateUser();
 
-			user.FirstName = Input.FirstName;
-			user.LastName = Input.LastName;
+			user.FirstName = this.Input.FirstName;
+			user.LastName = this.Input.LastName;
 
-			await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
-			await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
-			var result = await _userManager.CreateAsync(user, Input.Password);
+			await this._userStore.SetUserNameAsync(user, this.Input.Email, CancellationToken.None);
+			await this._emailStore.SetEmailAsync(user, this.Input.Email, CancellationToken.None);
+			var result = await this._userManager.CreateAsync(user, this.Input.Password);
 
 			if (result.Succeeded) {
-				_logger.LogInformation("Un usuario ha creado una cuenta con contraseña.");
+				this._logger.LogInformation("Un usuario ha creado una cuenta con contraseña.");
 
-				var userId = await _userManager.GetUserIdAsync(user);
-				var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+				var userId = await this._userManager.GetUserIdAsync(user);
+				var code = await this._userManager.GenerateEmailConfirmationTokenAsync(user);
 				code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-				var callbackUrl = Url.Page(
+				var callbackUrl = this.Url.Page(
 					"/Account/ConfirmEmail",
 					pageHandler: null,
-					values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
-					protocol: Request.Scheme);
+					values: new { area = "Identity", userId, code, returnUrl },
+					protocol: this.Request.Scheme);
 
-				await _emailSender.SendEmailAsync(Input.Email, "Confirma tu correo electrónico",
+				await this._emailSender.SendEmailAsync(this.Input.Email, "Confirma tu correo electrónico",
 					$"Por favor, confirma tu cuenta haciendo <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>click aquí</a>.");
 
-				if (_userManager.Options.SignIn.RequireConfirmedAccount) {
-					return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
+				if (this._userManager.Options.SignIn.RequireConfirmedAccount) {
+					return this.RedirectToPage("RegisterConfirmation", new { email = this.Input.Email, returnUrl });
 				} else {
-					await _signInManager.SignInAsync(user, isPersistent: false);
-					return LocalRedirect(returnUrl);
+					await this._signInManager.SignInAsync(user, isPersistent: false);
+					return this.LocalRedirect(returnUrl);
 				}
 			}
 			foreach (var error in result.Errors) {
-				ModelState.AddModelError(string.Empty, error.Description);
+				this.ModelState.AddModelError(string.Empty, error.Description);
 			}
 		}
 
 		// If we got this far, something failed, redisplay form
-		return Page();
+		return this.Page();
 	}
 
 	private ApplicationUser CreateUser() {
@@ -159,8 +158,8 @@ public class RegisterModel : PageModel {
 	}
 
 	private IUserEmailStore<ApplicationUser> GetEmailStore() {
-		return !_userManager.SupportsUserEmail
+		return !this._userManager.SupportsUserEmail
 			? throw new NotSupportedException("La UI por defecto requiere un guardado de usuario con correo electrónico.")
-			: (IUserEmailStore<ApplicationUser>)_userStore;
+			: (IUserEmailStore<ApplicationUser>)this._userStore;
 	}
 }

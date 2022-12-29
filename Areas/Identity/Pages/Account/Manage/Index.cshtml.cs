@@ -19,8 +19,8 @@ public class IndexModel : PageModel {
 	public IndexModel(
 		UserManager<ApplicationUser> userManager,
 		SignInManager<ApplicationUser> signInManager) {
-		_userManager = userManager;
-		_signInManager = signInManager;
+		this._userManager = userManager;
+		this._signInManager = signInManager;
 	}
 
 	/// <summary>
@@ -58,48 +58,48 @@ public class IndexModel : PageModel {
 	}
 
 	private async Task LoadAsync(ApplicationUser user) {
-		var userName = await _userManager.GetUserNameAsync(user);
-		var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
+		var userName = await this._userManager.GetUserNameAsync(user);
+		var phoneNumber = await this._userManager.GetPhoneNumberAsync(user);
 
-		Username = userName;
+		this.Username = userName;
 
-		Input = new InputModel {
+		this.Input = new InputModel {
 			PhoneNumber = phoneNumber
 		};
 	}
 
 	public async Task<IActionResult> OnGetAsync() {
-		var user = await _userManager.GetUserAsync(User);
+		var user = await this._userManager.GetUserAsync(this.User);
 		if (user == null) {
-			return NotFound($"No se pudo cargar el usuario con el ID '{_userManager.GetUserId(User)}'.");
+			return this.NotFound($"No se pudo cargar el usuario con el ID '{this._userManager.GetUserId(this.User)}'.");
 		}
 
-		await LoadAsync(user);
-		return Page();
+		await this.LoadAsync(user);
+		return this.Page();
 	}
 
 	public async Task<IActionResult> OnPostAsync() {
-		var user = await _userManager.GetUserAsync(User);
+		var user = await this._userManager.GetUserAsync(this.User);
 		if (user == null) {
-			return NotFound($"No se pudo cargar el usuario con el ID '{_userManager.GetUserId(User)}'.");
+			return this.NotFound($"No se pudo cargar el usuario con el ID '{this._userManager.GetUserId(this.User)}'.");
 		}
 
-		if (!ModelState.IsValid) {
-			await LoadAsync(user);
-			return Page();
+		if (!this.ModelState.IsValid) {
+			await this.LoadAsync(user);
+			return this.Page();
 		}
 
-		var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
-		if (Input.PhoneNumber != phoneNumber) {
-			var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, Input.PhoneNumber);
+		var phoneNumber = await this._userManager.GetPhoneNumberAsync(user);
+		if (this.Input.PhoneNumber != phoneNumber) {
+			var setPhoneResult = await this._userManager.SetPhoneNumberAsync(user, this.Input.PhoneNumber);
 			if (!setPhoneResult.Succeeded) {
-				StatusMessage = "Ocurrió un error inesperado al configurar su número de teléfono.";
-				return RedirectToPage();
+				this.StatusMessage = "Ocurrió un error inesperado al configurar su número de teléfono.";
+				return this.RedirectToPage();
 			}
 		}
 
-		await _signInManager.RefreshSignInAsync(user);
-		StatusMessage = "Tu perfil ha sido actualizado";
-		return RedirectToPage();
+		await this._signInManager.RefreshSignInAsync(user);
+		this.StatusMessage = "Tu perfil ha sido actualizado";
+		return this.RedirectToPage();
 	}
 }

@@ -21,9 +21,9 @@ public class DeletePersonalDataModel : PageModel {
 		UserManager<ApplicationUser> userManager,
 		SignInManager<ApplicationUser> signInManager,
 		ILogger<DeletePersonalDataModel> logger) {
-		_userManager = userManager;
-		_signInManager = signInManager;
-		_logger = logger;
+		this._userManager = userManager;
+		this._signInManager = signInManager;
+		this._logger = logger;
 	}
 
 	/// <summary>
@@ -54,39 +54,39 @@ public class DeletePersonalDataModel : PageModel {
 	public bool RequirePassword { get; set; }
 
 	public async Task<IActionResult> OnGet() {
-		var user = await _userManager.GetUserAsync(User);
+		var user = await this._userManager.GetUserAsync(this.User);
 		if (user == null) {
-			return NotFound($"No se pudo cargar el usuario con el ID '{_userManager.GetUserId(User)}'.");
+			return this.NotFound($"No se pudo cargar el usuario con el ID '{this._userManager.GetUserId(this.User)}'.");
 		}
 
-		RequirePassword = await _userManager.HasPasswordAsync(user);
-		return Page();
+		this.RequirePassword = await this._userManager.HasPasswordAsync(user);
+		return this.Page();
 	}
 
 	public async Task<IActionResult> OnPostAsync() {
-		var user = await _userManager.GetUserAsync(User);
+		var user = await this._userManager.GetUserAsync(this.User);
 		if (user == null) {
-			return NotFound($"No se pudo cargar el usuario con el ID '{_userManager.GetUserId(User)}'.");
+			return this.NotFound($"No se pudo cargar el usuario con el ID '{this._userManager.GetUserId(this.User)}'.");
 		}
 
-		RequirePassword = await _userManager.HasPasswordAsync(user);
-		if (RequirePassword) {
-			if (!await _userManager.CheckPasswordAsync(user, Input.Password)) {
-				ModelState.AddModelError(string.Empty, "Contraseña incorrecta.");
-				return Page();
+		this.RequirePassword = await this._userManager.HasPasswordAsync(user);
+		if (this.RequirePassword) {
+			if (!await this._userManager.CheckPasswordAsync(user, this.Input.Password)) {
+				this.ModelState.AddModelError(string.Empty, "Contraseña incorrecta.");
+				return this.Page();
 			}
 		}
 
-		var result = await _userManager.DeleteAsync(user);
-		var userId = await _userManager.GetUserIdAsync(user);
+		var result = await this._userManager.DeleteAsync(user);
+		var userId = await this._userManager.GetUserIdAsync(user);
 		if (!result.Succeeded) {
 			throw new InvalidOperationException($"Ocurrió un error inesperado al eliminar el usuario.");
 		}
 
-		await _signInManager.SignOutAsync();
+		await this._signInManager.SignOutAsync();
 
-		_logger.LogInformation("Usuario con ID '{UserId}' se eliminó a sí mismo.", userId);
+		this._logger.LogInformation("Usuario con ID '{UserId}' se eliminó a sí mismo.", userId);
 
-		return Redirect("~/");
+		return this.Redirect("~/");
 	}
 }

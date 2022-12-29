@@ -17,7 +17,7 @@ namespace Utal.Icc.Sgm.Areas.Identity.Pages.Account;
 public class ResetPasswordModel : PageModel {
 	private readonly UserManager<ApplicationUser> _userManager;
 
-	public ResetPasswordModel(UserManager<ApplicationUser> userManager) => _userManager = userManager;
+	public ResetPasswordModel(UserManager<ApplicationUser> userManager) => this._userManager = userManager;
 
 	/// <summary>
 	///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
@@ -63,39 +63,38 @@ public class ResetPasswordModel : PageModel {
 		/// </summary>
 		[Required]
 		public string Code { get; set; }
-
 	}
 
 	public IActionResult OnGet(string code = null) {
 		if (code == null) {
-			return BadRequest("Se debe proporcionar un código para reestablecer la contraseña.");
+			return this.BadRequest("Se debe proporcionar un código para reestablecer la contraseña.");
 		} else {
-			Input = new InputModel {
+			this.Input = new InputModel {
 				Code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code))
 			};
-			return Page();
+			return this.Page();
 		}
 	}
 
 	public async Task<IActionResult> OnPostAsync() {
-		if (!ModelState.IsValid) {
-			return Page();
+		if (!this.ModelState.IsValid) {
+			return this.Page();
 		}
 
-		var user = await _userManager.FindByEmailAsync(Input.Email);
+		var user = await this._userManager.FindByEmailAsync(this.Input.Email);
 		if (user == null) {
 			// Don't reveal that the user does not exist
-			return RedirectToPage("./ResetPasswordConfirmation");
+			return this.RedirectToPage("./ResetPasswordConfirmation");
 		}
 
-		var result = await _userManager.ResetPasswordAsync(user, Input.Code, Input.Password);
+		var result = await this._userManager.ResetPasswordAsync(user, this.Input.Code, this.Input.Password);
 		if (result.Succeeded) {
-			return RedirectToPage("./ResetPasswordConfirmation");
+			return this.RedirectToPage("./ResetPasswordConfirmation");
 		}
 
 		foreach (var error in result.Errors) {
-			ModelState.AddModelError(string.Empty, error.Description);
+			this.ModelState.AddModelError(string.Empty, error.Description);
 		}
-		return Page();
+		return this.Page();
 	}
 }

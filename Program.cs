@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 
 using Utal.Icc.Sgm.Data;
 using Utal.Icc.Sgm.Models;
+using Utal.Icc.Sgm.Seeders;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Environment.IsDevelopment() ? builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("No se encuentra el string de conexión hacia la base de datos.") : Environment.GetEnvironmentVariable("CONNECTION_STRING_DEFAULT_CONNECTION");
@@ -40,8 +41,8 @@ try {
 	var context = services.GetRequiredService<ApplicationDbContext>();
 	var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
 	var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
-	await ContextSeed.SeedRolesAsync(userManager, roleManager);
-	await ContextSeed.SeedAdministratorAsync(rootEmail!, rootPassword!, rootFirstName!, rootLastName!, userManager, roleManager);
+	await StartupSeeder.SeedRolesAsync(roleManager);
+	await StartupSeeder.SeedAdministratorAsync(rootEmail!, rootPassword!, rootFirstName!, rootLastName!, userManager);
 } catch {
 	var logger = loggerFactory.CreateLogger<Program>();
 	logger.LogError("Error al poblar la base de datos con roles.");
@@ -51,6 +52,15 @@ _ = app.UseStaticFiles();
 _ = app.UseRouting();
 _ = app.UseAuthentication();
 _ = app.UseAuthorization();
+_ = app.MapAreaControllerRoute(
+	name: "role",
+	areaName: "Role",
+	pattern: "Role/{controller=Playground}/{action=Index}/{id?}"
+);
+_ = app.MapControllerRoute(
+	name: "areas",
+	pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}"
+);
 _ = app.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
 _ = app.MapRazorPages();
 _ = app.UseRequestLocalization(app.Services.GetRequiredService<IOptions<RequestLocalizationOptions>>().Value);

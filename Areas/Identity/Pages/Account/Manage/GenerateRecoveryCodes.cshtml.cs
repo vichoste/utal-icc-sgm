@@ -17,8 +17,8 @@ public class GenerateRecoveryCodesModel : PageModel {
 	public GenerateRecoveryCodesModel(
 		UserManager<ApplicationUser> userManager,
 		ILogger<GenerateRecoveryCodesModel> logger) {
-		_userManager = userManager;
-		_logger = logger;
+		this._userManager = userManager;
+		this._logger = logger;
 	}
 
 	/// <summary>
@@ -36,36 +36,34 @@ public class GenerateRecoveryCodesModel : PageModel {
 	public string StatusMessage { get; set; }
 
 	public async Task<IActionResult> OnGetAsync() {
-		var user = await _userManager.GetUserAsync(User);
+		var user = await this._userManager.GetUserAsync(this.User);
 		if (user == null) {
-			return NotFound($"No se pudo cargar el usuario con el ID '{_userManager.GetUserId(User)}'.");
+			return this.NotFound($"No se pudo cargar el usuario con el ID '{this._userManager.GetUserId(this.User)}'.");
 		}
 
-		var isTwoFactorEnabled = await _userManager.GetTwoFactorEnabledAsync(user);
-		if (!isTwoFactorEnabled) {
-			throw new InvalidOperationException($"No se pueden generar códigos de recuperación porque el usuario no tiene la autenticación en dos pasos (2FA) habilitada.");
-		}
-
-		return Page();
+		var isTwoFactorEnabled = await this._userManager.GetTwoFactorEnabledAsync(user);
+		return !isTwoFactorEnabled
+			? throw new InvalidOperationException($"No se pueden generar códigos de recuperación porque el usuario no tiene la autenticación en dos pasos (2FA) habilitada.")
+			: (IActionResult)this.Page();
 	}
 
 	public async Task<IActionResult> OnPostAsync() {
-		var user = await _userManager.GetUserAsync(User);
+		var user = await this._userManager.GetUserAsync(this.User);
 		if (user == null) {
-			return NotFound($"No se pudo cargar el usuario con el ID '{_userManager.GetUserId(User)}'.");
+			return this.NotFound($"No se pudo cargar el usuario con el ID '{this._userManager.GetUserId(this.User)}'.");
 		}
 
-		var isTwoFactorEnabled = await _userManager.GetTwoFactorEnabledAsync(user);
-		var userId = await _userManager.GetUserIdAsync(user);
+		var isTwoFactorEnabled = await this._userManager.GetTwoFactorEnabledAsync(user);
+		var userId = await this._userManager.GetUserIdAsync(user);
 		if (!isTwoFactorEnabled) {
 			throw new InvalidOperationException($"No se pueden generar códigos de recuperación porque el usuario no tiene la autenticación en dos pasos (2FA) habilitada.");
 		}
 
-		var recoveryCodes = await _userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10);
-		RecoveryCodes = recoveryCodes.ToArray();
+		var recoveryCodes = await this._userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10);
+		this.RecoveryCodes = recoveryCodes.ToArray();
 
-		_logger.LogInformation("El usuario con el ID '{UserId}' ha generado nuevos códigos de recuperación.", userId);
-		StatusMessage = "Has generado nuevos códigos de recuperación.";
-		return RedirectToPage("./ShowRecoveryCodes");
+		this._logger.LogInformation("El usuario con el ID '{UserId}' ha generado nuevos códigos de recuperación.", userId);
+		this.StatusMessage = "Has generado nuevos códigos de recuperación.";
+		return this.RedirectToPage("./ShowRecoveryCodes");
 	}
 }

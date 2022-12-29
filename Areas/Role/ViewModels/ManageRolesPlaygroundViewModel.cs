@@ -1,6 +1,6 @@
-﻿namespace Utal.Icc.Sgm.Models;
+﻿namespace Utal.Icc.Sgm.Areas.Role.ViewModels;
 
-public class ManageUserRolesViewModel {
+public class ManageRolesPlaygroundViewModel {
 	public string? RoleId { get; set; }
 	public string? RoleName { get; set; }
 	public bool Selected { get; set; }

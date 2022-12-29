@@ -6,7 +6,6 @@ using System.Text;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
@@ -18,12 +17,8 @@ namespace Utal.Icc.Sgm.Areas.Identity.Pages.Account;
 [AllowAnonymous]
 public class RegisterConfirmationModel : PageModel {
 	private readonly UserManager<ApplicationUser> _userManager;
-	private readonly IEmailSender _sender;
 
-	public RegisterConfirmationModel(UserManager<ApplicationUser> userManager, IEmailSender sender) {
-		_userManager = userManager;
-		_sender = sender;
-	}
+	public RegisterConfirmationModel(UserManager<ApplicationUser> userManager) => this._userManager = userManager;
 
 	/// <summary>
 	///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
@@ -45,29 +40,29 @@ public class RegisterConfirmationModel : PageModel {
 
 	public async Task<IActionResult> OnGetAsync(string email, string returnUrl = null) {
 		if (email == null) {
-			return RedirectToPage("/Index");
+			return this.RedirectToPage("/Index");
 		}
-		returnUrl = returnUrl ?? Url.Content("~/");
+		returnUrl ??= this.Url.Content("~/");
 
-		var user = await _userManager.FindByEmailAsync(email);
+		var user = await this._userManager.FindByEmailAsync(email);
 		if (user == null) {
-			return NotFound($"No se pudo cargar el usuario con el email '{email}'.");
+			return this.NotFound($"No se pudo cargar el usuario con el email '{email}'.");
 		}
 
-		Email = email;
+		this.Email = email;
 		// Once you add a real email sender, you should remove this code that lets you confirm the account
-		DisplayConfirmAccountLink = true;
-		if (DisplayConfirmAccountLink) {
-			var userId = await _userManager.GetUserIdAsync(user);
-			var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+		this.DisplayConfirmAccountLink = true;
+		if (this.DisplayConfirmAccountLink) {
+			var userId = await this._userManager.GetUserIdAsync(user);
+			var code = await this._userManager.GenerateEmailConfirmationTokenAsync(user);
 			code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-			EmailConfirmationUrl = Url.Page(
+			this.EmailConfirmationUrl = this.Url.Page(
 				"/Account/ConfirmEmail",
 				pageHandler: null,
-				values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
-				protocol: Request.Scheme);
+				values: new { area = "Identity", userId, code, returnUrl },
+				protocol: this.Request.Scheme);
 		}
 
-		return Page();
+		return this.Page();
 	}
 }

@@ -18,16 +18,12 @@ namespace Utal.Icc.Sgm.Areas.Identity.Pages.Account.Manage;
 
 public class EmailModel : PageModel {
 	private readonly UserManager<ApplicationUser> _userManager;
-	private readonly SignInManager<ApplicationUser> _signInManager;
 	private readonly IEmailSender _emailSender;
 
 	public EmailModel(
-		UserManager<ApplicationUser> userManager,
-		SignInManager<ApplicationUser> signInManager,
-		IEmailSender emailSender) {
-		_userManager = userManager;
-		_signInManager = signInManager;
-		_emailSender = emailSender;
+		UserManager<ApplicationUser> userManager, IEmailSender emailSender) {
+		this._userManager = userManager;
+		this._emailSender = emailSender;
 	}
 
 	/// <summary>
@@ -72,86 +68,86 @@ public class EmailModel : PageModel {
 	}
 
 	private async Task LoadAsync(ApplicationUser user) {
-		var email = await _userManager.GetEmailAsync(user);
-		Email = email;
+		var email = await this._userManager.GetEmailAsync(user);
+		this.Email = email;
 
-		Input = new InputModel {
+		this.Input = new InputModel {
 			NewEmail = email,
 		};
 
-		IsEmailConfirmed = await _userManager.IsEmailConfirmedAsync(user);
+		this.IsEmailConfirmed = await this._userManager.IsEmailConfirmedAsync(user);
 	}
 
 	public async Task<IActionResult> OnGetAsync() {
-		var user = await _userManager.GetUserAsync(User);
+		var user = await this._userManager.GetUserAsync(this.User);
 		if (user == null) {
-			return NotFound($"No se pudo cargar el usuario con el ID '{_userManager.GetUserId(User)}'.");
+			return this.NotFound($"No se pudo cargar el usuario con el ID '{this._userManager.GetUserId(this.User)}'.");
 		}
 
-		await LoadAsync(user);
-		return Page();
+		await this.LoadAsync(user);
+		return this.Page();
 	}
 
 	public async Task<IActionResult> OnPostChangeEmailAsync() {
-		var user = await _userManager.GetUserAsync(User);
+		var user = await this._userManager.GetUserAsync(this.User);
 		if (user == null) {
-			return NotFound($"No se pudo cargar el usuario con el ID '{_userManager.GetUserId(User)}'.");
+			return this.NotFound($"No se pudo cargar el usuario con el ID '{this._userManager.GetUserId(this.User)}'.");
 		}
 
-		if (!ModelState.IsValid) {
-			await LoadAsync(user);
-			return Page();
+		if (!this.ModelState.IsValid) {
+			await this.LoadAsync(user);
+			return this.Page();
 		}
 
-		var email = await _userManager.GetEmailAsync(user);
-		if (Input.NewEmail != email) {
-			var userId = await _userManager.GetUserIdAsync(user);
-			var code = await _userManager.GenerateChangeEmailTokenAsync(user, Input.NewEmail);
+		var email = await this._userManager.GetEmailAsync(user);
+		if (this.Input.NewEmail != email) {
+			var userId = await this._userManager.GetUserIdAsync(user);
+			var code = await this._userManager.GenerateChangeEmailTokenAsync(user, this.Input.NewEmail);
 			code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-			var callbackUrl = Url.Page(
+			var callbackUrl = this.Url.Page(
 				"/Account/ConfirmEmailChange",
 				pageHandler: null,
-				values: new { area = "Identity", userId, email = Input.NewEmail, code },
-				protocol: Request.Scheme);
-			await _emailSender.SendEmailAsync(
-				Input.NewEmail,
+				values: new { area = "Identity", userId, email = this.Input.NewEmail, code },
+				protocol: this.Request.Scheme);
+			await this._emailSender.SendEmailAsync(
+				this.Input.NewEmail,
 				"Confirma tu correo electrónico",
 				$"Por favor confirma tu correo electrónico <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>haciendo click aquí</a>.");
 
-			StatusMessage = "El enlace para la confirmación de cambio de correo electrónico ha sido enviado. Por favor revisa tu bandeja de entrada.";
-			return RedirectToPage();
+			this.StatusMessage = "El enlace para la confirmación de cambio de correo electrónico ha sido enviado. Por favor revisa tu bandeja de entrada.";
+			return this.RedirectToPage();
 		}
 
-		StatusMessage = "Tu correo sigue sin cambios.";
-		return RedirectToPage();
+		this.StatusMessage = "Tu correo sigue sin cambios.";
+		return this.RedirectToPage();
 	}
 
 	public async Task<IActionResult> OnPostSendVerificationEmailAsync() {
-		var user = await _userManager.GetUserAsync(User);
+		var user = await this._userManager.GetUserAsync(this.User);
 		if (user == null) {
-			return NotFound($"No se pudo cargar el usuario con el ID  '{_userManager.GetUserId(User)}'.");
+			return this.NotFound($"No se pudo cargar el usuario con el ID  '{this._userManager.GetUserId(this.User)}'.");
 		}
 
-		if (!ModelState.IsValid) {
-			await LoadAsync(user);
-			return Page();
+		if (!this.ModelState.IsValid) {
+			await this.LoadAsync(user);
+			return this.Page();
 		}
 
-		var userId = await _userManager.GetUserIdAsync(user);
-		var email = await _userManager.GetEmailAsync(user);
-		var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+		var userId = await this._userManager.GetUserIdAsync(user);
+		var email = await this._userManager.GetEmailAsync(user);
+		var code = await this._userManager.GenerateEmailConfirmationTokenAsync(user);
 		code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-		var callbackUrl = Url.Page(
+		var callbackUrl = this.Url.Page(
 			"/Account/ConfirmEmail",
 			pageHandler: null,
 			values: new { area = "Identity", userId, code },
-			protocol: Request.Scheme);
-		await _emailSender.SendEmailAsync(
+			protocol: this.Request.Scheme);
+		await this._emailSender.SendEmailAsync(
 			email,
 			"Confirma tu correo electrónico",
 			$"Por favor confirma tu correo electrónico <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>haciendo click aquí</a>.");
 
-		StatusMessage = "Se ha enviado el correo electrónico de verificación. Por favor revisa tu bandeja de entrada.";
-		return RedirectToPage();
+		this.StatusMessage = "Se ha enviado el correo electrónico de verificación. Por favor revisa tu bandeja de entrada.";
+		return this.RedirectToPage();
 	}
 }

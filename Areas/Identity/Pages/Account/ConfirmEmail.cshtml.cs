@@ -16,7 +16,7 @@ namespace Utal.Icc.Sgm.Areas.Identity.Pages.Account;
 public class ConfirmEmailModel : PageModel {
 	private readonly UserManager<ApplicationUser> _userManager;
 
-	public ConfirmEmailModel(UserManager<ApplicationUser> userManager) => _userManager = userManager;
+	public ConfirmEmailModel(UserManager<ApplicationUser> userManager) => this._userManager = userManager;
 
 	/// <summary>
 	///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
@@ -26,17 +26,17 @@ public class ConfirmEmailModel : PageModel {
 	public string StatusMessage { get; set; }
 	public async Task<IActionResult> OnGetAsync(string userId, string code) {
 		if (userId == null || code == null) {
-			return RedirectToPage("/Index");
+			return this.RedirectToPage("/Index");
 		}
 
-		var user = await _userManager.FindByIdAsync(userId);
+		var user = await this._userManager.FindByIdAsync(userId);
 		if (user == null) {
-			return NotFound($"No se pudo cargar el usuario con el ID '{userId}'.");
+			return this.NotFound($"No se pudo cargar el usuario con el ID '{userId}'.");
 		}
 
 		code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code));
-		var result = await _userManager.ConfirmEmailAsync(user, code);
-		StatusMessage = result.Succeeded ? "Gracias por confirmar tu correo." : "Error al confirmar tu correo.";
-		return Page();
+		var result = await this._userManager.ConfirmEmailAsync(user, code);
+		this.StatusMessage = result.Succeeded ? "Gracias por confirmar tu correo." : "Error al confirmar tu correo.";
+		return this.Page();
 	}
 }

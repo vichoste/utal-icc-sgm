@@ -20,9 +20,9 @@ public class ExternalLoginsModel : PageModel {
 		UserManager<ApplicationUser> userManager,
 		SignInManager<ApplicationUser> signInManager,
 		IUserStore<ApplicationUser> userStore) {
-		_userManager = userManager;
-		_signInManager = signInManager;
-		_userStore = userStore;
+		this._userManager = userManager;
+		this._signInManager = signInManager;
+		this._userStore = userStore;
 	}
 
 	/// <summary>
@@ -51,74 +51,74 @@ public class ExternalLoginsModel : PageModel {
 	public string StatusMessage { get; set; }
 
 	public async Task<IActionResult> OnGetAsync() {
-		var user = await _userManager.GetUserAsync(User);
+		var user = await this._userManager.GetUserAsync(this.User);
 		if (user == null) {
-			return NotFound($"No se pudo cargar el usuario con el ID  '{_userManager.GetUserId(User)}'.");
+			return this.NotFound($"No se pudo cargar el usuario con el ID  '{this._userManager.GetUserId(this.User)}'.");
 		}
 
-		CurrentLogins = await _userManager.GetLoginsAsync(user);
-		OtherLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync())
-			.Where(auth => CurrentLogins.All(ul => auth.Name != ul.LoginProvider))
+		this.CurrentLogins = await this._userManager.GetLoginsAsync(user);
+		this.OtherLogins = (await this._signInManager.GetExternalAuthenticationSchemesAsync())
+			.Where(auth => this.CurrentLogins.All(ul => auth.Name != ul.LoginProvider))
 			.ToList();
 
 		string passwordHash = null;
-		if (_userStore is IUserPasswordStore<ApplicationUser> userPasswordStore) {
-			passwordHash = await userPasswordStore.GetPasswordHashAsync(user, HttpContext.RequestAborted);
+		if (this._userStore is IUserPasswordStore<ApplicationUser> userPasswordStore) {
+			passwordHash = await userPasswordStore.GetPasswordHashAsync(user, this.HttpContext.RequestAborted);
 		}
 
-		ShowRemoveButton = passwordHash != null || CurrentLogins.Count > 1;
-		return Page();
+		this.ShowRemoveButton = passwordHash != null || this.CurrentLogins.Count > 1;
+		return this.Page();
 	}
 
 	public async Task<IActionResult> OnPostRemoveLoginAsync(string loginProvider, string providerKey) {
-		var user = await _userManager.GetUserAsync(User);
+		var user = await this._userManager.GetUserAsync(this.User);
 		if (user == null) {
-			return NotFound($"No se pudo cargar el usuario con el ID  '{_userManager.GetUserId(User)}'.");
+			return this.NotFound($"No se pudo cargar el usuario con el ID  '{this._userManager.GetUserId(this.User)}'.");
 		}
 
-		var result = await _userManager.RemoveLoginAsync(user, loginProvider, providerKey);
+		var result = await this._userManager.RemoveLoginAsync(user, loginProvider, providerKey);
 		if (!result.Succeeded) {
-			StatusMessage = "El proveedor externo no ha sido removido.";
-			return RedirectToPage();
+			this.StatusMessage = "El proveedor externo no ha sido removido.";
+			return this.RedirectToPage();
 		}
 
-		await _signInManager.RefreshSignInAsync(user);
-		StatusMessage = "El proveedor externo ha sido removido.";
-		return RedirectToPage();
+		await this._signInManager.RefreshSignInAsync(user);
+		this.StatusMessage = "El proveedor externo ha sido removido.";
+		return this.RedirectToPage();
 	}
 
 	public async Task<IActionResult> OnPostLinkLoginAsync(string provider) {
 		// Clear the existing external cookie to ensure a clean login process
-		await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
+		await this.HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
 
 		// Request a redirect to the external login provider to link a login for the current user
-		var redirectUrl = Url.Page("./ExternalLogins", pageHandler: "LinkLoginCallback");
-		var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl, _userManager.GetUserId(User));
+		var redirectUrl = this.Url.Page("./ExternalLogins", pageHandler: "LinkLoginCallback");
+		var properties = this._signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl, this._userManager.GetUserId(this.User));
 		return new ChallengeResult(provider, properties);
 	}
 
 	public async Task<IActionResult> OnGetLinkLoginCallbackAsync() {
-		var user = await _userManager.GetUserAsync(User);
+		var user = await this._userManager.GetUserAsync(this.User);
 		if (user == null) {
-			return NotFound($"No se pudo cargar el usuario con el ID  '{_userManager.GetUserId(User)}'.");
+			return this.NotFound($"No se pudo cargar el usuario con el ID  '{this._userManager.GetUserId(this.User)}'.");
 		}
 
-		var userId = await _userManager.GetUserIdAsync(user);
-		var info = await _signInManager.GetExternalLoginInfoAsync(userId);
+		var userId = await this._userManager.GetUserIdAsync(user);
+		var info = await this._signInManager.GetExternalLoginInfoAsync(userId);
 		if (info == null) {
 			throw new InvalidOperationException($"Ocurrió un error inesperado al obtener información externa del proveedor.");
 		}
 
-		var result = await _userManager.AddLoginAsync(user, info);
+		var result = await this._userManager.AddLoginAsync(user, info);
 		if (!result.Succeeded) {
-			StatusMessage = "Un proveedor solamente se puede asociar con una cuenta.";
-			return RedirectToPage();
+			this.StatusMessage = "Un proveedor solamente se puede asociar con una cuenta.";
+			return this.RedirectToPage();
 		}
 
 		// Clear the existing external cookie to ensure a clean login process
-		await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
+		await this.HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
 
-		StatusMessage = "El proveedor externo ha sido añadido.";
-		return RedirectToPage();
+		this.StatusMessage = "El proveedor externo ha sido añadido.";
+		return this.RedirectToPage();
 	}
 }

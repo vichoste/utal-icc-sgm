@@ -21,9 +21,9 @@ public class LoginWithRecoveryCodeModel : PageModel {
 		SignInManager<ApplicationUser> signInManager,
 		UserManager<ApplicationUser> userManager,
 		ILogger<LoginWithRecoveryCodeModel> logger) {
-		_signInManager = signInManager;
-		_userManager = userManager;
-		_logger = logger;
+		this._signInManager = signInManager;
+		this._userManager = userManager;
+		this._logger = logger;
 	}
 
 	/// <summary>
@@ -57,43 +57,43 @@ public class LoginWithRecoveryCodeModel : PageModel {
 
 	public async Task<IActionResult> OnGetAsync(string returnUrl = null) {
 		// Ensure the user has gone through the username & password screen first
-		var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
+		var user = await this._signInManager.GetTwoFactorAuthenticationUserAsync();
 		if (user == null) {
 			throw new InvalidOperationException($"No se pudo cargar al usuario de autenticación en dos pasos (2FA).");
 		}
 
-		ReturnUrl = returnUrl;
+		this.ReturnUrl = returnUrl;
 
-		return Page();
+		return this.Page();
 	}
 
 	public async Task<IActionResult> OnPostAsync(string returnUrl = null) {
-		if (!ModelState.IsValid) {
-			return Page();
+		if (!this.ModelState.IsValid) {
+			return this.Page();
 		}
 
-		var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
+		var user = await this._signInManager.GetTwoFactorAuthenticationUserAsync();
 		if (user == null) {
 			throw new InvalidOperationException($"No se pudo cargar al usuario de autenticación en dos pasos (2FA).");
 		}
 
-		var recoveryCode = Input.RecoveryCode.Replace(" ", string.Empty);
+		var recoveryCode = this.Input.RecoveryCode.Replace(" ", string.Empty);
 
-		var result = await _signInManager.TwoFactorRecoveryCodeSignInAsync(recoveryCode);
+		var result = await this._signInManager.TwoFactorRecoveryCodeSignInAsync(recoveryCode);
 
-		var userId = await _userManager.GetUserIdAsync(user);
+		_ = await this._userManager.GetUserIdAsync(user);
 
 		if (result.Succeeded) {
-			_logger.LogInformation("Usuario con ID '{UserId}' ha iniciado sesión con un código de recuperación.", user.Id);
-			return LocalRedirect(returnUrl ?? Url.Content("~/"));
+			this._logger.LogInformation("Usuario con ID '{UserId}' ha iniciado sesión con un código de recuperación.", user.Id);
+			return this.LocalRedirect(returnUrl ?? this.Url.Content("~/"));
 		}
 		if (result.IsLockedOut) {
-			_logger.LogWarning("La cuenta está bloqueada.");
-			return RedirectToPage("./Lockout");
+			this._logger.LogWarning("La cuenta está bloqueada.");
+			return this.RedirectToPage("./Lockout");
 		} else {
-			_logger.LogWarning("Código inválido para el usuario con ID '{UserId}' ", user.Id);
-			ModelState.AddModelError(string.Empty, "Código de recuperación inválido.");
-			return Page();
+			this._logger.LogWarning("Código inválido para el usuario con ID '{UserId}' ", user.Id);
+			this.ModelState.AddModelError(string.Empty, "Código de recuperación inválido.");
+			return this.Page();
 		}
 	}
 }

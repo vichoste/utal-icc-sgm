@@ -2,28 +2,24 @@
 
 #nullable disable
 
-namespace Utal.Icc.Sgm.Migrations
-{
-    /// <inheritdoc />
-    public partial class RemoveUserChangeLimitORM : Migration
-    {
-        /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.DropColumn(
-                name: "UsernameChangeLimit",
-                table: "AspNetUsers");
-        }
+namespace Utal.Icc.Sgm.Migrations;
 
-        /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.AddColumn<int>(
-                name: "UsernameChangeLimit",
-                table: "AspNetUsers",
-                type: "int",
-                nullable: false,
-                defaultValue: 0);
-        }
-    }
+/// <inheritdoc />
+public partial class RemoveUserChangeLimitORM : Migration {
+	/// <inheritdoc />
+	protected override void Up(MigrationBuilder migrationBuilder) {
+		_ = migrationBuilder.DropColumn(
+			name: "UsernameChangeLimit",
+			table: "AspNetUsers");
+	}
+
+	/// <inheritdoc />
+	protected override void Down(MigrationBuilder migrationBuilder) {
+		_ = migrationBuilder.AddColumn<int>(
+			name: "UsernameChangeLimit",
+			table: "AspNetUsers",
+			type: "int",
+			nullable: false,
+			defaultValue: 0);
+	}
 }

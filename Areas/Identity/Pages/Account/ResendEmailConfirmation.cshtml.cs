@@ -23,8 +23,8 @@ public class ResendEmailConfirmationModel : PageModel {
 	private readonly IEmailSender _emailSender;
 
 	public ResendEmailConfirmationModel(UserManager<ApplicationUser> userManager, IEmailSender emailSender) {
-		_userManager = userManager;
-		_emailSender = emailSender;
+		this._userManager = userManager;
+		this._emailSender = emailSender;
 	}
 
 	/// <summary>
@@ -52,30 +52,30 @@ public class ResendEmailConfirmationModel : PageModel {
 	}
 
 	public async Task<IActionResult> OnPostAsync() {
-		if (!ModelState.IsValid) {
-			return Page();
+		if (!this.ModelState.IsValid) {
+			return this.Page();
 		}
 
-		var user = await _userManager.FindByEmailAsync(Input.Email);
+		var user = await this._userManager.FindByEmailAsync(this.Input.Email);
 		if (user == null) {
-			ModelState.AddModelError(string.Empty, "Correo electrónico de verificación enviado. Por favor revisa tu bandeja de entrada.");
-			return Page();
+			this.ModelState.AddModelError(string.Empty, "Correo electrónico de verificación enviado. Por favor revisa tu bandeja de entrada.");
+			return this.Page();
 		}
 
-		var userId = await _userManager.GetUserIdAsync(user);
-		var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+		var userId = await this._userManager.GetUserIdAsync(user);
+		var code = await this._userManager.GenerateEmailConfirmationTokenAsync(user);
 		code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-		var callbackUrl = Url.Page(
+		var callbackUrl = this.Url.Page(
 			"/Account/ConfirmEmail",
 			pageHandler: null,
 			values: new { userId, code },
-			protocol: Request.Scheme);
-		await _emailSender.SendEmailAsync(
-			Input.Email,
+			protocol: this.Request.Scheme);
+		await this._emailSender.SendEmailAsync(
+			this.Input.Email,
 			"Confirma tu correo electrónico",
 			$"Por favor, confirma tu correo electrónico <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>haciendo click aquí</a>.");
 
-		ModelState.AddModelError(string.Empty, "Correo electrónico de verificación enviado. Por favor revisa tu bandeja de entrada.");
-		return Page();
+		this.ModelState.AddModelError(string.Empty, "Correo electrónico de verificación enviado. Por favor revisa tu bandeja de entrada.");
+		return this.Page();
 	}
 }

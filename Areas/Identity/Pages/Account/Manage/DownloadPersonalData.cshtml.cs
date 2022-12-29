@@ -19,19 +19,19 @@ public class DownloadPersonalDataModel : PageModel {
 	public DownloadPersonalDataModel(
 		UserManager<ApplicationUser> userManager,
 		ILogger<DownloadPersonalDataModel> logger) {
-		_userManager = userManager;
-		_logger = logger;
+		this._userManager = userManager;
+		this._logger = logger;
 	}
 
-	public IActionResult OnGet() => NotFound();
+	public IActionResult OnGet() => this.NotFound();
 
 	public async Task<IActionResult> OnPostAsync() {
-		var user = await _userManager.GetUserAsync(User);
+		var user = await this._userManager.GetUserAsync(this.User);
 		if (user == null) {
-			return NotFound($"No se pudo cargar el usuario con el ID '{_userManager.GetUserId(User)}'.");
+			return this.NotFound($"No se pudo cargar el usuario con el ID '{this._userManager.GetUserId(this.User)}'.");
 		}
 
-		_logger.LogInformation("El usuario con el ID '{UserId}' pidió sus datos personales.", _userManager.GetUserId(User));
+		this._logger.LogInformation("El usuario con el ID '{UserId}' pidió sus datos personales.", this._userManager.GetUserId(this.User));
 
 		// Only include personal data for download
 		var personalData = new Dictionary<string, string>();
@@ -41,14 +41,14 @@ public class DownloadPersonalDataModel : PageModel {
 			personalData.Add(p.Name, p.GetValue(user)?.ToString() ?? "null");
 		}
 
-		var logins = await _userManager.GetLoginsAsync(user);
+		var logins = await this._userManager.GetLoginsAsync(user);
 		foreach (var l in logins) {
 			personalData.Add($"{l.LoginProvider} llave de proveedor de inicio de sesión externo", l.ProviderKey);
 		}
 
-		personalData.Add($"Llave de autenticador de dos pasos", await _userManager.GetAuthenticatorKeyAsync(user));
+		personalData.Add($"Llave de autenticador de dos pasos", await this._userManager.GetAuthenticatorKeyAsync(user));
 
-		Response.Headers.Add("Content-Disposition", "attachment; filename=PersonalData.json");
+		this.Response.Headers.Add("Content-Disposition", "attachment; filename=PersonalData.json");
 		return new FileContentResult(JsonSerializer.SerializeToUtf8Bytes(personalData), "application/json");
 	}
 }
