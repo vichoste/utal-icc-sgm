@@ -6,9 +6,6 @@ using Utal.Icc.Sgm.Views.Shared;
 
 namespace Utal.Icc.Sgm.Controllers;
 public class HomeController : Controller {
-	//private readonly ILogger<HomeController> _logger;
-
-	//public HomeController(ILogger<HomeController> logger) => this._logger = logger;
 	public HomeController() { }
 
 	public IActionResult Index() => this.View();
