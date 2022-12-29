@@ -1,10 +1,13 @@
 ﻿@page
+
 @model RegisterConfirmationModel
+
 @{
 	ViewData["Title"] = "Confirmar registro";
 }
 
 <h1>@ViewData["Title"]</h1>
+
 @{
 	if (@Model.DisplayConfirmAccountLink) {
 		<p>

@@ -1,12 +1,16 @@
 ﻿@page
+
 @model EnableAuthenticatorModel
+
 @{
 	ViewData["Title"] = "Configurar autenticador en dos pasos";
 	ViewData["ActivePage"] = ManageNavPages.TwoFactorAuthentication;
 }
 
 <partial name="_StatusMessage" for="StatusMessage" />
+
 <h3>@ViewData["Title"]</h3>
+
 <div>
 	<p>Para utilizar un autenticador en dos pasos, sigue estos pasos:</p>
 	<ol class="list">

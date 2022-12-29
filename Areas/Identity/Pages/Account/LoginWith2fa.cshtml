@@ -1,12 +1,17 @@
 ﻿@page
+
 @model LoginWith2faModel
+
 @{
 	ViewData["Title"] = "Autenticación en dos pasos (2FA)";
 }
 
 <h1>@ViewData["Title"]</h1>
+
 <hr />
+
 <p>Tu cuenta está protegida por un autenticador. Ingresa su código.</p>
+
 <div class="row">
 	<div class="col-md-4">
 		<form method="post" asp-route-returnUrl="@Model.ReturnUrl">

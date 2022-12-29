@@ -1,12 +1,16 @@
 ﻿@page
+
 @model GenerateRecoveryCodesModel
+
 @{
 	ViewData["Title"] = "Generar códigos de recuperación";
 	ViewData["ActivePage"] = ManageNavPages.TwoFactorAuthentication;
 }
 
 <partial name="_StatusMessage" for="StatusMessage" />
+
 <h3>@ViewData["Title"]</h3>
+
 <div class="alert alert-warning" role="alert">
 	<p>
 		<span class="glyphicon glyphicon-warning-sign"></span>
@@ -20,6 +24,7 @@
 		Si quieres cambiar la llave utilizada en tu aplicación, debes <a asp-page="./ResetAuthenticator">reestablecer tus llaves</a>.
 	</p>
 </div>
+
 <div>
 	<form method="post">
 		<button class="btn btn-danger" type="submit">Generar códigos de recuperación</button>

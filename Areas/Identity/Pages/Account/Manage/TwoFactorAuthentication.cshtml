@@ -1,34 +1,43 @@
 ﻿@page
+
 @using Microsoft.AspNetCore.Http.Features
+
 @model TwoFactorAuthenticationModel
+
 @{
 	ViewData["Title"] = "Autenticación en dos pasos (2FA)";
 	ViewData["ActivePage"] = ManageNavPages.TwoFactorAuthentication;
 }
 
 <partial name="_StatusMessage" for="StatusMessage" />
+
 <h3>@ViewData["Title"]</h3>
+
 @{
 	var consentFeature = HttpContext.Features.Get<ITrackingConsentFeature>();
 	@if (consentFeature?.CanTrack ?? true) {
 		@if (Model.Is2faEnabled) {
-			if (Model.RecoveryCodesLeft == 0) {
+			if (Model.RecoveryCodesLeft == 0)
+			{
 				<div class="alert alert-danger">
 					<strong>No te quedan códigos de recuperación.</strong>
 					<p>Deberás <a asp-page="./GenerateRecoveryCodes">generar nuevos códigos</a> antes de iniciar sesión con alguno de ellos.</p>
 				</div>
-			} else if (Model.RecoveryCodesLeft == 1) {
+			}
+			else if (Model.RecoveryCodesLeft == 1)
+			{
 				<div class="alert alert-danger">
 					<strong>Te queda un código de recuperación.</strong>
 					<p>Deberías <a asp-page="./GenerateRecoveryCodes">generar nuevos códigos</a>.</p>
 				</div>
-			} else if (Model.RecoveryCodesLeft <= 3) {
+			}
+			else if (Model.RecoveryCodesLeft <= 3)
+			{
 				<div class="alert alert-warning">
 					<strong>Te quedan @Model.RecoveryCodesLeft códigos de recuperación.</strong>
 					<p>Debería s<a asp-page="./GenerateRecoveryCodes">generar nuevos códigos</a>.</p>
 				</div>
 			}
-
 			if (Model.IsMachineRemembered) {
 				<form method="post" style="display: inline-block">
 					<button type="submit" class="btn btn-primary">Olvidar este explorador Web</button>
@@ -39,6 +48,7 @@
 		}
 
 		<h4>Aplicación autenticadora</h4>
+		
 		@if (!Model.HasAuthenticator) {
 			<a id="enable-authenticator" asp-page="./EnableAuthenticator" class="btn btn-primary">Agregar aplicación</a>
 		} else {
