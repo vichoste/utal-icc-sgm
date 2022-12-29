@@ -3,14 +3,14 @@
 @model List<ManageRolesPlaygroundViewModel>
 
 @{
-	ViewData["Title"] = "Gestionar roles";
+	ViewData["Title"] = "Gestionar Roles";
 	Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <form method="post">
 	<div class="card">
 		<div class="card-header">
-			<h2>Gestionar roles</h2>
+			<h2>Gestionar Roles</h2>
 			Agregar o remover roles para el usuario: @ViewBag.UserName.
 		</div>
 		<div class="card-body">
@@ -27,9 +27,8 @@
 			<div asp-validation-summary="All" class="text-danger"></div>
 		</div>
 		<div class="card-footer">
-			<input type="submit" value="Update" class="btn btn-primary" style="width:auto" />
-			<a asp-action="EditUser" asp-route-id="@ViewBag.userId"
-			   class="btn btn-primary" style="width:auto">Cancelar</a>
+			<input type="submit" value="Update" class="btn btn-primary" />
+			<a asp-action="Index" class="btn btn-primary">Cancelar</a>
 		</div>
 	</div>
 </form>

@@ -7,6 +7,7 @@ using Utal.Icc.Sgm.Models;
 
 namespace Utal.Icc.Sgm.Areas.Role.Controllers;
 
+[Area("Role")]
 public class PlaygroundController : Controller {
 	private readonly UserManager<ApplicationUser> _userManager;
 	private readonly RoleManager<IdentityRole> _roleManager;
@@ -18,7 +19,7 @@ public class PlaygroundController : Controller {
 
 	public async Task<IActionResult> Index() {
 		var users = await this._userManager.Users.ToListAsync();
-		var userRolesViewModel = new List<RolesPlaygroundViewModel>();
+		var roles = new List<RolesPlaygroundViewModel>();
 		foreach (var user in users) {
 			var thisViewModel = new RolesPlaygroundViewModel {
 				UserId = user.Id,
@@ -27,9 +28,9 @@ public class PlaygroundController : Controller {
 				LastName = user.LastName!,
 				Roles = await this.GetUserRoles(user)
 			};
-			userRolesViewModel.Add(thisViewModel);
+			roles.Add(thisViewModel);
 		}
-		return this.View(userRolesViewModel);
+		return this.View(roles);
 	}
 
 	public async Task<IActionResult> Manage(string userId) {
@@ -42,12 +43,12 @@ public class PlaygroundController : Controller {
 		this.ViewBag.UserName = user.UserName;
 		var model = new List<ManageRolesPlaygroundViewModel>();
 		foreach (var role in this._roleManager.Roles.ToList()) {
-			var userRolesViewModel = new ManageRolesPlaygroundViewModel {
+			var roles = new ManageRolesPlaygroundViewModel {
 				RoleId = role.Id,
 				RoleName = role.Name,
 				Selected = await this._userManager.IsInRoleAsync(user, role.Name!)
 			};
-			model.Add(userRolesViewModel);
+			model.Add(roles);
 		}
 		return this.View(model);
 	}

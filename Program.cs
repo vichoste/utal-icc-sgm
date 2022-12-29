@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 
 using Utal.Icc.Sgm.Data;
 using Utal.Icc.Sgm.Models;
@@ -53,15 +52,13 @@ _ = app.UseRouting();
 _ = app.UseAuthentication();
 _ = app.UseAuthorization();
 _ = app.MapAreaControllerRoute(
-	name: "role",
+	name: "Role",
 	areaName: "Role",
 	pattern: "Role/{controller=Playground}/{action=Index}/{id?}"
 );
 _ = app.MapControllerRoute(
-	name: "areas",
-	pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}"
+	name: "default",
+	pattern: "{controller=Home}/{action=Index}/{id?}"
 );
-_ = app.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
 _ = app.MapRazorPages();
-_ = app.UseRequestLocalization(app.Services.GetRequiredService<IOptions<RequestLocalizationOptions>>().Value);
 app.Run();
