@@ -1,8 +1,15 @@
-﻿<!DOCTYPE html>
-<html lang="en" @ViewData["HtmlAttribute"]>
+﻿@{
+	ViewData["MainTitle"] = "SGM ICC UTAL";
+	ViewData["MetaDescription"] = "Sistema de Gestión de Memorias - Ingeniería Civil en Computación - Universidad de Talca";
+	ViewData["MetaAuthor"] = "Vicente \"vichoste\" Calderón";
+	ViewData["MetaKeywords"] = "SGM, ICC, UTAL, Ingeniería Civil en Computación, Universidad de Talca, Vicente Calderón, vichoste";
+}
+
+<!DOCTYPE html>
+<html lang="es" @ViewData["HtmlAttribute"]>
 <head>
 	<meta charset="utf-8" />
-	<title>AspStudio | @ViewData["Title"]</title>
+	<title>@ViewData["Title"] - @ViewData["MainTitle"]</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<meta name="description" content="@ViewData["MetaDescription"]" />
 	<meta name="author" content="@ViewData["MetaAuthor"]" />
@@ -30,9 +37,6 @@
 			<a href="#" data-click="scroll-top" class="btn-scroll-top fade"><i class="fa fa-arrow-up"></i></a>
 		}
 		@RenderSection("OutterAppContainerContent", required: false)
-		@if (ViewData["AppWithFooter"] != null) {
-			<partial name="_Footer" />
-		}
 		<partial name="_ThemePanel" />
 	</div>
 	<script>

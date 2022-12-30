@@ -6,12 +6,10 @@
 	ViewData["Title"] = "Registrarse";
 }
 
-<h1>@ViewData["Title"]</h1>
-
-<div class="row">
-	<div class="col-md-4">
+<div class="row justify-content-md-center">
+	<div class="col-md-6 mb-3">
 		<form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
-			<h2>Crear una nueva cuenta.</h2>
+			<h2>Registrarse</h2>
 			<hr />
 			<div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
 			<div class="form-floating mb-3">
@@ -42,7 +40,7 @@
 			<button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Registrarse</button>
 		</form>
 	</div>
-	<div class="col-md-6 col-md-offset-2">
+	<div class="col-md-6">
 		<section>
 			<h3>Usar otro servicio para registrarse.</h3>
 			<hr />
