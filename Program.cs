@@ -25,6 +25,7 @@ _ = builder.Environment.IsDevelopment() ?
 	}).AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultUI().AddDefaultTokenProviders()
 	: builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultUI().AddDefaultTokenProviders();
 builder.Services.AddControllersWithViews().AddNewtonsoftJson();
+builder.Configuration.AddJsonFile("sidebar.json", optional: true, reloadOnChange: true);
 
 var app = builder.Build();
 if (app.Environment.IsDevelopment()) {
