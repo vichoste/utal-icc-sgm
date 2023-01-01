@@ -13,19 +13,10 @@ var rootFirstName = builder.Environment.IsDevelopment() ? builder.Configuration[
 var rootLastName = builder.Environment.IsDevelopment() ? builder.Configuration["RootLastName"] ?? throw new InvalidOperationException("No se encuentra el string del apellido del administrador.") : Environment.GetEnvironmentVariable("ROOT_LAST_NAME");
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-_ = builder.Environment.IsDevelopment() ?
-	builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options => {
-		options.Lockout.DefaultLockoutTimeSpan = TimeSpan.Zero;
-		options.Password.RequireDigit = false;
-		options.Password.RequiredLength = 0;
-		options.Password.RequiredUniqueChars = 0;
-		options.Password.RequireNonAlphanumeric = false;
-		options.Password.RequireUppercase = false;
-		options.Password.RequireLowercase = false;
-	}).AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultUI().AddDefaultTokenProviders()
-	: builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultUI().AddDefaultTokenProviders();
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
 builder.Services.AddControllersWithViews().AddNewtonsoftJson();
 builder.Configuration.AddJsonFile("sidebar.json", optional: true, reloadOnChange: true);
+builder.Services.AddRazorPages();
 
 var app = builder.Build();
 if (app.Environment.IsDevelopment()) {
