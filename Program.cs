@@ -2,8 +2,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 using Utal.Icc.Sgm.Areas.Account.Models;
+using Utal.Icc.Sgm.Areas.Account.Seeders;
 using Utal.Icc.Sgm.Data;
-using Utal.Icc.Sgm.Seeders;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Environment.IsDevelopment() ? builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("No se encuentra el string de conexión hacia la base de datos.") : Environment.GetEnvironmentVariable("CONNECTION_STRING_DEFAULT_CONNECTION");
@@ -14,9 +14,9 @@ var rootLastName = builder.Environment.IsDevelopment() ? builder.Configuration["
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
-builder.Services.AddControllersWithViews().AddNewtonsoftJson();
+builder.Services.AddControllersWithViews();
 builder.Configuration.AddJsonFile("sidebar.json", optional: true, reloadOnChange: true);
-builder.Services.AddRazorPages();
+builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
 
 var app = builder.Build();
 if (app.Environment.IsDevelopment()) {
@@ -46,7 +46,7 @@ _ = app.UseAuthorization();
 _ = app.MapAreaControllerRoute(
 	name: "Account",
 	areaName: "Account",
-	pattern: "Account/{controller=Login}/{action=Index}/{id?}"
+	pattern: "Account/{controller=SignIn}/{action=Index}/{id?}"
 );
 _ = app.MapControllerRoute(
 	name: "default",

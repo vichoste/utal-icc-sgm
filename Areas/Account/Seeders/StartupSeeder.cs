@@ -2,7 +2,7 @@
 
 using Utal.Icc.Sgm.Areas.Account.Models;
 
-namespace Utal.Icc.Sgm.Seeders;
+namespace Utal.Icc.Sgm.Areas.Account.Seeders;
 
 public static class StartupSeeder {
 	public static async Task SeedRolesAsync(RoleManager<IdentityRole> roleManager) {
