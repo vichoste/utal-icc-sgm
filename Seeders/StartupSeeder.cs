@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-using Utal.Icc.Sgm.Areas.Role.Models;
-using Utal.Icc.Sgm.Models;
+using Utal.Icc.Sgm.Areas.Account.Models;
 
 namespace Utal.Icc.Sgm.Seeders;
 

@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
+using Utal.Icc.Sgm.Areas.Account.Models;
 using Utal.Icc.Sgm.Data;
-using Utal.Icc.Sgm.Models;
 using Utal.Icc.Sgm.Seeders;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -44,9 +44,9 @@ _ = app.UseRouting();
 _ = app.UseAuthentication();
 _ = app.UseAuthorization();
 _ = app.MapAreaControllerRoute(
-	name: "Role",
-	areaName: "Role",
-	pattern: "Role/{controller=Playground}/{action=Index}/{id?}"
+	name: "Account",
+	areaName: "Account",
+	pattern: "Account/{controller=Login}/{action=Index}/{id?}"
 );
 _ = app.MapControllerRoute(
 	name: "default",

@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Utal.Icc.Sgm.Models;
+namespace Utal.Icc.Sgm.Areas.Account.Models;
 
 public class TeacherProfile {
 	[Key]

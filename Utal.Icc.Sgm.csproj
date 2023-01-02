@@ -19,7 +19,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Folder Include="ViewModels\" />
+	  <Folder Include="Areas\Account\Controllers\" />
 	</ItemGroup>
 
 </Project>

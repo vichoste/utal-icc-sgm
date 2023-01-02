@@ -1,4 +1,4 @@
-﻿namespace Utal.Icc.Sgm.Areas.Role.Models;
+﻿namespace Utal.Icc.Sgm.Areas.Account.Models;
 
 public enum Roles {
 	Administrator,

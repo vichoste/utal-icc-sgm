@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-namespace Utal.Icc.Sgm.Models;
+namespace Utal.Icc.Sgm.Areas.Account.Models;
 
 public class ApplicationUser : IdentityUser {
 	public string? FirstName { get; set; }
