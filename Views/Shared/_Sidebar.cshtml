@@ -1,72 +1,40 @@
-﻿@using Microsoft.Extensions.Configuration
+﻿@using Microsoft.AspNetCore.Identity
+@using Utal.Icc.Sgm.Areas.Account.Models
 
-@inject IConfiguration Configuration
-
-@{
-	var menuController = (ViewContext.RouteData.Values["controller"] != null) ? ViewContext.RouteData.Values["controller"]!.ToString() : null;
-	var menuAction = (ViewContext.RouteData.Values["action"] != null) ? ViewContext.RouteData.Values["action"]!.ToString() : null;
-	var sidebarMenu = Configuration.GetSection("sidebarMenu").GetChildren().ToArray();
-}
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
 
 <div id="sidebar" class="app-sidebar">
 	<div class="app-sidebar-content" data-scrollbar="true" data-height="100%">
 		<div class="menu">
-			@foreach (var menu in sidebarMenu) {
-				var menuChildren = menu.GetSection("children").GetChildren().ToArray();
-				@if (menu["is_header"] != null) {
-					<div class="menu-header">
-						@menu["text"]
-					</div>
-				} else if (menu["is_divider"] != null) {
-					<div class="menu-divider"></div>
-				} else {
-					<div class="menu-item @(menuController == @menu["controller"] ? "active" : "") @(menuChildren.Length > 0 ? "has-sub" : "")">
-						@if (menu["action"] != null && menu["controller"] != null) {
-							<a asp-controller="@menu["controller"]" asp-action="@menu["action"]" asp-area="@menu["area"]" class="menu-link">
-								<span class="menu-icon">
-									@if (menu["icon"] != null) {
-										<i class="@menu["icon"]"></i>
-									}
-									@if (menu["label"] != null) {
-										<span class="menu-icon-label">@menu["label"]</span>
-									}
-								</span>
-								<span class="menu-text">@menu["text"]</span>
-							</a>
-						} else {
-							<a href="#" class="menu-link">
-								<span class="menu-icon">
-									@if (menu["icon"] != null) {
-										<i class="@menu["icon"]"></i>
-									}
-									@if (menu["label"] != null) {
-										<span class="menu-icon-label">@menu["label"]</span>
-									}
-								</span>
-								<span class="menu-text">@menu["text"]</span>
-								@if (menuChildren.Length > 0) {
-									<span class="menu-caret"><b class="caret"></b></span>
-								}
-							</a>
-						}
-						@if (menuChildren.Length > 0) {
-							<div class="menu-submenu">
-								@foreach (var submenu in menuChildren) {
-									<div class="menu-item @(menuAction == @submenu["action"] ? "active" : "")">
-										<a asp-controller="@submenu["controller"]" asp-action="@submenu["action"]" asp-area="@submenu["area"]" class="menu-link">
-											<span class="menu-text">@submenu["text"]</span>
-										</a>
-									</div>
-								}
-							</div>
-						}
-					</div>
-				}
-			}
-			<div class="p-3 px-4 mt-auto hide-on-minified">
-				<a href="#" class="btn d-block w-100 btn-secondary font-weight-600 rounded-pill">
-					<i class="fa fa-code-branch me-1 ms-n1 opacity-5"></i> Documentación
+			<div class="menu-item has-sub">
+				<a href="#" class="menu-link">
+					@if (this.SignInManager.IsSignedIn(this.User)) {
+						<span class="menu-icon"><i class="fa fa-user"></i></span>
+						<span class="menu-text">Mi cuenta</span>
+					} else {
+						<span class="menu-icon"><i class="fa fa-fingerprint"></i></span>
+						<span class="menu-text">Ingresar</span>						
+					}
+					<span class="menu-caret"><b class="caret"></b></span>
 				</a>
+				<div class="menu-submenu">
+					@if (this.SignInManager.IsSignedIn(this.User)) {
+						<div class="menu-item">
+							<a class="menu-link" asp-area="Account" asp-controller="Profile">Mi perfil</a>
+						</div>
+						<div class="menu-item">
+							<form class="menu-link" asp-area="Account" asp-controller="SignOut" asp-route-returnUrl="@this.Url.Action("Index", "Home", new { area = "" })">
+								<button type="submit" class="menu-text">Cerrar sesión</button>
+							</form>
+						</div>
+					} else {
+						<div class="menu-item">
+							<a class="menu-link" asp-area="Account" asp-controller="SignUp">Registrarse</a>
+							<a class="menu-link" asp-area="Account" asp-controller="SignIn">Iniciar sesión</a>
+						</div>
+					}
+				</div>
 			</div>
 		</div>
 	</div>

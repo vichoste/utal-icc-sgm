@@ -18,30 +18,30 @@
 				<span class="bar"></span>
 			</button>
 		</div>
-		<a href="/" class="brand-logo">
-			<img src="~/img/logo.png" alt="" height="20" />
+		<a class="h3" asp-area="" asp-controller="Home" style="color: black; text-decoration: none; margin: 0">
+			SGM
 		</a>
 	</div>
 	<div class="menu d-flex justify-content-end">
 		<div class="menu-item dropdown">
 			<a href="#" data-bs-toggle="dropdown" data-bs-display="static" class="menu-link">
-				@if (SignInManager.IsSignedIn(User)) {
+				@if (this.SignInManager.IsSignedIn(this.User)) {
 					<div class="menu-img">
 						<i class="fa-solid fa-user"></i>
 					</div>
-					<div class="menu-text">@User.Identity?.Name</div>
+					<div class="menu-text">@this.User.Identity?.Name</div>
 				} else {
 					<div class="menu-img">
-						<i class="fa-solid fa-user"></i>
+						<i class="fa-solid fa-fingerprint"></i>
 					</div>
 					<div class="menu-text">Ingresar</div>
 				}
 			</a>
 			<div class="dropdown-menu dropdown-menu-end me-lg-3">
-				@if (SignInManager.IsSignedIn(User)) {
-					<a class="dropdown-item d-flex align-items-center" asp-area="Account" asp-page="Profile">Mi cuenta <i class="fa fa-user-circle fa-fw ms-auto text-gray-400 f-s-16"></i></a>
+				@if (this.SignInManager.IsSignedIn(this.User)) {
+					<a class="dropdown-item d-flex align-items-center" asp-area="Account" asp-controller="Profile">Mi perfil <i class="fa fa-user-circle fa-fw ms-auto text-gray-400 f-s-16"></i></a>
 					<div class="dropdown-divider"></div>
-					<form asp-area="Account" asp-controller="SignOut" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+					<form asp-area="Account" asp-controller="SignOut" asp-route-returnUrl="@this.Url.Action("Index", "Home", new { area = "" })">
 						<button type="submit" class="dropdown-item d-flex align-items-center">Cerrar sesión <i class="fa fa-toggle-off fa-fw ms-auto text-gray-400 f-s-16"></i></button>
 					</form>
 				} else {
