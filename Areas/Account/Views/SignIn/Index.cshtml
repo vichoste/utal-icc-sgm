@@ -12,7 +12,8 @@
 			<div class="card">
 				<div class="card-header text-center">Iniciar sesión</div>
 				<div class="card-body">
-					<form>
+					@using (this.Html.BeginForm("Execute", "SignIn", new { area = ""})) {
+						@this.Html.AntiForgeryToken()
 						<div class="row was-validated">
 							<div class="col">
 								<div class="form-group mb-3">
@@ -25,7 +26,8 @@
 									@this.Html.PasswordFor(m => m.Password, new { @class = "form-control", @required = "required" })
 									@this.Html.ValidationMessageFor(m => m.Password, "Ingresa tu contraseña", new { @class = "invalid-feedback" })
 								</div>
-								<div class="form-check"> @* TODO: Remove validation for this field *@
+								<div class="form-check">
+									@* TODO: Remove validation for this field *@
 									@this.Html.CheckBoxFor(m => m.RememberMe, new { @class = "form-check-input" })
 									@this.Html.LabelFor(m => m.RememberMe, new { @class = "form-check-label" })
 								</div>
@@ -36,7 +38,7 @@
 								<button type="submit" class="btn btn-primary">Iniciar sesión</button>
 							</div>
 						</div>
-					</form>
+					}
 				</div>
 			</div>
 		</div>

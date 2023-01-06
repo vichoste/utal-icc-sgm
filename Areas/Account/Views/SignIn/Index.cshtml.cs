@@ -1,10 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-using Microsoft.AspNetCore.Mvc.RazorPages;
-
 namespace Utal.Icc.Sgm.Areas.Account.Views.SignIn;
 
-public class IndexModel : PageModel {
+public class IndexModel {
 	[Display(Name = "E-mail"), EmailAddress, Required]
 	public string? Email { get; set; }
 	[Display(Name = "Contraseña"), Required]
