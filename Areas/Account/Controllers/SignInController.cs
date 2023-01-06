@@ -6,21 +6,28 @@ using Utal.Icc.Sgm.Areas.Account.Views.SignIn;
 
 namespace Utal.Icc.Sgm.Areas.Account.Controllers;
 
+[Area("Account")]
 public class SignInController : Controller {
 	private readonly SignInManager<ApplicationUser> _signInManager;
+
 	public SignInController(SignInManager<ApplicationUser> signInManager) => this._signInManager = signInManager;
-	public IActionResult Index() => this.View();
 
-	public IActionResult Error() => this.View();
+	public IActionResult Index() => this.User.Identity!.IsAuthenticated ? this.RedirectToAction("Index", "Home", new { area = "" }) : this.View();
 
-	[ValidateAntiForgeryToken]
-	public async Task<IActionResult> OnPost([FromForm] IndexModel model) {
+	[HttpPost, ValidateAntiForgeryToken]
+	public async Task<IActionResult> Index([FromForm] IndexModel model) {
+		if (this.User.Identity!.IsAuthenticated) {
+			return this.RedirectToAction("Index", "Home", new { area = "" });
+		}
 		if (!this.ModelState.IsValid) {
-			return this.RedirectToAction("Error", "SignIn", new { area = "Account" });
+			this.ViewBag.ErrorMessage = "Revisa que los campos estén correctos.";
+			return this.View();
 		}
 		var result = await this._signInManager.PasswordSignInAsync(model.Email!, model.Password!, model.RememberMe, false);
-		return !result.Succeeded
-			? this.RedirectToAction("Error", "SignIn", new { area = "Account" })
-			: (IActionResult)this.RedirectToAction("Index", "Home", new { area = "" });
+		if (!result.Succeeded) {
+			this.ViewBag.ErrorMessage = "Error al iniciar sesión.";
+			return this.View();
+		}
+		return this.RedirectToAction("Index", "Home", new { area = "" });
 	}
 }

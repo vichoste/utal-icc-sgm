@@ -19,18 +19,18 @@ public static class StartupSeeder {
 	}
 
 	public static async Task SeedAdministratorAsync(string email, string password, string firstName, string lastName, UserManager<ApplicationUser> userManager) {
-		var defaultUser = new ApplicationUser {
+		var rootUser = new ApplicationUser {
 			UserName = email,
 			Email = email,
 			EmailConfirmed = true,
 			FirstName = firstName,
 			LastName = lastName
 		};
-		if (userManager.Users.All(u => u.Id != defaultUser.Id)) {
+		if (userManager.Users.All(u => u.Id != rootUser.Id)) {
 			var user = await userManager.FindByEmailAsync(email);
 			if (user == null) {
-				_ = await userManager.CreateAsync(defaultUser, password);
-				_ = await userManager.AddToRoleAsync(defaultUser, Roles.Administrator.ToString());
+				_ = await userManager.CreateAsync(rootUser, password);
+				_ = await userManager.AddToRoleAsync(rootUser, Roles.Administrator.ToString());
 			}
 		}
 	}

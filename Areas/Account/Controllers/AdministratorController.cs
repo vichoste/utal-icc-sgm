@@ -1,47 +1,53 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 using Utal.Icc.Sgm.Areas.Account.Models;
-using Utal.Icc.Sgm.Areas.Account.Views.SignUp;
+using Utal.Icc.Sgm.Areas.Account.Views.Administrator;
 
 namespace Utal.Icc.Sgm.Areas.Account.Controllers;
-public class SignUpController : Controller {
+
+[Area("Account"), Authorize(Roles = "Administrator")]
+public class AdministratorController : Controller {
 	private readonly SignInManager<ApplicationUser> _signInManager;
 	private readonly UserManager<ApplicationUser> _userManager;
 	private readonly IUserStore<ApplicationUser> _userStore;
 	private readonly IUserEmailStore<ApplicationUser> _emailStore;
+	private readonly RoleManager<IdentityRole> _roleManager;
 
-	public SignUpController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore) {
+	public AdministratorController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, RoleManager<IdentityRole> roleManager) {
 		this._signInManager = signInManager;
 		this._userManager = userManager;
 		this._userStore = userStore;
 		this._emailStore = this.GetEmailStore();
+		this._roleManager = roleManager;
 	}
 
-	public IActionResult Index() => this.View();
+	public IActionResult CreateUser() => this.View();
 
-	public IActionResult Error() => this.View();
-
-	[ValidateAntiForgeryToken]
-	public async Task<IActionResult> OnPost([FromForm] IndexModel model) {
+	[HttpPost, ValidateAntiForgeryToken]
+	public async Task<IActionResult> CreateUser([FromForm] CreateUserModel model) {
 		if (!this.ModelState.IsValid) {
-			return this.RedirectToAction("Error", "SignUp", new { area = "Account" });
+			return this.View();
 		}
-		var user = CreateUser();
+		var user = CreateUserInstance();
 		user.FirstName = model.FirstName;
 		user.LastName = model.LastName;
 		await this._userStore.SetUserNameAsync(user, userName: model.Email, CancellationToken.None);
 		await this._emailStore.SetEmailAsync(user, model.Email, CancellationToken.None);
 		var result = await this._userManager.CreateAsync(user, model.Password!);
 		if (result.Succeeded) {
-			await this._signInManager.SignInAsync(user, isPersistent: false);
-			return this.RedirectToAction("Index", "Home", new { area = "" });
+			this.ViewBag.Message = "Usuario creado con éxito.";
+			return this.View();
 		}
-		// TODO: Reveal password errors while signing up
-		return this.RedirectToAction("Error", "SignUp", new { area = "Account" });
+		if (result.Errors.Any()) {
+			this.ViewBag.Errors = result.Errors.ToList();
+		}
+		this.ViewBag.Message = "Error al crear el usuario.";
+		return this.View();
 	}
 
-	private static ApplicationUser CreateUser() {
+	private static ApplicationUser CreateUserInstance() {
 		try {
 			return Activator.CreateInstance<ApplicationUser>();
 		} catch {

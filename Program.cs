@@ -24,19 +24,13 @@ if (app.Environment.IsDevelopment()) {
 	_ = app.UseExceptionHandler("/Home/Error");
 	_ = app.UseHsts();
 }
-var loggerFactory = app.Services.GetRequiredService<ILoggerFactory>();
 using var scope = app.Services.CreateScope();
 var services = scope.ServiceProvider;
-try {
-	var context = services.GetRequiredService<ApplicationDbContext>();
-	var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
-	var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
-	await StartupSeeder.SeedRolesAsync(roleManager);
-	await StartupSeeder.SeedAdministratorAsync(rootEmail!, rootPassword!, rootFirstName!, rootLastName!, userManager);
-} catch {
-	var logger = loggerFactory.CreateLogger<Program>();
-	logger.LogError("Error al poblar la base de datos con roles.");
-}
+var context = services.GetRequiredService<ApplicationDbContext>();
+var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+await StartupSeeder.SeedRolesAsync(roleManager);
+await StartupSeeder.SeedAdministratorAsync(rootEmail!, rootPassword!, rootFirstName!, rootLastName!, userManager);
 _ = app.UseHttpsRedirection();
 _ = app.UseStaticFiles();
 _ = app.UseRouting();

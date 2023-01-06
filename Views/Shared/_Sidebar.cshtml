@@ -7,33 +7,15 @@
 <div id="sidebar" class="app-sidebar">
 	<div class="app-sidebar-content" data-scrollbar="true" data-height="100%">
 		<div class="menu">
-			<div class="menu-item has-sub">
-				<a href="#" class="menu-link">
-					@if (this.SignInManager.IsSignedIn(this.User)) {
-						<span class="menu-icon"><i class="fa fa-user"></i></span>
-						<span class="menu-text">Mi cuenta</span>
-					} else {
-						<span class="menu-icon"><i class="fa fa-fingerprint"></i></span>
-						<span class="menu-text">Ingresar</span>						
-					}
-					<span class="menu-caret"><b class="caret"></b></span>
-				</a>
-				<div class="menu-submenu">
-					@if (this.SignInManager.IsSignedIn(this.User)) {
-						<div class="menu-item">
-							<a class="menu-link" asp-area="Account" asp-controller="Profile">Mi perfil</a>
-						</div>
-						<div class="menu-item">
-							<a class="menu-link" asp-area="Account" asp-controller="SignOut">Cerrar sesión</a>
-						</div>
-					} else {
-						<div class="menu-item">
-							<a class="menu-link" asp-area="Account" asp-controller="SignUp">Registrarse</a>
-							<a class="menu-link" asp-area="Account" asp-controller="SignIn">Iniciar sesión</a>
-						</div>
-					}
+			@if (this.User.IsInRole("Administrator")) {
+				<div class="menu-item has-sub">
+					<a href="#" class="menu-link">
+						<span class="menu-icon"><i class="fa fa-toolbox"></i></span>
+						<span class="menu-text">Herramientas de administrador</span>
+						<span class="menu-caret"><b class="caret"></b></span>
+					</a>
 				</div>
-			</div>
+			}
 		</div>
 	</div>
 	<button class="app-sidebar-mobile-backdrop" data-dismiss="sidebar-mobile"></button>

@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Utal.Icc.Sgm.Areas.Account.Views.SignUp;
+namespace Utal.Icc.Sgm.Areas.Account.Views.Administrator;
 
-public class IndexModel {
+public class CreateUserModel {
 	[Display(Name = "Nombre"), Required]
 	public string? FirstName { get; set; }
 	[Display(Name = "Apellido"), Required]
