@@ -24,9 +24,7 @@
 							<a class="menu-link" asp-area="Account" asp-controller="Profile">Mi perfil</a>
 						</div>
 						<div class="menu-item">
-							<form class="menu-link" asp-area="Account" asp-controller="SignOut" asp-route-returnUrl="@this.Url.Action("Index", "Home", new { area = "" })">
-								<button type="submit" class="menu-text">Cerrar sesión</button>
-							</form>
+							<a class="menu-link" asp-area="Account" asp-controller="SignOut">Cerrar sesión</a>
 						</div>
 					} else {
 						<div class="menu-item">
