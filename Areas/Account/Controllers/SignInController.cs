@@ -11,6 +11,8 @@ public class SignInController : Controller {
 	public SignInController(SignInManager<ApplicationUser> signInManager) => this._signInManager = signInManager;
 	public IActionResult Index() => this.View();
 
+	public IActionResult Error() => this.View();
+
 	[ValidateAntiForgeryToken]
 	public async Task<IActionResult> OnPost([FromForm] IndexModel model) {
 		if (!this.ModelState.IsValid) {
@@ -21,6 +23,4 @@ public class SignInController : Controller {
 			? this.RedirectToAction("Error", "SignIn", new { area = "Account" })
 			: (IActionResult)this.RedirectToAction("Index", "Home", new { area = "" });
 	}
-
-	public IActionResult Error() => this.View();
 }

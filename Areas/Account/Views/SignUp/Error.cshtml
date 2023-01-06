@@ -1,0 +1,9 @@
+﻿@{
+	this.ViewData["Title"] = "Error de registro";
+}
+
+<div class="text-center">
+	<h1>Error de registro</h1>
+	<h3>El registro no fue exitoso. Por favor, inténtalo de nuevo.</h3>
+	@this.Html.ActionLink("Volver al registro", "Index", "SignUp", new { area = "Account" }, new { @class = "btn btn-primary" })
+</div>
