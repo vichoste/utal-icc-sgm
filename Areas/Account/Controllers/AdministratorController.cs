@@ -19,48 +19,50 @@ public class AdministratorController : Controller {
 		this._signInManager = signInManager;
 		this._userManager = userManager;
 		this._userStore = userStore;
-		this._emailStore = this.GetEmailStore();
+		this._emailStore = (IUserEmailStore<ApplicationUser>)this._userStore;
 		this._roleManager = roleManager;
 	}
 
-	public IActionResult CreateUser() => this.View();
+	public IActionResult CreateUser() {
+		var roleViewModels = new List<CreateUserViewModel.RoleViewModel>();
+		foreach (var role in this._roleManager.Roles.ToList()) {
+			var roleViewModel = new CreateUserViewModel.RoleViewModel {
+				Name = SpanishRoles.TranslateRoleStringToSpanish(role!.Name),
+				IsSelected = false
+			};
+			roleViewModels.Add(roleViewModel);
+		}
+		this.ViewBag.RoleViewModels = roleViewModels;
+		return this.View();
+	}
 
 	[HttpPost, ValidateAntiForgeryToken]
-	public async Task<IActionResult> CreateUser([FromForm] CreateUserModel model) {
+	public async Task<IActionResult> CreateUser([FromForm] CreateUserViewModel model) {
 		if (!this.ModelState.IsValid) {
 			this.ViewBag.ErrorMessage = "Revisa que los campos estén correctos.";
 			return this.View();
 		}
-		var user = CreateUserInstance();
-		user.FirstName = model.FirstName;
-		user.LastName = model.LastName;
+		var user = new ApplicationUser {
+			FirstName = model.FirstName,
+			LastName = model.LastName
+		};
 		await this._userStore.SetUserNameAsync(user, userName: model.Email, CancellationToken.None);
 		await this._emailStore.SetEmailAsync(user, model.Email, CancellationToken.None);
-		var result = await this._userManager.CreateAsync(user, model.Password!);
-		if (result.Succeeded) {
-			this.ViewBag.SuccessMessage = "Usuario creado con éxito.";
+		var createResult = await this._userManager.CreateAsync(user, model.Password!);
+		if (createResult.Succeeded) {
+			var rolesResult = await this._userManager.AddToRolesAsync(user, model.Roles!);
+			if (rolesResult.Succeeded) {
+				this.ViewBag.SuccessMessage = "Usuario creado con éxito.";
+				return this.View();
+			}
+			this.ViewBag.WarningMessage = "Usuario creado, pero no se le pudo asignar el(los) rol(es).";
+			this.ViewBag.WarningMessages = rolesResult.Errors.Select(w => w.Description);
 			return this.View();
 		}
-		if (result.Errors.Any()) {
-			this.ViewBag.ErrorMessages = result.Errors.ToList();
+		if (createResult.Errors.Any()) {
+			this.ViewBag.ErrorMessages = createResult.Errors.Select(e => e.Description);
 		}
 		this.ViewBag.ErrorMessage = "Error al crear el usuario.";
 		return this.View();
-	}
-
-	private static ApplicationUser CreateUserInstance() {
-		try {
-			return Activator.CreateInstance<ApplicationUser>();
-		} catch {
-			throw new InvalidOperationException($"Can't create an instance of '{nameof(ApplicationUser)}'. " +
-				$"Ensure that '{nameof(ApplicationUser)}' is not an abstract class and has a parameterless constructor, or alternatively " +
-				$"override the register page in /Areas/Identity/Pages/Account/Register.cshtml");
-		}
-	}
-
-	private IUserEmailStore<ApplicationUser> GetEmailStore() {
-		return !this._userManager.SupportsUserEmail
-			? throw new NotSupportedException("The default UI requires a user store with email support.")
-			: (IUserEmailStore<ApplicationUser>)this._userStore;
 	}
 }

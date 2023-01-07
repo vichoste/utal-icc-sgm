@@ -1,7 +1,7 @@
 ﻿@using Microsoft.AspNetCore.Identity;
 @using Utal.Icc.Sgm.Areas.Account.Views.Administrator
 
-@model CreateUserModel
+@model CreateUserViewModel
 
 @{
 	this.ViewData["Title"] = "Crear usuario";
@@ -15,6 +15,24 @@
 	</div>
 }
 
+@if (this.ViewBag.WarningMessage is not null) {
+	<div class="row justify-content-center">
+		<div class="alert alert-warning" role="alert">
+			@this.ViewBag.WarningMessage
+		</div>
+	</div>
+}
+
+@if (this.ViewBag.WarningMessages is not null) {
+	@foreach (var warning in this.ViewBag.WarningMessages) {
+		<div class="row justify-content-center">
+			<div class="alert alert-warning" role="alert">
+				@warning
+			</div>
+		</div>
+	}
+}
+
 @if (this.ViewBag.ErrorMessage is not null) {
 	<div class="row justify-content-center">
 		<div class="alert alert-danger" role="alert">
@@ -25,10 +43,9 @@
 
 @if (this.ViewBag.ErrorMessages is not null) {
 	@foreach (var error in this.ViewBag.ErrorMessages) {
-		var errorString = (IdentityError)error;
 		<div class="row justify-content-center">
 			<div class="alert alert-danger" role="alert">
-				@errorString.Description
+				@error
 			</div>
 		</div>
 	}
@@ -68,6 +85,12 @@
 									@this.Html.LabelFor(m => m.ConfirmPassword, new { @class = "form-label" })
 									@this.Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control", @required = "required" })
 									@this.Html.ValidationMessageFor(m => m.ConfirmPassword, "Confirmación de contraseña requerida", new { @class = "invalid-feedback" })
+								</div>
+								<div class="form-check mb-3">
+									@foreach (var role in this.ViewBag.RoleViewModels) {
+										@this.Html.LabelFor(, new { @class = "form-check-label" })
+										@this.Html.CheckBoxFor(, new { @class = "form-check-input" })
+									}
 								</div>
 							</div>
 						</div>

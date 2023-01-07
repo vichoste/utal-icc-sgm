@@ -2,7 +2,7 @@
 
 namespace Utal.Icc.Sgm.Areas.Account.Views.Administrator;
 
-public class CreateUserModel {
+public class CreateUserViewModel {
 	[Display(Name = "Nombre"), Required]
 	public string? FirstName { get; set; }
 	[Display(Name = "Apellido"), Required]
@@ -13,4 +13,11 @@ public class CreateUserModel {
 	public string? Password { get; set; }
 	[Compare(nameof(Password), ErrorMessage = "Las contraseñas no coinciden"), DataType(DataType.Password), Display(Name = "Confirmar contraseña"), Required]
 	public string? ConfirmPassword { get; set; }
+	[Display(Name = "Roles"), Required]
+	public List<string>? Roles { get; set; }
+
+	public class RoleViewModel {
+		public string? Name { get; set; }
+		public bool IsSelected { get; set; }
+	}
 }
