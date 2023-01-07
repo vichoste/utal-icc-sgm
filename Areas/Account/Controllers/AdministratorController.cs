@@ -28,6 +28,7 @@ public class AdministratorController : Controller {
 	[HttpPost, ValidateAntiForgeryToken]
 	public async Task<IActionResult> CreateUser([FromForm] CreateUserModel model) {
 		if (!this.ModelState.IsValid) {
+			this.ViewBag.ErrorMessage = "Revisa que los campos estén correctos.";
 			return this.View();
 		}
 		var user = CreateUserInstance();
@@ -37,13 +38,13 @@ public class AdministratorController : Controller {
 		await this._emailStore.SetEmailAsync(user, model.Email, CancellationToken.None);
 		var result = await this._userManager.CreateAsync(user, model.Password!);
 		if (result.Succeeded) {
-			this.ViewBag.Message = "Usuario creado con éxito.";
+			this.ViewBag.SuccessMessage = "Usuario creado con éxito.";
 			return this.View();
 		}
 		if (result.Errors.Any()) {
-			this.ViewBag.Errors = result.Errors.ToList();
+			this.ViewBag.ErrorMessages = result.Errors.ToList();
 		}
-		this.ViewBag.Message = "Error al crear el usuario.";
+		this.ViewBag.ErrorMessage = "Error al crear el usuario.";
 		return this.View();
 	}
 
