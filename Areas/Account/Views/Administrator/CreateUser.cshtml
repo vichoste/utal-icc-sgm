@@ -86,12 +86,12 @@
 									@this.Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control", @required = "required" })
 									@this.Html.ValidationMessageFor(m => m.ConfirmPassword, "Confirmación de contraseña requerida", new { @class = "invalid-feedback" })
 								</div>
-								<div class="form-check mb-3">
-									@foreach (var role in this.ViewBag.RoleViewModels) {
-										@this.Html.LabelFor(, new { @class = "form-check-label" })
-										@this.Html.CheckBoxFor(, new { @class = "form-check-input" })
-									}
-								</div>
+								@for (var i = 0; i < this.Model.Roles!.Count; i++) {
+									<div class="form-check mb-3">
+										@this.Html.LabelFor(m => m.Roles![i].Name, this.Model.Roles![i].Name, new { @class = "form-check-label" })
+										@this.Html.CheckBoxFor(m => m.Roles![i].IsSelected, new { @class = "form-check-input", @value = this.Model.Roles[i].IsSelected })
+									</div>
+								}
 							</div>
 						</div>
 						<div class="row text-center">

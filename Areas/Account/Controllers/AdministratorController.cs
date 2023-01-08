@@ -32,8 +32,11 @@ public class AdministratorController : Controller {
 			};
 			roleViewModels.Add(roleViewModel);
 		}
-		this.ViewBag.RoleViewModels = roleViewModels;
-		return this.View();
+		var sortedRoleViewModels = roleViewModels.OrderBy(r => r.Name).ToList();
+		var createUserViewModel = new CreateUserViewModel {
+			Roles = sortedRoleViewModels
+		};
+		return this.View(createUserViewModel);
 	}
 
 	[HttpPost, ValidateAntiForgeryToken]
@@ -50,7 +53,7 @@ public class AdministratorController : Controller {
 		await this._emailStore.SetEmailAsync(user, model.Email, CancellationToken.None);
 		var createResult = await this._userManager.CreateAsync(user, model.Password!);
 		if (createResult.Succeeded) {
-			var rolesResult = await this._userManager.AddToRolesAsync(user, model.Roles!);
+			var rolesResult = await this._userManager.AddToRolesAsync(user, model.Roles!.Select(r => r.Name).ToList()!);
 			if (rolesResult.Succeeded) {
 				this.ViewBag.SuccessMessage = "Usuario creado con éxito.";
 				return this.View();

@@ -14,7 +14,7 @@ public class CreateUserViewModel {
 	[Compare(nameof(Password), ErrorMessage = "Las contraseñas no coinciden"), DataType(DataType.Password), Display(Name = "Confirmar contraseña"), Required]
 	public string? ConfirmPassword { get; set; }
 	[Display(Name = "Roles"), Required]
-	public List<string>? Roles { get; set; }
+	public List<RoleViewModel>? Roles { get; set; }
 
 	public class RoleViewModel {
 		public string? Name { get; set; }
