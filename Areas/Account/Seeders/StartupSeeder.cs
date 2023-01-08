@@ -12,10 +12,11 @@ public static class StartupSeeder {
 		_ = await roleManager.CreateAsync(new IdentityRole(Roles.CourseTeacher.ToString()));
 		_ = await roleManager.CreateAsync(new IdentityRole(Roles.MainTeacher.ToString()));
 		_ = await roleManager.CreateAsync(new IdentityRole(Roles.AssistantTeacher.ToString()));
+		_ = await roleManager.CreateAsync(new IdentityRole(Roles.Teacher.ToString()));
 		_ = await roleManager.CreateAsync(new IdentityRole(Roles.EngineerStudent.ToString()));
 		_ = await roleManager.CreateAsync(new IdentityRole(Roles.FinishedStudent.ToString()));
 		_ = await roleManager.CreateAsync(new IdentityRole(Roles.ThesisStudent.ToString()));
-		_ = await roleManager.CreateAsync(new IdentityRole(Roles.RegularStudent.ToString()));
+		_ = await roleManager.CreateAsync(new IdentityRole(Roles.Student.ToString()));
 	}
 
 	public static async Task SeedAdministratorAsync(string email, string password, string firstName, string lastName, UserManager<ApplicationUser> userManager) {

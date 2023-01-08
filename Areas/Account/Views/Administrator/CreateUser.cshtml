@@ -88,13 +88,18 @@
 								</div>
 								<hr>
 								<p><strong>Roles</strong></p>
-								@for (var i = 0; i < this.Model.Roles!.Count; i++) {
-									<div class="form-check mb-3">
-										@this.Html.HiddenFor(m => m.Roles![i].Id)
-										@this.Html.LabelFor(m => m.Roles![i].Name, this.Model.Roles![i].Name, new { @class = "form-check-label" })
-										@this.Html.CheckBoxFor(m => m.Roles![i].IsSelected, new { @class = "form-check-input", @value = this.Model.Roles![i].IsSelected })
-									</div>
-								}
+								<div class="form-check mb-3">
+									@this.Html.LabelFor(m => m.IsAdministrator, new { @class = "form-check-label" })
+									@this.Html.CheckBoxFor(m => m.IsAdministrator, new { @class = "form-check-input" })
+								</div>
+								<div class="form-check mb-3">
+									@this.Html.LabelFor(m => m.IsTeacher, new { @class = "form-check-label" })
+									@this.Html.CheckBoxFor(m => m.IsTeacher, new { @class = "form-check-input" })
+								</div>
+								<div class="form-check mb-3">
+									@this.Html.LabelFor(m => m.IsStudent, new { @class = "form-check-label" })
+									@this.Html.CheckBoxFor(m => m.IsStudent, new { @class = "form-check-input" })
+								</div>
 							</div>
 						</div>
 						<div class="row text-center">

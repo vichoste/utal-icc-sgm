@@ -23,23 +23,7 @@ public class AdministratorController : Controller {
 		this._roleManager = roleManager;
 	}
 
-	public IActionResult CreateUser() {
-		var roleViewModels = new List<CreateUserViewModel.RoleViewModel>();
-		var id = 0;
-		foreach (var role in this._roleManager.Roles.ToList()) {
-			var roleViewModel = new CreateUserViewModel.RoleViewModel {
-				Id = id++,
-				Name = RoleTextUtilities.TranslateRoleStringToSpanish(role!.Name),
-				IsSelected = false
-			};
-			roleViewModels.Add(roleViewModel);
-		}
-		var sortedRoleViewModels = roleViewModels.OrderBy(r => r.Id).ToList();
-		var createUserViewModel = new CreateUserViewModel {
-			Roles = sortedRoleViewModels
-		};
-		return this.View(createUserViewModel);
-	}
+	public IActionResult CreateUser() => this.View();
 
 	[HttpPost, ValidateAntiForgeryToken]
 	public async Task<IActionResult> CreateUser([FromForm] CreateUserViewModel model) {
@@ -51,11 +35,24 @@ public class AdministratorController : Controller {
 			FirstName = model.FirstName,
 			LastName = model.LastName
 		};
+		var roles = new List<string>();
+		var assistantTeacherRole = model.IsAdministrator ? Roles.Administrator.ToString() : null;
+		if (assistantTeacherRole is not null) {
+			roles.Add(assistantTeacherRole);
+		}
+		var teacherRole = model.IsTeacher ? Roles.Teacher.ToString() : null;
+		if (teacherRole is not null) {
+			roles.Add(teacherRole);
+		}
+		var studentRole = model.IsStudent ? Roles.Student.ToString() : null;
+		if (studentRole is not null) {
+			roles.Add(studentRole);
+		}
 		await this._userStore.SetUserNameAsync(user, userName: model.Email, CancellationToken.None);
 		await this._emailStore.SetEmailAsync(user, model.Email, CancellationToken.None);
 		var createResult = await this._userManager.CreateAsync(user, model.Password!);
 		if (createResult.Succeeded) {
-			var rolesResult = await this._userManager.AddToRolesAsync(user, model.Roles!.Where(r => r.IsSelected).Select(r => RoleTextUtilities.TranslateRoleStringToEnglish(r.Name)).ToList()!);
+			var rolesResult = await this._userManager.AddToRolesAsync(user, roles);
 			if (rolesResult.Succeeded) {
 				this.ViewBag.SuccessMessage = "Usuario creado con éxito.";
 				return this.View();

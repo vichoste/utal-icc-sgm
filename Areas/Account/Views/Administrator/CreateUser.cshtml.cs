@@ -13,12 +13,10 @@ public class CreateUserViewModel {
 	public string? Password { get; set; }
 	[Compare(nameof(Password), ErrorMessage = "Las contraseñas no coinciden"), DataType(DataType.Password), Display(Name = "Confirmar contraseña"), Required]
 	public string? ConfirmPassword { get; set; }
-	[Display(Name = "Roles"), Required]
-	public List<RoleViewModel>? Roles { get; set; }
-
-	public class RoleViewModel {
-		public int Id { get; set; }
-		public string? Name { get; set; }
-		public bool IsSelected { get; set; }
-	}
+	[Display(Name = "Administrador"), Required]
+	public bool IsAdministrator { get; set; }
+	[Display(Name = "Profesor"), Required]
+	public bool IsTeacher { get; set; }
+	[Display(Name = "Estudiante"), Required]
+	public bool IsStudent { get; set; }
 }
