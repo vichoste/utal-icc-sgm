@@ -18,9 +18,7 @@
 				<span class="bar"></span>
 			</button>
 		</div>
-		<a id="brand" class="h3 text-dark" asp-area="" asp-controller="Home">
-			SGM
-		</a>
+		@this.Html.ActionLink("SGM", "Index", "Home", new { area = "" }, new { @id = "brand", @class = "h3 text-dark" })
 	</div>
 	<div class="menu d-flex justify-content-end">
 		<div class="menu-item dropdown">

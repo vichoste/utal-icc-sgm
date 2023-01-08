@@ -11,6 +11,8 @@ var rootEmail = builder.Environment.IsDevelopment() ? builder.Configuration["Roo
 var rootPassword = builder.Environment.IsDevelopment() ? builder.Configuration["RootPassword"] ?? throw new InvalidOperationException("No se encuentra el string de la contraseña del administrador.") : Environment.GetEnvironmentVariable("ROOT_PASSWORD");
 var rootFirstName = builder.Environment.IsDevelopment() ? builder.Configuration["RootFirstName"] ?? throw new InvalidOperationException("No se encuentra el string del nombre del administrador.") : Environment.GetEnvironmentVariable("ROOT_FIRST_NAME");
 var rootLastName = builder.Environment.IsDevelopment() ? builder.Configuration["RootLastName"] ?? throw new InvalidOperationException("No se encuentra el string del apellido del administrador.") : Environment.GetEnvironmentVariable("ROOT_LAST_NAME");
+var rootUniversityId = builder.Environment.IsDevelopment() ? builder.Configuration["RootUniversityId"] ?? throw new InvalidOperationException("No se encuentra el string del número de matrícula del administrador.") : Environment.GetEnvironmentVariable("ROOT_UNIVERSITY_ID");
+var rootRut = builder.Environment.IsDevelopment() ? builder.Configuration["RootRut"] ?? throw new InvalidOperationException("No se encuentra el string del RUT del administrador.") : Environment.GetEnvironmentVariable("ROOT_RUT");
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
@@ -30,7 +32,7 @@ var context = services.GetRequiredService<ApplicationDbContext>();
 var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
 var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
 await StartupSeeder.SeedRolesAsync(roleManager);
-await StartupSeeder.SeedAdministratorAsync(rootEmail!, rootPassword!, rootFirstName!, rootLastName!, userManager);
+await StartupSeeder.SeedAdministratorAsync(rootEmail!, rootPassword!, rootFirstName!, rootLastName!, rootUniversityId!, rootRut!, userManager);
 _ = app.UseHttpsRedirection();
 _ = app.UseStaticFiles();
 _ = app.UseRouting();

@@ -55,10 +55,12 @@ public class AdministratorController : Controller {
 			var rolesResult = await this._userManager.AddToRolesAsync(user, roles);
 			if (rolesResult.Succeeded) {
 				this.ViewBag.SuccessMessage = "Usuario creado con éxito.";
+				this.ModelState.Clear();
 				return this.View();
 			}
 			this.ViewBag.WarningMessage = "Usuario creado, pero no se le pudo asignar el(los) rol(es).";
 			this.ViewBag.WarningMessages = rolesResult.Errors.Select(w => w.Description);
+			this.ModelState.Clear();
 			return this.View();
 		}
 		if (createResult.Errors.Any()) {
@@ -66,5 +68,18 @@ public class AdministratorController : Controller {
 		}
 		this.ViewBag.ErrorMessage = "Error al crear el usuario.";
 		return this.View();
+	}
+
+	public IActionResult ManageUsers() {
+		var users = this._userManager.Users.ToList();
+		var usersViewModel = users.Select(u => new ManageUsersViewModel {
+			Id = u.Id,
+			FirstName = u.FirstName,
+			LastName = u.LastName,
+			UniversityId = u.UniversityId,
+			Rut = u.Rut,
+			Email = u.Email
+		});
+		return this.View(usersViewModel);
 	}
 }

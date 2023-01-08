@@ -19,13 +19,15 @@ public static class StartupSeeder {
 		_ = await roleManager.CreateAsync(new IdentityRole(Roles.Student.ToString()));
 	}
 
-	public static async Task SeedAdministratorAsync(string email, string password, string firstName, string lastName, UserManager<ApplicationUser> userManager) {
+	public static async Task SeedAdministratorAsync(string email, string password, string firstName, string lastName, string universityId, string rut, UserManager<ApplicationUser> userManager) {
 		var rootUser = new ApplicationUser {
 			UserName = email,
 			Email = email,
 			EmailConfirmed = true,
 			FirstName = firstName,
-			LastName = lastName
+			LastName = lastName,
+			UniversityId = universityId,
+			Rut = rut
 		};
 		if (userManager.Users.All(u => u.Id != rootUser.Id)) {
 			var user = await userManager.FindByEmailAsync(email);
