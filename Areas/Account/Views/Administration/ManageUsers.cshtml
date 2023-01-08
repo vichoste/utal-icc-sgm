@@ -1,4 +1,4 @@
-﻿@using Utal.Icc.Sgm.Areas.Account.Views.Administrator
+﻿@using Utal.Icc.Sgm.Areas.Account.Views.Administration
 
 @model IEnumerable<ManageUsersViewModel>
 
@@ -46,11 +46,16 @@
 			</div>
 		}
 	}
-	<div class="row">
-		<h2>Gestionar usuarios</h2>
+	<div class="row justify-content-center">
+		<div class="col-12 col-md-10">
+			<h2>Gestionar usuarios</h2>
+		</div>
+		<div class="col-12 col-md-2">
+			@this.Html.ActionLink("Crear usuario", "CreateUser", "Administration", new { area = "Account" }, new { @class = "btn btn-success"})
+		</div>
 	</div>
 	<div class="row justify-content-center">
-		<div class="col-10">
+		<div class="col-12">
 			<div class="table-responsive">
 				<table class="table">
 					<thead>
@@ -72,8 +77,8 @@
 								<td>@item.UniversityId</td>
 								<td>@item.Email</td>
 								<td>
-									@this.Html.ActionLink("Editar", "EditUser", new { area = "Account", id = item.Id }, new { @class = "btn btn-yellow"})
-									@this.Html.ActionLink("Eliminar", "DeleteUser", new { area = "Account", id = item.Id }, new { @class = "btn btn-danger"})
+									@this.Html.ActionLink("Editar", "EditUser", "Administration", new { area = "Account", id = item.Id }, new { @class = "btn btn-yellow mb-3"})
+									@this.Html.ActionLink("Eliminar", "DeleteUser", "Administration", new { area = "Account", id = item.Id }, new { @class = "btn btn-danger mb-3"})
 								</td>
 							</tr>
 						}

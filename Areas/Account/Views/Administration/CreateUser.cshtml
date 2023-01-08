@@ -1,5 +1,5 @@
 ﻿@using Microsoft.AspNetCore.Identity;
-@using Utal.Icc.Sgm.Areas.Account.Views.Administrator
+@using Utal.Icc.Sgm.Areas.Account.Views.Administration
 
 @model CreateUserViewModel
 
@@ -52,7 +52,7 @@
 			<div class="card">
 				<div class="card-header text-center">Crear un nuevo usuario</div>
 				<div class="card-body">
-					@using (this.Html.BeginForm("CreateUser", "Administrator", new { area = "Account" })) {
+					@using (this.Html.BeginForm("CreateUser", "Administration", new { area = "Account" })) {
 						@this.Html.AntiForgeryToken()
 						<div class="row was-validated">
 							<div class="col">
@@ -110,7 +110,10 @@
 						</div>
 						<div class="row text-center">
 							<div class="col">
-								<button type="submit" class="btn btn-primary">Crear usuario</button>
+								<div class="btn-group">
+									@this.Html.ActionLink("Cancelar", "ManageUsers", "Administration", new { area = "Account" }, new { @class = "btn btn-secondary" })
+									<button type="submit" class="btn btn-primary">Crear usuario</button>
+								</div>	
 							</div>
 						</div>
 					}

@@ -3,19 +3,19 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 using Utal.Icc.Sgm.Areas.Account.Models;
-using Utal.Icc.Sgm.Areas.Account.Views.Administrator;
+using Utal.Icc.Sgm.Areas.Account.Views.Administration;
 
 namespace Utal.Icc.Sgm.Areas.Account.Controllers;
 
 [Area("Account"), Authorize(Roles = "Administrator")]
-public class AdministratorController : Controller {
+public class AdministrationController : Controller {
 	private readonly SignInManager<ApplicationUser> _signInManager;
 	private readonly UserManager<ApplicationUser> _userManager;
 	private readonly IUserStore<ApplicationUser> _userStore;
 	private readonly IUserEmailStore<ApplicationUser> _emailStore;
 	private readonly RoleManager<IdentityRole> _roleManager;
 
-	public AdministratorController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, RoleManager<IdentityRole> roleManager) {
+	public AdministrationController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, RoleManager<IdentityRole> roleManager) {
 		this._signInManager = signInManager;
 		this._userManager = userManager;
 		this._userStore = userStore;
@@ -33,7 +33,9 @@ public class AdministratorController : Controller {
 		}
 		var user = new ApplicationUser {
 			FirstName = model.FirstName,
-			LastName = model.LastName
+			LastName = model.LastName,
+			UniversityId = model.UniversityId,
+			Rut = model.Rut,
 		};
 		var roles = new List<string>();
 		var assistantTeacherRole = model.IsAdministrator ? Roles.Administrator.ToString() : null;

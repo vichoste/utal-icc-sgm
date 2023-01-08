@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Utal.Icc.Sgm.Areas.Account.Views.Administrator;
+namespace Utal.Icc.Sgm.Areas.Account.Views.Administration;
 
 public class CreateUserViewModel {
 	[Display(Name = "Nombre"), Required]
