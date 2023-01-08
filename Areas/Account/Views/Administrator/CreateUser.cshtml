@@ -53,7 +53,7 @@
 
 <div class="container">
 	<div class="row justify-content-center">
-		<div class="col-6">
+		<div class="col-10">
 			<div class="card">
 				<div class="card-header text-center">Crear un nuevo usuario</div>
 				<div class="card-body">
@@ -86,10 +86,13 @@
 									@this.Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control", @required = "required" })
 									@this.Html.ValidationMessageFor(m => m.ConfirmPassword, "Confirmación de contraseña requerida", new { @class = "invalid-feedback" })
 								</div>
+								<hr>
+								<p><strong>Roles</strong></p>
 								@for (var i = 0; i < this.Model.Roles!.Count; i++) {
 									<div class="form-check mb-3">
+										@this.Html.HiddenFor(m => m.Roles![i].Id)
 										@this.Html.LabelFor(m => m.Roles![i].Name, this.Model.Roles![i].Name, new { @class = "form-check-label" })
-										@this.Html.CheckBoxFor(m => m.Roles![i].IsSelected, new { @class = "form-check-input", @value = this.Model.Roles[i].IsSelected })
+										@this.Html.CheckBoxFor(m => m.Roles![i].IsSelected, new { @class = "form-check-input", @value = this.Model.Roles![i].IsSelected })
 									</div>
 								}
 							</div>

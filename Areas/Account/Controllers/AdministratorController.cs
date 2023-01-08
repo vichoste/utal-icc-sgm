@@ -25,14 +25,16 @@ public class AdministratorController : Controller {
 
 	public IActionResult CreateUser() {
 		var roleViewModels = new List<CreateUserViewModel.RoleViewModel>();
+		var id = 0;
 		foreach (var role in this._roleManager.Roles.ToList()) {
 			var roleViewModel = new CreateUserViewModel.RoleViewModel {
-				Name = SpanishRoles.TranslateRoleStringToSpanish(role!.Name),
+				Id = id++,
+				Name = RoleTextUtilities.TranslateRoleStringToSpanish(role!.Name),
 				IsSelected = false
 			};
 			roleViewModels.Add(roleViewModel);
 		}
-		var sortedRoleViewModels = roleViewModels.OrderBy(r => r.Name).ToList();
+		var sortedRoleViewModels = roleViewModels.OrderBy(r => r.Id).ToList();
 		var createUserViewModel = new CreateUserViewModel {
 			Roles = sortedRoleViewModels
 		};
@@ -53,7 +55,7 @@ public class AdministratorController : Controller {
 		await this._emailStore.SetEmailAsync(user, model.Email, CancellationToken.None);
 		var createResult = await this._userManager.CreateAsync(user, model.Password!);
 		if (createResult.Succeeded) {
-			var rolesResult = await this._userManager.AddToRolesAsync(user, model.Roles!.Select(r => r.Name).ToList()!);
+			var rolesResult = await this._userManager.AddToRolesAsync(user, model.Roles!.Where(r => r.IsSelected).Select(r => RoleTextUtilities.TranslateRoleStringToEnglish(r.Name)).ToList()!);
 			if (rolesResult.Succeeded) {
 				this.ViewBag.SuccessMessage = "Usuario creado con éxito.";
 				return this.View();

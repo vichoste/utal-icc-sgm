@@ -13,7 +13,7 @@ public enum Roles {
 	RegularStudent
 }
 
-public class SpanishRoles {
+public class RoleTextUtilities {
 	public static string? TranslateRoleStringToSpanish(string? role) {
 		return role switch {
 			"Administrator" => "Administrador",
@@ -27,6 +27,21 @@ public class SpanishRoles {
 			"ThesisStudent" => "Estudiante memorista",
 			"RegularStudent" => "Estudiante regular",
 			_ => "Rol Desconocido"
+		};
+	}
+	public static string? TranslateRoleStringToEnglish(string? role) {
+		return role switch {
+			"Administrador" => "Administrator",
+			"Profesor director de escuela" => "DirectorTeacher",
+			"Profesor de comité" => "CommitteeTeacher",
+			"Profesor de curso de titulación" => "CourseTeacher",
+			"Profesor guía" => "MainTeacher",
+			"Profesor co-guía" => "AssistantTeacher",
+			"Estudiante titulado" => "EngineerStudent",
+			"Estudiante graduado" => "FinishedStudent",
+			"Estudiante memorista" => "ThesisStudent",
+			"Estudiante regular" => "RegularStudent",
+			_ => "Unknown role"
 		};
 	}
 }
