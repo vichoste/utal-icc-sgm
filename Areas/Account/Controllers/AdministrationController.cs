@@ -72,12 +72,13 @@ public class AdministrationController : Controller {
 		return this.View();
 	}
 
-	public IActionResult ManageUsers(string sortOrder) {
+	public IActionResult ManageUsers(string sortOrder, string searchString) {
 		this.ViewData["FirstNameSortParam"] = sortOrder == "FirstName" ? "FirstNameDesc" : "FirstName";
 		this.ViewData["LastNameSortParam"] = sortOrder == "LastName" ? "LastNameDesc" : "LastName";
 		this.ViewData["UniversityIdSortParam"] = sortOrder == "UniversityId" ? "UniversityIdDesc" : "UniversityId";
 		this.ViewData["RutSortParam"] = sortOrder == "Rut" ? "RutDesc" : "Rut";
 		this.ViewData["EmailSortParam"] = sortOrder == "Email" ? "EmailDesc" : "Email";
+		this.ViewData["CurrentFilter"] = searchString;
 		var users = sortOrder switch {
 			"FirstName" => this._userManager.Users.OrderBy(u => u.FirstName).ToList(),
 			"FirstNameDesc" => this._userManager.Users.OrderByDescending(u => u.FirstName).ToList(),
@@ -91,6 +92,9 @@ public class AdministrationController : Controller {
 			"LastNameDesc" => this._userManager.Users.OrderByDescending(u => u.LastName).ToList(),
 			_ => this._userManager.Users.OrderBy(u => u.LastName).ToList()
 		};
+		if (!string.IsNullOrEmpty(searchString)) {
+			users = users.Where(s => s.FirstName == searchString || s.LastName == searchString || s.UniversityId == searchString || s.Rut == searchString || s.Email == searchString).ToList();
+		}
 		var usersViewModel = users.Select(u => new ManageUsersViewModel {
 			Id = u.Id,
 			FirstName = u.FirstName,
