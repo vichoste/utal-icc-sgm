@@ -72,12 +72,18 @@ public class AdministrationController : Controller {
 		return this.View();
 	}
 
-	public IActionResult ManageUsers(string sortOrder, string searchString) {
+	public IActionResult ManageUsers(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
 		this.ViewData["FirstNameSortParam"] = sortOrder == "FirstName" ? "FirstNameDesc" : "FirstName";
 		this.ViewData["LastNameSortParam"] = sortOrder == "LastName" ? "LastNameDesc" : "LastName";
 		this.ViewData["UniversityIdSortParam"] = sortOrder == "UniversityId" ? "UniversityIdDesc" : "UniversityId";
 		this.ViewData["RutSortParam"] = sortOrder == "Rut" ? "RutDesc" : "Rut";
 		this.ViewData["EmailSortParam"] = sortOrder == "Email" ? "EmailDesc" : "Email";
+		this.ViewData["CurrentSort"] = sortOrder;
+		if (searchString is not null) {
+			pageNumber = 1;
+		} else {
+			searchString = currentFilter;
+		}
 		this.ViewData["CurrentFilter"] = searchString;
 		var users = sortOrder switch {
 			"FirstName" => this._userManager.Users.OrderBy(u => u.FirstName).ToList(),
@@ -93,7 +99,7 @@ public class AdministrationController : Controller {
 			_ => this._userManager.Users.OrderBy(u => u.LastName).ToList()
 		};
 		if (!string.IsNullOrEmpty(searchString)) {
-			users = users.Where(s => s.FirstName == searchString || s.LastName == searchString || s.UniversityId == searchString || s.Rut == searchString || s.Email == searchString).ToList();
+			users = users.Where(s => s.FirstName!.ToUpper().Contains(searchString.ToUpper()) || s.LastName!.ToUpper().Contains(searchString.ToUpper()) || s.UniversityId!.ToUpper().Contains(searchString.ToUpper()) || s.Rut!.ToUpper().Contains(searchString.ToUpper()) || s.Email == searchString).ToList();
 		}
 		var usersViewModel = users.Select(u => new ManageUsersViewModel {
 			Id = u.Id,
@@ -103,6 +109,7 @@ public class AdministrationController : Controller {
 			Rut = u.Rut,
 			Email = u.Email
 		});
-		return this.View(usersViewModel);
+		var pageSize = 10;
+		return this.View(PaginatedList<ManageUsersViewModel>.Create(usersViewModel.AsQueryable(), pageNumber ?? 1, pageSize));
 	}
 }

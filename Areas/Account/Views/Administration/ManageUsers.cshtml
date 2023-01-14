@@ -1,6 +1,7 @@
-﻿@using Utal.Icc.Sgm.Areas.Account.Views.Administration
+﻿@using Utal.Icc.Sgm
+@using Utal.Icc.Sgm.Areas.Account.Views.Administration
 
-@model IEnumerable<ManageUsersViewModel>
+@model PaginatedList<ManageUsersViewModel>
 
 @{
 	this.ViewData["Title"] = "Gestionar usuarios";
@@ -64,28 +65,28 @@
 					<thead class="table-dark">
 						<tr>
 							<th>
-								<a asp-action="ManageUsers" asp-route-sortOrder="@this.ViewData["FirstNameSortParam"]">
-									@this.Html.DisplayNameFor(m => m.FirstName)
+								<a asp-action="ManageUsers" asp-route-sortOrder="@this.ViewData["FirstNameSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+									Nombre
 								</a>
 							</th>
 							<th>
-								<a asp-action="ManageUsers" asp-route-sortOrder="@this.ViewData["LastNameSortParam"]">
-									@this.Html.DisplayNameFor(m => m.LastName)
+								<a asp-action="ManageUsers" asp-route-sortOrder="@this.ViewData["LastNameSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+									Apellido
 								</a>
 							</th>
 							<th>
-								<a asp-action="ManageUsers" asp-route-sortOrder="@this.ViewData["RutSortParam"]">
-									@this.Html.DisplayNameFor(m => m.Rut)
+								<a asp-action="ManageUsers" asp-route-sortOrder="@this.ViewData["RutSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+									RUT
 								</a>
 							</th>
 							<th>
-								<a asp-action="ManageUsers" asp-route-sortOrder="@this.ViewData["UniversityIdSortParam"]">
-									@this.Html.DisplayNameFor(m => m.UniversityId)
+								<a asp-action="ManageUsers" asp-route-sortOrder="@this.ViewData["UniversityIdSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+									Número de matrícula
 								</a>
 							</th>
 							<th>
-								<a asp-action="ManageUsers" asp-route-sortOrder="@this.ViewData["EmailSortParam"]">
-									@this.Html.DisplayNameFor(m => m.Email)
+								<a asp-action="ManageUsers" asp-route-sortOrder="@this.ViewData["EmailSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+									E-mail
 								</a>
 							</th>
 							<th>Acciones</th>
@@ -101,12 +102,22 @@
 								<td>@item.Email</td>
 								<td>
 									@this.Html.ActionLink("Editar", "EditUser", "Administration", new { area = "Account", id = item.Id }, new { @class = "btn btn-yellow mb-3"})
-									@this.Html.ActionLink("Eliminar", "DeleteUser", "Administration", new { area = "Account", id = item.Id }, new { @class = "btn btn-danger mb-3"})
+									@this.Html.ActionLink("Deshabilitar", "DisableUser", "Administration", new { area = "Account", id = item.Id }, new { @class = "btn btn-danger mb-3"})
 								</td>
 							</tr>
 						}
 					</tbody>
 				</table>
+				@{
+					var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+					var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+				}
+				<a asp-action="ManageUsers" asp-route-sortOrder="@ViewData["CurrentSort"]" asp-route-pageNumber="@(Model.PageIndex - 1)" asp-route-currentFilter="@ViewData["CurrentFilter"]" class="btn btn-default @prevDisabled">
+					Anterior página
+				</a>
+				<a asp-action="ManageUsers" asp-route-sortOrder="@ViewData["CurrentSort"]" asp-route-pageNumber="@(Model.PageIndex + 1)" asp-route-currentFilter="@ViewData["CurrentFilter"]" class="btn btn-default @nextDisabled">
+					Siguiente página
+				</a>
 			</div>
 		</div>
 	</div>
