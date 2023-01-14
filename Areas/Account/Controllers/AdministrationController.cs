@@ -72,8 +72,19 @@ public class AdministrationController : Controller {
 		return this.View();
 	}
 
-	public IActionResult ManageUsers() {
-		var users = this._userManager.Users.ToList();
+	public IActionResult ManageUsers(string sortOrder) {
+		this.ViewData["NameSortParam"] = string.IsNullOrEmpty(sortOrder) ? "first_name" : "";
+		this.ViewData["DateSortParam"] = sortOrder == "Date" ? "date_desc" : "Date";
+		var users = sortOrder switch {
+			"NameDesc" => this._userManager.Users.OrderByDescending(u => u.LastName).ToList(),
+			"UniversityId" => this._userManager.Users.OrderBy(u => u.UniversityId).ToList(),
+			"UniversityIdDesc" => this._userManager.Users.OrderByDescending(u => u.UniversityId).ToList(),
+			"Rut" => this._userManager.Users.OrderBy(u => u.Rut).ToList(),
+			"RutDesc" => this._userManager.Users.OrderByDescending(u => u.Rut).ToList(),
+			"Email" => this._userManager.Users.OrderBy(u => u.Email).ToList(),
+			"EmailDesc" => this._userManager.Users.OrderByDescending(u => u.Email).ToList(),
+			_ => this._userManager.Users.OrderBy(u => u.LastName).ToList(),
+		};
 		var usersViewModel = users.Select(u => new ManageUsersViewModel {
 			Id = u.Id,
 			FirstName = u.FirstName,

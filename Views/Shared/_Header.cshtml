@@ -37,11 +37,11 @@
 			</a>
 			<div class="dropdown-menu dropdown-menu-end me-lg-3">
 				@if (this.SignInManager.IsSignedIn(this.User)) {
-					<a class="dropdown-item d-flex align-items-center" asp-area="Account" asp-controller="Profile">Mi perfil <i class="fa fa-user-circle fa-fw ms-auto text-gray-400 f-s-16"></i></a>
+					<a class="dropdown-item d-flex align-items-center" href="@this.Url.Action("Index", "Profile", new { area = "Account" })">Mi perfil <i class="fa fa-user-circle fa-fw ms-auto text-gray-400 f-s-16"></i></a>
 					<div class="dropdown-divider"></div>
-					<a asp-area="Account" asp-controller="SignOut" class="dropdown-item d-flex align-items-center">Cerrar sesión <i class="fa fa-toggle-off fa-fw ms-auto text-gray-400 f-s-16"></i></a>
+					<a class="dropdown-item d-flex align-items-center" href="@this.Url.Action("Index", "SignOut", new { area = "Account" })">Cerrar sesión <i class="fa fa-toggle-off fa-fw ms-auto text-gray-400 f-s-16"></i></a>
 				} else {
-					<a class="dropdown-item d-flex align-items-center" asp-area="Account" asp-controller="SignIn">Iniciar sesión <i class="fa fa-arrow-right-to-bracket fa-fw ms-auto text-gray-400 f-s-16"></i></a>
+					<a class="dropdown-item d-flex align-items-center" href="@this.Url.Action("Index", "SignIn", new { area = "Account" })">Iniciar sesión <i class="fa fa-arrow-right-to-bracket fa-fw ms-auto text-gray-400 f-s-16"></i></a>
 				}
 			</div>
 		</div>
