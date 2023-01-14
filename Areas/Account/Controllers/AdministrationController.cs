@@ -73,17 +73,23 @@ public class AdministrationController : Controller {
 	}
 
 	public IActionResult ManageUsers(string sortOrder) {
-		this.ViewData["NameSortParam"] = string.IsNullOrEmpty(sortOrder) ? "first_name" : "";
-		this.ViewData["DateSortParam"] = sortOrder == "Date" ? "date_desc" : "Date";
+		this.ViewData["FirstNameSortParam"] = sortOrder == "FirstName" ? "FirstNameDesc" : "FirstName";
+		this.ViewData["LastNameSortParam"] = sortOrder == "LastName" ? "LastNameDesc" : "LastName";
+		this.ViewData["UniversityIdSortParam"] = sortOrder == "UniversityId" ? "UniversityIdDesc" : "UniversityId";
+		this.ViewData["RutSortParam"] = sortOrder == "Rut" ? "RutDesc" : "Rut";
+		this.ViewData["EmailSortParam"] = sortOrder == "Email" ? "EmailDesc" : "Email";
 		var users = sortOrder switch {
-			"NameDesc" => this._userManager.Users.OrderByDescending(u => u.LastName).ToList(),
+			"FirstName" => this._userManager.Users.OrderBy(u => u.FirstName).ToList(),
+			"FirstNameDesc" => this._userManager.Users.OrderByDescending(u => u.FirstName).ToList(),
 			"UniversityId" => this._userManager.Users.OrderBy(u => u.UniversityId).ToList(),
 			"UniversityIdDesc" => this._userManager.Users.OrderByDescending(u => u.UniversityId).ToList(),
 			"Rut" => this._userManager.Users.OrderBy(u => u.Rut).ToList(),
 			"RutDesc" => this._userManager.Users.OrderByDescending(u => u.Rut).ToList(),
 			"Email" => this._userManager.Users.OrderBy(u => u.Email).ToList(),
 			"EmailDesc" => this._userManager.Users.OrderByDescending(u => u.Email).ToList(),
-			_ => this._userManager.Users.OrderBy(u => u.LastName).ToList(),
+			"LastName" => this._userManager.Users.OrderBy(u => u.LastName).ToList(),
+			"LastNameDesc" => this._userManager.Users.OrderByDescending(u => u.LastName).ToList(),
+			_ => this._userManager.Users.OrderBy(u => u.LastName).ToList()
 		};
 		var usersViewModel = users.Select(u => new ManageUsersViewModel {
 			Id = u.Id,

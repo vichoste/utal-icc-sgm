@@ -57,14 +57,34 @@
 	<div class="row justify-content-center">
 		<div class="col-12">
 			<div class="table-responsive">
-				<table class="table">
-					<thead>
+				<table class="table table-bordered">
+					<thead class="table-dark">
 						<tr>
-							<th>@this.Html.DisplayNameFor(m => m.FirstName)</th>
-							<th>@this.Html.DisplayNameFor(m => m.LastName)</th>
-							<th>@this.Html.DisplayNameFor(m => m.Rut)</th>
-							<th>@this.Html.DisplayNameFor(m => m.UniversityId)</th>
-							<th>@this.Html.DisplayNameFor(m => m.Email)</th>
+							<th>
+								<a asp-action="ManageUsers" asp-route-sortOrder="@this.ViewData["FirstNameSortParam"]">
+									@this.Html.DisplayNameFor(m => m.FirstName)
+								</a>
+							</th>
+							<th>
+								<a asp-action="ManageUsers" asp-route-sortOrder="@this.ViewData["LastNameSortParam"]">
+									@this.Html.DisplayNameFor(m => m.LastName)
+								</a>
+							</th>
+							<th>
+								<a asp-action="ManageUsers" asp-route-sortOrder="@this.ViewData["RutSortParam"]">
+									@this.Html.DisplayNameFor(m => m.Rut)
+								</a>
+							</th>
+							<th>
+								<a asp-action="ManageUsers" asp-route-sortOrder="@this.ViewData["UniversityIdSortParam"]">
+									@this.Html.DisplayNameFor(m => m.UniversityId)
+								</a>
+							</th>
+							<th>
+								<a asp-action="ManageUsers" asp-route-sortOrder="@this.ViewData["EmailSortParam"]">
+									@this.Html.DisplayNameFor(m => m.Email)
+								</a>
+							</th>
 							<th>Acciones</th>
 						</tr>
 					</thead>
