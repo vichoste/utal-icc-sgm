@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 
 using Utal.Icc.Sgm.Areas.Account.Models;
 using Utal.Icc.Sgm.Areas.Account.Views.Administration;
@@ -61,12 +62,12 @@ public class AdministrationController : Controller {
 				return this.View();
 			}
 			this.ViewBag.WarningMessage = "Usuario creado, pero no se le pudo asignar el(los) rol(es).";
-			this.ViewBag.WarningMessages = rolesResult.Errors.Select(w => w.Description);
+			this.ViewBag.WarningMessages = rolesResult.Errors.Select(w => w.Description).ToList();
 			this.ModelState.Clear();
 			return this.View();
 		}
 		if (createResult.Errors.Any()) {
-			this.ViewBag.ErrorMessages = createResult.Errors.Select(e => e.Description);
+			this.ViewBag.ErrorMessages = createResult.Errors.Select(e => e.Description).ToList();
 		}
 		this.ViewBag.ErrorMessage = "Error al crear el usuario.";
 		return this.View();
@@ -111,5 +112,81 @@ public class AdministrationController : Controller {
 		});
 		var pageSize = 10;
 		return this.View(PaginatedList<ManageUsersViewModel>.Create(usersViewModel.AsQueryable(), pageNumber ?? 1, pageSize));
+	}
+
+	public async Task<IActionResult> EditUser(string id) {
+		var user = this._userManager.Users.FirstOrDefault(u => u.Id == id);
+		if (user is null) {
+			this.ViewBag.ErrorMessage = "No se encontró el usuario.";
+			return this.View();
+		}
+		var editUserViewModel = new EditUserViewModel {
+			FirstName = user.FirstName,
+			LastName = user.LastName,
+			UniversityId = user.UniversityId,
+			Rut = user.Rut,
+			Email = user.Email
+		};
+		var userRoles = (await this._userManager.GetRolesAsync(user)).ToList();
+		editUserViewModel.IsAdministrator = userRoles.Contains(Roles.Administrator.ToString());
+		editUserViewModel.IsTeacher = userRoles.Contains(Roles.Teacher.ToString());
+		editUserViewModel.IsStudent = userRoles.Contains(Roles.Student.ToString());
+		return this.View(editUserViewModel);
+	}
+
+	[HttpPost, ValidateAntiForgeryToken]
+	public async Task<IActionResult> EditUser(string id, [FromForm] EditUserViewModel model) {
+		var user = this._userManager.Users.FirstOrDefault(u => u.Id == id);
+		if (user is null) {
+			this.ViewBag.ErrorMessage = "No se encontró el usuario.";
+			return this.View();
+		}
+		if (!model.CurrentPassword.IsNullOrEmpty() && !model.NewPassword.IsNullOrEmpty() && !model.ConfirmNewPassword.IsNullOrEmpty()) {
+			var passwordResult = await this._userManager.ChangePasswordAsync(user, model.CurrentPassword!, model.NewPassword!);
+			if (!passwordResult.Succeeded) {
+				this.ViewBag.ErrorMessage = "Error al cambiar la contraseña.";
+				this.ViewBag.ErrorMessages = passwordResult.Errors.Select(e => e.Description).ToList();
+				return this.View();
+			}
+		}
+		var userRoles = (await this._userManager.GetRolesAsync(user)).ToList();
+		var result = await this._userManager.RemoveFromRolesAsync(user, userRoles);
+		if (!result.Succeeded) {
+			this.ViewBag.ErrorMessage = "Error al eliminar los roles del usuario.";
+			this.ViewBag.ErrorMessages = result.Errors.Select(e => e.Description).ToList();
+			return this.View();
+		}
+		var roles = new List<string>();
+		if (model.IsAdministrator) {
+			roles.Add(Roles.Administrator.ToString());
+		}
+		if (model.IsTeacher) {
+			roles.Add(Roles.Teacher.ToString());
+		}
+		if (model.IsStudent) {
+			roles.Add(Roles.Student.ToString());
+		}
+		await this._userStore.SetUserNameAsync(user, userName: model.Email, CancellationToken.None);
+		await this._emailStore.SetEmailAsync(user, model.Email, CancellationToken.None);
+		user.FirstName = !model.FirstName.IsNullOrEmpty() ? model.FirstName : user.FirstName;
+		user.LastName = !model.LastName.IsNullOrEmpty() ? model.LastName : user.LastName;
+		user.UniversityId = !model.UniversityId.IsNullOrEmpty() ? model.UniversityId : user.UniversityId;
+		user.Rut = !model.Rut.IsNullOrEmpty() ? model.Rut : user.Rut;
+		var updateResult = await this._userManager.UpdateAsync(user);
+		if (updateResult.Succeeded) {
+			var rolesResult = await this._userManager.AddToRolesAsync(user, roles);
+			if (rolesResult.Succeeded) {
+				this.ViewBag.SuccessMessage = "Usuario actualizado con éxito.";
+				return this.View();
+			}
+			this.ViewBag.WarningMessage = "Usuario actualizado, pero no se le pudo asignar el(los) rol(es).";
+			this.ViewBag.WarningMessages = rolesResult.Errors.Select(w => w.Description).ToList();
+			return this.View();
+		}
+		if (updateResult.Errors.Any()) {
+			this.ViewBag.ErrorMessages = updateResult.Errors.Select(e => e.Description).ToList();
+		}
+		this.ViewBag.ErrorMessage = "Error al actualizar el usuario.";
+		return this.View();
 	}
 }

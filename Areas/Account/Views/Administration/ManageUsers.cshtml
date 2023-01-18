@@ -102,7 +102,7 @@
 								<td>@item.Email</td>
 								<td>
 									@this.Html.ActionLink("Editar", "EditUser", "Administration", new { area = "Account", id = item.Id }, new { @class = "btn btn-yellow mb-3"})
-									@this.Html.ActionLink("Deshabilitar", "DisableUser", "Administration", new { area = "Account", id = item.Id }, new { @class = "btn btn-danger mb-3"})
+									@this.Html.ActionLink("Eliminar", "DeleteUser", "Administration", new { area = "Account", id = item.Id }, new { @class = "btn btn-danger mb-3"})
 								</td>
 							</tr>
 						}

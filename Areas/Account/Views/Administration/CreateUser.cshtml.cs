@@ -17,10 +17,10 @@ public class CreateUserViewModel {
 	public string? Password { get; set; }
 	[Compare(nameof(Password), ErrorMessage = "Las contraseñas no coinciden"), DataType(DataType.Password), Display(Name = "Confirmar contraseña"), Required]
 	public string? ConfirmPassword { get; set; }
-	[Display(Name = "Administrador"), Required]
+	[Display(Name = "Administrador")]
 	public bool IsAdministrator { get; set; }
-	[Display(Name = "Profesor"), Required]
+	[Display(Name = "Profesor")]
 	public bool IsTeacher { get; set; }
-	[Display(Name = "Estudiante"), Required]
+	[Display(Name = "Estudiante")]
 	public bool IsStudent { get; set; }
 }
