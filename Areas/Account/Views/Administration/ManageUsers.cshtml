@@ -93,7 +93,7 @@
 						</tr>
 					</thead>
 					<tbody>
-						@foreach (var item in Model) {
+						@foreach (var item in this.Model) {
 							<tr>
 								<td>@item.FirstName</td>
 								<td>@item.LastName</td>
@@ -109,15 +109,28 @@
 					</tbody>
 				</table>
 				@{
-					var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
-					var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+					var prevDisabled = !this.Model.HasPreviousPage ? "disabled" : "";
+					var nextDisabled = !this.Model.HasNextPage ? "disabled" : "";
 				}
-				<a asp-action="ManageUsers" asp-route-sortOrder="@ViewData["CurrentSort"]" asp-route-pageNumber="@(Model.PageIndex - 1)" asp-route-currentFilter="@ViewData["CurrentFilter"]" class="btn btn-default @prevDisabled">
-					Anterior página
-				</a>
-				<a asp-action="ManageUsers" asp-route-sortOrder="@ViewData["CurrentSort"]" asp-route-pageNumber="@(Model.PageIndex + 1)" asp-route-currentFilter="@ViewData["CurrentFilter"]" class="btn btn-default @nextDisabled">
-					Siguiente página
-				</a>
+				<ul class="pagination mb-0">
+					<li class="page-item @prevDisabled">
+						<a asp-action="ManageUsers" asp-route-sortOrder="@this.ViewData["CurrentSort"]" asp-route-pageNumber="@(this.Model.PageIndex - 1)" asp-route-currentFilter="@this.ViewData["CurrentFilter"]" class="page-link">
+							Anterior página
+						</a>
+					</li>
+					@for (var i = 0; i < this.Model.TotalPages; i++) {
+						<li class="page-item @(i + 1 == this.Model.PageIndex ? " active" : "")">
+							<a asp-action="ManageUsers" asp-route-sortOrder="@this.ViewData["CurrentSort"]" asp-route-pageNumber="@(i + 1)" asp-route-currentFilter="@this.ViewData["CurrentFilter"]" class="page-link">
+								@(i + 1)
+							</a>
+						</li>
+					}
+					<li class="page-item @nextDisabled">
+						<a asp-action="ManageUsers" asp-route-sortOrder="@this.ViewData["CurrentSort"]" asp-route-pageNumber="@(this.Model.PageIndex + 1)" asp-route-currentFilter="@this.ViewData["CurrentFilter"]" class="page-link">
+							Siguiente página
+						</a>
+					</li>
+				</ul>
 			</div>
 		</div>
 	</div>
