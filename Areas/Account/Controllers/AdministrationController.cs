@@ -110,7 +110,7 @@ public class AdministrationController : Controller {
 			Rut = u.Rut,
 			Email = u.Email
 		});
-		var pageSize = 10;
+		var pageSize = 6;
 		return this.View(PaginatedList<ManageUsersViewModel>.Create(usersViewModel.AsQueryable(), pageNumber ?? 1, pageSize));
 	}
 
@@ -138,13 +138,13 @@ public class AdministrationController : Controller {
 	public async Task<IActionResult> EditUser(string id, [FromForm] EditUserViewModel model) {
 		var user = this._userManager.Users.FirstOrDefault(u => u.Id == id);
 		if (user is null) {
-			this.ViewBag.ErrorMessage = "No se encontró el usuario.";
+			this.ViewBag.ErrorMessage = "Error al obtener el usuario.";
 			return this.View();
 		}
 		if (!model.CurrentPassword.IsNullOrEmpty() && !model.NewPassword.IsNullOrEmpty() && !model.ConfirmNewPassword.IsNullOrEmpty()) {
 			var passwordResult = await this._userManager.ChangePasswordAsync(user, model.CurrentPassword!, model.NewPassword!);
 			if (!passwordResult.Succeeded) {
-				this.ViewBag.ErrorMessage = "Error al cambiar la contraseña.";
+				this.ViewBag.ErrorMessage = "Error al cambiar la contraseña del usuario.";
 				this.ViewBag.ErrorMessages = passwordResult.Errors.Select(e => e.Description).ToList();
 				return this.View();
 			}
@@ -187,6 +187,44 @@ public class AdministrationController : Controller {
 			this.ViewBag.ErrorMessages = updateResult.Errors.Select(e => e.Description).ToList();
 		}
 		this.ViewBag.ErrorMessage = "Error al actualizar el usuario.";
+		return this.View();
+	}
+
+	public IActionResult DeleteUser(string id) {
+		var user = this._userManager.Users.FirstOrDefault(u => u.Id == id);
+		if (user is null) {
+			this.ViewBag.ErrorMessage = "Error al obtener el usuario.";
+			return this.View();
+		}
+		var deleteUserViewModel = new DeleteUserViewModel {
+			Id = user.Id,
+			Email = user.Email
+		};
+		return this.View(deleteUserViewModel);
+	}
+
+	[HttpPost, ValidateAntiForgeryToken]
+	public async Task<IActionResult> DeleteUser(string id, [FromForm] DeleteUserViewModel model) {
+		var user = this._userManager.Users.FirstOrDefault(u => u.Id == id);
+		if (user is null) {
+			this.ViewBag.ErrorMessage = "Error al obtener el usuario.";
+			return this.View();
+		}
+		if (user!.Id == this._userManager.GetUserId(this.User)) {
+			this.ViewBag.ErrorMessage = "No te puedes eliminar a tí mismo.";
+			return this.View();
+		}
+		if (user is null) {
+			this.ViewBag.ErrorMessage = "Error al obtener el usuario.";
+			return this.View();
+		}
+		var result = await this._userManager.DeleteAsync(user);
+		if (result.Succeeded) {
+			this.ViewBag.SuccessMessage = "Usuario eliminado con éxito.";
+			return this.View();
+		}
+		this.ViewBag.ErrorMessage = "Error al eliminar el usuario.";
+		this.ViewBag.ErrorMessages = result.Errors.Select(e => e.Description).ToList();
 		return this.View();
 	}
 }
