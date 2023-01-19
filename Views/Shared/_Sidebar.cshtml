@@ -23,6 +23,68 @@
 					</div>
 				</div>
 			}
+			@if (this.User.IsInRole("Teacher")) {
+				<div class="menu-item has-sub">
+					<a href="#" class="menu-link">
+						<span class="menu-icon"><i class="fa fa-person-chalkboard"></i></span>
+						<span class="menu-text">Herramientas de profesor</span>
+						<span class="menu-caret"><b class="caret"></b></span>
+					</a>
+					<div class="menu-submenu">
+						<div class="menu-item">
+							<a href="@this.Url.Action("Index", "Teachers", new { area = "Thesis" })" class="menu-link">
+								<span class="menu-text">Gestionar mis memorias de título</span>
+							</a>
+						</div>
+						<div class="menu-item">
+							<a href="@this.Url.Action("Index", "Teachers", new { area = "Requests" })" class="menu-link">
+								<span class="menu-text">Gestionar mis solicitudes de memoria de título</span>
+							</a>
+						</div>
+						<div class="menu-item">
+							<a href="@this.Url.Action("Index", "Teachers", new { area = "Submissions" })" class="menu-link">
+								<span class="menu-text">Gestionar mis propuestas de memoria de título</span>
+							</a>
+						</div>
+						<div class="menu-item">
+							<a href="@this.Url.Action("Index", "Teachers", new { area = "Proposals" })" class="menu-link">
+								<span class="menu-text">Gestionar mis propuestas de estudiantes a memoria de título</span>
+							</a>
+						</div>
+					</div>
+				</div>
+			}
+			@if (this.User.IsInRole("Student")) {
+				<div class="menu-item has-sub">
+					<a href="#" class="menu-link">
+						<span class="menu-icon"><i class="fa fa-graduation-cap"></i></span>
+						<span class="menu-text">Herramientas de estudiante</span>
+						<span class="menu-caret"><b class="caret"></b></span>
+					</a>
+					<div class="menu-submenu">
+						<div class="menu-item">
+							<a href="@this.Url.Action("Index", "Students", new { area = "Thesis" })" class="menu-link">
+								<span class="menu-text">Gestionar mis memorias de título</span>
+							</a>
+						</div>
+						<div class="menu-item">
+							<a href="@this.Url.Action("Index", "Students", new { area = "Requests" })" class="menu-link">
+								<span class="menu-text">Gestionar mis solicitudes de memoria de título a comité</span>
+							</a>
+						</div>
+						<div class="menu-item">
+							<a href="@this.Url.Action("Index", "Students", new { area = "Submissions" })" class="menu-link">
+								<span class="menu-text">Gestionar mis postulaciones a memoria de título</span>
+							</a>
+						</div>
+						<div class="menu-item">
+							<a href="@this.Url.Action("Index", "Students", new { area = "Proposals" })" class="menu-link">
+								<span class="menu-text">Gestionar mis propuestas de memoria de título</span>
+							</a>
+						</div>
+					</div>
+				</div>
+			}
 		</div>
 	</div>
 	<button class="app-sidebar-mobile-backdrop" data-dismiss="sidebar-mobile"></button>
