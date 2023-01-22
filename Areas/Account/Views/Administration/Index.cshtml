@@ -1,7 +1,7 @@
 ﻿@using Utal.Icc.Sgm
 @using Utal.Icc.Sgm.Areas.Account.Views.Administration
 
-@model PaginatedList<ManageUsersViewModel>
+@model PaginatedList<IndexViewModel>
 
 @{
 	this.ViewData["Title"] = "Gestionar usuarios";
@@ -65,27 +65,27 @@
 					<thead class="table-dark">
 						<tr>
 							<th>
-								<a asp-action="ManageUsers" asp-route-sortOrder="@this.ViewData["FirstNameSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+								<a asp-action="Index" asp-route-sortOrder="@this.ViewData["FirstNameSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
 									Nombre
 								</a>
 							</th>
 							<th>
-								<a asp-action="ManageUsers" asp-route-sortOrder="@this.ViewData["LastNameSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+								<a asp-action="Index" asp-route-sortOrder="@this.ViewData["LastNameSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
 									Apellido
 								</a>
 							</th>
 							<th>
-								<a asp-action="ManageUsers" asp-route-sortOrder="@this.ViewData["RutSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+								<a asp-action="Index" asp-route-sortOrder="@this.ViewData["RutSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
 									RUT
 								</a>
 							</th>
 							<th>
-								<a asp-action="ManageUsers" asp-route-sortOrder="@this.ViewData["UniversityIdSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+								<a asp-action="Index" asp-route-sortOrder="@this.ViewData["UniversityIdSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
 									Número de matrícula
 								</a>
 							</th>
 							<th>
-								<a asp-action="ManageUsers" asp-route-sortOrder="@this.ViewData["EmailSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+								<a asp-action="Index" asp-route-sortOrder="@this.ViewData["EmailSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
 									E-mail
 								</a>
 							</th>
@@ -114,19 +114,19 @@
 				}
 				<ul class="pagination mb-0">
 					<li class="page-item @prevDisabled">
-						<a asp-action="ManageUsers" asp-route-sortOrder="@this.ViewData["CurrentSort"]" asp-route-pageNumber="@(this.Model.PageIndex - 1)" asp-route-currentFilter="@this.ViewData["CurrentFilter"]" class="page-link">
+						<a asp-action="Index" asp-route-sortOrder="@this.ViewData["CurrentSort"]" asp-route-pageNumber="@(this.Model.PageIndex - 1)" asp-route-currentFilter="@this.ViewData["CurrentFilter"]" class="page-link">
 							Anterior página
 						</a>
 					</li>
 					@for (var i = 0; i < this.Model.TotalPages; i++) {
 						<li class="page-item @(i + 1 == this.Model.PageIndex ? " active" : "")">
-							<a asp-action="ManageUsers" asp-route-sortOrder="@this.ViewData["CurrentSort"]" asp-route-pageNumber="@(i + 1)" asp-route-currentFilter="@this.ViewData["CurrentFilter"]" class="page-link">
+							<a asp-action="Index" asp-route-sortOrder="@this.ViewData["CurrentSort"]" asp-route-pageNumber="@(i + 1)" asp-route-currentFilter="@this.ViewData["CurrentFilter"]" class="page-link">
 								@(i + 1)
 							</a>
 						</li>
 					}
 					<li class="page-item @nextDisabled">
-						<a asp-action="ManageUsers" asp-route-sortOrder="@this.ViewData["CurrentSort"]" asp-route-pageNumber="@(this.Model.PageIndex + 1)" asp-route-currentFilter="@this.ViewData["CurrentFilter"]" class="page-link">
+						<a asp-action="Index" asp-route-sortOrder="@this.ViewData["CurrentSort"]" asp-route-pageNumber="@(this.Model.PageIndex + 1)" asp-route-currentFilter="@this.ViewData["CurrentFilter"]" class="page-link">
 							Siguiente página
 						</a>
 					</li>

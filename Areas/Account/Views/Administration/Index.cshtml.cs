@@ -2,7 +2,7 @@
 
 namespace Utal.Icc.Sgm.Areas.Account.Views.Administration;
 
-public class ManageUsersViewModel {
+public class IndexViewModel {
 	[Display(Name = "ID")]
 	public string? Id { get; set; }
 	[Display(Name = "Nombre")]

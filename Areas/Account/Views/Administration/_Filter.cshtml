@@ -2,11 +2,11 @@
 
 @model FilterPartialViewModel
 
-@using (this.Html.BeginForm("ManageUsers", "Administration", new { area = "Account" })) {
+@using (this.Html.BeginForm("Index", "Administration", new { area = "Account" })) {
 	<div class="form-group">
 		@this.Html.LabelFor(m => m.SearchString, new { @class = "form-label mb-3" })
 		@this.Html.TextBoxFor(m => m.SearchString, new { @class = "form-control mb-3" })
 	</div>
 	<button type="submit" class="btn btn-primary">Filtrar</button>
-	@this.Html.ActionLink("Volver a la lista principal", "ManageUsers", "Administration", new { area = "Account" }, new { @class = "btn btn-link" })
+	@this.Html.ActionLink("Volver a la lista principal", "Index", "Administration", new { area = "Account" }, new { @class = "btn btn-link" })
 }

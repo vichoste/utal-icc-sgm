@@ -73,7 +73,7 @@ public class AdministrationController : Controller {
 		return this.View();
 	}
 
-	public IActionResult ManageUsers(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
+	public IActionResult Index(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
 		this.ViewData["FirstNameSortParam"] = sortOrder == "FirstName" ? "FirstNameDesc" : "FirstName";
 		this.ViewData["LastNameSortParam"] = sortOrder == "LastName" ? "LastNameDesc" : "LastName";
 		this.ViewData["UniversityIdSortParam"] = sortOrder == "UniversityId" ? "UniversityIdDesc" : "UniversityId";
@@ -102,7 +102,7 @@ public class AdministrationController : Controller {
 		if (!string.IsNullOrEmpty(searchString)) {
 			users = users.Where(s => s.FirstName!.ToUpper().Contains(searchString.ToUpper()) || s.LastName!.ToUpper().Contains(searchString.ToUpper()) || s.UniversityId!.ToUpper().Contains(searchString.ToUpper()) || s.Rut!.ToUpper().Contains(searchString.ToUpper()) || s.Email == searchString).ToList();
 		}
-		var usersViewModel = users.Select(u => new ManageUsersViewModel {
+		var usersViewModel = users.Select(u => new IndexViewModel {
 			Id = u.Id,
 			FirstName = u.FirstName,
 			LastName = u.LastName,
@@ -111,7 +111,7 @@ public class AdministrationController : Controller {
 			Email = u.Email
 		});
 		var pageSize = 6;
-		return this.View(PaginatedList<ManageUsersViewModel>.Create(usersViewModel.AsQueryable(), pageNumber ?? 1, pageSize));
+		return this.View(PaginatedList<IndexViewModel>.Create(usersViewModel.AsQueryable(), pageNumber ?? 1, pageSize));
 	}
 
 	public async Task<IActionResult> EditUser(string id) {
