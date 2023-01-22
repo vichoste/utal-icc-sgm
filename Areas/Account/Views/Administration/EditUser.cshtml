@@ -55,7 +55,7 @@
 				<div class="card-body">
 					@using (this.Html.BeginForm("EditUser", "Administration", new { area = "Account" })) {
 						@this.Html.AntiForgeryToken()
-						<div class="row">
+						<div class="row was-validated">
 							<div class="col">
 								<div class="form-group mb-3">
 									@this.Html.LabelFor(m => m.FirstName, new { @class = "form-label" })

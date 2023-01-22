@@ -21,11 +21,11 @@ public class UserController : Controller {
 		this._emailStore = (IUserEmailStore<ApplicationUser>)this._userStore;
 		this._roleManager = roleManager;
 	}
-	
+
 	public async Task<IActionResult> Index() {
 		var user = await this._userManager.GetUserAsync(this.User);
 		if (!this.User.Identity!.IsAuthenticated) {
-			return this.RedirectToAction("Index", "SignIn", new { area = "Account"});
+			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
 		}
 		var indexViewModel = new IndexViewModel {
 			FirstName = user!.FirstName,
@@ -38,5 +38,24 @@ public class UserController : Controller {
 			IsStudent = await this._userManager.IsInRoleAsync(user, "Student")
 		};
 		return this.View(indexViewModel);
+	}
+
+	public IActionResult ChangePassword() => !this.User.Identity!.IsAuthenticated ? this.RedirectToAction("Index", "SignIn", new { area = "Account" }) : this.View();
+
+	[HttpPost, ValidateAntiForgeryToken]
+	public async Task<IActionResult> ChangePassword(string id, [FromForm] ChangePasswordViewModel model) {
+		if (!this.User.Identity!.IsAuthenticated) {
+			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
+		}
+		var user = await this._userManager.GetUserAsync(this.User);
+		var passwordResult = await this._userManager.ChangePasswordAsync(user!, model.CurrentPassword!, model.NewPassword!);
+		if (!passwordResult.Succeeded) {
+			this.ViewBag.ErrorMessage = "Error al cambiar la contraseña del usuario.";
+			this.ViewBag.ErrorMessages = passwordResult.Errors.Select(e => e.Description).ToList();
+			return this.View();
+		}
+		this.ViewBag.SuccessMessage = "Se cambió la contraseña con éxito.";
+		this.ModelState.Clear();
+		return this.View();
 	}
 }

@@ -117,7 +117,7 @@ public class AdministrationController : Controller {
 	public async Task<IActionResult> EditUser(string id) {
 		var user = this._userManager.Users.FirstOrDefault(u => u.Id == id);
 		if (user is null) {
-			this.ViewBag.ErrorMessage = "No se encontró el usuario.";
+			this.ViewBag.ErrorMessage = "Error al obtener al usuario.";
 			return this.View();
 		}
 		var editUserViewModel = new EditUserViewModel {
