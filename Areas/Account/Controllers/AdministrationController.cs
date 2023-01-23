@@ -24,6 +24,47 @@ public class AdministrationController : Controller {
 		this._roleManager = roleManager;
 	}
 
+	public IActionResult Index(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
+		this.ViewData["FirstNameSortParam"] = sortOrder == "FirstName" ? "FirstNameDesc" : "FirstName";
+		this.ViewData["LastNameSortParam"] = sortOrder == "LastName" ? "LastNameDesc" : "LastName";
+		this.ViewData["UniversityIdSortParam"] = sortOrder == "UniversityId" ? "UniversityIdDesc" : "UniversityId";
+		this.ViewData["RutSortParam"] = sortOrder == "Rut" ? "RutDesc" : "Rut";
+		this.ViewData["EmailSortParam"] = sortOrder == "Email" ? "EmailDesc" : "Email";
+		this.ViewData["CurrentSort"] = sortOrder;
+		if (searchString is not null) {
+			pageNumber = 1;
+		} else {
+			searchString = currentFilter;
+		}
+		this.ViewData["CurrentFilter"] = searchString;
+		var users = sortOrder switch {
+			"FirstName" => this._userManager.Users.OrderBy(u => u.FirstName).ToList(),
+			"FirstNameDesc" => this._userManager.Users.OrderByDescending(u => u.FirstName).ToList(),
+			"UniversityId" => this._userManager.Users.OrderBy(u => u.UniversityId).ToList(),
+			"UniversityIdDesc" => this._userManager.Users.OrderByDescending(u => u.UniversityId).ToList(),
+			"Rut" => this._userManager.Users.OrderBy(u => u.Rut).ToList(),
+			"RutDesc" => this._userManager.Users.OrderByDescending(u => u.Rut).ToList(),
+			"Email" => this._userManager.Users.OrderBy(u => u.Email).ToList(),
+			"EmailDesc" => this._userManager.Users.OrderByDescending(u => u.Email).ToList(),
+			"LastName" => this._userManager.Users.OrderBy(u => u.LastName).ToList(),
+			"LastNameDesc" => this._userManager.Users.OrderByDescending(u => u.LastName).ToList(),
+			_ => this._userManager.Users.OrderBy(u => u.LastName).ToList()
+		};
+		if (!string.IsNullOrEmpty(searchString)) {
+			users = users.Where(s => s.FirstName!.ToUpper().Contains(searchString.ToUpper()) || s.LastName!.ToUpper().Contains(searchString.ToUpper()) || s.UniversityId!.ToUpper().Contains(searchString.ToUpper()) || s.Rut!.ToUpper().Contains(searchString.ToUpper()) || s.Email == searchString).ToList();
+		}
+		var usersViewModel = users.Select(u => new IndexViewModel {
+			Id = u.Id,
+			FirstName = u.FirstName,
+			LastName = u.LastName,
+			UniversityId = u.UniversityId,
+			Rut = u.Rut,
+			Email = u.Email
+		});
+		var pageSize = 6;
+		return this.View(PaginatedList<IndexViewModel>.Create(usersViewModel.AsQueryable(), pageNumber ?? 1, pageSize));
+	}
+
 	public IActionResult CreateUser() => this.View();
 
 	[HttpPost, ValidateAntiForgeryToken]
@@ -71,47 +112,6 @@ public class AdministrationController : Controller {
 		}
 		this.ViewBag.ErrorMessage = "Error al crear el usuario.";
 		return this.View();
-	}
-
-	public IActionResult Index(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
-		this.ViewData["FirstNameSortParam"] = sortOrder == "FirstName" ? "FirstNameDesc" : "FirstName";
-		this.ViewData["LastNameSortParam"] = sortOrder == "LastName" ? "LastNameDesc" : "LastName";
-		this.ViewData["UniversityIdSortParam"] = sortOrder == "UniversityId" ? "UniversityIdDesc" : "UniversityId";
-		this.ViewData["RutSortParam"] = sortOrder == "Rut" ? "RutDesc" : "Rut";
-		this.ViewData["EmailSortParam"] = sortOrder == "Email" ? "EmailDesc" : "Email";
-		this.ViewData["CurrentSort"] = sortOrder;
-		if (searchString is not null) {
-			pageNumber = 1;
-		} else {
-			searchString = currentFilter;
-		}
-		this.ViewData["CurrentFilter"] = searchString;
-		var users = sortOrder switch {
-			"FirstName" => this._userManager.Users.OrderBy(u => u.FirstName).ToList(),
-			"FirstNameDesc" => this._userManager.Users.OrderByDescending(u => u.FirstName).ToList(),
-			"UniversityId" => this._userManager.Users.OrderBy(u => u.UniversityId).ToList(),
-			"UniversityIdDesc" => this._userManager.Users.OrderByDescending(u => u.UniversityId).ToList(),
-			"Rut" => this._userManager.Users.OrderBy(u => u.Rut).ToList(),
-			"RutDesc" => this._userManager.Users.OrderByDescending(u => u.Rut).ToList(),
-			"Email" => this._userManager.Users.OrderBy(u => u.Email).ToList(),
-			"EmailDesc" => this._userManager.Users.OrderByDescending(u => u.Email).ToList(),
-			"LastName" => this._userManager.Users.OrderBy(u => u.LastName).ToList(),
-			"LastNameDesc" => this._userManager.Users.OrderByDescending(u => u.LastName).ToList(),
-			_ => this._userManager.Users.OrderBy(u => u.LastName).ToList()
-		};
-		if (!string.IsNullOrEmpty(searchString)) {
-			users = users.Where(s => s.FirstName!.ToUpper().Contains(searchString.ToUpper()) || s.LastName!.ToUpper().Contains(searchString.ToUpper()) || s.UniversityId!.ToUpper().Contains(searchString.ToUpper()) || s.Rut!.ToUpper().Contains(searchString.ToUpper()) || s.Email == searchString).ToList();
-		}
-		var usersViewModel = users.Select(u => new IndexViewModel {
-			Id = u.Id,
-			FirstName = u.FirstName,
-			LastName = u.LastName,
-			UniversityId = u.UniversityId,
-			Rut = u.Rut,
-			Email = u.Email
-		});
-		var pageSize = 6;
-		return this.View(PaginatedList<IndexViewModel>.Create(usersViewModel.AsQueryable(), pageNumber ?? 1, pageSize));
 	}
 
 	public async Task<IActionResult> EditUser(string id) {

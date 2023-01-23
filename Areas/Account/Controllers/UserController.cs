@@ -32,10 +32,7 @@ public class UserController : Controller {
 			LastName = user.LastName,
 			Rut = user.Rut,
 			UniversityId = user.UniversityId,
-			Email = await this._emailStore.GetEmailAsync(user, CancellationToken.None),
-			IsAdministrator = await this._userManager.IsInRoleAsync(user, "Administrator"),
-			IsTeacher = await this._userManager.IsInRoleAsync(user, "Teacher"),
-			IsStudent = await this._userManager.IsInRoleAsync(user, "Student")
+			Email = await this._emailStore.GetEmailAsync(user, CancellationToken.None)
 		};
 		return this.View(indexViewModel);
 	}
