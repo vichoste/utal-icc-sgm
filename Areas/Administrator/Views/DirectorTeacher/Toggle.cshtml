@@ -51,11 +51,12 @@
 			<div class="card">
 				<div class="card-header text-center">Establecer rol de director de carrera</div>
 				<div class="card-body text-center">
+					@* TODO: This thing crashes when POST
 					@if (this.Model.IsDirectorTeacher) {
 						<p class="card-text">¿Deseas que <b>@this.Html.DisplayFor(m => m.Email)</b> deje de ser director de carrera?</p>
 					} else {
 						<p class="card-text">¿Deseas que <b>@this.Html.DisplayFor(m => m.Email)</b> sea director de carrera?</p>
-					}
+					}*@
 					@using (this.Html.BeginForm("Toggle", "DirectorTeacher", new { area = "Administrator" })) {
 						@this.Html.AntiForgeryToken()
 						<div class="row text-center">
