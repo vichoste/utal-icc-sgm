@@ -1,5 +1,6 @@
 ﻿@using Microsoft.AspNetCore.Identity
-@using Utal.Icc.Sgm.Areas.Account.Models
+
+@using Utal.Icc.Sgm.Models
 
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
@@ -37,8 +38,8 @@
 			</a>
 			<div class="dropdown-menu dropdown-menu-end me-lg-3">
 				@if (this.SignInManager.IsSignedIn(this.User)) {
-					<a class="dropdown-item d-flex align-items-center" href="@this.Url.Action("Index", "User", new { area = "Account" })">Mi perfil <i class="fa fa-user-circle fa-fw ms-auto text-gray-400 f-s-16"></i></a>
-					<a class="dropdown-item d-flex align-items-center" href="@this.Url.Action("ChangePassword", "User", new { area = "Account" })">Contraseña <i class="fa fa-key fa-fw ms-auto text-gray-400 f-s-16"></i></a>
+					<a class="dropdown-item d-flex align-items-center" href="@this.Url.Action("Index", "Profile", new { area = "Account" })">Mi perfil <i class="fa fa-user-circle fa-fw ms-auto text-gray-400 f-s-16"></i></a>
+					<a class="dropdown-item d-flex align-items-center" href="@this.Url.Action("ChangePassword", "Profile", new { area = "Account" })">Contraseña <i class="fa fa-key fa-fw ms-auto text-gray-400 f-s-16"></i></a>
 					<div class="dropdown-divider"></div>
 					<a class="dropdown-item d-flex align-items-center" href="@this.Url.Action("Index", "SignOut", new { area = "Account" })">Cerrar sesión <i class="fa fa-toggle-off fa-fw ms-auto text-gray-400 f-s-16"></i></a>
 				} else {

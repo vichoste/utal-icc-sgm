@@ -1,0 +1,131 @@
+﻿@using Utal.Icc.Sgm
+@using Utal.Icc.Sgm.Areas.Administrator.Views.Account
+
+@model PaginatedList<IndexViewModel>
+
+@{
+	this.ViewData["Title"] = "Gestionar usuarios";
+}
+
+<div class="container">
+	@if (this.ViewBag.SuccessMessage is not null) {
+		<div class="row justify-content-center">
+			<div class="alert alert-success" role="alert">
+				@this.ViewBag.SuccessMessage
+			</div>
+		</div>
+	}
+	@if (this.ViewBag.WarningMessage is not null) {
+		<div class="row justify-content-center">
+			<div class="alert alert-warning" role="alert">
+				@this.ViewBag.WarningMessage
+			</div>
+		</div>
+	}
+	@if (this.ViewBag.WarningMessages is not null) {
+		@foreach (var warning in this.ViewBag.WarningMessages) {
+			<div class="row justify-content-center">
+				<div class="alert alert-warning" role="alert">
+					@warning
+				</div>
+			</div>
+		}
+	}
+	@if (this.ViewBag.ErrorMessage is not null) {
+		<div class="row justify-content-center">
+			<div class="alert alert-danger" role="alert">
+				@this.ViewBag.ErrorMessage
+			</div>
+		</div>
+	}
+	@if (this.ViewBag.ErrorMessages is not null) {
+		@foreach (var error in this.ViewBag.ErrorMessages) {
+			<div class="row justify-content-center">
+				<div class="alert alert-danger" role="alert">
+					@error
+				</div>
+			</div>
+		}
+	}
+	<div class="row justify-content-center">
+		<div class="col-12 col-md-10 mb-3">
+			<h2>Gestionar usuarios</h2>
+		</div>
+		<div class="col-12 col-md-2 mb-3">
+			@this.Html.ActionLink("Crear usuario", "Create", "Account", new { area = "Administrator" }, new { @class = "btn btn-success"})
+		</div>
+		<div class="col-12 mb-3">
+			<partial name="_Filter" , model="@new FilterPartialViewModel()" />
+		</div>
+	</div>
+	<div class="row justify-content-center">
+		<div class="col-12">
+			<div class="table-responsive">
+				<table class="table table-bordered">
+					<thead class="table-dark">
+						<tr>
+							<th>
+								<a asp-action="Index" asp-route-sortOrder="@this.ViewData["FirstNameSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+									Nombre
+								</a>
+							</th>
+							<th>
+								<a asp-action="Index" asp-route-sortOrder="@this.ViewData["LastNameSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+									Apellido
+								</a>
+							</th>
+							<th>
+								<a asp-action="Index" asp-route-sortOrder="@this.ViewData["RutSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+									RUT
+								</a>
+							</th>
+							<th>
+								<a asp-action="Index" asp-route-sortOrder="@this.ViewData["EmailSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+									E-mail
+								</a>
+							</th>
+							<th>Acciones</th>
+						</tr>
+					</thead>
+					<tbody>
+						@foreach (var item in this.Model) {
+							<tr>
+								<td>@item.FirstName</td>
+								<td>@item.LastName</td>
+								<td>@item.Rut</td>
+								<td>@item.Email</td>
+								<td>
+									@this.Html.ActionLink("Editar", "Edit", "Account", new { area = "Administrator", id = item.Id }, new { @class = "btn btn-yellow mb-3"})
+									@this.Html.ActionLink("Eliminar", "Delete", "Account", new { area = "Administrator", id = item.Id }, new { @class = "btn btn-danger mb-3"})
+								</td>
+							</tr>
+						}
+					</tbody>
+				</table>
+				@{
+					var prevDisabled = !this.Model.HasPreviousPage ? "disabled" : "";
+					var nextDisabled = !this.Model.HasNextPage ? "disabled" : "";
+				}
+				<ul class="pagination mb-0">
+					<li class="page-item @prevDisabled">
+						<a asp-action="Index" asp-route-sortOrder="@this.ViewData["CurrentSort"]" asp-route-pageNumber="@(this.Model.PageIndex - 1)" asp-route-currentFilter="@this.ViewData["CurrentFilter"]" class="page-link">
+							Anterior página
+						</a>
+					</li>
+					@for (var i = 0; i < this.Model.TotalPages; i++) {
+						<li class="page-item @(i + 1 == this.Model.PageIndex ? " active" : "")">
+							<a asp-action="Index" asp-route-sortOrder="@this.ViewData["CurrentSort"]" asp-route-pageNumber="@(i + 1)" asp-route-currentFilter="@this.ViewData["CurrentFilter"]" class="page-link">
+								@(i + 1)
+							</a>
+						</li>
+					}
+					<li class="page-item @nextDisabled">
+						<a asp-action="Index" asp-route-sortOrder="@this.ViewData["CurrentSort"]" asp-route-pageNumber="@(this.Model.PageIndex + 1)" asp-route-currentFilter="@this.ViewData["CurrentFilter"]" class="page-link">
+							Siguiente página
+						</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+</div>

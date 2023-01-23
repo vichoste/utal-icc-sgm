@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
-using Utal.Icc.Sgm.Areas.Account.Models;
 using Utal.Icc.Sgm.Areas.Account.Views.SignIn;
+using Utal.Icc.Sgm.Models;
 
 namespace Utal.Icc.Sgm.Areas.Account.Controllers;
 
