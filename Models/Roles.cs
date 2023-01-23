@@ -5,6 +5,7 @@ public enum Roles {
 	DirectorTeacher, // RANK ROLE
 	CommitteeTeacher, // RANK ROLE
 	CourseTeacher, // RANK ROLE
+	GuideTeacher, // RANK ROLE
 	AssistantTeacher, // RANK ROLE
 	Teacher, // MAIN ROLE
 	EngineerStudent, // RANK ROLE

@@ -1,10 +1,10 @@
 ﻿@using Utal.Icc.Sgm
-@using Utal.Icc.Sgm.Areas.Administrator.Views.DirectorTeacher
+@using Utal.Icc.Sgm.Areas.DirectorTeacher.Views.Student
 
 @model PaginatedList<IndexViewModel>
 
 @{
-	this.ViewData["Title"] = "Gestionar directores de carrera";
+	this.ViewData["Title"] = "Gestionar estudiantes";
 }
 
 <div class="container">
@@ -48,8 +48,11 @@
 		}
 	}
 	<div class="row justify-content-center">
-		<div class="col-12 mb-3">
-			<h2>Gestionar directores de carrera</h2>
+		<div class="col-12 col-md-10 mb-3">
+			<h2>Gestionar estudiantes</h2>
+		</div>
+		<div class="col-12 col-md-2 mb-3">
+			@this.Html.ActionLink("Importar estudiantes desde CSV", "ImportCsv", "Student", new { area = "DirectorTeacher" }, new { @class = "btn btn-success"})
 		</div>
 		<div class="col-12 mb-3">
 			<partial name="_Filter" , model="@new FilterPartialViewModel()" />
@@ -72,6 +75,11 @@
 								</a>
 							</th>
 							<th>
+								<a asp-action="Index" asp-route-sortOrder="@this.ViewData["UniversityIdParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+									Número de Matrícula
+								</a>
+							</th>
+							<th>
 								<a asp-action="Index" asp-route-sortOrder="@this.ViewData["RutSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
 									RUT
 								</a>
@@ -89,14 +97,12 @@
 							<tr>
 								<td>@item.FirstName</td>
 								<td>@item.LastName</td>
+								<td>@item.UniversityId</td>
 								<td>@item.Rut</td>
 								<td>@item.Email</td>
 								<td>
-									@if (item.IsDirectorTeacher) {
-										@this.Html.ActionLink("Es director de carrera", "Toggle", "DirectorTeacher", new { area = "Administrator", id = item.Id }, new { @class = "btn btn-success" })
-									} else {
-										@this.Html.ActionLink("No es director de carrera", "Toggle", "DirectorTeacher", new { area = "Administrator", id = item.Id }, new { @class = "btn btn-danger" })
-									}
+									@this.Html.ActionLink("Editar", "Edit", "Account", new { area = "Administrator", id = item.Id }, new { @class = "btn btn-yellow mb-3"})
+									@this.Html.ActionLink("Eliminar", "Delete", "Account", new { area = "Administrator", id = item.Id }, new { @class = "btn btn-danger mb-3"})
 								</td>
 							</tr>
 						}

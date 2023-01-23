@@ -20,7 +20,7 @@
 			@if (this.User.IsInRole("Administrator")) {
 				<div class="menu-item has-sub">
 					<a href="#" class="menu-link">
-						<span class="menu-icon"><i class="fa fa-toolbox"></i></span>
+						<span class="menu-icon"><i class="fa fa-user-gear"></i></span>
 						<span class="menu-text">Administrador</span>
 						<span class="menu-caret"><b class="caret"></b></span>
 					</a>
@@ -88,70 +88,87 @@
 			@if (this.User.IsInRole("CourseTeacher")) {
 				<div class="menu-item has-sub">
 					<a href="#" class="menu-link">
-						<span class="menu-icon"><i class="fa fa-people-line"></i></span>
+						<span class="menu-icon"><i class="fa fa-person-chalkboard"></i></span>
 						<span class="menu-text">Profesor del curso</span>
 						<span class="menu-caret"><b class="caret"></b></span>
 					</a>
 					<div class="menu-submenu">
 						<div class="menu-item">
 							<a href="@this.Url.Action("Index", "Course", new { area = "CourseTeacher" })" class="menu-link">
-								<span class="menu-text">Gestionar mis cursos</span>
+								<span class="menu-text">Gestionar mis cursos y sus estudiantes</span>
+							</a>
+						</div>
+					</div>
+				</div>
+			}
+			@if (this.User.IsInRole("GuideTeacher")) {
+				<div class="menu-item has-sub">
+					<a href="#" class="menu-link">
+						<span class="menu-icon"><i class="fa fa-user-tie"></i></span>
+						<span class="menu-text">Profesor guía</span>
+						<span class="menu-caret"><b class="caret"></b></span>
+					</a>
+					<div class="menu-submenu">
+						<div class="menu-item">
+							<a href="@this.Url.Action("Index", "ThesisStudent", new { area = "GuideTeacher" })" class="menu-link">
+								<span class="menu-text">Gestionar mis memoristas y nuestras memorias de título</span>
 							</a>
 						</div>
 						<div class="menu-item">
-							<a href="@this.Url.Action("Index", "Student", new { area = "CourseTeacher" })" class="menu-link">
-								<span class="menu-text">Gestionar estudiantes de mis cursos</span>
+							<a href="@this.Url.Action("Index", "Request", new { area = "GuideTeacher" })" class="menu-link">
+								<span class="menu-text">Gestionar nuestras solicitudes de memoria de título a comité</span>
+							</a>
+						</div>
+						<div class="menu-item">
+							<a href="@this.Url.Action("Index", "Apply", new { area = "GuideTeacher" })" class="menu-link">
+								<span class="menu-text">Gestionar postulaciones de estudiantes a mis memorias de título</span>
+							</a>
+						</div>
+						<div class="menu-item">
+							<a href="@this.Url.Action("Index", "Proposal", new { area = "GuideTeacher" })" class="menu-link">
+								<span class="menu-text">Gestionar mis propuestas de memoria de título para estudiantes</span>
+							</a>
+						</div>
+					</div>
+				</div>
+			}
+			@if (this.User.IsInRole("AssistantTeacher")) {
+				<div class="menu-item has-sub">
+					<a href="#" class="menu-link">
+						<span class="menu-icon"><i class="fa fa-user-tie"></i></span>
+						<span class="menu-text">Profesor co-guía</span>
+						<span class="menu-caret"><b class="caret"></b></span>
+					</a>
+					<div class="menu-submenu">
+						<div class="menu-item">
+							<a href="@this.Url.Action("Index", "ThesisStudent", new { area = "AssistantTeacher" })" class="menu-link">
+								<span class="menu-text">Gestionar mis memoristas y nuestras memorias de título</span>
 							</a>
 						</div>
 					</div>
 				</div>
 			}
 			@if (this.User.IsInRole("Teacher")) {
-				<div class="menu-item has-sub">
+				<div class="menu-item">
 					<a href="#" class="menu-link">
-						<span class="menu-icon"><i class="fa fa-person-chalkboard"></i></span>
-						<span class="menu-text">Profesor guía</span>
-						<span class="menu-caret"><b class="caret"></b></span>
+						<span class="menu-icon"><i class="fa fa-user-tie"></i></span>
+						<span class="menu-text">Profesor</span>
 					</a>
-					<div class="menu-submenu">
-						<div class="menu-item">
-							<a href="@this.Url.Action("Index", "ThesisStudent", new { area = "Teacher" })" class="menu-link">
-								<span class="menu-text">Gestionar mis memoristas y nuestras memorias de título</span>
-							</a>
-						</div>
-						<div class="menu-item">
-							<a href="@this.Url.Action("Index", "Request", new { area = "Student" })" class="menu-link">
-								<span class="menu-text">Gestionar nuestras solicitudes de memoria de título a comité</span>
-							</a>
-						</div>
-						<div class="menu-item">
-							<a href="@this.Url.Action("Index", "Apply", new { area = "Student" })" class="menu-link">
-								<span class="menu-text">Gestionar postulaciones de estudiantes a mis memorias de título</span>
-							</a>
-						</div>
-						<div class="menu-item">
-							<a href="@this.Url.Action("Index", "Proposal", new { area = "Student" })" class="menu-link">
-								<span class="menu-text">Gestionar mis propuestas de memoria de título de estudiantes</span>
-							</a>
-						</div>
-					</div>
 				</div>
 			}
 			@if (this.User.IsInRole("EngineerStudent")) {
-				<div class="menu-item has-sub">
+				<div class="menu-item">
 					<a href="#" class="menu-link">
 						<span class="menu-icon"><i class="fa fa-user-graduate"></i></span>
 						<span class="menu-text">Ingeniero Civil en Computación</span>
-						<span class="menu-caret"><b class="caret"></b></span>
 					</a>
 				</div>
 			}
 			@if (this.User.IsInRole("CompletedStudent")) {
-				<div class="menu-item has-sub">
+				<div class="menu-item">
 					<a href="#" class="menu-link">
 						<span class="menu-icon"><i class="fa fa-user-graduate"></i></span>
 						<span class="menu-text">Carrera completada</span>
-						<span class="menu-caret"><b class="caret"></b></span>
 					</a>
 				</div>
 			}
@@ -179,7 +196,7 @@
 			@if (this.User.IsInRole("Student")) {
 				<div class="menu-item has-sub">
 					<a href="#" class="menu-link">
-						<span class="menu-icon"><i class="fa fa-user"></i></span>
+						<span class="menu-icon"><i class="fa fa-user-graduate"></i></span>
 						<span class="menu-text">Estudiante</span>
 						<span class="menu-caret"><b class="caret"></b></span>
 					</a>

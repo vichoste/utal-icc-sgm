@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
+using Utal.Icc.Sgm.Data;
 using Utal.Icc.Sgm.Models;
 
 namespace Utal.Icc.Sgm.Seeders;
@@ -17,6 +18,9 @@ public static class StartupSeeder {
 		}
 		if (!await roleManager.RoleExistsAsync(Roles.CourseTeacher.ToString())) {
 			_ = await roleManager.CreateAsync(new IdentityRole(Roles.CourseTeacher.ToString()));
+		}
+		if (!await roleManager.RoleExistsAsync(Roles.GuideTeacher.ToString())) {
+			_ = await roleManager.CreateAsync(new IdentityRole(Roles.GuideTeacher.ToString()));
 		}
 		if (!await roleManager.RoleExistsAsync(Roles.AssistantTeacher.ToString())) {
 			_ = await roleManager.CreateAsync(new IdentityRole(Roles.AssistantTeacher.ToString()));
@@ -38,7 +42,7 @@ public static class StartupSeeder {
 		}
 	}
 
-	public static async Task SeedAdministratorAsync(string email, string password, string firstName, string lastName, string rut, UserManager<ApplicationUser> userManager) {
+	public static async Task SeedAdministratorAsync(string email, string password, string firstName, string lastName, string rut, UserManager<ApplicationUser> userManager, ApplicationDbContext dbContext) {
 		var rootUser = new ApplicationUser {
 			UserName = email,
 			Email = email,
@@ -47,11 +51,20 @@ public static class StartupSeeder {
 			LastName = lastName,
 			Rut = rut
 		};
-		if (userManager.Users.All(u => u.Id != rootUser.Id)) {
+		var studentProfile = new StudentProfile {
+			ApplicationUser = rootUser
+		};
+		var teacherProfile = new TeacherProfile {
+			ApplicationUser = rootUser
+		};
+		if (userManager.Users.All(a => a.Id != rootUser.Id)) {
 			var user = await userManager.FindByEmailAsync(email);
 			if (user == null) {
 				_ = await userManager.CreateAsync(rootUser, password);
 				_ = await userManager.AddToRoleAsync(rootUser, Roles.Administrator.ToString());
+				_ = dbContext.StudentProfiles.Add(studentProfile);
+				_ = dbContext.TeacherProfiles.Add(teacherProfile);
+				_ = await dbContext.SaveChangesAsync();
 			}
 		}
 	}

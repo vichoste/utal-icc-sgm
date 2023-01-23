@@ -11,7 +11,7 @@ namespace Utal.Icc.Sgm.Areas.Administrator.Controllers;
 public class DirectorTeacherController : Controller {
 	private readonly UserManager<ApplicationUser> _userManager;
 
-	public DirectorTeacherController(UserManager<ApplicationUser> userManager) => this._userManager = userManager;
+	public DirectorTeacherController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager) => this._userManager = userManager;
 
 	public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
 		this.ViewData["FirstNameSortParam"] = sortOrder == "FirstName" ? "FirstNameDesc" : "FirstName";
@@ -25,39 +25,34 @@ public class DirectorTeacherController : Controller {
 			searchString = currentFilter;
 		}
 		this.ViewData["CurrentFilter"] = searchString;
-		var users = sortOrder switch {
-			"FirstName" => this._userManager.Users.OrderBy(u => u.FirstName).ToList(),
-			"FirstNameDesc" => this._userManager.Users.OrderByDescending(u => u.FirstName).ToList(),
-			"Rut" => this._userManager.Users.OrderBy(u => u.Rut).ToList(),
-			"RutDesc" => this._userManager.Users.OrderByDescending(u => u.Rut).ToList(),
-			"Email" => this._userManager.Users.OrderBy(u => u.Email).ToList(),
-			"EmailDesc" => this._userManager.Users.OrderByDescending(u => u.Email).ToList(),
-			"LastName" => this._userManager.Users.OrderBy(u => u.LastName).ToList(),
-			"LastNameDesc" => this._userManager.Users.OrderByDescending(u => u.LastName).ToList(),
-			_ => this._userManager.Users.OrderBy(u => u.LastName).ToList()
+		var teachers = sortOrder switch {
+			"FirstName" => (await this._userManager.GetUsersInRoleAsync("Teacher")).OrderBy(a => a.FirstName).ToList(),
+			"FirstNameDesc" => (await this._userManager.GetUsersInRoleAsync("Teacher")).OrderByDescending(a => a.FirstName).ToList(),
+			"Rut" => (await this._userManager.GetUsersInRoleAsync("Teacher")).OrderBy(a => a.Rut).ToList(),
+			"RutDesc" => (await this._userManager.GetUsersInRoleAsync("Teacher")).OrderByDescending(a => a.Rut).ToList(),
+			"Email" => (await this._userManager.GetUsersInRoleAsync("Teacher")).OrderBy(a => a.Email).ToList(),
+			"EmailDesc" => (await this._userManager.GetUsersInRoleAsync("Teacher")).OrderByDescending(a => a.Email).ToList(),
+			"LastName" => (await this._userManager.GetUsersInRoleAsync("Teacher")).OrderBy(a => a.LastName).ToList(),
+			"LastNameDesc" => (await this._userManager.GetUsersInRoleAsync("Teacher")).OrderByDescending(a => a.LastName).ToList(),
+			_ => (await this._userManager.GetUsersInRoleAsync("Teacher")).OrderBy(a => a.LastName).ToList()
 		};
 		if (!string.IsNullOrEmpty(searchString)) {
-			users = users.Where(s => s.FirstName!.ToUpper().Contains(searchString.ToUpper()) || s.LastName!.ToUpper().Contains(searchString.ToUpper()) || s.Rut!.ToUpper().Contains(searchString.ToUpper()) || s.Email == searchString).ToList();
+			teachers = teachers.Where(s => s.FirstName!.ToUpper().Contains(searchString.ToUpper()) || s.LastName!.ToUpper().Contains(searchString.ToUpper()) || s.Rut!.ToUpper().Contains(searchString.ToUpper()) || s.Email == searchString).ToList();
 		}
-		var indexViewModels = new List<IndexViewModel>();
-		foreach (var user in users) {
-			if (await this._userManager.IsInRoleAsync(user, "Teacher")) {
-				indexViewModels.Add(new IndexViewModel {
-					Id = user.Id,
-					FirstName = user.FirstName,
-					LastName = user.LastName,
-					Rut = user.Rut,
-					Email = user.Email,
-					IsDirectorTeacher = await this._userManager.IsInRoleAsync(user, "DirectorTeacher")
-				});
-			}
-		}
+		var indexViewModels = teachers.Select(async t => new IndexViewModel {
+			Id = t.Id,
+			FirstName = t.FirstName,
+			LastName = t.LastName,
+			Rut = t.Rut,
+			Email = t.Email,
+			IsDirectorTeacher = await this._userManager.IsInRoleAsync(t, "DirectorTeacher")
+		}).Select(t => t.Result);
 		var pageSize = 6;
 		return this.View(PaginatedList<IndexViewModel>.Create(indexViewModels.AsQueryable(), pageNumber ?? 1, pageSize));
 	}
 
 	public async Task<IActionResult> Toggle(string id) {
-		var user = this._userManager.Users.FirstOrDefault(u => u.Id == id);
+		var user = this._userManager.Users.FirstOrDefault(a => a.Id == id);
 		if (user is null) {
 			this.ViewBag.ErrorMessage = "Error al obtener al usuario.";
 			return this.View();
@@ -76,7 +71,7 @@ public class DirectorTeacherController : Controller {
 
 	[HttpPost, ValidateAntiForgeryToken]
 	public async Task<IActionResult> Toggle(string id, [FromForm] ToggleViewModel model) {
-		var user = this._userManager.Users.FirstOrDefault(u => u.Id == id);
+		var user = this._userManager.Users.FirstOrDefault(a => a.Id == id);
 		if (user is null) {
 			this.ViewBag.ErrorMessage = "Error al obtener al usuario.";
 			return this.View();

@@ -30,8 +30,9 @@ var services = scope.ServiceProvider;
 var context = services.GetRequiredService<ApplicationDbContext>();
 var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
 var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+var dbContext = services.GetRequiredService<ApplicationDbContext>();
 await StartupSeeder.SeedRolesAsync(roleManager);
-await StartupSeeder.SeedAdministratorAsync(rootEmail!, rootPassword!, rootFirstName!, rootLastName!, rootRut!, userManager);
+await StartupSeeder.SeedAdministratorAsync(rootEmail!, rootPassword!, rootFirstName!, rootLastName!, rootRut!, userManager, dbContext);
 _ = app.UseHttpsRedirection();
 _ = app.UseStaticFiles();
 _ = app.UseRouting();
@@ -46,6 +47,11 @@ _ = app.MapAreaControllerRoute(
 	name: "Administrator",
 	areaName: "Administrator",
 	pattern: "Administrator/{controller=Account}/{action=Index}/{id?}"
+);
+_ = app.MapAreaControllerRoute(
+	name: "DirectorTeacher",
+	areaName: "DirectorTeacher",
+	pattern: "DirectorTeacher/{controller=Student}/{action=Index}/{id?}"
 );
 _ = app.MapControllerRoute(
 	name: "default",

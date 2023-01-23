@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 
 using Utal.Icc.Sgm.Areas.Administrator.Views.Account;
+using Utal.Icc.Sgm.Data;
 using Utal.Icc.Sgm.Models;
 
 namespace Utal.Icc.Sgm.Areas.Administrator.Controllers;
@@ -15,13 +16,15 @@ public class AccountController : Controller {
 	private readonly IUserStore<ApplicationUser> _userStore;
 	private readonly IUserEmailStore<ApplicationUser> _emailStore;
 	private readonly RoleManager<IdentityRole> _roleManager;
+	private readonly ApplicationDbContext _dbContext;
 
-	public AccountController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, RoleManager<IdentityRole> roleManager) {
+	public AccountController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, RoleManager<IdentityRole> roleManager, ApplicationDbContext dbContext) {
 		this._signInManager = signInManager;
 		this._userManager = userManager;
 		this._userStore = userStore;
 		this._emailStore = (IUserEmailStore<ApplicationUser>)this._userStore;
 		this._roleManager = roleManager;
+		this._dbContext = dbContext;
 	}
 
 	public IActionResult Index(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
@@ -36,26 +39,26 @@ public class AccountController : Controller {
 			searchString = currentFilter;
 		}
 		this.ViewData["CurrentFilter"] = searchString;
-		var users = sortOrder switch {
-			"FirstName" => this._userManager.Users.OrderBy(u => u.FirstName).ToList(),
-			"FirstNameDesc" => this._userManager.Users.OrderByDescending(u => u.FirstName).ToList(),
-			"Rut" => this._userManager.Users.OrderBy(u => u.Rut).ToList(),
-			"RutDesc" => this._userManager.Users.OrderByDescending(u => u.Rut).ToList(),
-			"Email" => this._userManager.Users.OrderBy(u => u.Email).ToList(),
-			"EmailDesc" => this._userManager.Users.OrderByDescending(u => u.Email).ToList(),
-			"LastName" => this._userManager.Users.OrderBy(u => u.LastName).ToList(),
-			"LastNameDesc" => this._userManager.Users.OrderByDescending(u => u.LastName).ToList(),
-			_ => this._userManager.Users.OrderBy(u => u.LastName).ToList()
+		var applicationUsers = sortOrder switch {
+			"FirstName" => this._userManager.Users.OrderBy(a => a.FirstName).ToList(),
+			"FirstNameDesc" => this._userManager.Users.OrderByDescending(a => a.FirstName).ToList(),
+			"Rut" => this._userManager.Users.OrderBy(a => a.Rut).ToList(),
+			"RutDesc" => this._userManager.Users.OrderByDescending(a => a.Rut).ToList(),
+			"Email" => this._userManager.Users.OrderBy(a => a.Email).ToList(),
+			"EmailDesc" => this._userManager.Users.OrderByDescending(a => a.Email).ToList(),
+			"LastName" => this._userManager.Users.OrderBy(a => a.LastName).ToList(),
+			"LastNameDesc" => this._userManager.Users.OrderByDescending(a => a.LastName).ToList(),
+			_ => this._userManager.Users.OrderBy(a => a.LastName).ToList()
 		};
 		if (!string.IsNullOrEmpty(searchString)) {
-			users = users.Where(s => s.FirstName!.ToUpper().Contains(searchString.ToUpper()) || s.LastName!.ToUpper().Contains(searchString.ToUpper()) || s.Rut!.ToUpper().Contains(searchString.ToUpper()) || s.Email == searchString).ToList();
+			applicationUsers = applicationUsers.Where(s => s.FirstName!.ToUpper().Contains(searchString.ToUpper()) || s.LastName!.ToUpper().Contains(searchString.ToUpper()) || s.Rut!.ToUpper().Contains(searchString.ToUpper()) || s.Email == searchString).ToList();
 		}
-		var indexViewModels = users.Select(u => new IndexViewModel {
-			Id = u.Id,
-			FirstName = u.FirstName,
-			LastName = u.LastName,
-			Rut = u.Rut,
-			Email = u.Email
+		var indexViewModels = applicationUsers.Select(a => new IndexViewModel {
+			Id = a.Id,
+			FirstName = a.FirstName,
+			LastName = a.LastName,
+			Rut = a.Rut,
+			Email = a.Email
 		});
 		var pageSize = 6;
 		return this.View(PaginatedList<IndexViewModel>.Create(indexViewModels.AsQueryable(), pageNumber ?? 1, pageSize));
@@ -69,7 +72,7 @@ public class AccountController : Controller {
 			this.ViewBag.ErrorMessage = "Revisa que los campos estén correctos.";
 			return this.View();
 		}
-		var user = new ApplicationUser {
+		var applicationUser = new ApplicationUser {
 			FirstName = model.FirstName,
 			LastName = model.LastName,
 			Rut = model.Rut,
@@ -87,12 +90,21 @@ public class AccountController : Controller {
 		if (studentRole is not null) {
 			roles.Add(studentRole);
 		}
-		await this._userStore.SetUserNameAsync(user, userName: model.Email, CancellationToken.None);
-		await this._emailStore.SetEmailAsync(user, model.Email, CancellationToken.None);
-		var createResult = await this._userManager.CreateAsync(user, model.Password!);
+		await this._userStore.SetUserNameAsync(applicationUser, model.Email, CancellationToken.None);
+		await this._emailStore.SetEmailAsync(applicationUser, model.Email, CancellationToken.None);
+		var createResult = await this._userManager.CreateAsync(applicationUser, model.Password!);
 		if (createResult.Succeeded) {
-			var rolesResult = await this._userManager.AddToRolesAsync(user, roles);
+			var rolesResult = await this._userManager.AddToRolesAsync(applicationUser, roles);
 			if (rolesResult.Succeeded) {
+				var studentProfile = new StudentProfile {
+					ApplicationUser = applicationUser
+				};
+				var teacherProfile = new TeacherProfile {
+					ApplicationUser = applicationUser
+				};
+				_ = this._dbContext.StudentProfiles.Add(studentProfile);
+				_ = this._dbContext.TeacherProfiles.Add(teacherProfile);
+				_ = await this._dbContext.SaveChangesAsync();
 				this.ViewBag.SuccessMessage = "Usuario creado con éxito.";
 				this.ModelState.Clear();
 				return this.View();
@@ -110,7 +122,7 @@ public class AccountController : Controller {
 	}
 
 	public async Task<IActionResult> Edit(string id) {
-		var user = this._userManager.Users.FirstOrDefault(u => u.Id == id);
+		var user = this._userManager.Users.FirstOrDefault(a => a.Id == id);
 		if (user is null) {
 			this.ViewBag.ErrorMessage = "Error al obtener al usuario.";
 			return this.View();
@@ -130,7 +142,7 @@ public class AccountController : Controller {
 
 	[HttpPost, ValidateAntiForgeryToken]
 	public async Task<IActionResult> Edit(string id, [FromForm] EditViewModel model) {
-		var user = this._userManager.Users.FirstOrDefault(u => u.Id == id);
+		var user = this._userManager.Users.FirstOrDefault(a => a.Id == id);
 		if (user is null) {
 			this.ViewBag.ErrorMessage = "Error al obtener el usuario.";
 			return this.View();
@@ -184,7 +196,7 @@ public class AccountController : Controller {
 	}
 
 	public IActionResult Delete(string id) {
-		var user = this._userManager.Users.FirstOrDefault(u => u.Id == id);
+		var user = this._userManager.Users.FirstOrDefault(a => a.Id == id);
 		if (user is null) {
 			this.ViewBag.ErrorMessage = "Error al obtener el usuario.";
 			return this.View();
@@ -198,7 +210,7 @@ public class AccountController : Controller {
 
 	[HttpPost, ValidateAntiForgeryToken]
 	public async Task<IActionResult> Delete(string id, [FromForm] DeleteViewModel model) {
-		var user = this._userManager.Users.FirstOrDefault(u => u.Id == id);
+		var user = this._userManager.Users.FirstOrDefault(a => a.Id == id);
 		if (user is null) {
 			this.ViewBag.ErrorMessage = "Error al obtener el usuario.";
 			return this.View();
