@@ -1,9 +1,9 @@
-﻿@using Utal.Icc.Sgm.Areas.Account.Views.Profile
+﻿@using Utal.Icc.Sgm.Areas.Administrator.Views.DirectorTeacher
 
-@model IndexViewModel
+@model ToggleViewModel
 
 @{
-	this.ViewData["Title"] = "Perfil de usuario";
+	this.ViewData["Title"] = "Establecer rol de director de carrera";
 }
 
 <div class="container">
@@ -49,34 +49,24 @@
 	<div class="row justify-content-center">
 		<div class="col-10">
 			<div class="card">
-				<div class="card-header text-center">Perfil de usuario</div>
-				<div class="card-body">
-					<div class="row">
-						<div class="col-sm-12 col-md-6 mb-3">
-							<b>@this.Html.LabelFor(m => m.FirstName)</b>
+				<div class="card-header text-center">Establecer rol de director de carrera</div>
+				<div class="card-body text-center">
+					@if (this.Model.IsDirectorTeacher) {
+						<p class="card-text">¿Deseas que <b>@this.Html.DisplayFor(m => m.Email)</b> deje de ser director de carrera?</p>
+					} else {
+						<p class="card-text">¿Deseas que <b>@this.Html.DisplayFor(m => m.Email)</b> sea director de carrera?</p>
+					}
+					@using (this.Html.BeginForm("Toggle", "DirectorTeacher", new { area = "Administrator" })) {
+						@this.Html.AntiForgeryToken()
+						<div class="row text-center">
+							<div class="col">
+								<div class="btn-group">
+									@this.Html.ActionLink("No", "Index", "DirectorTeacher", new { area = "Administrator" }, new { @class = "btn btn-secondary" })
+									<button type="submit" class="btn btn-primary">Sí</button>
+								</div>
+							</div>
 						</div>
-						<div class="col-sm-12 col-md-6 mb-3">
-							@this.Html.DisplayFor(m => m.FirstName)
-						</div>
-						<div class="col-sm-12 col-md-6 mb-3">
-							<b>@this.Html.LabelFor(m => m.LastName)</b>
-						</div>
-						<div class="col-sm-12 col-md-6 mb-3">
-							@this.Html.DisplayFor(m => m.LastName)
-						</div>
-						<div class="col-sm-12 col-md-6 mb-3">
-							<b>@this.Html.LabelFor(m => m.Rut)</b>
-						</div>
-						<div class="col-sm-12 col-md-6 mb-3">
-							@this.Html.DisplayFor(m => m.Rut)
-						</div>
-						<div class="col-sm-12 col-md-6 mb-3">
-							<b>@this.Html.LabelFor(m => m.Email)</b>
-						</div>
-						<div class="col-sm-12 col-md-6 mb-3">
-							@this.Html.DisplayFor(m => m.Email)
-						</div>
-					</div>
+					}
 				</div>
 			</div>
 		</div>

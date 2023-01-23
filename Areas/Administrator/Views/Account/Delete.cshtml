@@ -48,7 +48,7 @@
 	}
 	<div class="card">
 		<div class="card-header text-center">Eliminar usuario</div>
-		<div class="card-body">
+		<div class="card-body text-center">
 			@using (this.Html.BeginForm("Delete", "Account", new { area = "Administrator" })) {
 				<h5 class="card-title">¿Estás seguro que quieres eliminar a este usuario?</h5>
 				@this.Html.AntiForgeryToken()

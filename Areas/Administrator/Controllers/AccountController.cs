@@ -50,7 +50,7 @@ public class AccountController : Controller {
 		if (!string.IsNullOrEmpty(searchString)) {
 			users = users.Where(s => s.FirstName!.ToUpper().Contains(searchString.ToUpper()) || s.LastName!.ToUpper().Contains(searchString.ToUpper()) || s.Rut!.ToUpper().Contains(searchString.ToUpper()) || s.Email == searchString).ToList();
 		}
-		var usersViewModel = users.Select(u => new IndexViewModel {
+		var indexViewModels = users.Select(u => new IndexViewModel {
 			Id = u.Id,
 			FirstName = u.FirstName,
 			LastName = u.LastName,
@@ -58,7 +58,7 @@ public class AccountController : Controller {
 			Email = u.Email
 		});
 		var pageSize = 6;
-		return this.View(PaginatedList<IndexViewModel>.Create(usersViewModel.AsQueryable(), pageNumber ?? 1, pageSize));
+		return this.View(PaginatedList<IndexViewModel>.Create(indexViewModels.AsQueryable(), pageNumber ?? 1, pageSize));
 	}
 
 	public IActionResult Create() => this.View();
