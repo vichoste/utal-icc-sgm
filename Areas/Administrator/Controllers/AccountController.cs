@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 using Utal.Icc.Sgm.Areas.Administrator.Views.Account;
@@ -210,7 +211,7 @@ public class AccountController : Controller {
 
 	[HttpPost, ValidateAntiForgeryToken]
 	public async Task<IActionResult> Delete(string id, [FromForm] DeleteViewModel model) {
-		var applicationUser = this._userManager.Users.FirstOrDefault(a => a.Id == id);
+		var applicationUser = this._userManager.Users.Include(a => a.StudentProfile).Include(a => a.TeacherProfile).FirstOrDefault(a => a.Id == id);
 		if (applicationUser is null) {
 			this.ViewBag.ErrorMessage = "Error al obtener el usuario.";
 			return this.View();
@@ -223,6 +224,9 @@ public class AccountController : Controller {
 			this.ViewBag.ErrorMessage = "Error al obtener el usuario.";
 			return this.View();
 		}
+		_ = this._dbContext.StudentProfiles.Remove(applicationUser.StudentProfile!);
+		_ = this._dbContext.TeacherProfiles.Remove(applicationUser.TeacherProfile!);
+		_ = await this._dbContext.SaveChangesAsync();
 		var result = await this._userManager.DeleteAsync(applicationUser);
 		if (result.Succeeded) {
 			this.ViewBag.SuccessMessage = "Usuario eliminado con éxito.";

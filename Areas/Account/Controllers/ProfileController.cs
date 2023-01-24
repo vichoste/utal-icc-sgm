@@ -32,6 +32,10 @@ public class ProfileController : Controller {
 			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
 		}
 		var applicationUser = await this._userManager.GetUserAsync(this.User);
+		if (applicationUser is null) {
+			this.ViewBag.ErrorMessage = "Error al obtener al usuario.";
+			return this.View();
+		}
 		var indexViewModel = new IndexViewModel {
 			FirstName = applicationUser!.FirstName,
 			LastName = applicationUser.LastName,
@@ -73,6 +77,10 @@ public class ProfileController : Controller {
 				break;
 			}
 		}
+		if (student is null) {
+			this.ViewBag.ErrorMessage = "Error al obtener al estudiante.";
+			return this.View();
+		}
 		var studentViewModel = new StudentViewModel {
 			UniversityId = student!.StudentProfile!.UniversityId,
 			RemainingCourses = student!.StudentProfile.RemainingCourses,
@@ -94,6 +102,10 @@ public class ProfileController : Controller {
 				student = applicationUser;
 				break;
 			}
+		}
+		if (student is null) {
+			this.ViewBag.ErrorMessage = "Error al obtener al estudiante.";
+			return this.View();
 		}
 		student!.StudentProfile!.UniversityId = model.UniversityId;
 		student.StudentProfile.RemainingCourses = model.RemainingCourses;
@@ -117,6 +129,10 @@ public class ProfileController : Controller {
 				break;
 			}
 		}
+		if (teacher is null) {
+			this.ViewBag.ErrorMessage = "Error al obtener al profesor.";
+			return this.View();
+		}
 		var teacherViewModel = new TeacherViewModel {
 			Office = teacher!.TeacherProfile!.Office,
 			Schedule = teacher!.TeacherProfile.Schedule,
@@ -137,6 +153,10 @@ public class ProfileController : Controller {
 				teacher = applicationUser;
 				break;
 			}
+		}
+		if (teacher is null) {
+			this.ViewBag.ErrorMessage = "Error al obtener al profesor.";
+			return this.View();
 		}
 		teacher!.TeacherProfile!.Office = model.Office;
 		teacher.TeacherProfile.Schedule = model.Schedule;

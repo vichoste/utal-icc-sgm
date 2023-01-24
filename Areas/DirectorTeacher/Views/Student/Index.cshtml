@@ -76,7 +76,7 @@
 							</th>
 							<th>
 								<a asp-action="Index" asp-route-sortOrder="@this.ViewData["UniversityIdParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
-									Número de Matrícula
+									Número de matrícula
 								</a>
 							</th>
 							<th>
@@ -101,8 +101,8 @@
 								<td>@item.Rut</td>
 								<td>@item.Email</td>
 								<td>
-									@this.Html.ActionLink("Editar", "Edit", "Account", new { area = "Administrator", id = item.Id }, new { @class = "btn btn-yellow mb-3"})
-									@this.Html.ActionLink("Eliminar", "Delete", "Account", new { area = "Administrator", id = item.Id }, new { @class = "btn btn-danger mb-3"})
+									@this.Html.ActionLink("Editar", "Edit", "Student", new { area = "DirectorTeacher", id = item.Id }, new { @class = "btn btn-yellow mb-3"})
+									@this.Html.ActionLink("Eliminar", "Delete", "Student", new { area = "DirectorTeacher", id = item.Id }, new { @class = "btn btn-danger mb-3"})
 								</td>
 							</tr>
 						}
