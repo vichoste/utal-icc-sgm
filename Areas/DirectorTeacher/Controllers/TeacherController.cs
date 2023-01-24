@@ -240,4 +240,51 @@ public class TeacherController : Controller {
 		this.ViewBag.ErrorMessages = result.Errors.Select(e => e.Description).ToList();
 		return this.View();
 	}
+
+	public IActionResult Transfer(string id) {
+		var applicationUser = this._userManager.Users.FirstOrDefault(a => a.Id == id);
+		if (applicationUser is null) {
+			this.ViewBag.ErrorMessage = "Error al obtener al profesor.";
+			return this.View();
+		}
+		var transferViewModel = new TransferViewModel {
+			Id = applicationUser.Id,
+			Email = applicationUser.Email
+		};
+		return this.View(transferViewModel);
+	}
+
+	[HttpPost, ValidateAntiForgeryToken]
+	public async Task<IActionResult> Transfer(string id, [FromForm] TransferViewModel model) {
+		var applicationUser = this._userManager.Users.FirstOrDefault(a => a.Id == id);
+		if (applicationUser is null) {
+			this.ViewBag.ErrorMessage = "Error al obtener al profesor.";
+			return this.View();
+		}
+		var directorTeacher = this._userManager.Users.FirstOrDefault(a => a.Id == this._userManager.GetUserId(this.User));
+		if (applicationUser == directorTeacher) {
+			this.ViewBag.ErrorMessage = "No puedes transferirte a tí mismo.";
+			return this.View();
+		}
+		if (directorTeacher is null) {
+			this.ViewBag.ErrorMessage = "Error al obtener al director de carrera actual.";
+			return this.View();
+		}
+		var directorTeacherRoles = (await this._userManager.GetRolesAsync(directorTeacher)).ToList();
+		if (!directorTeacherRoles.Contains(Roles.DirectorTeacher.ToString())) {
+			this.ViewBag.ErrorMessage = "El director de carrera actual no es director de carrera.";
+			return this.View();
+		}
+		var removeDirectorTeacherRoleResult = await this._userManager.RemoveFromRoleAsync(directorTeacher, Roles.DirectorTeacher.ToString());
+		var addDirectorTeacherRoleResult = await this._userManager.AddToRoleAsync(applicationUser, Roles.DirectorTeacher.ToString());
+		if (removeDirectorTeacherRoleResult.Succeeded && addDirectorTeacherRoleResult.Succeeded) {
+			this.ViewBag.SuccessMessage = "Director de carrera transferido con éxito.";
+			this.ModelState.Clear();
+			return this.View();
+		}
+		this.ViewBag.ErrorMessage = "Error al transferir el director de carrera.";
+		this.ViewBag.ErrorMessages = removeDirectorTeacherRoleResult.Errors.Select(e => e.Description).ToList();
+		this.ViewBag.ErrorMessages2 = addDirectorTeacherRoleResult.Errors.Select(e => e.Description).ToList();
+		return this.View();
+	}
 }

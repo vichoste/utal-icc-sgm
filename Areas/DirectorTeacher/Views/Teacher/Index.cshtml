@@ -98,9 +98,9 @@
 									@this.Html.ActionLink("Editar", "Edit", "Teacher", new { area = "DirectorTeacher", id = item.Id }, new { @class = "btn btn-yellow mb-3"})
 									@this.Html.ActionLink("Eliminar", "Delete", "Teacher", new { area = "DirectorTeacher", id = item.Id }, new { @class = "btn btn-danger mb-3"})
 									@if (item.IsDirectorTeacher) {
-										@this.Html.ActionLink("Es director de carrera", "SwitchDirectorTeacher", "Teacher", new { area = "DirectorTeacher", id = item.Id }, new { @class = "btn btn-pink mb-3" })
+										<a asp-action="Index" asp-route-sortOrder="@this.ViewData["CurrentSort"]" asp-route-pageNumber="@(this.Model.PageIndex)" asp-route-currentFilter="@this.ViewData["CurrentFilter"]" class="btn btn-info mb-3">Es director de carrera</a>
 									} else {
-										@this.Html.ActionLink("No es director de carrera", "SwitchDirectorTeacher", "Teacher", new { area = "DirectorTeacher", id = item.Id }, new { @class = "btn btn-teal mb-3" })
+										@this.Html.ActionLink("No es director de carrera", "Transfer", "Teacher", new { area = "DirectorTeacher", id = item.Id }, new { @class = "btn btn-default mb-3" })
 									}
 								</td>
 							</tr>
