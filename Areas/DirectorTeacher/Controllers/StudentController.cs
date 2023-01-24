@@ -55,6 +55,7 @@ public class StudentController : Controller {
 			"FirstName" => students.OrderBy(a => a.FirstName).ToList(),
 			"FirstNameDesc" => students.OrderByDescending(a => a.FirstName).ToList(),
 			"UniversityId" => students.OrderBy(a => a.StudentProfile!.UniversityId).ToList(),
+			"UniversityIdDesc" => students.OrderByDescending(a => a.StudentProfile!.UniversityId).ToList(),
 			"Rut" => students.OrderBy(a => a.Rut).ToList(),
 			"RutDesc" => students.OrderByDescending(a => a.Rut).ToList(),
 			"Email" => students.OrderBy(a => a.Email).ToList(),
