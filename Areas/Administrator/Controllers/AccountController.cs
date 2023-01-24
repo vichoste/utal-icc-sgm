@@ -122,18 +122,18 @@ public class AccountController : Controller {
 	}
 
 	public async Task<IActionResult> Edit(string id) {
-		var user = this._userManager.Users.FirstOrDefault(a => a.Id == id);
-		if (user is null) {
+		var applicationUser = this._userManager.Users.FirstOrDefault(a => a.Id == id);
+		if (applicationUser is null) {
 			this.ViewBag.ErrorMessage = "Error al obtener al usuario.";
 			return this.View();
 		}
 		var editViewModel = new EditViewModel {
-			FirstName = user.FirstName,
-			LastName = user.LastName,
-			Rut = user.Rut,
-			Email = user.Email
+			FirstName = applicationUser.FirstName,
+			LastName = applicationUser.LastName,
+			Rut = applicationUser.Rut,
+			Email = applicationUser.Email
 		};
-		var userRoles = (await this._userManager.GetRolesAsync(user)).ToList();
+		var userRoles = (await this._userManager.GetRolesAsync(applicationUser)).ToList();
 		editViewModel.IsAdministrator = userRoles.Contains(Roles.Administrator.ToString());
 		editViewModel.IsTeacher = userRoles.Contains(Roles.Teacher.ToString());
 		editViewModel.IsStudent = userRoles.Contains(Roles.Student.ToString());
@@ -142,21 +142,21 @@ public class AccountController : Controller {
 
 	[HttpPost, ValidateAntiForgeryToken]
 	public async Task<IActionResult> Edit(string id, [FromForm] EditViewModel model) {
-		var user = this._userManager.Users.FirstOrDefault(a => a.Id == id);
-		if (user is null) {
+		var applicationUser = this._userManager.Users.FirstOrDefault(a => a.Id == id);
+		if (applicationUser is null) {
 			this.ViewBag.ErrorMessage = "Error al obtener el usuario.";
 			return this.View();
 		}
 		if (!model.CurrentPassword.IsNullOrEmpty() && !model.NewPassword.IsNullOrEmpty() && !model.ConfirmNewPassword.IsNullOrEmpty()) {
-			var passwordResult = await this._userManager.ChangePasswordAsync(user, model.CurrentPassword!, model.NewPassword!);
+			var passwordResult = await this._userManager.ChangePasswordAsync(applicationUser, model.CurrentPassword!, model.NewPassword!);
 			if (!passwordResult.Succeeded) {
 				this.ViewBag.ErrorMessage = "Error al cambiar la contraseña del usuario.";
 				this.ViewBag.ErrorMessages = passwordResult.Errors.Select(e => e.Description).ToList();
 				return this.View();
 			}
 		}
-		var userRoles = (await this._userManager.GetRolesAsync(user)).ToList();
-		var result = await this._userManager.RemoveFromRolesAsync(user, userRoles);
+		var userRoles = (await this._userManager.GetRolesAsync(applicationUser)).ToList();
+		var result = await this._userManager.RemoveFromRolesAsync(applicationUser, userRoles);
 		if (!result.Succeeded) {
 			this.ViewBag.ErrorMessage = "Error al eliminar los roles del usuario.";
 			this.ViewBag.ErrorMessages = result.Errors.Select(e => e.Description).ToList();
@@ -172,14 +172,14 @@ public class AccountController : Controller {
 		if (model.IsStudent) {
 			roles.Add(Roles.Student.ToString());
 		}
-		await this._userStore.SetUserNameAsync(user, userName: model.Email, CancellationToken.None);
-		await this._emailStore.SetEmailAsync(user, model.Email, CancellationToken.None);
-		user.FirstName = !model.FirstName.IsNullOrEmpty() ? model.FirstName : user.FirstName;
-		user.LastName = !model.LastName.IsNullOrEmpty() ? model.LastName : user.LastName;
-		user.Rut = !model.Rut.IsNullOrEmpty() ? model.Rut : user.Rut;
-		var updateResult = await this._userManager.UpdateAsync(user);
+		await this._userStore.SetUserNameAsync(applicationUser, userName: model.Email, CancellationToken.None);
+		await this._emailStore.SetEmailAsync(applicationUser, model.Email, CancellationToken.None);
+		applicationUser.FirstName = !model.FirstName.IsNullOrEmpty() ? model.FirstName : applicationUser.FirstName;
+		applicationUser.LastName = !model.LastName.IsNullOrEmpty() ? model.LastName : applicationUser.LastName;
+		applicationUser.Rut = !model.Rut.IsNullOrEmpty() ? model.Rut : applicationUser.Rut;
+		var updateResult = await this._userManager.UpdateAsync(applicationUser);
 		if (updateResult.Succeeded) {
-			var rolesResult = await this._userManager.AddToRolesAsync(user, roles);
+			var rolesResult = await this._userManager.AddToRolesAsync(applicationUser, roles);
 			if (rolesResult.Succeeded) {
 				this.ViewBag.SuccessMessage = "Usuario actualizado con éxito.";
 				return this.View();
@@ -196,34 +196,34 @@ public class AccountController : Controller {
 	}
 
 	public IActionResult Delete(string id) {
-		var user = this._userManager.Users.FirstOrDefault(a => a.Id == id);
-		if (user is null) {
+		var applicationUser = this._userManager.Users.FirstOrDefault(a => a.Id == id);
+		if (applicationUser is null) {
 			this.ViewBag.ErrorMessage = "Error al obtener el usuario.";
 			return this.View();
 		}
 		var deleteViewModel = new DeleteViewModel {
-			Id = user.Id,
-			Email = user.Email
+			Id = applicationUser.Id,
+			Email = applicationUser.Email
 		};
 		return this.View(deleteViewModel);
 	}
 
 	[HttpPost, ValidateAntiForgeryToken]
 	public async Task<IActionResult> Delete(string id, [FromForm] DeleteViewModel model) {
-		var user = this._userManager.Users.FirstOrDefault(a => a.Id == id);
-		if (user is null) {
+		var applicationUser = this._userManager.Users.FirstOrDefault(a => a.Id == id);
+		if (applicationUser is null) {
 			this.ViewBag.ErrorMessage = "Error al obtener el usuario.";
 			return this.View();
 		}
-		if (user!.Id == this._userManager.GetUserId(this.User)) {
+		if (applicationUser!.Id == this._userManager.GetUserId(this.User)) {
 			this.ViewBag.ErrorMessage = "No te puedes eliminar a tí mismo.";
 			return this.View();
 		}
-		if (user is null) {
+		if (applicationUser is null) {
 			this.ViewBag.ErrorMessage = "Error al obtener el usuario.";
 			return this.View();
 		}
-		var result = await this._userManager.DeleteAsync(user);
+		var result = await this._userManager.DeleteAsync(applicationUser);
 		if (result.Succeeded) {
 			this.ViewBag.SuccessMessage = "Usuario eliminado con éxito.";
 			return this.View();

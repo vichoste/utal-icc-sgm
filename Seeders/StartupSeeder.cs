@@ -58,8 +58,8 @@ public static class StartupSeeder {
 			ApplicationUser = rootUser
 		};
 		if (userManager.Users.All(a => a.Id != rootUser.Id)) {
-			var user = await userManager.FindByEmailAsync(email);
-			if (user == null) {
+			var applicationUser = await userManager.FindByEmailAsync(email);
+			if (applicationUser == null) {
 				_ = await userManager.CreateAsync(rootUser, password);
 				_ = await userManager.AddToRoleAsync(rootUser, Roles.Administrator.ToString());
 				_ = dbContext.StudentProfiles.Add(studentProfile);

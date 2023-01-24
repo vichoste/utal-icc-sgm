@@ -39,6 +39,12 @@
 			<div class="dropdown-menu dropdown-menu-end me-lg-3">
 				@if (this.SignInManager.IsSignedIn(this.User)) {
 					<a class="dropdown-item d-flex align-items-center" href="@this.Url.Action("Index", "Profile", new { area = "Account" })">Mi perfil <i class="fa fa-user-circle fa-fw ms-auto text-gray-400 f-s-16"></i></a>
+					@if (this.User.IsInRole("Teacher")) {
+						<a class="dropdown-item d-flex align-items-center" href="@this.Url.Action("Teacher", "Profile", new { area = "Account" })">Perfil profesor <i class="fa fa-user-tie fa-fw ms-auto text-gray-400 f-s-16"></i></a>
+					}
+					@if (this.User.IsInRole("Student")) {
+						<a class="dropdown-item d-flex align-items-center" href="@this.Url.Action("Student", "Profile", new { area = "Account" })">Perfil estudiante <i class="fa fa-user-tie fa-fw ms-auto text-gray-400 f-s-16"></i></a>
+					}
 					<a class="dropdown-item d-flex align-items-center" href="@this.Url.Action("ChangePassword", "Profile", new { area = "Account" })">Contraseña <i class="fa fa-key fa-fw ms-auto text-gray-400 f-s-16"></i></a>
 					<div class="dropdown-divider"></div>
 					<a class="dropdown-item d-flex align-items-center" href="@this.Url.Action("Index", "SignOut", new { area = "Account" })">Cerrar sesión <i class="fa fa-toggle-off fa-fw ms-auto text-gray-400 f-s-16"></i></a>

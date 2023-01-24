@@ -1,0 +1,89 @@
+﻿@using Utal.Icc.Sgm.Areas.Account.Views.Profile
+
+@model StudentViewModel
+
+@{
+	this.ViewData["Title"] = "Perfil de estudiante";
+}
+
+<div class="container">
+	@if (this.ViewBag.SuccessMessage is not null) {
+		<div class="row justify-content-center">
+			<div class="alert alert-success" role="alert">
+				@this.ViewBag.SuccessMessage
+			</div>
+		</div>
+	}
+	@if (this.ViewBag.WarningMessage is not null) {
+		<div class="row justify-content-center">
+			<div class="alert alert-warning" role="alert">
+				@this.ViewBag.WarningMessage
+			</div>
+		</div>
+	}
+	@if (this.ViewBag.WarningMessages is not null) {
+		@foreach (var warning in this.ViewBag.WarningMessages) {
+			<div class="row justify-content-center">
+				<div class="alert alert-warning" role="alert">
+					@warning
+				</div>
+			</div>
+		}
+	}
+	@if (this.ViewBag.ErrorMessage is not null) {
+		<div class="row justify-content-center">
+			<div class="alert alert-danger" role="alert">
+				@this.ViewBag.ErrorMessage
+			</div>
+		</div>
+	}
+	@if (this.ViewBag.ErrorMessages is not null) {
+		@foreach (var error in this.ViewBag.ErrorMessages) {
+			<div class="row justify-content-center">
+				<div class="alert alert-danger" role="alert">
+					@error
+				</div>
+			</div>
+		}
+	}
+	<div class="row justify-content-center">
+		<div class="col-10">
+			<div class="card">
+				<div class="card-header text-center">Perfil de estudiante</div>
+				<div class="card-body">
+					@using (this.Html.BeginForm("Student", "Profile", new { area = "Account" })) {
+						@this.Html.AntiForgeryToken()
+						<div class="row">
+							<div class="col">
+								<div class="form-group mb-3">
+									@this.Html.LabelFor(m => m.UniversityId, new { @class = "form-label" })
+									@this.Html.TextBoxFor(m => m.UniversityId, new { @class = "form-control" })
+								</div>
+								<div class="form-group mb-3">
+									@this.Html.LabelFor(m => m.RemainingCourses, new { @class = "form-label" })
+									@this.Html.TextBoxFor(m => m.RemainingCourses, new { @class = "form-control" })
+								</div>
+								<div class="form-check mb-3">
+									@this.Html.LabelFor(m => m.IsDoingThePractice, new { @class = "form-check-label" })
+									@this.Html.CheckBoxFor(m => m.IsDoingThePractice, new { @class = "form-check-input" })
+								</div>
+								<div class="form-check mb-3">
+									@this.Html.LabelFor(m => m.IsWorking, new { @class = "form-check-label" })
+									@this.Html.CheckBoxFor(m => m.IsWorking, new { @class = "form-check-input" })
+								</div>
+							</div>
+						</div>
+						<div class="row text-center">
+							<div class="col">
+								<div class="btn-group">
+									@this.Html.ActionLink("Cancelar", "Index", "Profile", new { area = "Account" }, new { @class = "btn btn-secondary" })
+									<button type="submit" class="btn btn-primary">Actualizar perfil</button>
+								</div>
+							</div>
+						</div>
+					}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

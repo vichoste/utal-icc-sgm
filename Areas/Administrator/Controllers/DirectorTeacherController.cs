@@ -52,40 +52,40 @@ public class DirectorTeacherController : Controller {
 	}
 
 	public async Task<IActionResult> Toggle(string id) {
-		var user = this._userManager.Users.FirstOrDefault(a => a.Id == id);
-		if (user is null) {
+		var applicationUser = this._userManager.Users.FirstOrDefault(a => a.Id == id);
+		if (applicationUser is null) {
 			this.ViewBag.ErrorMessage = "Error al obtener al usuario.";
 			return this.View();
 		}
-		if (!await this._userManager.IsInRoleAsync(user, "Teacher")) {
+		if (!await this._userManager.IsInRoleAsync(applicationUser, "Teacher")) {
 			this.ViewBag.ErrorMessage = "Error al obtener al usuario.";
 			return this.View();
 		}
 		var model = new ToggleViewModel {
-			Id = user.Id,
-			Email = user.Email,
-			IsDirectorTeacher = await this._userManager.IsInRoleAsync(user, "DirectorTeacher")
+			Id = applicationUser.Id,
+			Email = applicationUser.Email,
+			IsDirectorTeacher = await this._userManager.IsInRoleAsync(applicationUser, "DirectorTeacher")
 		};
 		return this.View(model);
 	}
 
 	[HttpPost, ValidateAntiForgeryToken]
 	public async Task<IActionResult> Toggle(string id, [FromForm] ToggleViewModel model) {
-		var user = this._userManager.Users.FirstOrDefault(a => a.Id == id);
-		if (user is null) {
+		var applicationUser = this._userManager.Users.FirstOrDefault(a => a.Id == id);
+		if (applicationUser is null) {
 			this.ViewBag.ErrorMessage = "Error al obtener al usuario.";
 			return this.View();
 		}
-		if (!await this._userManager.IsInRoleAsync(user, "Teacher")) {
+		if (!await this._userManager.IsInRoleAsync(applicationUser, "Teacher")) {
 			this.ViewBag.ErrorMessage = "Error al obtener al usuario.";
 			return this.View();
 		}
-		if (await this._userManager.IsInRoleAsync(user, "DirectorTeacher")) {
-			_ = await this._userManager.RemoveFromRoleAsync(user, "DirectorTeacher");
+		if (await this._userManager.IsInRoleAsync(applicationUser, "DirectorTeacher")) {
+			_ = await this._userManager.RemoveFromRoleAsync(applicationUser, "DirectorTeacher");
 			this.ViewBag.SuccessMessage = "Ya no es director de carrera.";
 			return this.View();
 		} else {
-			_ = await this._userManager.AddToRoleAsync(user, "DirectorTeacher");
+			_ = await this._userManager.AddToRoleAsync(applicationUser, "DirectorTeacher");
 			this.ViewBag.SuccessMessage = "Ahora es director de carrera.";
 		}
 		return this.View();
