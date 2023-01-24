@@ -17,28 +17,7 @@
 					Debes iniciar sesión para visualizar tus roles y herramientas
 				</div>
 			}
-			@if (this.User.IsInRole("Administrator")) {
-				<div class="menu-item has-sub">
-					<a href="#" class="menu-link">
-						<span class="menu-icon"><i class="fa fa-user-gear"></i></span>
-						<span class="menu-text">Administrador</span>
-						<span class="menu-caret"><b class="caret"></b></span>
-					</a>
-					<div class="menu-submenu">
-						<div class="menu-item">
-							<a href="@this.Url.Action("Index", "Account", new { area = "Administrator" })" class="menu-link">
-								<span class="menu-text">Gestionar cuentas</span>
-							</a>
-						</div>
-						<div class="menu-item">
-							<a href="@this.Url.Action("Index", "DirectorTeacher", new { area = "Administrator" })" class="menu-link">
-								<span class="menu-text">Gestionar directores de carrera</span>
-							</a>
-						</div>
-					</div>
-				</div>
-			}
-			@if (this.User.IsInRole("DirectorTeacher")) {
+			@if (this.User.IsInRole(Roles.DirectorTeacher.ToString())) {
 				<div class="menu-item has-sub">
 					<a href="#" class="menu-link">
 						<span class="menu-icon"><i class="fa fa-school"></i></span>
@@ -64,7 +43,7 @@
 					</div>
 				</div>
 			}
-			@if (this.User.IsInRole("CommitteeTeacher")) {
+			@if (this.User.IsInRole(Roles.CommitteeTeacher.ToString())) {
 				<div class="menu-item has-sub">
 					<a href="#" class="menu-link">
 						<span class="menu-icon"><i class="fa fa-people-line"></i></span>
@@ -85,7 +64,7 @@
 					</div>
 				</div>
 			}
-			@if (this.User.IsInRole("CourseTeacher")) {
+			@if (this.User.IsInRole(Roles.CourseTeacher.ToString())) {
 				<div class="menu-item has-sub">
 					<a href="#" class="menu-link">
 						<span class="menu-icon"><i class="fa fa-person-chalkboard"></i></span>
@@ -101,7 +80,7 @@
 					</div>
 				</div>
 			}
-			@if (this.User.IsInRole("GuideTeacher")) {
+			@if (this.User.IsInRole(Roles.GuideTeacher.ToString())) {
 				<div class="menu-item has-sub">
 					<a href="#" class="menu-link">
 						<span class="menu-icon"><i class="fa fa-user-tie"></i></span>
@@ -132,7 +111,7 @@
 					</div>
 				</div>
 			}
-			@if (this.User.IsInRole("AssistantTeacher")) {
+			@if (this.User.IsInRole(Roles.AssistantTeacher.ToString())) {
 				<div class="menu-item has-sub">
 					<a href="#" class="menu-link">
 						<span class="menu-icon"><i class="fa fa-user-tie"></i></span>
@@ -148,7 +127,7 @@
 					</div>
 				</div>
 			}
-			@if (this.User.IsInRole("Teacher")) {
+			@if (this.User.IsInRole(Roles.Teacher.ToString())) {
 				<div class="menu-item">
 					<a href="#" class="menu-link">
 						<span class="menu-icon"><i class="fa fa-user-tie"></i></span>
@@ -156,7 +135,7 @@
 					</a>
 				</div>
 			}
-			@if (this.User.IsInRole("EngineerStudent")) {
+			@if (this.User.IsInRole(Roles.EngineerStudent.ToString())) {
 				<div class="menu-item">
 					<a href="#" class="menu-link">
 						<span class="menu-icon"><i class="fa fa-user-graduate"></i></span>
@@ -164,7 +143,7 @@
 					</a>
 				</div>
 			}
-			@if (this.User.IsInRole("CompletedStudent")) {
+			@if (this.User.IsInRole(Roles.CompletedStudent.ToString())) {
 				<div class="menu-item">
 					<a href="#" class="menu-link">
 						<span class="menu-icon"><i class="fa fa-user-graduate"></i></span>
@@ -172,7 +151,7 @@
 					</a>
 				</div>
 			}
-			@if (this.User.IsInRole("ThesisStudent")) {
+			@if (this.User.IsInRole(Roles.ThesisStudent.ToString())) {
 				<div class="menu-item has-sub">
 					<a href="#" class="menu-link">
 						<span class="menu-icon"><i class="fa fa-user-graduate"></i></span>
@@ -193,7 +172,7 @@
 					</div>
 				</div>
 			}
-			@if (this.User.IsInRole("Student")) {
+			@if (this.User.IsInRole(Roles.Student.ToString())) {
 				<div class="menu-item has-sub">
 					<a href="#" class="menu-link">
 						<span class="menu-icon"><i class="fa fa-user-graduate"></i></span>

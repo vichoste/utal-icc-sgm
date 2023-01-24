@@ -43,7 +43,7 @@ public class StudentController : Controller {
 		this.ViewData["CurrentFilter"] = searchString;
 		var students = new List<ApplicationUser>();
 		foreach (var applicationUser in this._userManager.Users.Include(a => a.StudentProfile).ToList()) {
-			if (await this._userManager.IsInRoleAsync(applicationUser, "Student")) {
+			if (await this._userManager.IsInRoleAsync(applicationUser, Roles.Student.ToString())) {
 				students.Add(applicationUser);
 			}
 		}
@@ -131,7 +131,7 @@ public class StudentController : Controller {
 
 	[HttpPost, ValidateAntiForgeryToken]
 	public async Task<IActionResult> Delete(string id, [FromForm] DeleteViewModel model) {
-		var applicationUser = this._userManager.Users.Include(a => a.StudentProfile).Include(a => a.TeacherProfile).FirstOrDefault(a => a.Id == id);
+		var applicationUser = this._userManager.Users.Include(a => a.StudentProfile).FirstOrDefault(a => a.Id == id);
 		if (applicationUser is null) {
 			this.ViewBag.ErrorMessage = "Error al obtener al estudiante.";
 			return this.View();
@@ -140,12 +140,7 @@ public class StudentController : Controller {
 			this.ViewBag.ErrorMessage = "No te puedes eliminar a tí mismo.";
 			return this.View();
 		}
-		if (applicationUser is null) {
-			this.ViewBag.ErrorMessage = "Error al obtener al estudiante.";
-			return this.View();
-		}
 		_ = this._dbContext.StudentProfiles.Remove(applicationUser.StudentProfile!);
-		_ = this._dbContext.TeacherProfiles.Remove(applicationUser.TeacherProfile!);
 		_ = await this._dbContext.SaveChangesAsync();
 		var result = await this._userManager.DeleteAsync(applicationUser);
 		if (result.Succeeded) {

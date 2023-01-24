@@ -42,7 +42,7 @@ public class TeacherController : Controller {
 		this.ViewData["CurrentFilter"] = searchString;
 		var teachers = new List<ApplicationUser>();
 		foreach (var applicationUser in this._userManager.Users.Include(a => a.TeacherProfile).ToList()) {
-			if (await this._userManager.IsInRoleAsync(applicationUser, "Teacher")) {
+			if (await this._userManager.IsInRoleAsync(applicationUser, Roles.Teacher.ToString())) {
 				teachers.Add(applicationUser);
 			}
 		}
@@ -60,13 +60,14 @@ public class TeacherController : Controller {
 		if (!string.IsNullOrEmpty(searchString)) {
 			teachers = teachers.Where(s => s.FirstName!.ToUpper().Contains(searchString.ToUpper()) || s.LastName!.ToUpper().Contains(searchString.ToUpper()) || s.Rut!.ToUpper().Contains(searchString.ToUpper()) || s.Email == searchString).ToList();
 		}
-		var indexViewModels = teachers.Select(a => new IndexViewModel {
+		var indexViewModels = teachers.Select(async a => new IndexViewModel {
 			Id = a.Id,
 			FirstName = a.FirstName,
 			LastName = a.LastName,
 			Rut = a.Rut,
-			Email = a.Email
-		});
+			Email = a.Email,
+			IsDirectorTeacher = await this._userManager.IsInRoleAsync(a, Roles.DirectorTeacher.ToString()),
+		}).Select(t => t.Result);
 		var pageSize = 6;
 		return this.View(PaginatedList<IndexViewModel>.Create(indexViewModels.AsQueryable(), pageNumber ?? 1, pageSize));
 	}
@@ -89,21 +90,31 @@ public class TeacherController : Controller {
 		var createResult = await this._userManager.CreateAsync(applicationUser, model.Password!);
 		if (createResult.Succeeded) {
 			var rolesResult = await this._userManager.AddToRoleAsync(applicationUser, "Teacher");
-			if (rolesResult.Succeeded) {
-				var studentProfile = new StudentProfile {
-					ApplicationUser = applicationUser
-				};
+			var rankRoles = new List<string>();
+			if (model.IsGuideTeacher) {
+				rankRoles.Add(Roles.GuideTeacher.ToString());
+			}
+			if (model.IsAssistantTeacher) {
+				rankRoles.Add(Roles.AssistantTeacher.ToString());
+			}
+			if (model.IsCourseTeacher) {
+				rankRoles.Add(Roles.CourseTeacher.ToString());
+			}
+			if (model.IsCommitteeTeacher) {
+				rankRoles.Add(Roles.CommitteeTeacher.ToString());
+			}
+			var rankRolesResult = await this._userManager.AddToRolesAsync(applicationUser, rankRoles);
+			if (rolesResult.Succeeded && rankRolesResult.Succeeded) {
 				var teacherProfile = new TeacherProfile {
 					ApplicationUser = applicationUser
 				};
-				_ = this._dbContext.StudentProfiles.Add(studentProfile);
 				_ = this._dbContext.TeacherProfiles.Add(teacherProfile);
 				_ = await this._dbContext.SaveChangesAsync();
-				this.ViewBag.SuccessMessage = "Usuario creado con éxito.";
+				this.ViewBag.SuccessMessage = "Profesor creado con éxito.";
 				this.ModelState.Clear();
 				return this.View();
 			}
-			this.ViewBag.WarningMessage = "Usuario creado, pero no se le pudo asignar el(los) rol(es).";
+			this.ViewBag.WarningMessage = "Profesor creado, pero no se le pudo asignar el(los) rol(es).";
 			this.ViewBag.WarningMessages = rolesResult.Errors.Select(w => w.Description).ToList();
 			this.ModelState.Clear();
 			return this.View();
@@ -111,11 +122,11 @@ public class TeacherController : Controller {
 		if (createResult.Errors.Any()) {
 			this.ViewBag.ErrorMessages = createResult.Errors.Select(e => e.Description).ToList();
 		}
-		this.ViewBag.ErrorMessage = "Error al crear el usuario.";
+		this.ViewBag.ErrorMessage = "Error al crear el profesor.";
 		return this.View();
 	}
 
-	public IActionResult Edit(string id) {
+	public async Task<IActionResult> Edit(string id) {
 		var applicationUser = this._userManager.Users.Include(a => a.TeacherProfile).FirstOrDefault(a => a.Id == id);
 		if (applicationUser is null) {
 			this.ViewBag.ErrorMessage = "Error al obtener al profesor.";
@@ -127,6 +138,11 @@ public class TeacherController : Controller {
 			Rut = applicationUser.Rut,
 			Email = applicationUser.Email
 		};
+		var roles = (await this._userManager.GetRolesAsync(applicationUser)).ToList();
+		editViewModel.IsGuideTeacher = roles.Contains(Roles.GuideTeacher.ToString());
+		editViewModel.IsAssistantTeacher = roles.Contains(Roles.AssistantTeacher.ToString());
+		editViewModel.IsCourseTeacher = roles.Contains(Roles.CourseTeacher.ToString());
+		editViewModel.IsCommitteeTeacher = roles.Contains(Roles.CommitteeTeacher.ToString());
 		return this.View(editViewModel);
 	}
 
@@ -144,7 +160,37 @@ public class TeacherController : Controller {
 		applicationUser.Rut = !model.Rut.IsNullOrEmpty() ? model.Rut : applicationUser.Rut;
 		var updateResult = await this._userManager.UpdateAsync(applicationUser);
 		if (updateResult.Succeeded) {
-			this.ViewBag.SuccessMessage = "Profesor actualizado con éxito.";
+			var roles = (await this._userManager.GetRolesAsync(applicationUser)).ToList();
+			if (roles.Contains(Roles.Teacher.ToString())) {
+				_ = roles.Remove(Roles.Teacher.ToString());
+			}
+			if (roles.Contains(Roles.DirectorTeacher.ToString())) {
+				_ = roles.Remove(Roles.DirectorTeacher.ToString());
+			}
+			var removeRankRolesResult = await this._userManager.RemoveFromRolesAsync(applicationUser, roles);
+			var rankRoles = new List<string>();
+			if (model.IsGuideTeacher) {
+				rankRoles.Add(Roles.GuideTeacher.ToString());
+			}
+			if (model.IsAssistantTeacher) {
+				rankRoles.Add(Roles.AssistantTeacher.ToString());
+			}
+			if (model.IsCourseTeacher) {
+				rankRoles.Add(Roles.CourseTeacher.ToString());
+			}
+			if (model.IsCommitteeTeacher) {
+				rankRoles.Add(Roles.CommitteeTeacher.ToString());
+			}
+			var rankRolesResult = await this._userManager.AddToRolesAsync(applicationUser, rankRoles);
+			if (removeRankRolesResult.Succeeded && rankRolesResult.Succeeded) {
+				this.ViewBag.SuccessMessage = "Profesor actualizado con éxito.";
+				this.ModelState.Clear();
+				return this.View();
+			}
+			this.ViewBag.WarningMessage = "Profesor actualizado, pero no se le pudo asignar el(los) rol(es).";
+			this.ViewBag.WarningMessages = removeRankRolesResult.Errors.Select(w => w.Description).ToList();
+			this.ViewBag.WarningMessages2 = rankRolesResult.Errors.Select(w => w.Description).ToList();
+			this.ModelState.Clear();
 			return this.View();
 		}
 		if (updateResult.Errors.Any()) {
@@ -169,7 +215,7 @@ public class TeacherController : Controller {
 
 	[HttpPost, ValidateAntiForgeryToken]
 	public async Task<IActionResult> Delete(string id, [FromForm] DeleteViewModel model) {
-		var applicationUser = this._userManager.Users.Include(a => a.StudentProfile).Include(a => a.TeacherProfile).FirstOrDefault(a => a.Id == id);
+		var applicationUser = this._userManager.Users.Include(a => a.TeacherProfile).FirstOrDefault(a => a.Id == id);
 		if (applicationUser is null) {
 			this.ViewBag.ErrorMessage = "Error al obtener al profesor.";
 			return this.View();
@@ -178,11 +224,11 @@ public class TeacherController : Controller {
 			this.ViewBag.ErrorMessage = "No te puedes eliminar a tí mismo.";
 			return this.View();
 		}
-		if (applicationUser is null) {
-			this.ViewBag.ErrorMessage = "Error al obtener al profesor.";
+		var roles = (await this._userManager.GetRolesAsync(applicationUser)).ToList();
+		if (roles.Contains(Roles.DirectorTeacher.ToString())) {
+			this.ViewBag.ErrorMessage = "No puedes eliminar al director de carrera actual.";
 			return this.View();
 		}
-		_ = this._dbContext.StudentProfiles.Remove(applicationUser.StudentProfile!);
 		_ = this._dbContext.TeacherProfiles.Remove(applicationUser.TeacherProfile!);
 		_ = await this._dbContext.SaveChangesAsync();
 		var result = await this._userManager.DeleteAsync(applicationUser);

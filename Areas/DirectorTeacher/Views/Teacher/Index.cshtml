@@ -97,6 +97,11 @@
 								<td>
 									@this.Html.ActionLink("Editar", "Edit", "Teacher", new { area = "DirectorTeacher", id = item.Id }, new { @class = "btn btn-yellow mb-3"})
 									@this.Html.ActionLink("Eliminar", "Delete", "Teacher", new { area = "DirectorTeacher", id = item.Id }, new { @class = "btn btn-danger mb-3"})
+									@if (item.IsDirectorTeacher) {
+										@this.Html.ActionLink("Es director de carrera", "SwitchDirectorTeacher", "Teacher", new { area = "DirectorTeacher", id = item.Id }, new { @class = "btn btn-pink mb-3" })
+									} else {
+										@this.Html.ActionLink("No es director de carrera", "SwitchDirectorTeacher", "Teacher", new { area = "DirectorTeacher", id = item.Id }, new { @class = "btn btn-teal mb-3" })
+									}
 								</td>
 							</tr>
 						}

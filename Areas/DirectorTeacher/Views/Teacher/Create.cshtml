@@ -51,7 +51,7 @@
 	<div class="row justify-content-center">
 		<div class="col-10">
 			<div class="card">
-				<div class="card-header text-center">Crear un nuevo profesor</div>
+				<div class="card-header text-center">Crear profesor</div>
 				<div class="card-body">
 					@using (this.Html.BeginForm("Create", "Teacher", new { area = "DirectorTeacher" })) {
 						@this.Html.AntiForgeryToken()
@@ -86,6 +86,24 @@
 									@this.Html.LabelFor(m => m.ConfirmPassword, new { @class = "form-label" })
 									@this.Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control", @required = "required" })
 									@this.Html.ValidationMessageFor(m => m.ConfirmPassword, "Confirmación de contraseña requerida", new { @class = "invalid-feedback" })
+								</div>
+								@* TODO: Remove validation for those fields *@
+								<p><strong>Roles</strong></p>
+								<div class="form-check mb-3">
+									@this.Html.LabelFor(m => m.IsGuideTeacher, new { @class = "form-check-label" })
+									@this.Html.CheckBoxFor(m => m.IsGuideTeacher, new { @class = "form-check-input" })
+								</div>
+								<div class="form-check mb-3">
+									@this.Html.LabelFor(m => m.IsAssistantTeacher, new { @class = "form-check-label" })
+									@this.Html.CheckBoxFor(m => m.IsAssistantTeacher, new { @class = "form-check-input" })
+								</div>
+								<div class="form-check mb-3">
+									@this.Html.LabelFor(m => m.IsCourseTeacher, new { @class = "form-check-label" })
+									@this.Html.CheckBoxFor(m => m.IsCourseTeacher, new { @class = "form-check-input" })
+								</div>
+								<div class="form-check mb-3">
+									@this.Html.LabelFor(m => m.IsCommitteeTeacher, new { @class = "form-check-label" })
+									@this.Html.CheckBoxFor(m => m.IsCommitteeTeacher, new { @class = "form-check-input" })
 								</div>
 							</div>
 						</div>

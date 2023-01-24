@@ -32,6 +32,15 @@
 			</div>
 		}
 	}
+	@if (this.ViewBag.WarningMessages2 is not null) {
+		@foreach (var warning in this.ViewBag.WarningMessages2) {
+			<div class="row justify-content-center">
+				<div class="alert alert-warning" role="alert">
+					@warning
+				</div>
+			</div>
+		}
+	}
 	@if (this.ViewBag.ErrorMessage is not null) {
 		<div class="row justify-content-center">
 			<div class="alert alert-danger" role="alert">
@@ -72,6 +81,23 @@
 								<div class="form-group mb-3">
 									@this.Html.LabelFor(m => m.Email, new { @class = "form-label" })
 									@this.Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+								</div>
+								<p><strong>Roles</strong></p>
+								<div class="form-check mb-3">
+									@this.Html.LabelFor(m => m.IsGuideTeacher, new { @class = "form-check-label" })
+									@this.Html.CheckBoxFor(m => m.IsGuideTeacher, new { @class = "form-check-input" })
+								</div>
+								<div class="form-check mb-3">
+									@this.Html.LabelFor(m => m.IsAssistantTeacher, new { @class = "form-check-label" })
+									@this.Html.CheckBoxFor(m => m.IsAssistantTeacher, new { @class = "form-check-input" })
+								</div>
+								<div class="form-check mb-3">
+									@this.Html.LabelFor(m => m.IsCourseTeacher, new { @class = "form-check-label" })
+									@this.Html.CheckBoxFor(m => m.IsCourseTeacher, new { @class = "form-check-input" })
+								</div>
+								<div class="form-check mb-3">
+									@this.Html.LabelFor(m => m.IsCommitteeTeacher, new { @class = "form-check-label" })
+									@this.Html.CheckBoxFor(m => m.IsCommitteeTeacher, new { @class = "form-check-input" })
 								</div>
 							</div>
 						</div>

@@ -7,9 +7,6 @@ namespace Utal.Icc.Sgm.Seeders;
 
 public static class StartupSeeder {
 	public static async Task SeedRolesAsync(RoleManager<IdentityRole> roleManager) {
-		if (!await roleManager.RoleExistsAsync(Roles.Administrator.ToString())) {
-			_ = await roleManager.CreateAsync(new IdentityRole(Roles.Administrator.ToString()));
-		}
 		if (!await roleManager.RoleExistsAsync(Roles.DirectorTeacher.ToString())) {
 			_ = await roleManager.CreateAsync(new IdentityRole(Roles.DirectorTeacher.ToString()));
 		}
@@ -42,27 +39,22 @@ public static class StartupSeeder {
 		}
 	}
 
-	public static async Task SeedAdministratorAsync(string email, string password, string firstName, string lastName, string rut, UserManager<ApplicationUser> userManager, ApplicationDbContext dbContext) {
-		var rootUser = new ApplicationUser {
+	public static async Task SeedDirectorTeacherAsync(string email, string password, string firstName, string lastName, string rut, UserManager<ApplicationUser> userManager, ApplicationDbContext dbContext) {
+		var directorTeacher = new ApplicationUser {
 			UserName = email,
 			Email = email,
-			EmailConfirmed = true,
 			FirstName = firstName,
 			LastName = lastName,
 			Rut = rut
 		};
-		var studentProfile = new StudentProfile {
-			ApplicationUser = rootUser
-		};
-		var teacherProfile = new TeacherProfile {
-			ApplicationUser = rootUser
-		};
-		if (userManager.Users.All(a => a.Id != rootUser.Id)) {
+		if (userManager.Users.All(a => a.Id != directorTeacher.Id)) {
 			var applicationUser = await userManager.FindByEmailAsync(email);
 			if (applicationUser == null) {
-				_ = await userManager.CreateAsync(rootUser, password);
-				_ = await userManager.AddToRoleAsync(rootUser, Roles.Administrator.ToString());
-				_ = dbContext.StudentProfiles.Add(studentProfile);
+				var teacherProfile = new TeacherProfile {
+					ApplicationUser = directorTeacher,
+				};
+				_ = await userManager.CreateAsync(directorTeacher, password);
+				_ = await userManager.AddToRolesAsync(directorTeacher, new List<string> { Roles.Teacher.ToString(), Roles.DirectorTeacher.ToString() });
 				_ = dbContext.TeacherProfiles.Add(teacherProfile);
 				_ = await dbContext.SaveChangesAsync();
 			}

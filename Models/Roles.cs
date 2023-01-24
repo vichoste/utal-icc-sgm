@@ -1,7 +1,6 @@
 ﻿namespace Utal.Icc.Sgm.Models;
 
 public enum Roles {
-	Administrator, // MAIN ROLE
 	DirectorTeacher, // RANK ROLE
 	CommitteeTeacher, // RANK ROLE
 	CourseTeacher, // RANK ROLE

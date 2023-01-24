@@ -11,4 +11,12 @@ public class EditViewModel {
 	public string? Rut { get; set; }
 	[DataType(DataType.EmailAddress), Display(Name = "E-mail"), EmailAddress]
 	public string? Email { get; set; }
+	[Display(Name = "Profesor guía")]
+	public bool IsGuideTeacher { get; set; }
+	[Display(Name = "Profesor co-guía")]
+	public bool IsAssistantTeacher { get; set; }
+	[Display(Name = "Profesor de curso")]
+	public bool IsCourseTeacher { get; set; }
+	[Display(Name = "Profesor de comité")]
+	public bool IsCommitteeTeacher { get; set; }
 }

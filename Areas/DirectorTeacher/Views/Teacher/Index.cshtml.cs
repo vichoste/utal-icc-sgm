@@ -13,4 +13,6 @@ public class IndexViewModel {
 	public string? Rut { get; set; }
 	[Display(Name = "E-mail")]
 	public string? Email { get; set; }
+	[Display(Name = "¿Es director de carrera?")]
+	public bool IsDirectorTeacher { get; set; }
 }

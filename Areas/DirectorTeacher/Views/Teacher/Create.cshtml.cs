@@ -15,4 +15,12 @@ public class Create {
 	public string? Password { get; set; }
 	[Compare(nameof(Password), ErrorMessage = "Las contraseñas no coinciden"), DataType(DataType.Password), Display(Name = "Confirmar contraseña"), Required]
 	public string? ConfirmPassword { get; set; }
+	[Display(Name = "Profesor guía")]
+	public bool IsGuideTeacher { get; set; }
+	[Display(Name = "Profesor co-guía")]
+	public bool IsAssistantTeacher { get; set; }
+	[Display(Name = "Profesor de curso")]
+	public bool IsCourseTeacher { get; set; }
+	[Display(Name = "Profesor de comité")]
+	public bool IsCommitteeTeacher { get; set; }
 }
