@@ -1,22 +1,14 @@
-﻿@model ErrorViewModel
+﻿@using Utal.Icc.Sgm.Views.Shared
+
+@model ErrorViewModel
 
 @{
-	ViewData["Title"] = "Error";
+	this.ViewData["Title"] = "Error";
 }
 
 <h1 class="text-danger">Error.</h1>
 <h2 class="text-danger">Ocurrió un error mientras se procesaba la petición.</h2>
 
-@if (Model.ShowRequestId) {
-	<p>
-		<strong>ID de la petición:</strong> <code>@Model.RequestId</code>
-	</p>
+@if (this.Model.ShowRequestId) {
+	<p><strong>ID de la petición:</strong> <code>@this.Model.RequestId</code></p>
 }
-
-<h3>Modo de desarrollador</h3>
-<p>
-	Hay más información al respecto en el modo de <strong>desarrollador</strong>.
-</p>
-<p>
-	<strong>El entorno de desarrollador no debe ser utilizado en producción.</strong><br>Puede resultar en la exposición de información sensible para cualquier usuario.<br>Si se desea usar el modo de <strong>desarrollador</strong>, se debe habilitar mediante <strong>ASPNETCORE_ENVIRONMENT=Development</strong> y luego reiniciar la aplicación.
-</p>

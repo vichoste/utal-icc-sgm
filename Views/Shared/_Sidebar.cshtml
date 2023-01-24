@@ -1,0 +1,204 @@
+﻿@using Microsoft.AspNetCore.Identity
+
+@using Utal.Icc.Sgm.Models
+
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+<div id="sidebar" class="app-sidebar">
+	<div class="app-sidebar-content" data-scrollbar="true" data-height="100%">
+		<div class="menu">
+			@if (this.User.Identity!.IsAuthenticated) {
+				<div class="menu-header">
+					Mis roles y herramientas
+				</div>
+			} else {
+				<div class="menu-header">
+					Debes iniciar sesión para visualizar tus roles y herramientas
+				</div>
+			}
+			@if (this.User.IsInRole(Roles.DirectorTeacher.ToString())) {
+				<div class="menu-item has-sub">
+					<a href="#" class="menu-link">
+						<span class="menu-icon"><i class="fa fa-school"></i></span>
+						<span class="menu-text">Director de carrera</span>
+						<span class="menu-caret"><b class="caret"></b></span>
+					</a>
+					<div class="menu-submenu">
+						<div class="menu-item">
+							<a href="@this.Url.Action("Index", "Student", new { area = "DirectorTeacher" })" class="menu-link">
+								<span class="menu-text">Gestionar estudiantes</span>
+							</a>
+						</div>
+						<div class="menu-item">
+							<a href="@this.Url.Action("Index", "Teacher", new { area = "DirectorTeacher" })" class="menu-link">
+								<span class="menu-text">Gestionar profesores</span>
+							</a>
+						</div>
+						<div class="menu-item">
+							<a href="@this.Url.Action("Index", "Course", new { area = "DirectorTeacher" })" class="menu-link">
+								<span class="menu-text">Gestionar cursos de memoria de título</span>
+							</a>
+						</div>
+					</div>
+				</div>
+			}
+			@if (this.User.IsInRole(Roles.CommitteeTeacher.ToString())) {
+				<div class="menu-item has-sub">
+					<a href="#" class="menu-link">
+						<span class="menu-icon"><i class="fa fa-people-line"></i></span>
+						<span class="menu-text">Profesor del comité</span>
+						<span class="menu-caret"><b class="caret"></b></span>
+					</a>
+					<div class="menu-submenu">
+						<div class="menu-item">
+							<a href="@this.Url.Action("Index", "Request", new { area = "CommitteeTeacher" })" class="menu-link">
+								<span class="menu-text">Gestionar solicitudes de memoria de título</span>
+							</a>
+						</div>
+						<div class="menu-item">
+							<a href="@this.Url.Action("Index", "Teacher", new { area = "CommitteeTeacher" })" class="menu-link">
+								<span class="menu-text">Gestionar habilidades de profesores</span>
+							</a>
+						</div>
+					</div>
+				</div>
+			}
+			@if (this.User.IsInRole(Roles.CourseTeacher.ToString())) {
+				<div class="menu-item has-sub">
+					<a href="#" class="menu-link">
+						<span class="menu-icon"><i class="fa fa-person-chalkboard"></i></span>
+						<span class="menu-text">Profesor del curso</span>
+						<span class="menu-caret"><b class="caret"></b></span>
+					</a>
+					<div class="menu-submenu">
+						<div class="menu-item">
+							<a href="@this.Url.Action("Index", "Course", new { area = "CourseTeacher" })" class="menu-link">
+								<span class="menu-text">Gestionar mis cursos y sus estudiantes</span>
+							</a>
+						</div>
+					</div>
+				</div>
+			}
+			@if (this.User.IsInRole(Roles.GuideTeacher.ToString())) {
+				<div class="menu-item has-sub">
+					<a href="#" class="menu-link">
+						<span class="menu-icon"><i class="fa fa-user-tie"></i></span>
+						<span class="menu-text">Profesor guía</span>
+						<span class="menu-caret"><b class="caret"></b></span>
+					</a>
+					<div class="menu-submenu">
+						<div class="menu-item">
+							<a href="@this.Url.Action("Index", "ThesisStudent", new { area = "GuideTeacher" })" class="menu-link">
+								<span class="menu-text">Gestionar mis memoristas y nuestras memorias de título</span>
+							</a>
+						</div>
+						<div class="menu-item">
+							<a href="@this.Url.Action("Index", "Request", new { area = "GuideTeacher" })" class="menu-link">
+								<span class="menu-text">Gestionar nuestras solicitudes de memoria de título a comité</span>
+							</a>
+						</div>
+						<div class="menu-item">
+							<a href="@this.Url.Action("Index", "Apply", new { area = "GuideTeacher" })" class="menu-link">
+								<span class="menu-text">Gestionar postulaciones de estudiantes a mis memorias de título</span>
+							</a>
+						</div>
+						<div class="menu-item">
+							<a href="@this.Url.Action("Index", "Proposal", new { area = "GuideTeacher" })" class="menu-link">
+								<span class="menu-text">Gestionar mis propuestas de memoria de título para estudiantes</span>
+							</a>
+						</div>
+					</div>
+				</div>
+			}
+			@if (this.User.IsInRole(Roles.AssistantTeacher.ToString())) {
+				<div class="menu-item has-sub">
+					<a href="#" class="menu-link">
+						<span class="menu-icon"><i class="fa fa-user-tie"></i></span>
+						<span class="menu-text">Profesor co-guía</span>
+						<span class="menu-caret"><b class="caret"></b></span>
+					</a>
+					<div class="menu-submenu">
+						<div class="menu-item">
+							<a href="@this.Url.Action("Index", "ThesisStudent", new { area = "AssistantTeacher" })" class="menu-link">
+								<span class="menu-text">Gestionar mis memoristas y nuestras memorias de título</span>
+							</a>
+						</div>
+					</div>
+				</div>
+			}
+			@if (this.User.IsInRole(Roles.Teacher.ToString())) {
+				<div class="menu-item">
+					<a href="#" class="menu-link">
+						<span class="menu-icon"><i class="fa fa-user-tie"></i></span>
+						<span class="menu-text">Profesor</span>
+					</a>
+				</div>
+			}
+			@if (this.User.IsInRole(Roles.EngineerStudent.ToString())) {
+				<div class="menu-item">
+					<a href="#" class="menu-link">
+						<span class="menu-icon"><i class="fa fa-user-graduate"></i></span>
+						<span class="menu-text">Ingeniero Civil en Computación</span>
+					</a>
+				</div>
+			}
+			@if (this.User.IsInRole(Roles.CompletedStudent.ToString())) {
+				<div class="menu-item">
+					<a href="#" class="menu-link">
+						<span class="menu-icon"><i class="fa fa-user-graduate"></i></span>
+						<span class="menu-text">Carrera completada</span>
+					</a>
+				</div>
+			}
+			@if (this.User.IsInRole(Roles.ThesisStudent.ToString())) {
+				<div class="menu-item has-sub">
+					<a href="#" class="menu-link">
+						<span class="menu-icon"><i class="fa fa-user-graduate"></i></span>
+						<span class="menu-text">Memorista</span>
+						<span class="menu-caret"><b class="caret"></b></span>
+					</a>
+					<div class="menu-submenu">
+						<div class="menu-item">
+							<a href="@this.Url.Action("Index", "Thesis", new { area = "ThesisStudent" })" class="menu-link">
+								<span class="menu-text">Gestionar mi memoria de título</span>
+							</a>
+						</div>
+						<div class="menu-item">
+							<a href="@this.Url.Action("Index", "Course", new { area = "ThesisStudent" })" class="menu-link">
+								<span class="menu-text">Gestionar mi curso de memoria de título</span>
+							</a>
+						</div>
+					</div>
+				</div>
+			}
+			@if (this.User.IsInRole(Roles.Student.ToString())) {
+				<div class="menu-item has-sub">
+					<a href="#" class="menu-link">
+						<span class="menu-icon"><i class="fa fa-user-graduate"></i></span>
+						<span class="menu-text">Estudiante</span>
+						<span class="menu-caret"><b class="caret"></b></span>
+					</a>
+					<div class="menu-submenu">
+						<div class="menu-item">
+							<a href="@this.Url.Action("Index", "Request", new { area = "Student" })" class="menu-link">
+								<span class="menu-text">Gestionar nuestras solicitudes de memoria de título a comité</span>
+							</a>
+						</div>
+						<div class="menu-item">
+							<a href="@this.Url.Action("Index", "Apply", new { area = "Student" })" class="menu-link">
+								<span class="menu-text">Gestionar mis postulaciones a memoria de título de profesores</span>
+							</a>
+						</div>
+						<div class="menu-item">
+							<a href="@this.Url.Action("Index", "Proposal", new { area = "Student" })" class="menu-link">
+								<span class="menu-text">Gestionar mis propuestas de memoria de título a profesores</span>
+							</a>
+						</div>
+					</div>
+				</div>
+			}
+		</div>
+	</div>
+	<button class="app-sidebar-mobile-backdrop" data-dismiss="sidebar-mobile"></button>
+</div>

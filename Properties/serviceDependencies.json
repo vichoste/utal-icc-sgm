@@ -1,8 +1,8 @@
 {
-  "dependencies": {
-    "mssql2": {
-      "type": "mssql",
-      "connectionId": "ConnectionStrings:DefaultConnection"
-    }
-  }
+	"dependencies": {
+		"mssql2": {
+			"connectionId": "ConnectionStrings:DefaultConnection",
+			"type": "mssql"
+		}
+	}
 }

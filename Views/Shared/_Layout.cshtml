@@ -1,49 +1,56 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+﻿@{
+	this.ViewData["MainTitle"] = "Sistema de Gestión de Memorias - Ingeniería Civil en Computación - Universidad de Talca";
+	this.ViewData["MetaDescription"] = "Sistema de Gestión de Memorias - Ingeniería Civil en Computación - Universidad de Talca";
+	this.ViewData["MetaAuthor"] = "Vicente \"vichoste\" Calderón";
+	this.ViewData["MetaKeywords"] = "SGM, ICC, UTAL, Ingeniería Civil en Computación, Universidad de Talca, Vicente Calderón, vichoste";
+	this.ViewData["AppClass"] = "app-footer-fixed";
+}
+
+<!DOCTYPE html>
+<html lang="es" @ViewData["HtmlAttribute"]>
 <head>
 	<meta charset="utf-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>@ViewData["Title"] - Sistema de Gestión de Memorias - Ingeniería Civil en Computación - Universidad de Talca</title>
-	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+	<title>@ViewData["Title"] - @ViewData["MainTitle"]</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<meta name="description" content="@ViewData["MetaDescription"]" />
+	<meta name="author" content="@ViewData["MetaAuthor"]" />
+	<meta name="keywords" content="@ViewData["MetaKeywords"]" />
+	@RenderSection("MetaTag", required: false)
+	<link href="~/css/vendor.min.css" rel="stylesheet" />
+	<link href="~/css/app.min.css" rel="stylesheet" />
 	<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-	<link rel="stylesheet" href="~/Utal.Icc.Sgm.styles.css" asp-append-version="true" />
+	@RenderSection("Styles", required: false)
 </head>
-<body>
-	<header>
-		<nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-			<div class="container-fluid">
-				<a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Sistema de Gestión de Memorias</a>
-				<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-						aria-expanded="false" aria-label="Toggle navigation">
-					<span class="navbar-toggler-icon"></span>
-				</button>
-				<div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-					<ul class="navbar-nav flex-grow-1">
-						<li class="nav-item">
-							<a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Inicio</a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacidad</a>
-						</li>
-					</ul>
-					<partial name="_LoginPartial" />
-				</div>
+<body class="@ViewData["BodyClass"]">
+	<div id="app" class="app @ViewData["AppClass"]">
+		@if (ViewData["AppWithoutHeader"] == null) {
+			<partial name="_Header" />
+		}
+		@if (ViewData["AppWithoutSidebar"] == null) {
+			<partial name="_Sidebar" />
+		}
+		@if (ViewData["AppWithoutContainer"] == null) {
+			<div id="content" class="app-content @ViewData["AppContentClass"]">
+				@RenderBody()
+				<a href="#" data-click="scroll-top" class="btn-scroll-top fade"><i class="fa fa-arrow-up"></i></a>
 			</div>
-		</nav>
-	</header>
-	<div class="container">
-		<main role="main" class="pb-3">
+		} else {
 			@RenderBody()
-		</main>
+			<a href="#" data-click="scroll-top" class="btn-scroll-top fade"><i class="fa fa-arrow-up"></i></a>
+		}
+		@RenderSection("OutterAppContainerContent", required: false)
+		@if (ViewData["AppWithFooter"] != null) {
+			<partial name="_Footer" />
+		}
+		<partial name="_ThemePanel" />
 	</div>
-
-	<footer class="border-top footer text-muted">
-		<div class="container">
-			&copy; 2022 - Ingeniería Civil en Computación - Universidad de Talca - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacidad</a>
-		</div>
-	</footer>
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
-	<script src="~/js/site.js" asp-append-version="true"></script>
-	@await RenderSectionAsync("Scripts", required: false)
+	<script>
+		window.paceOptions = {
+			ajax: { ignoreURLs: ['mainHub', '__browserLink', 'browserLinkSignalR'], trackWebSockets: false }
+		};
+	</script>
+	<script src="~/js/vendor.min.js"></script>
+	<script src="~/js/app.min.js"></script>
+	@RenderSection("Scripts", required: false)
 </body>
 </html>
