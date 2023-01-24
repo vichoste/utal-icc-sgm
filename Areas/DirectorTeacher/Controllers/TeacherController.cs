@@ -75,7 +75,7 @@ public class TeacherController : Controller {
 	public IActionResult Create() => this.View();
 
 	[HttpPost, ValidateAntiForgeryToken]
-	public async Task<IActionResult> Create([FromForm] Create model) {
+	public async Task<IActionResult> Create([FromForm] CreateViewModel model) {
 		if (!this.ModelState.IsValid) {
 			this.ViewBag.ErrorMessage = "Revisa que los campos estén correctos.";
 			return this.View();
@@ -114,7 +114,7 @@ public class TeacherController : Controller {
 				this.ModelState.Clear();
 				return this.View();
 			}
-			this.ViewBag.WarningMessage = "Profesor creado, pero no se le pudo asignar el(los) rol(es).";
+			this.ViewBag.WarningMessage = "Profesor creado, pero no se le pudo asignar el rol.";
 			this.ViewBag.WarningMessages = rolesResult.Errors.Select(w => w.Description).ToList();
 			this.ModelState.Clear();
 			return this.View();

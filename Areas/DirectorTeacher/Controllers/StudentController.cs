@@ -1,4 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Globalization;
+
+using CsvHelper;
+
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -73,6 +77,61 @@ public class StudentController : Controller {
 		var pageSize = 6;
 		return this.View(PaginatedList<IndexViewModel>.Create(indexViewModels.AsQueryable(), pageNumber ?? 1, pageSize));
 	}
+
+	public IActionResult Create() => this.View();
+
+	[HttpPost]
+	public async Task<IActionResult> Create([FromForm] CreateViewModel model) {
+		try {
+			var errorMessages = new List<string>();
+			var warningMessages = new List<string>();
+			var successMessages = new List<string>();
+			using var reader = new StreamReader(model.CsvFile!.OpenReadStream());
+			using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+			var records = csv.GetRecords<CreateModel>();
+			foreach (var record in records) {
+				var user = new ApplicationUser {
+					FirstName = record.FirstName,
+					LastName = record.LastName,
+					UserName = record.Email,
+					Email = record.Email,
+					Rut = record.Rut,
+				};
+				await this._userStore.SetUserNameAsync(user, user.Email, CancellationToken.None);
+				await this._emailStore.SetEmailAsync(user, user.Email, CancellationToken.None);
+				var result = await this._userManager.CreateAsync(user, record!.Password!);
+				if (result.Succeeded) {
+					var roleResult = await this._userManager.AddToRoleAsync(user, Roles.Student.ToString());
+					if (roleResult.Succeeded) {
+						var studentProfile = new StudentProfile {
+							UniversityId = record.UniversityId,
+							ApplicationUser = user
+						};
+						_ = this._dbContext.StudentProfiles.Add(studentProfile);
+						successMessages.Add($"Estudiante {user.Email} creado correctamente.");
+					} else {
+						warningMessages.Add($"Estudiante {user.Email} creado, pero no se le pudo asignar el rol.");
+					}
+				} else {
+					errorMessages.Add($"Error al crear al estudiante {user.Email}");
+				}
+			}
+			_ = await this._dbContext.SaveChangesAsync();
+			if (errorMessages.Any()) {
+				this.ViewBag.ErrorMessages = errorMessages;
+			}
+			if (warningMessages.Any()) {
+				this.ViewBag.WarningMessages = warningMessages;
+			}
+			if (successMessages.Any()) {
+				this.ViewBag.SuccessMessages = successMessages;
+			}
+			return this.View();
+		} catch {
+			this.ViewBag.ErrorMessage = "Error al importar el archivo CSV.";
+			return this.View();
+		}
+	} 
 
 	public IActionResult Edit(string id) {
 		var applicationUser = this._userManager.Users.Include(a => a.StudentProfile).FirstOrDefault(a => a.Id == id);

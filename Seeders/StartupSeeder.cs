@@ -39,7 +39,8 @@ public static class StartupSeeder {
 		}
 	}
 
-	public static async Task SeedDirectorTeacherAsync(string email, string password, string firstName, string lastName, string rut, UserManager<ApplicationUser> userManager, ApplicationDbContext dbContext) {
+	public static async Task SeedDirectorTeacherAsync(string email, string password, string firstName, string lastName, string rut, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, ApplicationDbContext dbContext) {
+		var emailStore = (IUserEmailStore<ApplicationUser>)userStore;
 		var directorTeacher = new ApplicationUser {
 			UserName = email,
 			Email = email,
@@ -53,6 +54,8 @@ public static class StartupSeeder {
 				var teacherProfile = new TeacherProfile {
 					ApplicationUser = directorTeacher,
 				};
+				await userStore.SetUserNameAsync(directorTeacher, directorTeacher.Email, CancellationToken.None);
+				await emailStore.SetEmailAsync(directorTeacher, directorTeacher.Email, CancellationToken.None);
 				_ = await userManager.CreateAsync(directorTeacher, password);
 				_ = await userManager.AddToRolesAsync(directorTeacher, new List<string> { Roles.Teacher.ToString(), Roles.DirectorTeacher.ToString() });
 				_ = dbContext.TeacherProfiles.Add(teacherProfile);

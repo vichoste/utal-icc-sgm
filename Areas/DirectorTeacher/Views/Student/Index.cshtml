@@ -52,7 +52,7 @@
 			<h2>Gestionar estudiantes</h2>
 		</div>
 		<div class="col-12 col-md-2 mb-3">
-			@this.Html.ActionLink("Importar estudiantes desde CSV", "ImportCsv", "Student", new { area = "DirectorTeacher" }, new { @class = "btn btn-success"})
+			@this.Html.ActionLink("Importar estudiantes desde CSV", "Create", "Student", new { area = "DirectorTeacher" }, new { @class = "btn btn-success"})
 		</div>
 		<div class="col-12 mb-3">
 			<partial name="_Filter" , model="@new FilterPartialViewModel()" />

@@ -2,7 +2,7 @@
 
 namespace Utal.Icc.Sgm.Areas.DirectorTeacher.Views.Teacher;
 
-public class Create {
+public class CreateViewModel {
 	[Display(Name = "Nombre"), Required]
 	public string? FirstName { get; set; }
 	[Display(Name = "Apellido"), Required]
