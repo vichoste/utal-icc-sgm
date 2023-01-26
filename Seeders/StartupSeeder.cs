@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-using Utal.Icc.Sgm.Data;
 using Utal.Icc.Sgm.Models;
 
 namespace Utal.Icc.Sgm.Seeders;
@@ -39,28 +38,19 @@ public static class StartupSeeder {
 		}
 	}
 
-	public static async Task SeedDirectorTeacherAsync(string email, string password, string firstName, string lastName, string rut, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, ApplicationDbContext dbContext) {
+	public static async Task SeedDirectorTeacherAsync(string email, string password, string firstName, string lastName, string rut, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore) {
 		var emailStore = (IUserEmailStore<ApplicationUser>)userStore;
 		var directorTeacher = new ApplicationUser {
-			UserName = email,
-			Email = email,
 			FirstName = firstName,
 			LastName = lastName,
 			Rut = rut
 		};
-		if (userManager.Users.All(a => a.Id != directorTeacher.Id)) {
-			var applicationUser = await userManager.FindByEmailAsync(email);
-			if (applicationUser == null) {
-				var teacherProfile = new TeacherProfile {
-					ApplicationUser = directorTeacher,
-				};
-				await userStore.SetUserNameAsync(directorTeacher, directorTeacher.Email, CancellationToken.None);
-				await emailStore.SetEmailAsync(directorTeacher, directorTeacher.Email, CancellationToken.None);
-				_ = await userManager.CreateAsync(directorTeacher, password);
-				_ = await userManager.AddToRolesAsync(directorTeacher, new List<string> { Roles.Teacher.ToString(), Roles.DirectorTeacher.ToString() });
-				_ = dbContext.TeacherProfiles.Add(teacherProfile);
-				_ = await dbContext.SaveChangesAsync();
-			}
+		var directorTeacherCheck = await userManager.FindByIdAsync(email);
+		if (directorTeacherCheck is null) {
+			await userStore.SetUserNameAsync(directorTeacher, email, CancellationToken.None);
+			await emailStore.SetEmailAsync(directorTeacher, email, CancellationToken.None);
+			_ = await userManager.CreateAsync(directorTeacher, password);
+			_ = await userManager.AddToRolesAsync(directorTeacher, new List<string> { Roles.Teacher.ToString(), Roles.DirectorTeacher.ToString() });
 		}
 	}
 }

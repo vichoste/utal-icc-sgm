@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 using Utal.Icc.Sgm.Areas.Account.Views.Profile;
 using Utal.Icc.Sgm.Data;
@@ -16,15 +15,13 @@ public class ProfileController : Controller {
 	private readonly IUserStore<ApplicationUser> _userStore;
 	private readonly IUserEmailStore<ApplicationUser> _emailStore;
 	private readonly RoleManager<IdentityRole> _roleManager;
-	private readonly ApplicationDbContext _dbContext;
 
-	public ProfileController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, RoleManager<IdentityRole> roleManager, ApplicationDbContext dbContext) {
+	public ProfileController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, RoleManager<IdentityRole> roleManager) {
 		this._signInManager = signInManager;
 		this._userManager = userManager;
 		this._userStore = userStore;
 		this._emailStore = (IUserEmailStore<ApplicationUser>)this._userStore;
 		this._roleManager = roleManager;
-		this._dbContext = dbContext;
 	}
 
 	public async Task<IActionResult> Index() {
@@ -69,23 +66,15 @@ public class ProfileController : Controller {
 		if (!this.User.Identity!.IsAuthenticated) {
 			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
 		}
-		var applicationUsers = this._userManager.Users.Include(a => a.StudentProfile).ToList();
-		ApplicationUser? student = null;
-		foreach (var applicationUser in applicationUsers) {
-			if (applicationUser == await this._userManager.GetUserAsync(this.User)) {
-				student = applicationUser;
-				break;
-			}
-		}
-		if (student is null) {
+		if (await this._userManager.GetUserAsync(this.User) is not ApplicationUser student) {
 			this.ViewBag.ErrorMessage = "Error al obtener al estudiante.";
 			return this.View();
 		}
 		var studentViewModel = new StudentViewModel {
-			UniversityId = student!.StudentProfile!.UniversityId,
-			RemainingCourses = student!.StudentProfile.RemainingCourses,
-			IsDoingThePractice = student!.StudentProfile.IsDoingThePractice,
-			IsWorking = student!.StudentProfile.IsWorking
+			UniversityId = student.UniversityId,
+			RemainingCourses = student.RemainingCourses,
+			IsDoingThePractice = student.IsDoingThePractice,
+			IsWorking = student.IsWorking
 		};
 		return this.View(studentViewModel);
 	}
@@ -95,23 +84,15 @@ public class ProfileController : Controller {
 		if (!this.User.Identity!.IsAuthenticated) {
 			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
 		}
-		var applicationUsers = this._userManager.Users.Include(a => a.StudentProfile).ToList();
-		ApplicationUser? student = null;
-		foreach (var applicationUser in applicationUsers) {
-			if (applicationUser == await this._userManager.GetUserAsync(this.User)) {
-				student = applicationUser;
-				break;
-			}
-		}
-		if (student is null) {
+		if (await this._userManager.GetUserAsync(this.User) is not ApplicationUser student) {
 			this.ViewBag.ErrorMessage = "Error al obtener al estudiante.";
 			return this.View();
 		}
-		student!.StudentProfile!.UniversityId = model.UniversityId;
-		student.StudentProfile.RemainingCourses = model.RemainingCourses;
-		student.StudentProfile.IsDoingThePractice = model.IsDoingThePractice;
-		student.StudentProfile.IsWorking = model.IsWorking;
-		_ = await this._dbContext.SaveChangesAsync();
+		student.UniversityId = model.UniversityId;
+		student.RemainingCourses = model.RemainingCourses;
+		student.IsDoingThePractice = model.IsDoingThePractice;
+		student.IsWorking = model.IsWorking;
+		_ = await this._userManager.UpdateAsync(student);
 		this.ViewBag.SuccessMessage = "Se actualizó el perfil con éxito.";
 		return this.View();
 	}
@@ -121,22 +102,14 @@ public class ProfileController : Controller {
 		if (!this.User.Identity!.IsAuthenticated) {
 			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
 		}
-		var applicationUsers = this._userManager.Users.Include(a => a.TeacherProfile).ToList();
-		ApplicationUser? teacher = null;
-		foreach (var applicationUser in applicationUsers) {
-			if (applicationUser == await this._userManager.GetUserAsync(this.User)) {
-				teacher = applicationUser;
-				break;
-			}
-		}
-		if (teacher is null) {
-			this.ViewBag.ErrorMessage = "Error al obtener al profesor.";
+		if (await this._userManager.GetUserAsync(this.User) is not ApplicationUser teacher) {
+			this.ViewBag.ErrorMessage = "Error al obtener al estudiante.";
 			return this.View();
 		}
 		var teacherViewModel = new TeacherViewModel {
-			Office = teacher!.TeacherProfile!.Office,
-			Schedule = teacher!.TeacherProfile.Schedule,
-			Specialization = teacher!.TeacherProfile.Specialization,
+			Office = teacher.Office,
+			Schedule = teacher.Schedule,
+			Specialization = teacher.Specialization,
 		};
 		return this.View(teacherViewModel);
 	}
@@ -146,22 +119,14 @@ public class ProfileController : Controller {
 		if (!this.User.Identity!.IsAuthenticated) {
 			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
 		}
-		var applicationUsers = this._userManager.Users.Include(a => a.TeacherProfile).ToList();
-		ApplicationUser? teacher = null;
-		foreach (var applicationUser in applicationUsers) {
-			if (applicationUser == await this._userManager.GetUserAsync(this.User)) {
-				teacher = applicationUser;
-				break;
-			}
-		}
-		if (teacher is null) {
-			this.ViewBag.ErrorMessage = "Error al obtener al profesor.";
+		if (await this._userManager.GetUserAsync(this.User) is not ApplicationUser teacher) {
+			this.ViewBag.ErrorMessage = "Error al obtener al estudiante.";
 			return this.View();
 		}
-		teacher!.TeacherProfile!.Office = model.Office;
-		teacher.TeacherProfile.Schedule = model.Schedule;
-		teacher.TeacherProfile.Specialization = model.Specialization;
-		_ = await this._dbContext.SaveChangesAsync();
+		teacher.Office = model.Office;
+		teacher.Schedule = model.Schedule;
+		teacher.Specialization = model.Specialization;
+		_ = await this._userManager.UpdateAsync(teacher);
 		this.ViewBag.SuccessMessage = "Se actualizó el perfil con éxito.";
 		return this.View();
 	}

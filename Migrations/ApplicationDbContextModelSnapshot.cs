@@ -165,6 +165,12 @@ namespace Utal.Icc.Sgm.Migrations {
 				b.Property<string>("FirstName")
 					.HasColumnType("nvarchar(max)");
 
+				b.Property<bool>("IsDoingThePractice")
+					.HasColumnType("bit");
+
+				b.Property<bool>("IsWorking")
+					.HasColumnType("bit");
+
 				b.Property<string>("LastName")
 					.HasColumnType("nvarchar(max)");
 
@@ -182,6 +188,9 @@ namespace Utal.Icc.Sgm.Migrations {
 					.HasMaxLength(256)
 					.HasColumnType("nvarchar(256)");
 
+				b.Property<string>("Office")
+					.HasColumnType("nvarchar(max)");
+
 				b.Property<string>("PasswordHash")
 					.HasColumnType("nvarchar(max)");
 
@@ -191,14 +200,26 @@ namespace Utal.Icc.Sgm.Migrations {
 				b.Property<bool>("PhoneNumberConfirmed")
 					.HasColumnType("bit");
 
+				b.Property<string>("RemainingCourses")
+					.HasColumnType("nvarchar(max)");
+
 				b.Property<string>("Rut")
+					.HasColumnType("nvarchar(max)");
+
+				b.Property<string>("Schedule")
 					.HasColumnType("nvarchar(max)");
 
 				b.Property<string>("SecurityStamp")
 					.HasColumnType("nvarchar(max)");
 
+				b.Property<string>("Specialization")
+					.HasColumnType("nvarchar(max)");
+
 				b.Property<bool>("TwoFactorEnabled")
 					.HasColumnType("bit");
+
+				b.Property<string>("UniversityId")
+					.HasColumnType("nvarchar(max)");
 
 				b.Property<string>("UserName")
 					.HasMaxLength(256)
@@ -217,59 +238,25 @@ namespace Utal.Icc.Sgm.Migrations {
 				b.ToTable("AspNetUsers", (string)null);
 			});
 
-			modelBuilder.Entity("Utal.Icc.Sgm.Models.StudentProfile", b => {
+			modelBuilder.Entity("Utal.Icc.Sgm.Models.StudentProposal", b => {
 				b.Property<Guid>("Id")
 					.ValueGeneratedOnAdd()
 					.HasColumnType("uniqueidentifier");
 
-				b.Property<bool>("IsDoingThePractice")
-					.HasColumnType("bit");
-
-				b.Property<bool>("IsWorking")
-					.HasColumnType("bit");
-
-				b.Property<string>("RemainingCourses")
-					.HasColumnType("nvarchar(max)");
-
-				b.Property<string>("StudentProfile")
+				b.Property<string>("ApplicationUserId")
 					.HasColumnType("nvarchar(450)");
 
-				b.Property<string>("UniversityId")
+				b.Property<string>("Description")
+					.HasColumnType("nvarchar(max)");
+
+				b.Property<string>("Title")
 					.HasColumnType("nvarchar(max)");
 
 				b.HasKey("Id");
 
-				b.HasIndex("StudentProfile")
-					.IsUnique()
-					.HasFilter("[StudentProfile] IS NOT NULL");
+				b.HasIndex("ApplicationUserId");
 
-				b.ToTable("StudentProfiles");
-			});
-
-			modelBuilder.Entity("Utal.Icc.Sgm.Models.TeacherProfile", b => {
-				b.Property<Guid>("Id")
-					.ValueGeneratedOnAdd()
-					.HasColumnType("uniqueidentifier");
-
-				b.Property<string>("Office")
-					.HasColumnType("nvarchar(max)");
-
-				b.Property<string>("Schedule")
-					.HasColumnType("nvarchar(max)");
-
-				b.Property<string>("Specialization")
-					.HasColumnType("nvarchar(max)");
-
-				b.Property<string>("TeacherProfile")
-					.HasColumnType("nvarchar(450)");
-
-				b.HasKey("Id");
-
-				b.HasIndex("TeacherProfile")
-					.IsUnique()
-					.HasFilter("[TeacherProfile] IS NOT NULL");
-
-				b.ToTable("TeacherProfiles");
+				b.ToTable("StudentProposal");
 			});
 
 			modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b => {
@@ -318,26 +305,16 @@ namespace Utal.Icc.Sgm.Migrations {
 					.IsRequired();
 			});
 
-			modelBuilder.Entity("Utal.Icc.Sgm.Models.StudentProfile", b => {
+			modelBuilder.Entity("Utal.Icc.Sgm.Models.StudentProposal", b => {
 				b.HasOne("Utal.Icc.Sgm.Models.ApplicationUser", "ApplicationUser")
-					.WithOne("StudentProfile")
-					.HasForeignKey("Utal.Icc.Sgm.Models.StudentProfile", "StudentProfile");
-
-				b.Navigation("ApplicationUser");
-			});
-
-			modelBuilder.Entity("Utal.Icc.Sgm.Models.TeacherProfile", b => {
-				b.HasOne("Utal.Icc.Sgm.Models.ApplicationUser", "ApplicationUser")
-					.WithOne("TeacherProfile")
-					.HasForeignKey("Utal.Icc.Sgm.Models.TeacherProfile", "TeacherProfile");
+					.WithMany("StudentProposals")
+					.HasForeignKey("ApplicationUserId");
 
 				b.Navigation("ApplicationUser");
 			});
 
 			modelBuilder.Entity("Utal.Icc.Sgm.Models.ApplicationUser", b => {
-				b.Navigation("StudentProfile");
-
-				b.Navigation("TeacherProfile");
+				b.Navigation("StudentProposals");
 			});
 #pragma warning restore 612, 618
 		}
