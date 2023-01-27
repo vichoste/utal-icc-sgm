@@ -69,7 +69,7 @@
 									Título
 								</a>
 							</th>
-							<th>¿Es borrador?</th>
+							<th>Estados</th>
 							<th>Acciones</th>
 						</tr>
 					</thead>
@@ -82,11 +82,21 @@
 									} else {
 										<span class="badge bg-success">Enviado</span>
 									}
+									@if (item.IsPending) {
+										<span class="badge bg-yellow">Pendiente</span>
+									} else if (!item.IsAccepted) {
+										<span class="badge bg-danger">Rechazado</span>
+									} else if (item.IsAccepted) {
+										<span class="badge bg-danger">Aceptado</span>
+									}
 								</td>
 								<td>
 									@this.Html.ActionLink("Editar", "Edit", "Proposal", new { area = "Student", id = item.Id }, new { @class = "btn btn-yellow mb-3"})
 									@this.Html.ActionLink("Eliminar", "Delete", "Proposal", new { area = "Student", id = item.Id }, new { @class = "btn btn-danger mb-3"})
-									@this.Html.ActionLink("Enviar a profesor", "SendToTeacher", "Proposal", new { area = "Student", id = item.Id }, new { @class = "btn btn-danger mb-3"})
+									@this.Html.ActionLink("Enviar a profesor", "Send", "Proposal", new { area = "Student", id = item.Id }, new { @class = "btn btn-primary mb-3"})
+									@if (item.IsAccepted) {
+										@this.Html.ActionLink("Confirmar propuesta", "Confirm", "Proposal", new { area = "Student", id = item.Id }, new { @class = "btn btn-success mb-3"})
+									}
 								</td>
 							</tr>
 						}

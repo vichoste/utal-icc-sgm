@@ -11,16 +11,24 @@ public class ApplicationUser : IdentityUser {
 	public string? Rut { get; set; }
 	#endregion
 	#region Student
-	public string? UniversityId { get; set; }
-	public string? RemainingCourses { get; set; }
-	public bool IsDoingThePractice { get; set; }
-	public bool IsWorking { get; set; }
-	[InverseProperty("Student")]
-	public virtual ICollection<StudentProposal>? StudentProposals { get; set; }
+	public string? StudentUniversityId { get; set; }
+	public string? StudentRemainingCourses { get; set; }
+	public bool StudentIsDoingThePractice { get; set; }
+	public bool StudentIsWorking { get; set; }
+	[InverseProperty("StudentOwnerOfTheStudentProposal")]
+	public virtual ICollection<StudentProposal>? StudentProposalsWhichIOwn { get; set; }
 	#endregion
 	#region Teacher
-	public string? Office { get; set; }
-	public string? Schedule { get; set; }
-	public string? Specialization { get; set; }
+	public string? TeacherOffice { get; set; }
+	public string? TeacherSchedule { get; set; }
+	public string? TeacherSpecialization { get; set; }
+	#endregion
+	#region AssistantTeacher
+	[InverseProperty("AssistantTeachersCandidatesOfTheStudentProposal")]
+	public virtual ICollection<StudentProposal>? StudentProposalsWhereImAAssistantTeacherCandidate { get; set; }
+	#endregion
+	#region GuideTeacher
+	[InverseProperty("GuideTeacherCandidateOfTheStudentProposal")]
+	public virtual ICollection<StudentProposal>? StudentProposalsWhereImAGuideTeacherCandidate { get; set; }
 	#endregion
 }

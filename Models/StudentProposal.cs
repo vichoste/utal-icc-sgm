@@ -8,7 +8,9 @@ public class StudentProposal {
 	public string? Title { get; set; }
 	public string? Description { get; set; }
 	public bool IsDraft { get; set; }
-	public virtual ApplicationUser? StudentProposalOwner { get; set; }
-	public virtual ApplicationUser? GuideTeacher { get; set; }
-	public virtual ICollection<ApplicationUser>? AssistantTeachers { get; set; }
+	public bool IsPending { get; set; }
+	public bool IsAccepted { get; set; }
+	public virtual ApplicationUser? StudentOwnerOfTheStudentProposal { get; set; }
+	public virtual ApplicationUser? GuideTeacherCandidateOfTheStudentProposal { get; set; }
+	public virtual ICollection<ApplicationUser>? AssistantTeachersCandidatesOfTheStudentProposal { get; set; }
 }

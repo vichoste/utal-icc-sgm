@@ -32,18 +32,29 @@ public class ProposalController : Controller {
 			return this.View();
 		}
 		var orderedProposals = sortOrder switch {
-			"Title" => student.StudentProposals!.OrderBy(s => s.Title),
-			"TitleDesc" => student.StudentProposals!.OrderByDescending(s => s.Title),
-			_ => student.StudentProposals!.OrderBy(s => s.Title)
+			"Title" => student.StudentProposalsWhichIOwn!.OrderBy(sp => sp.Title),
+			"TitleDesc" => student.StudentProposalsWhichIOwn!.OrderByDescending(sp => sp.Title),
+			_ => student.StudentProposalsWhichIOwn!.OrderBy(sp => sp.Title)
 		};
 		var filteredAndOrderedProposals = orderedProposals.ToList();
 		if (!string.IsNullOrEmpty(searchString)) {
-			filteredAndOrderedProposals = orderedProposals.Where(s => s.Title!.ToUpper().Contains(searchString.ToUpper()) || s.Description!.ToUpper().Contains(searchString.ToUpper())).ToList();
+			filteredAndOrderedProposals = orderedProposals.Where(sp => sp.Title!.ToUpper().Contains(searchString.ToUpper())).ToList();
 		}
-		var indexViewModels = filteredAndOrderedProposals.Select(s => new IndexViewModel {
-			Title = s.Title,
+		var indexViewModels = filteredAndOrderedProposals.Select(sp => new IndexViewModel {
+			Title = sp.Title,
+			IsDraft = sp.IsDraft,
+			IsPending = sp.IsPending,
+			IsAccepted = sp.IsAccepted,
 		});
 		var pageSize = 6;
 		return this.View(PaginatedList<IndexViewModel>.Create(indexViewModels.AsQueryable(), pageNumber ?? 1, pageSize));
+	}
+
+	public IActionResult Create() => this.View();
+
+	[HttpPost, ValidateAntiForgeryToken]
+	public async Task<IActionResult> Create([FromForm] CreateViewModel model) {
+		var guideTeachers = await this._userManager.GetUsersInRoleAsync(Roles.GuideTeacher.ToString());
+		var assistantTeachers = await this._userManager.GetUsersInRoleAsync(Roles.AssistantTeacher.ToString());
 	}
 }

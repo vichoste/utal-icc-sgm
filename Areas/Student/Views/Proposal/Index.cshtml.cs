@@ -9,4 +9,8 @@ public class IndexViewModel {
 	public string? Title { get; set; }
 	[Display(Name = "¿Es un borrador?")]
 	public bool IsDraft { get; set; }
+	[Display(Name = "¿Está pendiente?")]
+	public bool IsPending { get; set; }
+	[Display(Name = "¿Fue aceptada?")]
+	public bool IsAccepted { get; set; }
 }

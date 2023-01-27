@@ -27,7 +27,7 @@ public class StudentController : Controller {
 	public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
 		this.ViewData["FirstNameSortParam"] = sortOrder == "FirstName" ? "FirstNameDesc" : "FirstName";
 		this.ViewData["LastNameSortParam"] = sortOrder == "LastName" ? "LastNameDesc" : "LastName";
-		this.ViewData["UniversityIdSortParam"] = sortOrder == "UniversityId" ? "UniversityIdDesc" : "UniversityId";
+		this.ViewData["UniversityIdSortParam"] = sortOrder == "StudentUniversityId" ? "UniversityIdDesc" : "StudentUniversityId";
 		this.ViewData["RutSortParam"] = sortOrder == "Rut" ? "RutDesc" : "Rut";
 		this.ViewData["EmailSortParam"] = sortOrder == "Email" ? "EmailDesc" : "Email";
 		this.ViewData["CurrentSort"] = sortOrder;
@@ -41,8 +41,8 @@ public class StudentController : Controller {
 		var orderedStudents = sortOrder switch {
 			"FirstName" => students.OrderBy(s => s.FirstName),
 			"FirstNameDesc" => students.OrderByDescending(s => s.FirstName),
-			"UniversityId" => students.OrderBy(s => s.UniversityId),
-			"UniversityIdDesc" => students.OrderByDescending(s => s.UniversityId),
+			"StudentUniversityId" => students.OrderBy(s => s.StudentUniversityId),
+			"UniversityIdDesc" => students.OrderByDescending(s => s.StudentUniversityId),
 			"Rut" => students.OrderBy(s => s.Rut),
 			"RutDesc" => students.OrderByDescending(s => s.Rut),
 			"Email" => students.OrderBy(s => s.Email),
@@ -53,13 +53,13 @@ public class StudentController : Controller {
 		};
 		var filteredAndOrderedStudents = orderedStudents.ToList();
 		if (!string.IsNullOrEmpty(searchString)) {
-			filteredAndOrderedStudents = orderedStudents.Where(s => s.FirstName!.ToUpper().Contains(searchString.ToUpper()) || s.LastName!.ToUpper().Contains(searchString.ToUpper()) || s.UniversityId!.ToUpper().Contains(searchString) || s.Rut!.ToUpper().Contains(searchString.ToUpper()) || s.Email == searchString).ToList();
+			filteredAndOrderedStudents = orderedStudents.Where(s => s.FirstName!.ToUpper().Contains(searchString.ToUpper()) || s.LastName!.ToUpper().Contains(searchString.ToUpper()) || s.StudentUniversityId!.ToUpper().Contains(searchString) || s.Rut!.ToUpper().Contains(searchString.ToUpper()) || s.Email == searchString).ToList();
 		}
 		var indexViewModels = filteredAndOrderedStudents.Select(s => new IndexViewModel {
 			Id = s.Id,
 			FirstName = s.FirstName,
 			LastName = s.LastName,
-			UniversityId = s.UniversityId,
+			UniversityId = s.StudentUniversityId,
 			Rut = s.Rut,
 			Email = s.Email
 		});
@@ -82,7 +82,7 @@ public class StudentController : Controller {
 				var user = new ApplicationUser {
 					FirstName = record.FirstName,
 					LastName = record.LastName,
-					UniversityId = record.UniversityId,
+					StudentUniversityId = record.UniversityId,
 					Rut = record.Rut,
 				};
 				await this._userStore.SetUserNameAsync(user, record.Email, CancellationToken.None);
@@ -124,7 +124,7 @@ public class StudentController : Controller {
 		var editViewModel = new EditViewModel {
 			FirstName = student.FirstName,
 			LastName = student.LastName,
-			UniversityId = student.UniversityId,
+			UniversityId = student.StudentUniversityId,
 			Rut = student.Rut,
 			Email = student.Email
 		};
@@ -142,7 +142,7 @@ public class StudentController : Controller {
 		await this._emailStore.SetEmailAsync(student, model.Email, CancellationToken.None);
 		student.FirstName = !model.FirstName.IsNullOrEmpty() ? model.FirstName : student.FirstName;
 		student.LastName = !model.LastName.IsNullOrEmpty() ? model.LastName : student.LastName;
-		student.UniversityId = !model.UniversityId.IsNullOrEmpty() ? model.UniversityId : student.UniversityId;
+		student.StudentUniversityId = !model.UniversityId.IsNullOrEmpty() ? model.UniversityId : student.StudentUniversityId;
 		student.Rut = !model.Rut.IsNullOrEmpty() ? model.Rut : student.Rut;
 		var updateResult = await this._userManager.UpdateAsync(student);
 		if (updateResult.Succeeded) {

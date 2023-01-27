@@ -66,10 +66,10 @@ public class ProfileController : Controller {
 			return this.View();
 		}
 		var studentViewModel = new StudentViewModel {
-			UniversityId = student.UniversityId,
-			RemainingCourses = student.RemainingCourses,
-			IsDoingThePractice = student.IsDoingThePractice,
-			IsWorking = student.IsWorking
+			UniversityId = student.StudentUniversityId,
+			RemainingCourses = student.StudentRemainingCourses,
+			IsDoingThePractice = student.StudentIsDoingThePractice,
+			IsWorking = student.StudentIsWorking
 		};
 		return this.View(studentViewModel);
 	}
@@ -83,10 +83,10 @@ public class ProfileController : Controller {
 			this.ViewBag.ErrorMessage = "Error al obtener al estudiante.";
 			return this.View();
 		}
-		student.UniversityId = model.UniversityId;
-		student.RemainingCourses = model.RemainingCourses;
-		student.IsDoingThePractice = model.IsDoingThePractice;
-		student.IsWorking = model.IsWorking;
+		student.StudentUniversityId = model.UniversityId;
+		student.StudentRemainingCourses = model.RemainingCourses;
+		student.StudentIsDoingThePractice = model.IsDoingThePractice;
+		student.StudentIsWorking = model.IsWorking;
 		_ = await this._userManager.UpdateAsync(student);
 		this.ViewBag.SuccessMessage = "Se actualizó el perfil con éxito.";
 		return this.View();
@@ -102,9 +102,9 @@ public class ProfileController : Controller {
 			return this.View();
 		}
 		var teacherViewModel = new TeacherViewModel {
-			Office = teacher.Office,
-			Schedule = teacher.Schedule,
-			Specialization = teacher.Specialization,
+			Office = teacher.TeacherOffice,
+			Schedule = teacher.TeacherSchedule,
+			Specialization = teacher.TeacherSpecialization,
 		};
 		return this.View(teacherViewModel);
 	}
@@ -118,9 +118,9 @@ public class ProfileController : Controller {
 			this.ViewBag.ErrorMessage = "Error al obtener al estudiante.";
 			return this.View();
 		}
-		teacher.Office = model.Office;
-		teacher.Schedule = model.Schedule;
-		teacher.Specialization = model.Specialization;
+		teacher.TeacherOffice = model.Office;
+		teacher.TeacherSchedule = model.Schedule;
+		teacher.TeacherSpecialization = model.Specialization;
 		_ = await this._userManager.UpdateAsync(teacher);
 		this.ViewBag.SuccessMessage = "Se actualizó el perfil con éxito.";
 		return this.View();
