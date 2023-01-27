@@ -47,7 +47,7 @@
 		}
 	}
 	<div class="card">
-		<div class="card-header text-center">Eliminar estudiante</div>
+		<div class="card-header text-center">@this.ViewData["Title"]</div>
 		<div class="card-body text-center">
 			@using (this.Html.BeginForm("Delete", "Student", new { area = "DirectorTeacher" })) {
 				<h5 class="card-title">¿Estás seguro que quieres eliminar a este estudiante?</h5>

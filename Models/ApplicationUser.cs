@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+using Microsoft.AspNetCore.Identity;
 
 namespace Utal.Icc.Sgm.Models;
 
@@ -13,6 +15,7 @@ public class ApplicationUser : IdentityUser {
 	public string? RemainingCourses { get; set; }
 	public bool IsDoingThePractice { get; set; }
 	public bool IsWorking { get; set; }
+	[InverseProperty("Student")]
 	public virtual ICollection<StudentProposal>? StudentProposals { get; set; }
 	#endregion
 	#region Teacher

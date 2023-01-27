@@ -51,7 +51,7 @@
 	<div class="row justify-content-center">
 		<div class="col-10">
 			<div class="card">
-				<div class="card-header text-center">Crear profesor</div>
+				<div class="card-header text-center">@this.ViewData["Title"]</div>
 				<div class="card-body">
 					@using (this.Html.BeginForm("Create", "Teacher", new { area = "DirectorTeacher" })) {
 						@this.Html.AntiForgeryToken()

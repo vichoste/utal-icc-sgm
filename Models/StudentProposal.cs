@@ -7,5 +7,8 @@ public class StudentProposal {
 	public Guid Id { get; set; }
 	public string? Title { get; set; }
 	public string? Description { get; set; }
-	public virtual ApplicationUser? ApplicationUser { get; set; }
+	public bool IsDraft { get; set; }
+	public virtual ApplicationUser? StudentProposalOwner { get; set; }
+	public virtual ApplicationUser? GuideTeacher { get; set; }
+	public virtual ICollection<ApplicationUser>? AssistantTeachers { get; set; }
 }

@@ -3,25 +3,20 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 using Utal.Icc.Sgm.Areas.Account.Views.Profile;
-using Utal.Icc.Sgm.Data;
 using Utal.Icc.Sgm.Models;
 
 namespace Utal.Icc.Sgm.Areas.Account.Controllers;
 
 [Area("Account")]
 public class ProfileController : Controller {
-	private readonly SignInManager<ApplicationUser> _signInManager;
 	private readonly UserManager<ApplicationUser> _userManager;
 	private readonly IUserStore<ApplicationUser> _userStore;
 	private readonly IUserEmailStore<ApplicationUser> _emailStore;
-	private readonly RoleManager<IdentityRole> _roleManager;
 
-	public ProfileController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, RoleManager<IdentityRole> roleManager) {
-		this._signInManager = signInManager;
+	public ProfileController(UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore) {
 		this._userManager = userManager;
 		this._userStore = userStore;
 		this._emailStore = (IUserEmailStore<ApplicationUser>)this._userStore;
-		this._roleManager = roleManager;
 	}
 
 	public async Task<IActionResult> Index() {

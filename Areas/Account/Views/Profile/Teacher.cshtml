@@ -3,7 +3,7 @@
 @model TeacherViewModel
 
 @{
-	this.ViewData["Title"] = "Perfil de profesor";
+	this.ViewData["Title"] = "Mi perfil de profesor";
 }
 
 <div class="container">
@@ -49,7 +49,7 @@
 	<div class="row justify-content-center">
 		<div class="col-10">
 			<div class="card">
-				<div class="card-header text-center">Perfil de profesor</div>
+				<div class="card-header text-center">@this.ViewData["Title"]</div>
 				<div class="card-body">
 					@using (this.Html.BeginForm("Teacher", "Profile", new { area = "Account" })) {
 						@this.Html.AntiForgeryToken()

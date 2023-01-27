@@ -22,10 +22,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Folder Include="Areas\Student\Controllers\" />
-		<Folder Include="Areas\Student\Views\" />
-		<Folder Include="Areas\Teacher\Controllers\" />
-		<Folder Include="Areas\Teacher\Views\" />
+		<Folder Include="Areas\GuideTeacher\Controllers\" />
+		<Folder Include="Areas\GuideTeacher\Views\" />
 	</ItemGroup>
 
 </Project>

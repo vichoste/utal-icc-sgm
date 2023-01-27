@@ -10,13 +10,11 @@ namespace Utal.Icc.Sgm.Areas.DirectorTeacher.Controllers;
 
 [Area("DirectorTeacher"), Authorize(Roles = "DirectorTeacher")]
 public class TeacherController : Controller {
-	private readonly SignInManager<ApplicationUser> _signInManager;
 	private readonly UserManager<ApplicationUser> _userManager;
 	private readonly IUserStore<ApplicationUser> _userStore;
 	private readonly IUserEmailStore<ApplicationUser> _emailStore;
 
-	public TeacherController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore) {
-		this._signInManager = signInManager;
+	public TeacherController(UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore) {
 		this._userManager = userManager;
 		this._userStore = userStore;
 		this._emailStore = (IUserEmailStore<ApplicationUser>)this._userStore;
