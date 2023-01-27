@@ -183,6 +183,7 @@ public class StudentController : Controller {
 		var result = await this._userManager.DeleteAsync(student);
 		if (result.Succeeded) {
 			this.ViewBag.SuccessMessage = "Estudiante eliminado con éxito.";
+			this.ModelState.Clear();
 			return this.View();
 		}
 		this.ViewBag.ErrorMessage = "Error al eliminar al estudiante.";

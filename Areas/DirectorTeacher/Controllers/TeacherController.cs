@@ -168,13 +168,11 @@ public class TeacherController : Controller {
 			var rankRolesResult = await this._userManager.AddToRolesAsync(teacher, rankRoles);
 			if (removeRankRolesResult.Succeeded && rankRolesResult.Succeeded) {
 				this.ViewBag.SuccessMessage = "Profesor actualizado con éxito.";
-				this.ModelState.Clear();
 				return this.View();
 			}
 			this.ViewBag.WarningMessage = "Profesor actualizado, pero no se le pudo asignar el(los) rol(es).";
 			this.ViewBag.WarningMessages = removeRankRolesResult.Errors.Select(w => w.Description).ToList();
 			this.ViewBag.WarningMessages2 = rankRolesResult.Errors.Select(w => w.Description).ToList();
-			this.ModelState.Clear();
 			return this.View();
 		}
 		if (updateResult.Errors.Any()) {
@@ -216,6 +214,7 @@ public class TeacherController : Controller {
 		var result = await this._userManager.DeleteAsync(teacher);
 		if (result.Succeeded) {
 			this.ViewBag.SuccessMessage = "Profesor eliminado con éxito.";
+			this.ModelState.Clear();
 			return this.View();
 		}
 		this.ViewBag.ErrorMessage = "Error al eliminar al profesor.";

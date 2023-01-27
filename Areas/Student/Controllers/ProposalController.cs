@@ -51,9 +51,24 @@ public class ProposalController : Controller {
 	}
 
 	public async Task<IActionResult> Create() {
-		var guideTeachers = (await this._userManager.GetUsersInRoleAsync(Roles.GuideTeacher.ToString())).OrderBy(gt => gt.LastName);
-		var assistantTeachers = (await this._userManager.GetUsersInRoleAsync(Roles.AssistantTeacher.ToString())).OrderBy(at => at.LastName);
-		return this.View();
+		var guideTeachers = (await this._userManager.GetUsersInRoleAsync(Roles.GuideTeacher.ToString())).OrderBy(gt => gt.LastName).ToList();
+		var assistantTeachers1 = (await this._userManager.GetUsersInRoleAsync(Roles.AssistantTeacher.ToString())).OrderBy(at => at.LastName).ToList();
+		var assistantTeachers2 = (await this._userManager.GetUsersInRoleAsync(Roles.AssistantTeacher.ToString())).OrderBy(at => at.LastName).ToList();
+		var createViewModel = new CreateViewModel {
+			GuideTeachers = guideTeachers.Select(gt => new GuideTeacherViewModel {
+				Id = gt.Id,
+				Name = $"{gt.FirstName} {gt.LastName}"
+			}),
+			AssistantTeachers1 = assistantTeachers1.Select(at => new AssistantTeacherViewModel {
+				Id = at.Id,
+				Name = $"{at.FirstName} {at.LastName}"
+			}),
+			AssistantTeachers2 = assistantTeachers2.Select(at => new AssistantTeacherViewModel {
+				Id = at.Id,
+				Name = $"{at.FirstName} {at.LastName}"
+			})
+		};
+		return this.View(createViewModel);
 	}
 
 	[HttpPost, ValidateAntiForgeryToken]
