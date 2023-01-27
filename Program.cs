@@ -47,6 +47,16 @@ _ = app.MapAreaControllerRoute(
 	areaName: "DirectorTeacher",
 	pattern: "DirectorTeacher/{controller=Student}/{action=Index}/{id?}"
 );
+_ = app.MapAreaControllerRoute(
+	name: "GuideTeacher",
+	areaName: "GuideTeacher",
+	pattern: "GuideTeacher/{controller=Proposal}/{action=Index}/{id?}"
+);
+_ = app.MapAreaControllerRoute(
+	name: "Student",
+	areaName: "Student",
+	pattern: "Student/{controller=Proposal}/{action=Index}/{id?}"
+);
 _ = app.MapControllerRoute(
 	name: "default",
 	pattern: "{controller=Home}/{action=Index}/{id?}"

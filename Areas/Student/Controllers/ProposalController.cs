@@ -50,11 +50,14 @@ public class ProposalController : Controller {
 		return this.View(PaginatedList<IndexViewModel>.Create(indexViewModels.AsQueryable(), pageNumber ?? 1, pageSize));
 	}
 
-	public IActionResult Create() => this.View();
+	public async Task<IActionResult> Create() {
+		var guideTeachers = (await this._userManager.GetUsersInRoleAsync(Roles.GuideTeacher.ToString())).OrderBy(gt => gt.LastName);
+		var assistantTeachers = (await this._userManager.GetUsersInRoleAsync(Roles.AssistantTeacher.ToString())).OrderBy(at => at.LastName);
+		return this.View();
+	}
 
 	[HttpPost, ValidateAntiForgeryToken]
 	public async Task<IActionResult> Create([FromForm] CreateViewModel model) {
-		var guideTeachers = await this._userManager.GetUsersInRoleAsync(Roles.GuideTeacher.ToString());
-		var assistantTeachers = await this._userManager.GetUsersInRoleAsync(Roles.AssistantTeacher.ToString());
+		return this.View();
 	}
 }

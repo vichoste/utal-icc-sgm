@@ -89,8 +89,13 @@
 					</a>
 					<div class="menu-submenu">
 						<div class="menu-item">
-							<a href="@this.Url.Action("Index", "ThesisStudent", new { area = "GuideTeacher" })" class="menu-link">
-								<span class="menu-text">Gestionar mis memoristas y nuestras memorias de título</span>
+							<a href="@this.Url.Action("Index", "Apply", new { area = "GuideTeacher" })" class="menu-link">
+								<span class="menu-text">Gestionar propuestas de estudiantes a memorias de título</span>
+							</a>
+						</div>
+						<div class="menu-item">
+							<a href="@this.Url.Action("Index", "Proposal", new { area = "GuideTeacher" })" class="menu-link">
+								<span class="menu-text">Gestionar mis propuestas de memoria de título para estudiantes</span>
 							</a>
 						</div>
 						<div class="menu-item">
@@ -99,13 +104,8 @@
 							</a>
 						</div>
 						<div class="menu-item">
-							<a href="@this.Url.Action("Index", "Apply", new { area = "GuideTeacher" })" class="menu-link">
-								<span class="menu-text">Gestionar postulaciones de estudiantes a mis memorias de título</span>
-							</a>
-						</div>
-						<div class="menu-item">
-							<a href="@this.Url.Action("Index", "Proposal", new { area = "GuideTeacher" })" class="menu-link">
-								<span class="menu-text">Gestionar mis propuestas de memoria de título para estudiantes</span>
+							<a href="@this.Url.Action("Index", "ThesisStudent", new { area = "GuideTeacher" })" class="menu-link">
+								<span class="menu-text">Gestionar mis memoristas y nuestras memorias de título</span>
 							</a>
 						</div>
 					</div>
@@ -181,8 +181,8 @@
 					</a>
 					<div class="menu-submenu">
 						<div class="menu-item">
-							<a href="@this.Url.Action("Index", "Request", new { area = "Student" })" class="menu-link">
-								<span class="menu-text">Gestionar nuestras solicitudes de memoria de título a comité</span>
+							<a href="@this.Url.Action("Index", "Proposal", new { area = "Student" })" class="menu-link">
+								<span class="menu-text">Gestionar mis propuestas de memoria de título a profesores</span>
 							</a>
 						</div>
 						<div class="menu-item">
@@ -191,8 +191,8 @@
 							</a>
 						</div>
 						<div class="menu-item">
-							<a href="@this.Url.Action("Index", "Proposal", new { area = "Student" })" class="menu-link">
-								<span class="menu-text">Gestionar mis propuestas de memoria de título a profesores</span>
+							<a href="@this.Url.Action("Index", "Request", new { area = "Student" })" class="menu-link">
+								<span class="menu-text">Gestionar nuestras solicitudes de memoria de título a comité</span>
 							</a>
 						</div>
 					</div>

@@ -40,10 +40,10 @@
 				@if (this.SignInManager.IsSignedIn(this.User)) {
 					<a class="dropdown-item d-flex align-items-center" href="@this.Url.Action("Index", "Profile", new { area = "Account" })">Mi perfil <i class="fa fa-user-circle fa-fw ms-auto text-gray-400 f-s-16"></i></a>
 					@if (this.User.IsInRole(Roles.Teacher.ToString())) {
-						<a class="dropdown-item d-flex align-items-center" href="@this.Url.Action("Teacher", "Profile", new { area = "Account" })">Perfil profesor <i class="fa fa-user-tie fa-fw ms-auto text-gray-400 f-s-16"></i></a>
+						<a class="dropdown-item d-flex align-items-center" href="@this.Url.Action("Teacher", "Profile", new { area = "Account" })">Mi perfil de profesor <i class="fa fa-user-tie fa-fw ms-auto text-gray-400 f-s-16"></i></a>
 					}
 					@if (this.User.IsInRole(Roles.Student.ToString())) {
-						<a class="dropdown-item d-flex align-items-center" href="@this.Url.Action("Student", "Profile", new { area = "Account" })">Perfil estudiante <i class="fa fa-user-tie fa-fw ms-auto text-gray-400 f-s-16"></i></a>
+						<a class="dropdown-item d-flex align-items-center" href="@this.Url.Action("Student", "Profile", new { area = "Account" })">Mi perfil de estudiante <i class="fa fa-user-tie fa-fw ms-auto text-gray-400 f-s-16"></i></a>
 					}
 					<a class="dropdown-item d-flex align-items-center" href="@this.Url.Action("ChangePassword", "Profile", new { area = "Account" })">Contraseña <i class="fa fa-key fa-fw ms-auto text-gray-400 f-s-16"></i></a>
 					<div class="dropdown-divider"></div>

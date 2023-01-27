@@ -15,8 +15,8 @@ public class ApplicationUser : IdentityUser {
 	public string? StudentRemainingCourses { get; set; }
 	public bool StudentIsDoingThePractice { get; set; }
 	public bool StudentIsWorking { get; set; }
-	[InverseProperty("StudentOwnerOfTheStudentProposal")]
-	public virtual ICollection<StudentProposal>? StudentProposalsWhichIOwn { get; set; }
+	[InverseProperty(nameof(StudentProposal.StudentOwnerOfTheStudentProposal))]
+	public virtual ICollection<StudentProposal>? StudentProposalsWhichIOwn { get; set; } = new HashSet<StudentProposal>();
 	#endregion
 	#region Teacher
 	public string? TeacherOffice { get; set; }
@@ -24,11 +24,11 @@ public class ApplicationUser : IdentityUser {
 	public string? TeacherSpecialization { get; set; }
 	#endregion
 	#region AssistantTeacher
-	[InverseProperty("AssistantTeachersCandidatesOfTheStudentProposal")]
-	public virtual ICollection<StudentProposal>? StudentProposalsWhereImAAssistantTeacherCandidate { get; set; }
+	[InverseProperty(nameof(StudentProposal.AssistantTeachersCandidatesOfTheStudentProposal))]
+	public virtual ICollection<StudentProposal>? StudentProposalsWhereImAAssistantTeacherCandidate { get; set; } = new HashSet<StudentProposal>();
 	#endregion
 	#region GuideTeacher
-	[InverseProperty("GuideTeacherCandidateOfTheStudentProposal")]
-	public virtual ICollection<StudentProposal>? StudentProposalsWhereImAGuideTeacherCandidate { get; set; }
+	[InverseProperty(nameof(StudentProposal.GuideTeacherCandidateOfTheStudentProposal))]
+	public virtual ICollection<StudentProposal>? StudentProposalsWhereImAGuideTeacherCandidate { get; set; } = new HashSet<StudentProposal>();
 	#endregion
 }

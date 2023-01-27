@@ -12,5 +12,5 @@ public class StudentProposal {
 	public bool IsAccepted { get; set; }
 	public virtual ApplicationUser? StudentOwnerOfTheStudentProposal { get; set; }
 	public virtual ApplicationUser? GuideTeacherCandidateOfTheStudentProposal { get; set; }
-	public virtual ICollection<ApplicationUser>? AssistantTeachersCandidatesOfTheStudentProposal { get; set; }
+	public virtual ICollection<ApplicationUser>? AssistantTeachersCandidatesOfTheStudentProposal { get; set; } = new HashSet<ApplicationUser>();
 }
