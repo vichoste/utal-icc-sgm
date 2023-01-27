@@ -13,6 +13,8 @@ public class CreateViewModel {
 	public IEnumerable<AssistantTeacherViewModel>? AssistantTeachers1 { get; set; } = new HashSet<AssistantTeacherViewModel>();
 	[Display(Name = "Segundo profesor co-guía")]
 	public IEnumerable<AssistantTeacherViewModel>? AssistantTeachers2 { get; set; } = new HashSet<AssistantTeacherViewModel>();
+	[Display(Name = "Tercer profesor co-guía")]
+	public IEnumerable<AssistantTeacherViewModel>? AssistantTeachers3 { get; set; } = new HashSet<AssistantTeacherViewModel>();
 }
 
 public class GuideTeacherViewModel {

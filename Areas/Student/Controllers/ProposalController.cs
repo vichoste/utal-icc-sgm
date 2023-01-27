@@ -54,6 +54,7 @@ public class ProposalController : Controller {
 		var guideTeachers = (await this._userManager.GetUsersInRoleAsync(Roles.GuideTeacher.ToString())).OrderBy(gt => gt.LastName).ToList();
 		var assistantTeachers1 = (await this._userManager.GetUsersInRoleAsync(Roles.AssistantTeacher.ToString())).OrderBy(at => at.LastName).ToList();
 		var assistantTeachers2 = (await this._userManager.GetUsersInRoleAsync(Roles.AssistantTeacher.ToString())).OrderBy(at => at.LastName).ToList();
+		var assistantTeachers3 = (await this._userManager.GetUsersInRoleAsync(Roles.AssistantTeacher.ToString())).OrderBy(at => at.LastName).ToList();
 		var createViewModel = new CreateViewModel {
 			GuideTeachers = guideTeachers.Select(gt => new GuideTeacherViewModel {
 				Id = gt.Id,
@@ -64,6 +65,10 @@ public class ProposalController : Controller {
 				Name = $"{at.FirstName} {at.LastName}"
 			}),
 			AssistantTeachers2 = assistantTeachers2.Select(at => new AssistantTeacherViewModel {
+				Id = at.Id,
+				Name = $"{at.FirstName} {at.LastName}"
+			}),
+			AssistantTeachers3 = assistantTeachers3.Select(at => new AssistantTeacherViewModel {
 				Id = at.Id,
 				Name = $"{at.FirstName} {at.LastName}"
 			})
