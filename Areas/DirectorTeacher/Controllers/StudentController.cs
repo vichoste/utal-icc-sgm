@@ -70,14 +70,14 @@ public class StudentController : Controller {
 	public IActionResult Create() => this.View();
 
 	[HttpPost]
-	public async Task<IActionResult> Create([FromForm] CreateViewModel model) {
+	public async Task<IActionResult> Create([FromForm] InputViewModel model) {
 		try {
 			var errorMessages = new List<string>();
 			var warningMessages = new List<string>();
 			var successMessages = new List<string>();
 			using var reader = new StreamReader(model.CsvFile!.OpenReadStream());
 			using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
-			var records = csv.GetRecords<CreateModel>();
+			var records = csv.GetRecords<CreateViewModel>();
 			foreach (var record in records) {
 				var user = new ApplicationUser {
 					FirstName = record.FirstName,
