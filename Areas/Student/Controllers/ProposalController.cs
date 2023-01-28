@@ -77,6 +77,6 @@ public class ProposalController : Controller {
 
 	[HttpPost, ValidateAntiForgeryToken]
 	public async Task<IActionResult> Create([FromForm] CreateViewModel model) {
-		return this.View(model);
+		return this.RedirectToAction("Index", "Proposal", new { area = "Student"});
 	}
 }

@@ -66,7 +66,7 @@ public class TeacherController : Controller {
 	[HttpPost, ValidateAntiForgeryToken]
 	public async Task<IActionResult> Create([FromForm] CreateViewModel model) {
 		if (!this.ModelState.IsValid) {
-			this.ViewBag.ErrorMessage = "Revisa que los campos estén correctos.";
+			this.ViewBag.WarningMessage = "Revisa que los campos estén correctos.";
 			return this.View(model);
 		}
 		var teacher = new ApplicationUser {
@@ -94,27 +94,25 @@ public class TeacherController : Controller {
 			}
 			var rankRolesResult = await this._userManager.AddToRolesAsync(teacher, rankRoles);
 			if (rolesResult.Succeeded && rankRolesResult.Succeeded) {
-				this.ViewBag.SuccessMessage = "Profesor creado con éxito.";
-				this.ModelState.Clear();
-				return this.View(model);
+				this.TempData["SuccessMessage"] = "Profesor creado con éxito.";
+				return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
 			}
-			this.ViewBag.WarningMessage = "Profesor creado, pero no se le pudo asignar el rol.";
-			this.ViewBag.WarningMessages = rolesResult.Errors.Select(w => w.Description).ToList();
-			this.ModelState.Clear();
-			return this.View(model);
+			this.TempData["WarningMessage"] = "Profesor creado, pero no se le pudo asignar el rol.";
+			this.TempData["WarningMessages"] = rolesResult.Errors.Select(w => w.Description).ToList();
+			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
 		}
 		if (createResult.Errors.Any()) {
 			this.ViewBag.ErrorMessages = createResult.Errors.Select(e => e.Description).ToList();
 		}
-		this.ViewBag.ErrorMessage = "Error al crear el profesor.";
-		return this.View(model);
+		this.TempData["ErrorMessage"] = "Error al crear el profesor.";
+		return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
 	}
 
 	public async Task<IActionResult> Edit(string id) {
 		var teacher = await this._userManager.FindByIdAsync(id);
 		if (teacher is null) {
-			this.ViewBag.ErrorMessage = "Error al obtener al profesor.";
-			return this.View();
+			this.TempData["ErrorMessage"] = "Error al obtener al profesor.";
+			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
 		}
 		var editViewModel = new EditViewModel {
 			FirstName = teacher.FirstName,
@@ -134,8 +132,8 @@ public class TeacherController : Controller {
 	public async Task<IActionResult> Edit(string id, [FromForm] EditViewModel model) {
 		var teacher = await this._userManager.FindByIdAsync(id);
 		if (teacher is null) {
-			this.ViewBag.ErrorMessage = "Error al obtener al profesor.";
-			return this.View(model);
+			this.TempData["ErrorMessage"] = "Error al obtener al profesor.";
+			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
 		}
 		await this._userStore.SetUserNameAsync(teacher, userName: model.Email, CancellationToken.None);
 		await this._emailStore.SetEmailAsync(teacher, model.Email, CancellationToken.None);
@@ -170,23 +168,21 @@ public class TeacherController : Controller {
 				this.ViewBag.SuccessMessage = "Profesor actualizado con éxito.";
 				return this.View(model);
 			}
-			this.ViewBag.WarningMessage = "Profesor actualizado, pero no se le pudo asignar el(los) rol(es).";
-			this.ViewBag.WarningMessages = removeRankRolesResult.Errors.Select(w => w.Description).ToList();
-			this.ViewBag.WarningMessages2 = rankRolesResult.Errors.Select(w => w.Description).ToList();
+			this.TempData["WarningMessage"] = "Profesor actualizado, pero no se le pudo asignar el(los) rol(es).";
+			this.TempData["WarningMessages1"] = removeRankRolesResult.Errors.Select(w => w.Description).ToList();
+			this.TempData["WarningMessages2"] = rankRolesResult.Errors.Select(w => w.Description).ToList();
 			return this.View(model);
 		}
-		if (updateResult.Errors.Any()) {
-			this.ViewBag.ErrorMessages = updateResult.Errors.Select(e => e.Description).ToList();
-		}
-		this.ViewBag.ErrorMessage = "Error al actualizar al profesor.";
+		this.TempData["ErrorMessage"] = "Error al actualizar al profesor.";
+		this.TempData["ErrorMessages"] = updateResult.Errors.Select(e => e.Description).ToList();
 		return this.View(model);
 	}
 
 	public async Task<IActionResult> Delete(string id) {
 		var teacher = await this._userManager.FindByIdAsync(id);
 		if (teacher is null) {
-			this.ViewBag.ErrorMessage = "Error al obtener al profesor.";
-			return this.View();
+			this.TempData["ErrorMessage"] = "Error al obtener al profesor.";
+			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
 		}
 		var deleteViewModel = new DeleteViewModel {
 			Id = teacher.Id,
@@ -199,34 +195,33 @@ public class TeacherController : Controller {
 	public async Task<IActionResult> Delete(string id, [FromForm] DeleteViewModel model) {
 		var teacher = await this._userManager.FindByIdAsync(id);
 		if (teacher is null) {
-			this.ViewBag.ErrorMessage = "Error al obtener al profesor.";
-			return this.View(model);
+			this.TempData["ErrorMessage"] = "Error al obtener al profesor.";
+			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
 		}
 		if (teacher!.Id == this._userManager.GetUserId(this.User)) {
-			this.ViewBag.ErrorMessage = "No te puedes eliminar a tí mismo.";
-			return this.View(model);
+			this.TempData["ErrorMessage"] = "No te puedes eliminar a tí mismo.";
+			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
 		}
 		var roles = (await this._userManager.GetRolesAsync(teacher)).ToList();
 		if (roles.Contains(Roles.DirectorTeacher.ToString())) {
-			this.ViewBag.ErrorMessage = "No puedes eliminar al director de carrera actual.";
-			return this.View(model);
+			this.TempData["ErrorMessage"] = "No puedes eliminar al director de carrera actual.";
+			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
 		}
 		var result = await this._userManager.DeleteAsync(teacher);
 		if (result.Succeeded) {
-			this.ViewBag.SuccessMessage = "Profesor eliminado con éxito.";
-			this.ModelState.Clear();
-			return this.View(model);
+			this.TempData["ErrorMessage"] = "Profesor eliminado con éxito.";
+			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" }); ;
 		}
-		this.ViewBag.ErrorMessage = "Error al eliminar al profesor.";
-		this.ViewBag.ErrorMessages = result.Errors.Select(e => e.Description).ToList();
-		return this.View(model);
+		this.TempData["ErrorMessage"] = "Error al eliminar al profesor.";
+		this.TempData["ErrorMessages"] = result.Errors.Select(e => e.Description).ToList();
+		return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" }); ;
 	}
 
 	public async Task<IActionResult> Transfer(string id) {
 		var teacher = await this._userManager.FindByIdAsync(id);
 		if (teacher is null) {
-			this.ViewBag.ErrorMessage = "Error al obtener al profesor.";
-			return this.View();
+			this.TempData["ErrorMessage"] = "Error al obtener al profesor.";
+			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
 		}
 		var transferViewModel = new TransferViewModel {
 			Id = teacher.Id,
@@ -236,36 +231,35 @@ public class TeacherController : Controller {
 	}
 
 	[HttpPost, ValidateAntiForgeryToken]
-	public async Task<IActionResult> Transfer(string id, [FromForm] TransferViewModel model) {
-		var currentDirectorTeacher = await this._userManager.FindByIdAsync(id);
+	public async Task<IActionResult> Transfer([FromForm] TransferViewModel model) {
+		var currentDirectorTeacher = await this._userManager.GetUserAsync(this.User);
 		if (currentDirectorTeacher is null) {
-			this.ViewBag.ErrorMessage = "Error al obtener al director de carrera actual.";
-			return this.View(model);
+			this.TempData["ErrorMessage"] = "Error al obtener al director de carrera actual.";
+			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
 		}
 		var newDirectorTeacher = await this._userManager.FindByIdAsync(model.Id!);
 		if (newDirectorTeacher is null) {
-			this.ViewBag.ErrorMessage = "Error al obtener al nuevo director de carrera actual.";
-			return this.View(model);
+			this.TempData["ErrorMessage"] = "Error al obtener al candidato a director de carrera actual.";
+			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
 		}
 		if (currentDirectorTeacher == newDirectorTeacher) {
-			this.ViewBag.ErrorMessage = "No puedes transferirte a tí mismo.";
-			return this.View(model);
+			this.TempData["ErrorMessage"] = "No puedes transferirte a tí mismo.";
+			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
 		}
 		var currentDirectorTeacherRoles = (await this._userManager.GetRolesAsync(currentDirectorTeacher)).ToList();
 		if (!currentDirectorTeacherRoles.Contains(Roles.DirectorTeacher.ToString())) {
-			this.ViewBag.ErrorMessage = "El profesor quien es fuente de esta petición no es director de carrera.";
-			return this.View(model);
+			this.TempData["ErrorMessage"] = "El profesor quien es fuente de esta petición no es director de carrera.";
+			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
 		}
 		var removeCurrentDirectorTeacherResult = await this._userManager.RemoveFromRoleAsync(currentDirectorTeacher, Roles.DirectorTeacher.ToString());
 		var transferCurrentDirectorTeacherResult = await this._userManager.AddToRoleAsync(newDirectorTeacher, Roles.DirectorTeacher.ToString());
 		if (removeCurrentDirectorTeacherResult.Succeeded && transferCurrentDirectorTeacherResult.Succeeded) {
-			this.ViewBag.SuccessMessage = "Director de carrera transferido con éxito.";
-			this.ModelState.Clear();
-			return this.View(model);
+			this.TempData["SuccessMessage"] = "Director de carrera transferido con éxito.";
+			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
 		}
-		this.ViewBag.ErrorMessage = "Error al transferir el director de carrera.";
-		this.ViewBag.ErrorMessages = removeCurrentDirectorTeacherResult.Errors.Select(e => e.Description).ToList();
-		this.ViewBag.ErrorMessages2 = transferCurrentDirectorTeacherResult.Errors.Select(e => e.Description).ToList();
-		return this.View(model);
+		this.TempData["ErrorMessage"] = "Error al transferir el director de carrera.";
+		this.TempData["ErrorMessages1"] = removeCurrentDirectorTeacherResult.Errors.Select(e => e.Description).ToList();
+		this.TempData["ErrorMessages2"] = transferCurrentDirectorTeacherResult.Errors.Select(e => e.Description).ToList();
+		return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
 	}
 }

@@ -100,18 +100,18 @@ public class StudentController : Controller {
 				}
 			}
 			if (errorMessages.Any()) {
-				this.ViewBag.ErrorMessages = errorMessages;
+				this.TempData["ErrorMessages"] = errorMessages;
 			}
 			if (warningMessages.Any()) {
-				this.ViewBag.WarningMessages = warningMessages;
+				this.TempData["WarningMessages"] = warningMessages;
 			}
 			if (successMessages.Any()) {
-				this.ViewBag.SuccessMessages = successMessages;
+				this.TempData["SuccessMessages"] = successMessages;
 			}
-			return this.View(model);
+			return this.RedirectToAction("Index", "Student", new { area = "DirectorTeacher" });
 		} catch {
-			this.ViewBag.ErrorMessage = "Error al importar el archivo CSV.";
-			return this.View(model);
+			this.TempData["ErrorMessage"] = "Error al importar el archivo CSV.";
+			return this.RedirectToAction("Index", "Student", new { area = "DirectorTeacher" });
 		}
 	}
 
@@ -135,8 +135,8 @@ public class StudentController : Controller {
 	public async Task<IActionResult> Edit(string id, [FromForm] EditViewModel model) {
 		var student = await this._userManager.FindByIdAsync(id);
 		if (student is null) {
-			this.ViewBag.ErrorMessage = "Error al obtener al estudiante.";
-			return this.View(model);
+			this.TempData["ErrorMessage"] = "Error al obtener al estudiante.";
+			return this.RedirectToAction("Index", "Student", new { area = "DirectorTeacher" });
 		}
 		await this._userStore.SetUserNameAsync(student, model.Email, CancellationToken.None);
 		await this._emailStore.SetEmailAsync(student, model.Email, CancellationToken.None);
@@ -149,18 +149,16 @@ public class StudentController : Controller {
 			this.ViewBag.SuccessMessage = "Estudiante actualizado con éxito.";
 			return this.View(model);
 		}
-		if (updateResult.Errors.Any()) {
-			this.ViewBag.ErrorMessages = updateResult.Errors.Select(e => e.Description).ToList();
-		}
-		this.ViewBag.ErrorMessage = "Error al actualizar al estudiante.";
-		return this.View(model);
+		this.TempData["ErrorMessages"] = updateResult.Errors.Select(e => e.Description).ToList();
+		this.TempData["ErrorMessage"] = "Error al actualizar al estudiante.";
+		return this.RedirectToAction("Index", "Student", new { area = "DirectorTeacher" });
 	}
 
 	public async Task<IActionResult> Delete(string id) {
 		var student = await this._userManager.FindByIdAsync(id);
 		if (student is null) {
-			this.ViewBag.ErrorMessage = "Error al obtener al estudiante.";
-			return this.View();
+			this.TempData["ErrorMessage"] = "Error al obtener al estudiante.";
+			return this.RedirectToAction("Index", "Student", new { area = "DirectorTeacher" });
 		}
 		var deleteViewModel = new DeleteViewModel {
 			Id = student.Id,
@@ -173,21 +171,20 @@ public class StudentController : Controller {
 	public async Task<IActionResult> Delete(string id, [FromForm] DeleteViewModel model) {
 		var student = await this._userManager.FindByIdAsync(id);
 		if (student is null) {
-			this.ViewBag.ErrorMessage = "Error al obtener al estudiante.";
-			return this.View(model);
+			this.TempData["ErrorMessage"] = "Error al obtener al estudiante.";
+			return this.RedirectToAction("Index", "Student", new { area = "DirectorTeacher" });
 		}
 		if (student!.Id == this._userManager.GetUserId(this.User)) {
-			this.ViewBag.ErrorMessage = "No te puedes eliminar a tí mismo.";
-			return this.View(model);
+			this.TempData["ErrorMessage"] = "No te puedes eliminar a tí mismo.";
+			return this.RedirectToAction("Index", "Student", new { area = "DirectorTeacher" });
 		}
 		var result = await this._userManager.DeleteAsync(student);
 		if (result.Succeeded) {
-			this.ViewBag.SuccessMessage = "Estudiante eliminado con éxito.";
-			this.ModelState.Clear();
-			return this.View(model);
+			this.TempData["SuccessMessage"] = "Estudiante eliminado con éxito.";
+			return this.RedirectToAction("Index", "Student", new { area = "DirectorTeacher" });
 		}
-		this.ViewBag.ErrorMessage = "Error al eliminar al estudiante.";
-		this.ViewBag.ErrorMessages = result.Errors.Select(e => e.Description).ToList();
-		return this.View();
+		this.TempData["ErrorMessage"] = "Error al eliminar al estudiante.";
+		this.TempData["ErrorMessages"] = result.Errors.Select(e => e.Description).ToList();
+		return this.RedirectToAction("Index", "Student", new { area = "DirectorTeacher" });
 	}
 }
