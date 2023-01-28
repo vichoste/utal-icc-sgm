@@ -145,11 +145,11 @@
 									} else {
 										<span class="badge bg-success">Enviado</span>
 									}
-									@if (item.IsPending) {
+									@if (!item.IsDraft && item.IsPending) {
 										<span class="badge bg-yellow">Pendiente</span>
-									} else if (!item.IsAccepted) {
+									} else if (!item.IsPending && !item.IsAccepted) {
 										<span class="badge bg-danger">Rechazado</span>
-									} else if (item.IsAccepted) {
+									} else if (!item.IsPending && item.IsAccepted) {
 										<span class="badge bg-danger">Aceptado</span>
 									}
 								</td>
