@@ -27,7 +27,11 @@
 			<a href="#" data-bs-toggle="dropdown" data-bs-display="static" class="menu-link">
 				@if (this.SignInManager.IsSignedIn(this.User)) {
 					<div class="menu-img">
-						<i class="fa-solid fa-user"></i>
+						@if (this.User.IsInRole(Roles.Teacher.ToString())) {
+							<i class="fa-solid fa-user-tie"></i>
+						} else if (this.User.IsInRole(Roles.Student.ToString())) {
+							<i class="fa-solid fa fa-user-graduate"></i>
+						}
 					</div>
 					<div class="menu-text">@this.User.Identity?.Name</div>
 				} else {
@@ -44,7 +48,7 @@
 						<a class="dropdown-item d-flex align-items-center" href="@this.Url.Action("Teacher", "Profile", new { area = "Account" })">Mi perfil<i class="fa fa-user-tie fa-fw ms-auto text-gray-400 f-s-16"></i></a>
 					}
 					@if (this.User.IsInRole(Roles.Student.ToString())) {
-						<a class="dropdown-item d-flex align-items-center" href="@this.Url.Action("Student", "Profile", new { area = "Account" })">Mi perfil <i class="fa fa-user-tie fa-fw ms-auto text-gray-400 f-s-16"></i></a>
+						<a class="dropdown-item d-flex align-items-center" href="@this.Url.Action("Student", "Profile", new { area = "Account" })">Mi perfil <i class="fa fa-user-graduate fa-fw ms-auto text-gray-400 f-s-16"></i></a>
 					}
 					<a class="dropdown-item d-flex align-items-center" href="@this.Url.Action("ChangePassword", "Profile", new { area = "Account" })">Contraseña <i class="fa fa-key fa-fw ms-auto text-gray-400 f-s-16"></i></a>
 					<div class="dropdown-divider"></div>
