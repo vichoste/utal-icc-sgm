@@ -40,7 +40,7 @@ public class ProfileController : Controller {
 	public IActionResult ChangePassword() => !this.User.Identity!.IsAuthenticated ? this.RedirectToAction("Index", "SignIn", new { area = "Account" }) : this.View();
 
 	[HttpPost, ValidateAntiForgeryToken]
-	public async Task<IActionResult> ChangePassword(string id, [FromForm] ChangePasswordViewModel model) {
+	public async Task<IActionResult> ChangePassword([FromForm] ChangePasswordViewModel model) {
 		if (!this.User.Identity!.IsAuthenticated) {
 			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
 		}
@@ -50,11 +50,11 @@ public class ProfileController : Controller {
 		}
 		var passwordResult = await this._userManager.ChangePasswordAsync(applicationUser!, model.CurrentPassword!, model.NewPassword!);
 		if (!passwordResult.Succeeded) {
-			this.ViewBag.ErrorMessage = "Error al cambiar la contraseña.";
+			this.ViewBag.ErrorMessage = "Tu contraseña no se pudo cambiar.";
 			this.ViewBag.ErrorMessages = passwordResult.Errors.Select(e => e.Description).ToList();
 			return this.View(model);
 		}
-		this.TempData["SuccessMessage"] = "Se cambió la contraseña con éxito.";
+		this.TempData["SuccessMessage"] = "Has cambiado tu contraseña con éxito.";
 		return this.RedirectToAction("Index", "Profile", new { area = "Account" });
 	}
 
@@ -88,7 +88,7 @@ public class ProfileController : Controller {
 		student.StudentIsDoingThePractice = model.IsDoingThePractice;
 		student.StudentIsWorking = model.IsWorking;
 		_ = await this._userManager.UpdateAsync(student);
-		this.ViewBag.SuccessMessage = "Se actualizó el perfil con éxito.";
+		this.ViewBag.SuccessMessage = "Has actualizado tu perfil con éxito.";
 		return this.View(model);
 	}
 
@@ -120,7 +120,7 @@ public class ProfileController : Controller {
 		teacher.TeacherSchedule = model.Schedule;
 		teacher.TeacherSpecialization = model.Specialization;
 		_ = await this._userManager.UpdateAsync(teacher);
-		this.ViewBag.SuccessMessage = "Se actualizó el perfil con éxito.";
+		this.ViewBag.SuccessMessage = "Has actualizado tu perfil con éxito.";
 		return this.View(model);
 	}
 }

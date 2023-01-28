@@ -220,7 +220,7 @@ public class TeacherController : Controller {
 	public async Task<IActionResult> Transfer(string id) {
 		var teacher = await this._userManager.FindByIdAsync(id);
 		if (teacher is null) {
-			this.TempData["ErrorMessage"] = "Error al obtener al profesor.";
+			this.TempData["ErrorMessage"] = "Error al obtener al profesor objetivo.";
 			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
 		}
 		var transferViewModel = new TransferViewModel {
@@ -248,7 +248,7 @@ public class TeacherController : Controller {
 		}
 		var currentDirectorTeacherRoles = (await this._userManager.GetRolesAsync(currentDirectorTeacher)).ToList();
 		if (!currentDirectorTeacherRoles.Contains(Roles.DirectorTeacher.ToString())) {
-			this.TempData["ErrorMessage"] = "El profesor quien es fuente de esta petición no es director de carrera.";
+			this.TempData["ErrorMessage"] = "Tú no eres director de carrera.";
 			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
 		}
 		var removeCurrentDirectorTeacherResult = await this._userManager.RemoveFromRoleAsync(currentDirectorTeacher, Roles.DirectorTeacher.ToString());
@@ -257,7 +257,7 @@ public class TeacherController : Controller {
 			this.TempData["SuccessMessage"] = "Director de carrera transferido con éxito.";
 			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
 		}
-		this.TempData["ErrorMessage"] = "Error al transferir el director de carrera.";
+		this.TempData["ErrorMessage"] = "Error al transferir el rol de director de carrera.";
 		this.TempData["ErrorMessages1"] = removeCurrentDirectorTeacherResult.Errors.Select(e => e.Description).ToList();
 		this.TempData["ErrorMessages2"] = transferCurrentDirectorTeacherResult.Errors.Select(e => e.Description).ToList();
 		return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
