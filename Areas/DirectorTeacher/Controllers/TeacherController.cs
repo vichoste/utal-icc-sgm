@@ -3,8 +3,12 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 
+using NuGet.DependencyResolver;
+
 using Utal.Icc.Sgm.Areas.DirectorTeacher.Views.Teacher;
 using Utal.Icc.Sgm.Models;
+
+using static Utal.Icc.Sgm.Models.ApplicationUser;
 
 namespace Utal.Icc.Sgm.Areas.DirectorTeacher.Controllers;
 
@@ -58,7 +62,7 @@ public class TeacherController : Controller {
 			IsDirectorTeacher = await this._userManager.IsInRoleAsync(t, Roles.DirectorTeacher.ToString()),
 		}).Select(t => t.Result);
 		var pageSize = 6;
-		return this.View(PaginatedList<IndexViewModel>.Create(indexViewModels.AsQueryable(), pageNumber ?? 1, pageSize));
+		return this.View(PaginatedList<IndexViewModel>.Create((await this._userManager.GetUserAsync(this.User))!.Id, indexViewModels.AsQueryable(), pageNumber ?? 1, pageSize));
 	}
 
 	public IActionResult Create() => this.View();
@@ -73,6 +77,8 @@ public class TeacherController : Controller {
 			FirstName = model.FirstName,
 			LastName = model.LastName,
 			Rut = model.Rut,
+			CreatedAt = DateTimeOffset.Now,
+			UpdatedAt = DateTimeOffset.Now,
 		};
 		await this._userStore.SetUserNameAsync(teacher, model.Email, CancellationToken.None);
 		await this._emailStore.SetEmailAsync(teacher, model.Email, CancellationToken.None);
@@ -118,7 +124,9 @@ public class TeacherController : Controller {
 			FirstName = teacher.FirstName,
 			LastName = teacher.LastName,
 			Rut = teacher.Rut,
-			Email = teacher.Email
+			Email = teacher.Email,
+			CreatedAt = teacher.CreatedAt,
+			UpdatedAt = teacher.UpdatedAt
 		};
 		var roles = (await this._userManager.GetRolesAsync(teacher)).ToList();
 		editViewModel.IsGuideTeacher = roles.Contains(Roles.GuideTeacher.ToString());
@@ -129,8 +137,8 @@ public class TeacherController : Controller {
 	}
 
 	[HttpPost, ValidateAntiForgeryToken]
-	public async Task<IActionResult> Edit(string id, [FromForm] EditViewModel model) {
-		var teacher = await this._userManager.FindByIdAsync(id);
+	public async Task<IActionResult> Edit([FromForm] EditViewModel model) {
+		var teacher = await this._userManager.FindByIdAsync(model.Id!.ToString()!);
 		if (teacher is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener al profesor.";
 			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
@@ -140,6 +148,7 @@ public class TeacherController : Controller {
 		teacher.FirstName = !model.FirstName.IsNullOrEmpty() ? model.FirstName : teacher.FirstName;
 		teacher.LastName = !model.LastName.IsNullOrEmpty() ? model.LastName : teacher.LastName;
 		teacher.Rut = !model.Rut.IsNullOrEmpty() ? model.Rut : teacher.Rut;
+		teacher.UpdatedAt = DateTimeOffset.Now;
 		var updateResult = await this._userManager.UpdateAsync(teacher);
 		if (updateResult.Succeeded) {
 			var roles = (await this._userManager.GetRolesAsync(teacher)).ToList();
@@ -192,8 +201,8 @@ public class TeacherController : Controller {
 	}
 
 	[HttpPost, ValidateAntiForgeryToken]
-	public async Task<IActionResult> Delete(string id, [FromForm] DeleteViewModel model) {
-		var teacher = await this._userManager.FindByIdAsync(id);
+	public async Task<IActionResult> Delete([FromForm] DeleteViewModel model) {
+		var teacher = await this._userManager.FindByIdAsync(model.Id!.ToString()!);
 		if (teacher is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener al profesor.";
 			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
@@ -217,44 +226,58 @@ public class TeacherController : Controller {
 		return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" }); ;
 	}
 
-	public async Task<IActionResult> Transfer(string id) {
-		var teacher = await this._userManager.FindByIdAsync(id);
-		if (teacher is null) {
+	public async Task<IActionResult> Transfer(string currentDirectorTeacherId, string newDirectorTeacherId) {
+		var currentDirectorTeacher = await this._userManager.FindByIdAsync(currentDirectorTeacherId);
+		var newDirectorTeacher = await this._userManager.FindByIdAsync(newDirectorTeacherId);
+		if (currentDirectorTeacher is null) {
+			this.TempData["ErrorMessage"] = "Error al obtener al profesor fuente.";
+			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
+		}
+		if (newDirectorTeacher is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener al profesor objetivo.";
 			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
 		}
 		var transferViewModel = new TransferViewModel {
-			Id = teacher.Id,
-			Email = teacher.Email
+			CurrentDirectorTeacherId = currentDirectorTeacher.Id.ToString(),
+			NewDirectorTeacherId = newDirectorTeacher.Id.ToString(),
+			NewDirectorTeacherEmail = newDirectorTeacher.Email
 		};
 		return this.View(transferViewModel);
 	}
 
 	[HttpPost, ValidateAntiForgeryToken]
 	public async Task<IActionResult> Transfer([FromForm] TransferViewModel model) {
-		var currentDirectorTeacher = await this._userManager.GetUserAsync(this.User);
+		var currentDirectorTeacher = await this._userManager.FindByIdAsync(model.CurrentDirectorTeacherId!);
 		if (currentDirectorTeacher is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener al director de carrera actual.";
 			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
 		}
-		var newDirectorTeacher = await this._userManager.FindByIdAsync(model.Id!);
+		var currentDirectorTeacherRoles = (await this._userManager.GetRolesAsync(currentDirectorTeacher)).ToList();
+		if (!currentDirectorTeacherRoles.Contains(Roles.DirectorTeacher.ToString())) {
+			this.TempData["ErrorMessage"] = "El profesor fuente no es director de carrera.";
+			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
+		}
+		var newDirectorTeacher = await this._userManager.FindByIdAsync(model.NewDirectorTeacherId!);
 		if (newDirectorTeacher is null) {
-			this.TempData["ErrorMessage"] = "Error al obtener al candidato a director de carrera actual.";
+			this.TempData["ErrorMessage"] = "Error al obtener al nuevo director de carrera actual.";
 			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
 		}
 		if (currentDirectorTeacher == newDirectorTeacher) {
-			this.TempData["ErrorMessage"] = "No puedes transferirte a tí mismo.";
-			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
-		}
-		var currentDirectorTeacherRoles = (await this._userManager.GetRolesAsync(currentDirectorTeacher)).ToList();
-		if (!currentDirectorTeacherRoles.Contains(Roles.DirectorTeacher.ToString())) {
-			this.TempData["ErrorMessage"] = "Tú no eres director de carrera.";
+			this.TempData["ErrorMessage"] = "Ambos profesores involucrados en la transferencia son el mismo.";
 			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
 		}
 		var removeCurrentDirectorTeacherResult = await this._userManager.RemoveFromRoleAsync(currentDirectorTeacher, Roles.DirectorTeacher.ToString());
 		var transferCurrentDirectorTeacherResult = await this._userManager.AddToRoleAsync(newDirectorTeacher, Roles.DirectorTeacher.ToString());
 		if (removeCurrentDirectorTeacherResult.Succeeded && transferCurrentDirectorTeacherResult.Succeeded) {
-			this.TempData["SuccessMessage"] = "Director de carrera transferido con éxito.";
+			currentDirectorTeacher.UpdatedAt = DateTimeOffset.Now;
+			newDirectorTeacher.UpdatedAt = DateTimeOffset.Now;
+			var updateResult = await this._userManager.UpdateAsync(currentDirectorTeacher);
+			if (updateResult.Succeeded) {
+				this.TempData["SuccessMessage"] = "Director de carrera transferido con éxito.";
+				return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
+			}
+			this.TempData["WarningMessage"] = "Director de carrera transferido, pero no se pudo guardar el timestamp.";
+			this.TempData["WarningMessages"] = updateResult.Errors.Select(e => e.Description).ToList();
 			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
 		}
 		this.TempData["ErrorMessage"] = "Error al transferir el rol de director de carrera.";

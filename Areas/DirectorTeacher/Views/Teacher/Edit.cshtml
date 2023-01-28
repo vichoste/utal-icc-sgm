@@ -32,6 +32,7 @@
 				<div class="card-body">
 					@using (this.Html.BeginForm("Edit", "Teacher", new { area = "DirectorTeacher" })) {
 						@this.Html.AntiForgeryToken()
+						@this.Html.HiddenFor(m => m.Id)
 						<div class="row was-validated">
 							<div class="col">
 								<div class="form-group mb-3">
@@ -75,6 +76,23 @@
 									@this.Html.ActionLink("Volver al inicio", "Index", "Teacher", new { area = "DirectorTeacher" }, new { @class = "btn btn-secondary" })
 									<button type="submit" class="btn btn-primary">Editar</button>
 								</div>
+							</div>
+						</div>
+						<hr />
+						<div class="row text-center">
+							<div class="col-sm-12 col-md-6 mb-3 text-muted">
+								<b>@this.Html.LabelFor(m => m.CreatedAt)</b>
+							</div>
+							<div class="col-sm-12 col-md-6 mb-3 text-muted">
+								@this.Html.HiddenFor(m => m.CreatedAt)
+								@this.Html.DisplayFor(m => m.CreatedAt)
+							</div>
+							<div class="col-sm-12 col-md-6 mb-3 text-muted">
+								<b>@this.Html.LabelFor(m => m.UpdatedAt)</b>
+							</div>
+							<div class="col-sm-12 col-md-6 mb-3 text-muted">
+								@this.Html.HiddenFor(m => m.UpdatedAt)
+								@this.Html.DisplayFor(m => m.UpdatedAt)
 							</div>
 						</div>
 					}

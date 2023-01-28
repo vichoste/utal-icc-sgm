@@ -12,10 +12,11 @@
 			<div class="card">
 				<div class="card-header text-center">@this.ViewData["Title"]</div>
 				<div class="card-body text-center">
-					<p>¿Deseas transferir el rol de <b>director de carrera</b> al usuario <b>@this.Html.DisplayFor(m => m.Email)</b>?</p>
+					<p>¿Deseas transferir el rol de <b>director de carrera</b> al usuario <b>@this.Html.DisplayFor(m => m.NewDirectorTeacherEmail)</b>?</p>
 					@using (this.Html.BeginForm("Transfer", "Teacher", new { area = "DirectorTeacher" })) {
 						@this.Html.AntiForgeryToken()
-						@this.Html.HiddenFor(m => m.Id)
+						@this.Html.HiddenFor(m => m.CurrentDirectorTeacherId)
+						@this.Html.HiddenFor(m => m.NewDirectorTeacherId)
 						<div class="row text-center">
 							<div class="col">
 								<div class="btn-group">

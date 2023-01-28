@@ -124,6 +124,7 @@
 	<div class="row justify-content-center">
 		<div class="col-12">
 			<div class="table-responsive">
+				@this.Html.HiddenFor(m => m.ApplicationUserId)
 				<table class="table table-bordered">
 					<thead class="table-dark">
 						<tr>
@@ -163,7 +164,7 @@
 									@if (item.IsDirectorTeacher) {
 										<a asp-action="Index" asp-route-sortOrder="@this.ViewData["CurrentSort"]" asp-route-pageNumber="@(this.Model.PageIndex)" asp-route-currentFilter="@this.ViewData["CurrentFilter"]" class="btn btn-info mb-3">Es director de carrera</a>
 									} else {
-										@this.Html.ActionLink("No es director de carrera", "Transfer", "Teacher", new { area = "DirectorTeacher", id = item.Id }, new { @class = "btn btn-default mb-3" })
+										@this.Html.ActionLink("No es director de carrera", "Transfer", "Teacher", new { area = "DirectorTeacher", currentDirectorTeacherId = this.Model.ApplicationUserId , newDirectorTeacherId = item.Id }, new { @class = "btn btn-default mb-3" })
 									}
 								</td>
 							</tr>

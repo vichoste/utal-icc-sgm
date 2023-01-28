@@ -33,6 +33,8 @@ namespace Utal.Icc.Sgm.Migrations
                     FirstName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     LastName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Rut = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
                     StudentUniversityId = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     StudentRemainingCourses = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     StudentIsDoingThePractice = table.Column<bool>(type: "bit", nullable: false),
@@ -173,11 +175,12 @@ namespace Utal.Icc.Sgm.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IsDraft = table.Column<bool>(type: "bit", nullable: false),
-                    IsPending = table.Column<bool>(type: "bit", nullable: false),
-                    IsAccepted = table.Column<bool>(type: "bit", nullable: false),
+                    ProposalStatus = table.Column<int>(type: "int", nullable: true),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
                     StudentOwnerOfTheStudentProposalId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    GuideTeacherCandidateOfTheStudentProposalId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    GuideTeacherCandidateOfTheStudentProposalId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: true)
                 },
                 constraints: table =>
                 {

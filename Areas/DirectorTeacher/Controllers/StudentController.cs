@@ -10,6 +10,8 @@ using Microsoft.IdentityModel.Tokens;
 using Utal.Icc.Sgm.Areas.DirectorTeacher.Views.Student;
 using Utal.Icc.Sgm.Models;
 
+using static Utal.Icc.Sgm.Models.ApplicationUser;
+
 namespace Utal.Icc.Sgm.Areas.DirectorTeacher.Controllers;
 
 [Area("DirectorTeacher"), Authorize(Roles = "DirectorTeacher")]
@@ -64,7 +66,7 @@ public class StudentController : Controller {
 			Email = s.Email
 		});
 		var pageSize = 6;
-		return this.View(PaginatedList<IndexViewModel>.Create(indexViewModels.AsQueryable(), pageNumber ?? 1, pageSize));
+		return this.View(PaginatedList<IndexViewModel>.Create((await this._userManager.GetUserAsync(this.User))!.Id, indexViewModels.AsQueryable(), pageNumber ?? 1, pageSize));
 	}
 
 	public IActionResult Create() => this.View();
@@ -84,6 +86,8 @@ public class StudentController : Controller {
 					LastName = record.LastName,
 					StudentUniversityId = record.UniversityId,
 					Rut = record.Rut,
+					CreatedAt = DateTimeOffset.Now,
+					UpdatedAt = DateTimeOffset.Now
 				};
 				await this._userStore.SetUserNameAsync(user, record.Email, CancellationToken.None);
 				await this._emailStore.SetEmailAsync(user, record.Email, CancellationToken.None);
@@ -126,14 +130,16 @@ public class StudentController : Controller {
 			LastName = student.LastName,
 			UniversityId = student.StudentUniversityId,
 			Rut = student.Rut,
-			Email = student.Email
+			Email = student.Email,
+			CreatedAt = student.CreatedAt,
+			UpdatedAt = student.UpdatedAt
 		};
 		return this.View(editViewModel);
 	}
 
 	[HttpPost, ValidateAntiForgeryToken]
-	public async Task<IActionResult> Edit(string id, [FromForm] EditViewModel model) {
-		var student = await this._userManager.FindByIdAsync(id);
+	public async Task<IActionResult> Edit([FromForm] EditViewModel model) {
+		var student = await this._userManager.FindByIdAsync(model.Id!.ToString()!);
 		if (student is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener al estudiante.";
 			return this.RedirectToAction("Index", "Student", new { area = "DirectorTeacher" });
@@ -144,6 +150,7 @@ public class StudentController : Controller {
 		student.LastName = !model.LastName.IsNullOrEmpty() ? model.LastName : student.LastName;
 		student.StudentUniversityId = !model.UniversityId.IsNullOrEmpty() ? model.UniversityId : student.StudentUniversityId;
 		student.Rut = !model.Rut.IsNullOrEmpty() ? model.Rut : student.Rut;
+		student.UpdatedAt = DateTimeOffset.Now;
 		var updateResult = await this._userManager.UpdateAsync(student);
 		if (updateResult.Succeeded) {
 			this.ViewBag.SuccessMessage = "Estudiante actualizado con éxito.";
@@ -168,8 +175,8 @@ public class StudentController : Controller {
 	}
 
 	[HttpPost, ValidateAntiForgeryToken]
-	public async Task<IActionResult> Delete(string id, [FromForm] DeleteViewModel model) {
-		var student = await this._userManager.FindByIdAsync(id);
+	public async Task<IActionResult> Delete([FromForm] DeleteViewModel model) {
+		var student = await this._userManager.FindByIdAsync(model.Id!.ToString()!);
 		if (student is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener al estudiante.";
 			return this.RedirectToAction("Index", "Student", new { area = "DirectorTeacher" });

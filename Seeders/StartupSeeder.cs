@@ -2,6 +2,8 @@
 
 using Utal.Icc.Sgm.Models;
 
+using static Utal.Icc.Sgm.Models.ApplicationUser;
+
 namespace Utal.Icc.Sgm.Seeders;
 
 public static class StartupSeeder {
@@ -43,7 +45,9 @@ public static class StartupSeeder {
 		var directorTeacher = new ApplicationUser {
 			FirstName = firstName,
 			LastName = lastName,
-			Rut = rut
+			Rut = rut,
+			CreatedAt = DateTimeOffset.Now,
+			UpdatedAt = DateTimeOffset.Now
 		};
 		var directorTeacherCheck = await userManager.FindByIdAsync(email);
 		if (directorTeacherCheck is null) {

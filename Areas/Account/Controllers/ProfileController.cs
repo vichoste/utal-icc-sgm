@@ -32,7 +32,9 @@ public class ProfileController : Controller {
 			FirstName = applicationUser!.FirstName,
 			LastName = applicationUser.LastName,
 			Rut = applicationUser.Rut,
-			Email = await this._emailStore.GetEmailAsync(applicationUser, CancellationToken.None)
+			Email = await this._emailStore.GetEmailAsync(applicationUser, CancellationToken.None),
+			CreatedAt = applicationUser.CreatedAt,
+			UpdatedAt = applicationUser.UpdatedAt
 		};
 		return this.View(indexViewModel);
 	}
@@ -54,6 +56,8 @@ public class ProfileController : Controller {
 			this.ViewBag.ErrorMessages = passwordResult.Errors.Select(e => e.Description).ToList();
 			return this.View(model);
 		}
+		applicationUser.UpdatedAt = DateTimeOffset.Now;
+		_ = await this._userManager.UpdateAsync(applicationUser);
 		this.TempData["SuccessMessage"] = "Has cambiado tu contraseña con éxito.";
 		return this.RedirectToAction("Index", "Profile", new { area = "Account" });
 	}
@@ -87,6 +91,7 @@ public class ProfileController : Controller {
 		student.StudentRemainingCourses = model.RemainingCourses;
 		student.StudentIsDoingThePractice = model.IsDoingThePractice;
 		student.StudentIsWorking = model.IsWorking;
+		student.UpdatedAt = DateTimeOffset.Now;
 		_ = await this._userManager.UpdateAsync(student);
 		this.ViewBag.SuccessMessage = "Has actualizado tu perfil con éxito.";
 		return this.View(model);
@@ -119,6 +124,7 @@ public class ProfileController : Controller {
 		teacher.TeacherOffice = model.Office;
 		teacher.TeacherSchedule = model.Schedule;
 		teacher.TeacherSpecialization = model.Specialization;
+		teacher.UpdatedAt = DateTimeOffset.Now;
 		_ = await this._userManager.UpdateAsync(teacher);
 		this.ViewBag.SuccessMessage = "Has actualizado tu perfil con éxito.";
 		return this.View(model);

@@ -12,7 +12,7 @@ using Utal.Icc.Sgm.Data;
 namespace Utal.Icc.Sgm.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230127194403_Init")]
+    [Migration("20230128192208_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -185,6 +185,9 @@ namespace Utal.Icc.Sgm.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -251,6 +254,9 @@ namespace Utal.Icc.Sgm.Migrations
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
 
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -274,26 +280,31 @@ namespace Utal.Icc.Sgm.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<DateTimeOffset?>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("GuideTeacherCandidateOfTheStudentProposalId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<bool>("IsAccepted")
-                        .HasColumnType("bit");
+                    b.Property<int?>("ProposalStatus")
+                        .HasColumnType("int");
 
-                    b.Property<bool>("IsDraft")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsPending")
-                        .HasColumnType("bit");
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
 
                     b.Property<string>("StudentOwnerOfTheStudentProposalId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
 

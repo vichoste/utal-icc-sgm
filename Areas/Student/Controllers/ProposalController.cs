@@ -9,6 +9,8 @@ using Utal.Icc.Sgm.Areas.Student.Views.Proposal;
 using Utal.Icc.Sgm.Data;
 using Utal.Icc.Sgm.Models;
 
+using static Utal.Icc.Sgm.Models.ApplicationUser;
+
 namespace Utal.Icc.Sgm.Areas.Student.Controllers;
 
 [Area("Student"), Authorize(Roles = "Student")]
@@ -21,7 +23,7 @@ public class ProposalController : Controller {
 		this._userManager = userManager;
 	}
 	
-	public IActionResult Index(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
+	public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
 		this.ViewData["TitleSortParam"] = sortOrder == "Title" ? "TitleDesc" : "Title";
 		if (searchString is not null) {
 			pageNumber = 1;
@@ -45,12 +47,10 @@ public class ProposalController : Controller {
 		}
 		var indexViewModels = filteredAndOrderedProposals.Select(sp => new IndexViewModel {
 			Title = sp.Title,
-			IsDraft = sp.IsDraft,
-			IsPending = sp.IsPending,
-			IsAccepted = sp.IsAccepted,
+			ProposalStatus = sp.ProposalStatus.ToString(),
 		});
 		var pageSize = 6;
-		return this.View(PaginatedList<IndexViewModel>.Create(indexViewModels.AsQueryable(), pageNumber ?? 1, pageSize));
+		return this.View(PaginatedList<IndexViewModel>.Create((await this._userManager.GetUserAsync(this.User))!.Id, indexViewModels.AsQueryable(), pageNumber ?? 1, pageSize));
 	}
 
 	public async Task<IActionResult> Create() {
@@ -197,9 +197,9 @@ public class ProposalController : Controller {
 			StudentOwnerOfTheStudentProposal = student,
 			GuideTeacherCandidateOfTheStudentProposal = guideTeacher,
 			AssistantTeachersCandidatesOfTheStudentProposal = new List<ApplicationUser>(),
-			IsDraft = true,
-			IsPending = true,
-			IsAccepted = false,
+			ProposalStatus = StudentProposal.Status.Sent,
+			CreatedAt = DateTimeOffset.Now,
+			UpdatedAt = DateTimeOffset.Now
 		};
 		if (assistantTeacher1 is not null) {
 			studentProposal.AssistantTeachersCandidatesOfTheStudentProposal.Add(assistantTeacher1);
@@ -212,7 +212,7 @@ public class ProposalController : Controller {
 		}
 		_ = await this._context.StudentProposals.AddAsync(studentProposal);
 		_ = await this._context.SaveChangesAsync();
-		this.TempData["SuccessMessage"] = "Tu propuesta de memoria de título de estudiante ha sido registrada con éxito.";
+		this.TempData["SuccessMessage"] = "Tu propuesta de memoria de título ha sido registrada con éxito.";
 		return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
 	}
 }

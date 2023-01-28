@@ -3,6 +3,8 @@
 namespace Utal.Icc.Sgm.Areas.Account.Views.Profile;
 
 public class StudentViewModel {
+	[Display(Name = "ID"), Required]
+	public Guid? Id { get; set; }
 	[Display(Name = "Número de matrícula")]
 	public string? UniversityId { get; set; }
 	[Display(Name = "Cursos restantes")]
