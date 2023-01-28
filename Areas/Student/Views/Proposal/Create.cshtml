@@ -68,21 +68,21 @@
 									@this.Html.ValidationMessageFor(m => m.Description, "Descripción requerida", new { @class = "invalid-feedback" })
 								</div>
 								<div class="form-group mb-3">
-									@this.Html.LabelFor(m => m.GuideTeachers, new { @class = "form-label" })
-									@this.Html.DropDownListFor(m => m.GuideTeachers, new SelectList(this.Model.GuideTeachers, "Id", "Name"), "Seleccionar profesor guía", new { @class = "form-select", @required = "required" })
-									@this.Html.ValidationMessageFor(m => m.GuideTeachers, "Profesor guía requerido", new { @class = "invalid-feedback" })
+									@this.Html.LabelFor(m => m.GuideTeacher, new { @class = "form-label" })
+									@this.Html.DropDownListFor(m => m.GuideTeacher, (IEnumerable<SelectListItem>)this.ViewData["GuideTeachers"]!, "Seleccionar profesor guía", new { @class = "form-select", @required = "required" })
+									@this.Html.ValidationMessageFor(m => m.GuideTeacher, "Profesor guía requerido", new { @class = "invalid-feedback" })
 								</div>
 								<div class="form-group mb-3">
-									@this.Html.LabelFor(m => m.AssistantTeachers1, new { @class = "form-label" })
-									@this.Html.DropDownListFor(m => m.AssistantTeachers1, new SelectList(this.Model.AssistantTeachers1, "Id", "Name"), "Seleccionar primer profesor co-guía", new { @class = "form-select" })
+									@this.Html.LabelFor(m => m.AssistantTeacher1, new { @class = "form-label" })
+									@this.Html.DropDownListFor(m => m.AssistantTeacher1, (IEnumerable<SelectListItem>)this.ViewData["AssistantTeachers1"]!, "Seleccionar primer profesor co-guía", new { @class = "form-select" })
 								</div>
 								<div class="form-group mb-3">
-									@this.Html.LabelFor(m => m.AssistantTeachers2, new { @class = "form-label" })
-									@this.Html.DropDownListFor(m => m.AssistantTeachers2, new SelectList(this.Model.AssistantTeachers2, "Id", "Name"), "Seleccionar segundo profesor co-guía", new { @class = "form-select" })
+									@this.Html.LabelFor(m => m.AssistantTeacher2, new { @class = "form-label" })
+									@this.Html.DropDownListFor(m => m.AssistantTeacher2, (IEnumerable<SelectListItem>)this.ViewData["AssistantTeachers2"]!, "Seleccionar segundo profesor co-guía", new { @class = "form-select" })
 								</div>
 								<div class="form-group mb-3">
-									@this.Html.LabelFor(m => m.AssistantTeachers3, new { @class = "form-label" })
-									@this.Html.DropDownListFor(m => m.AssistantTeachers3, new SelectList(this.Model.AssistantTeachers3, "Id", "Name"), "Seleccionar tercer profesor co-guía", new { @class = "form-select" })
+									@this.Html.LabelFor(m => m.AssistantTeacher3, new { @class = "form-label" })
+									@this.Html.DropDownListFor(m => m.AssistantTeacher3, (IEnumerable<SelectListItem>)this.ViewData["AssistantTeachers3"]!, "Seleccionar tercer profesor co-guía", new { @class = "form-select" })
 								</div>
 							</div>
 						</div>

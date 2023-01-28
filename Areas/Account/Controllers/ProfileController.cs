@@ -49,11 +49,11 @@ public class ProfileController : Controller {
 		if (!passwordResult.Succeeded) {
 			this.ViewBag.ErrorMessage = "Error al cambiar la contraseña.";
 			this.ViewBag.ErrorMessages = passwordResult.Errors.Select(e => e.Description).ToList();
-			return this.View();
+			return this.View(model);
 		}
 		this.ViewBag.SuccessMessage = "Se cambió la contraseña con éxito.";
 		this.ModelState.Clear();
-		return this.View();
+		return this.View(model);
 	}
 
 	[Authorize(Roles = "Student")]
@@ -81,7 +81,7 @@ public class ProfileController : Controller {
 		}
 		if (await this._userManager.GetUserAsync(this.User) is not ApplicationUser student) {
 			this.ViewBag.ErrorMessage = "Error al obtener al estudiante.";
-			return this.View();
+			return this.View(model);
 		}
 		student.StudentUniversityId = model.UniversityId;
 		student.StudentRemainingCourses = model.RemainingCourses;
@@ -89,7 +89,7 @@ public class ProfileController : Controller {
 		student.StudentIsWorking = model.IsWorking;
 		_ = await this._userManager.UpdateAsync(student);
 		this.ViewBag.SuccessMessage = "Se actualizó el perfil con éxito.";
-		return this.View();
+		return this.View(model);
 	}
 
 	[Authorize(Roles = "Teacher")]
@@ -123,6 +123,6 @@ public class ProfileController : Controller {
 		teacher.TeacherSpecialization = model.Specialization;
 		_ = await this._userManager.UpdateAsync(teacher);
 		this.ViewBag.SuccessMessage = "Se actualizó el perfil con éxito.";
-		return this.View();
+		return this.View(model);
 	}
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 using Utal.Icc.Sgm.Areas.Student.Views.Proposal;
 using Utal.Icc.Sgm.Data;
@@ -55,29 +56,27 @@ public class ProposalController : Controller {
 		var assistantTeachers1 = (await this._userManager.GetUsersInRoleAsync(Roles.AssistantTeacher.ToString())).OrderBy(at => at.LastName).ToList();
 		var assistantTeachers2 = (await this._userManager.GetUsersInRoleAsync(Roles.AssistantTeacher.ToString())).OrderBy(at => at.LastName).ToList();
 		var assistantTeachers3 = (await this._userManager.GetUsersInRoleAsync(Roles.AssistantTeacher.ToString())).OrderBy(at => at.LastName).ToList();
-		var createViewModel = new CreateViewModel {
-			GuideTeachers = guideTeachers.Select(gt => new GuideTeacherViewModel {
-				Id = gt.Id,
-				Name = $"{gt.FirstName} {gt.LastName}"
-			}),
-			AssistantTeachers1 = assistantTeachers1.Select(at => new AssistantTeacherViewModel {
-				Id = at.Id,
-				Name = $"{at.FirstName} {at.LastName}"
-			}),
-			AssistantTeachers2 = assistantTeachers2.Select(at => new AssistantTeacherViewModel {
-				Id = at.Id,
-				Name = $"{at.FirstName} {at.LastName}"
-			}),
-			AssistantTeachers3 = assistantTeachers3.Select(at => new AssistantTeacherViewModel {
-				Id = at.Id,
-				Name = $"{at.FirstName} {at.LastName}"
-			})
-		};
-		return this.View(createViewModel);
+		this.ViewData["GuideTeachers"] = guideTeachers.Select(gt => new SelectListItem {
+			Text = $"{gt.FirstName} {gt.LastName}",
+			Value = gt.Id.ToString()
+		});
+		this.ViewData["AssistantTeachers1"] = assistantTeachers1.Select(gt => new SelectListItem {
+			Text = $"{gt.FirstName} {gt.LastName}",
+			Value = gt.Id.ToString()
+		});
+		this.ViewData["AssistantTeachers2"] = assistantTeachers2.Select(gt => new SelectListItem {
+			Text = $"{gt.FirstName} {gt.LastName}",
+			Value = gt.Id.ToString()
+		});
+		this.ViewData["AssistantTeachers3"] = assistantTeachers3.Select(gt => new SelectListItem {
+			Text = $"{gt.FirstName} {gt.LastName}",
+			Value = gt.Id.ToString()
+		});
+		return this.View(new CreateViewModel());
 	}
 
 	[HttpPost, ValidateAntiForgeryToken]
 	public async Task<IActionResult> Create([FromForm] CreateViewModel model) {
-		return this.View();
+		return this.View(model);
 	}
 }

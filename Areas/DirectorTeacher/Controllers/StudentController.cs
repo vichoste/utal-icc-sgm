@@ -108,10 +108,10 @@ public class StudentController : Controller {
 			if (successMessages.Any()) {
 				this.ViewBag.SuccessMessages = successMessages;
 			}
-			return this.View();
+			return this.View(model);
 		} catch {
 			this.ViewBag.ErrorMessage = "Error al importar el archivo CSV.";
-			return this.View();
+			return this.View(model);
 		}
 	}
 
@@ -136,7 +136,7 @@ public class StudentController : Controller {
 		var student = await this._userManager.FindByIdAsync(id);
 		if (student is null) {
 			this.ViewBag.ErrorMessage = "Error al obtener al estudiante.";
-			return this.View();
+			return this.View(model);
 		}
 		await this._userStore.SetUserNameAsync(student, model.Email, CancellationToken.None);
 		await this._emailStore.SetEmailAsync(student, model.Email, CancellationToken.None);
@@ -147,13 +147,13 @@ public class StudentController : Controller {
 		var updateResult = await this._userManager.UpdateAsync(student);
 		if (updateResult.Succeeded) {
 			this.ViewBag.SuccessMessage = "Estudiante actualizado con éxito.";
-			return this.View();
+			return this.View(model);
 		}
 		if (updateResult.Errors.Any()) {
 			this.ViewBag.ErrorMessages = updateResult.Errors.Select(e => e.Description).ToList();
 		}
 		this.ViewBag.ErrorMessage = "Error al actualizar al estudiante.";
-		return this.View();
+		return this.View(model);
 	}
 
 	public async Task<IActionResult> Delete(string id) {
@@ -174,17 +174,17 @@ public class StudentController : Controller {
 		var student = await this._userManager.FindByIdAsync(id);
 		if (student is null) {
 			this.ViewBag.ErrorMessage = "Error al obtener al estudiante.";
-			return this.View();
+			return this.View(model);
 		}
 		if (student!.Id == this._userManager.GetUserId(this.User)) {
 			this.ViewBag.ErrorMessage = "No te puedes eliminar a tí mismo.";
-			return this.View();
+			return this.View(model);
 		}
 		var result = await this._userManager.DeleteAsync(student);
 		if (result.Succeeded) {
 			this.ViewBag.SuccessMessage = "Estudiante eliminado con éxito.";
 			this.ModelState.Clear();
-			return this.View();
+			return this.View(model);
 		}
 		this.ViewBag.ErrorMessage = "Error al eliminar al estudiante.";
 		this.ViewBag.ErrorMessages = result.Errors.Select(e => e.Description).ToList();
