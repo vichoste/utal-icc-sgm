@@ -25,7 +25,7 @@ public class ProfileController : Controller {
 		}
 		var applicationUser = await this._userManager.GetUserAsync(this.User);
 		if (applicationUser is null) {
-			this.ViewBag.ErrorMessage = "Error al obtener al usuario.";
+			this.TempData["ErrorMessage"] = "Error al obtener al usuario.";
 			return this.View();
 		}
 		var indexViewModel = new IndexViewModel {
@@ -45,15 +45,17 @@ public class ProfileController : Controller {
 			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
 		}
 		var applicationUser = await this._userManager.GetUserAsync(this.User);
+		if (applicationUser is null) {
+			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
+		}
 		var passwordResult = await this._userManager.ChangePasswordAsync(applicationUser!, model.CurrentPassword!, model.NewPassword!);
 		if (!passwordResult.Succeeded) {
 			this.ViewBag.ErrorMessage = "Error al cambiar la contraseña.";
 			this.ViewBag.ErrorMessages = passwordResult.Errors.Select(e => e.Description).ToList();
 			return this.View(model);
 		}
-		this.ViewBag.SuccessMessage = "Se cambió la contraseña con éxito.";
-		this.ModelState.Clear();
-		return this.View(model);
+		this.TempData["SuccessMessage"] = "Se cambió la contraseña con éxito.";
+		return this.RedirectToAction("Index", "Profile", new { area = "Account" });
 	}
 
 	[Authorize(Roles = "Student")]
@@ -62,8 +64,7 @@ public class ProfileController : Controller {
 			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
 		}
 		if (await this._userManager.GetUserAsync(this.User) is not ApplicationUser student) {
-			this.ViewBag.ErrorMessage = "Error al obtener al estudiante.";
-			return this.View();
+			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
 		}
 		var studentViewModel = new StudentViewModel {
 			UniversityId = student.StudentUniversityId,
@@ -80,8 +81,7 @@ public class ProfileController : Controller {
 			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
 		}
 		if (await this._userManager.GetUserAsync(this.User) is not ApplicationUser student) {
-			this.ViewBag.ErrorMessage = "Error al obtener al estudiante.";
-			return this.View(model);
+			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
 		}
 		student.StudentUniversityId = model.UniversityId;
 		student.StudentRemainingCourses = model.RemainingCourses;
@@ -98,8 +98,7 @@ public class ProfileController : Controller {
 			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
 		}
 		if (await this._userManager.GetUserAsync(this.User) is not ApplicationUser teacher) {
-			this.ViewBag.ErrorMessage = "Error al obtener al estudiante.";
-			return this.View();
+			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
 		}
 		var teacherViewModel = new TeacherViewModel {
 			Office = teacher.TeacherOffice,
@@ -115,8 +114,7 @@ public class ProfileController : Controller {
 			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
 		}
 		if (await this._userManager.GetUserAsync(this.User) is not ApplicationUser teacher) {
-			this.ViewBag.ErrorMessage = "Error al obtener al estudiante.";
-			return this.View();
+			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
 		}
 		teacher.TeacherOffice = model.Office;
 		teacher.TeacherSchedule = model.Schedule;
