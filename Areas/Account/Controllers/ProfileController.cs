@@ -58,7 +58,7 @@ public class ProfileController : Controller {
 		}
 		applicationUser.UpdatedAt = DateTimeOffset.Now;
 		_ = await this._userManager.UpdateAsync(applicationUser);
-		this.TempData["SuccessMessage"] = "Has cambiado tu contraseña con éxito.";
+		this.TempData["SuccessMessage"] = "Has cambiado tu contraseña correctamente.";
 		return this.RedirectToAction("Index", "Profile", new { area = "Account" });
 	}
 
@@ -87,13 +87,12 @@ public class ProfileController : Controller {
 		if (await this._userManager.GetUserAsync(this.User) is not ApplicationUser student) {
 			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
 		}
-		student.StudentUniversityId = model.UniversityId;
 		student.StudentRemainingCourses = model.RemainingCourses;
 		student.StudentIsDoingThePractice = model.IsDoingThePractice;
 		student.StudentIsWorking = model.IsWorking;
 		student.UpdatedAt = DateTimeOffset.Now;
 		_ = await this._userManager.UpdateAsync(student);
-		this.ViewBag.SuccessMessage = "Has actualizado tu perfil con éxito.";
+		this.ViewBag.SuccessMessage = "Has actualizado tu perfil correctamente.";
 		return this.View(model);
 	}
 
@@ -126,7 +125,7 @@ public class ProfileController : Controller {
 		teacher.TeacherSpecialization = model.Specialization;
 		teacher.UpdatedAt = DateTimeOffset.Now;
 		_ = await this._userManager.UpdateAsync(teacher);
-		this.ViewBag.SuccessMessage = "Has actualizado tu perfil con éxito.";
+		this.ViewBag.SuccessMessage = "Has actualizado tu perfil correctamente.";
 		return this.View(model);
 	}
 }

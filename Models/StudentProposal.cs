@@ -18,8 +18,10 @@ public class StudentProposal {
 	public DateTimeOffset? CreatedAt { get; set; }
 	public DateTimeOffset? UpdatedAt { get; set; }
 	public virtual ApplicationUser? StudentOwnerOfTheStudentProposal { get; set; }
-	public virtual ApplicationUser? GuideTeacherCandidateOfTheStudentProposal { get; set; }
-	public virtual ICollection<ApplicationUser>? AssistantTeachersCandidatesOfTheStudentProposal { get; set; } = new HashSet<ApplicationUser>();
+	public virtual ApplicationUser? GuideTeacherOfTheStudentProposal { get; set; }
+	public virtual ApplicationUser? AssistantTeacherOfTheStudentProposal1 { get; set; }
+	public virtual ApplicationUser? AssistantTeacherOfTheStudentProposal2 { get; set; }
+	public virtual ApplicationUser? AssistantTeacherOfTheStudentProposal3 { get; set; }
 	[Timestamp]
 	public byte[]? RowVersion { get; set; }
 }

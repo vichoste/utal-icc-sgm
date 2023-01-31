@@ -38,11 +38,15 @@ public class ApplicationUser : IdentityUser {
 	public string? TeacherSpecialization { get; set; }
 	#endregion
 	#region AssistantTeacher
-	[InverseProperty(nameof(StudentProposal.AssistantTeachersCandidatesOfTheStudentProposal))]
-	public virtual ICollection<StudentProposal>? StudentProposalsWhereImAAssistantTeacherCandidate { get; set; } = new HashSet<StudentProposal>();
+	[InverseProperty(nameof(StudentProposal.AssistantTeacherOfTheStudentProposal1))]
+	public virtual StudentProposal? AssistantTeacherOfTheStudentProposals1 { get; set; }
+	[InverseProperty(nameof(StudentProposal.AssistantTeacherOfTheStudentProposal2))]
+	public virtual StudentProposal? AssistantTeacherOfTheStudentProposals2 { get; set; }
+	[InverseProperty(nameof(StudentProposal.AssistantTeacherOfTheStudentProposal3))]
+	public virtual StudentProposal? AssistantTeacherOfTheStudentProposals3 { get; set; }
 	#endregion
 	#region GuideTeacher
-	[InverseProperty(nameof(StudentProposal.GuideTeacherCandidateOfTheStudentProposal))]
+	[InverseProperty(nameof(StudentProposal.GuideTeacherOfTheStudentProposal))]
 	public virtual ICollection<StudentProposal>? StudentProposalsWhereImAGuideTeacherCandidate { get; set; } = new HashSet<StudentProposal>();
 	#endregion
 }

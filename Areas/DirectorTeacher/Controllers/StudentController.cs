@@ -5,7 +5,6 @@ using CsvHelper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 
 using Utal.Icc.Sgm.Areas.DirectorTeacher.Views.Student;
 using Utal.Icc.Sgm.Models;
@@ -94,20 +93,13 @@ public class StudentController : Controller {
 				var result = await this._userManager.CreateAsync(user, record!.Password!);
 				if (!result.Succeeded) {
 					errorMessages.Add($"Error al crear al estudiante {record.Email}");
-				} else {
-					var roleResult = await this._userManager.AddToRoleAsync(user, Roles.Student.ToString());
-					if (roleResult.Succeeded) {
-						successMessages.Add($"Estudiante {record.Email} creado correctamente.");
-					} else {
-						warningMessages.Add($"Estudiante {record.Email} creado, pero no se le pudo asignar el rol.");
-					}
+					continue;
 				}
+				_ = await this._userManager.AddToRoleAsync(user, Roles.Student.ToString());
+				successMessages.Add($"Estudiante {record.Email} creado correctamente.");
 			}
 			if (errorMessages.Any()) {
 				this.TempData["ErrorMessages"] = errorMessages;
-			}
-			if (warningMessages.Any()) {
-				this.TempData["WarningMessages"] = warningMessages;
 			}
 			if (successMessages.Any()) {
 				this.TempData["SuccessMessages"] = successMessages;
@@ -146,19 +138,23 @@ public class StudentController : Controller {
 		}
 		await this._userStore.SetUserNameAsync(student, model.Email, CancellationToken.None);
 		await this._emailStore.SetEmailAsync(student, model.Email, CancellationToken.None);
-		student.FirstName = !model.FirstName.IsNullOrEmpty() ? model.FirstName : student.FirstName;
-		student.LastName = !model.LastName.IsNullOrEmpty() ? model.LastName : student.LastName;
-		student.StudentUniversityId = !model.UniversityId.IsNullOrEmpty() ? model.UniversityId : student.StudentUniversityId;
-		student.Rut = !model.Rut.IsNullOrEmpty() ? model.Rut : student.Rut;
+		student.FirstName = model.FirstName;
+		student.LastName = model.LastName;
+		student.StudentUniversityId = model.UniversityId;
+		student.Rut = model.Rut;
 		student.UpdatedAt = DateTimeOffset.Now;
-		var updateResult = await this._userManager.UpdateAsync(student);
-		if (updateResult.Succeeded) {
-			this.ViewBag.SuccessMessage = "Estudiante actualizado con éxito.";
-			return this.View(model);
-		}
-		this.TempData["ErrorMessages"] = updateResult.Errors.Select(e => e.Description).ToList();
-		this.TempData["ErrorMessage"] = "Error al actualizar al estudiante.";
-		return this.RedirectToAction("Index", "Student", new { area = "DirectorTeacher" });
+		_ = await this._userManager.UpdateAsync(student);
+		var editViewModel = new EditViewModel {
+			FirstName = student.FirstName,
+			LastName = student.LastName,
+			UniversityId = student.StudentUniversityId,
+			Rut = student.Rut,
+			Email = student.Email,
+			CreatedAt = student.CreatedAt,
+			UpdatedAt = student.UpdatedAt
+		};
+		this.ViewBag.SuccessMessage = "Estudiante actualizado correctamente.";
+		return this.View(editViewModel);
 	}
 
 	public async Task<IActionResult> Delete(string id) {
@@ -185,13 +181,8 @@ public class StudentController : Controller {
 			this.TempData["ErrorMessage"] = "No te puedes eliminar a tí mismo.";
 			return this.RedirectToAction("Index", "Student", new { area = "DirectorTeacher" });
 		}
-		var result = await this._userManager.DeleteAsync(student);
-		if (result.Succeeded) {
-			this.TempData["SuccessMessage"] = "Estudiante eliminado con éxito.";
-			return this.RedirectToAction("Index", "Student", new { area = "DirectorTeacher" });
-		}
-		this.TempData["ErrorMessage"] = "Error al eliminar al estudiante.";
-		this.TempData["ErrorMessages"] = result.Errors.Select(e => e.Description).ToList();
+		_ = await this._userManager.DeleteAsync(student);
+		this.TempData["SuccessMessage"] = "Estudiante eliminado correctamente.";
 		return this.RedirectToAction("Index", "Student", new { area = "DirectorTeacher" });
 	}
 }
