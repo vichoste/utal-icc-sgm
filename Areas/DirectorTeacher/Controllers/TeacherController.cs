@@ -3,8 +3,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 
-using NuGet.DependencyResolver;
-
 using Utal.Icc.Sgm.Areas.DirectorTeacher.Views.Teacher;
 using Utal.Icc.Sgm.Models;
 
