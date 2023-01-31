@@ -106,6 +106,7 @@ public class TeacherController : Controller {
 			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
 		}
 		var editViewModel = new EditViewModel {
+			Id = id,
 			FirstName = teacher.FirstName,
 			LastName = teacher.LastName,
 			Rut = teacher.Rut,

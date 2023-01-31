@@ -38,15 +38,15 @@ public class ApplicationUser : IdentityUser {
 	public string? TeacherSpecialization { get; set; }
 	#endregion
 	#region AssistantTeacher
-	[InverseProperty(nameof(StudentProposal.AssistantTeacherOfTheStudentProposal1))]
-	public virtual StudentProposal? AssistantTeacherOfTheStudentProposals1 { get; set; }
-	[InverseProperty(nameof(StudentProposal.AssistantTeacherOfTheStudentProposal2))]
-	public virtual StudentProposal? AssistantTeacherOfTheStudentProposals2 { get; set; }
-	[InverseProperty(nameof(StudentProposal.AssistantTeacherOfTheStudentProposal3))]
-	public virtual StudentProposal? AssistantTeacherOfTheStudentProposals3 { get; set; }
+	[InverseProperty(nameof(StudentProposal.AssistantTeacher1OfTheStudentProposal))]
+	public virtual ICollection<StudentProposal>? ImAssistantTeacher1OfTheStudentProposals { get; set; } = new HashSet<StudentProposal>();
+	[InverseProperty(nameof(StudentProposal.AssistantTeacher2OfTheStudentProposal))]
+	public virtual ICollection<StudentProposal>? ImAssistantTeacher2OfTheStudentProposals { get; set; } = new HashSet<StudentProposal>();
+	[InverseProperty(nameof(StudentProposal.AssistantTeacher3OfTheStudentProposal))]
+	public virtual ICollection<StudentProposal>? ImAssistantTeacher3OfTheStudentProposals { get; set; } = new HashSet<StudentProposal>();
 	#endregion
 	#region GuideTeacher
 	[InverseProperty(nameof(StudentProposal.GuideTeacherOfTheStudentProposal))]
-	public virtual ICollection<StudentProposal>? StudentProposalsWhereImAGuideTeacherCandidate { get; set; } = new HashSet<StudentProposal>();
+	public virtual ICollection<StudentProposal>? ImGuideTeacherOfTheStudentProposals { get; set; } = new HashSet<StudentProposal>();
 	#endregion
 }

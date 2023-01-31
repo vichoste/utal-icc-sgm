@@ -118,6 +118,7 @@ public class StudentController : Controller {
 			return this.View();
 		}
 		var editViewModel = new EditViewModel {
+			Id = id,
 			FirstName = student.FirstName,
 			LastName = student.LastName,
 			UniversityId = student.StudentUniversityId,
@@ -145,6 +146,7 @@ public class StudentController : Controller {
 		student.UpdatedAt = DateTimeOffset.Now;
 		_ = await this._userManager.UpdateAsync(student);
 		var editViewModel = new EditViewModel {
+			Id = student.Id,
 			FirstName = student.FirstName,
 			LastName = student.LastName,
 			UniversityId = student.StudentUniversityId,
@@ -164,7 +166,7 @@ public class StudentController : Controller {
 			return this.RedirectToAction("Index", "Student", new { area = "DirectorTeacher" });
 		}
 		var deleteViewModel = new DeleteViewModel {
-			Id = student.Id,
+			Id = id,
 			Email = student.Email
 		};
 		return this.View(deleteViewModel);

@@ -19,9 +19,9 @@ public class StudentProposal {
 	public DateTimeOffset? UpdatedAt { get; set; }
 	public virtual ApplicationUser? StudentOwnerOfTheStudentProposal { get; set; }
 	public virtual ApplicationUser? GuideTeacherOfTheStudentProposal { get; set; }
-	public virtual ApplicationUser? AssistantTeacherOfTheStudentProposal1 { get; set; }
-	public virtual ApplicationUser? AssistantTeacherOfTheStudentProposal2 { get; set; }
-	public virtual ApplicationUser? AssistantTeacherOfTheStudentProposal3 { get; set; }
+	public virtual ApplicationUser? AssistantTeacher1OfTheStudentProposal { get; set; }
+	public virtual ApplicationUser? AssistantTeacher2OfTheStudentProposal { get; set; }
+	public virtual ApplicationUser? AssistantTeacher3OfTheStudentProposal { get; set; }
 	[Timestamp]
 	public byte[]? RowVersion { get; set; }
 }

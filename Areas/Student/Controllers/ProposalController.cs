@@ -51,6 +51,7 @@ public class ProposalController : Controller {
 				.ToList();
 		}
 		var indexViewModels = filteredAndOrderedProposals.Select(sp => new IndexViewModel {
+			Id = sp.Id.ToString(),
 			Title = sp.Title,
 			ProposalStatus = sp.ProposalStatus.ToString(),
 		});
@@ -201,10 +202,10 @@ public class ProposalController : Controller {
 			Description = model.Description,
 			StudentOwnerOfTheStudentProposal = student,
 			GuideTeacherOfTheStudentProposal = guideTeacher,
-			AssistantTeacherOfTheStudentProposal1 = assistantTeacher1,
-			AssistantTeacherOfTheStudentProposal2 = assistantTeacher2,
-			AssistantTeacherOfTheStudentProposal3 = assistantTeacher3,
-			ProposalStatus = StudentProposal.Status.Sent,
+			AssistantTeacher1OfTheStudentProposal = assistantTeacher1,
+			AssistantTeacher2OfTheStudentProposal = assistantTeacher2,
+			AssistantTeacher3OfTheStudentProposal = assistantTeacher3,
+			ProposalStatus = StudentProposal.Status.Draft,
 			CreatedAt = DateTimeOffset.Now,
 			UpdatedAt = DateTimeOffset.Now
 		};
@@ -256,9 +257,9 @@ public class ProposalController : Controller {
 			.Include(sp => sp.StudentOwnerOfTheStudentProposal).AsNoTracking()
 			.Where(sp => sp.StudentOwnerOfTheStudentProposal == student).AsNoTracking()
 			.Include(sp => sp.GuideTeacherOfTheStudentProposal).AsNoTracking()
-			.Include(sp => sp.AssistantTeacherOfTheStudentProposal1).AsNoTracking()
-			.Include(sp => sp.AssistantTeacherOfTheStudentProposal2).AsNoTracking()
-			.Include(sp => sp.AssistantTeacherOfTheStudentProposal3).AsNoTracking()
+			.Include(sp => sp.AssistantTeacher1OfTheStudentProposal).AsNoTracking()
+			.Include(sp => sp.AssistantTeacher2OfTheStudentProposal).AsNoTracking()
+			.Include(sp => sp.AssistantTeacher3OfTheStudentProposal).AsNoTracking()
 			.FirstOrDefaultAsync(sp => sp.Id.ToString() == id);
 		if (studentProposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
@@ -269,18 +270,50 @@ public class ProposalController : Controller {
 			Title = studentProposal!.Title,
 			Description = studentProposal.Description,
 			GuideTeacher = studentProposal.GuideTeacherOfTheStudentProposal!.Id,
-			AssistantTeacher1 = studentProposal.AssistantTeacherOfTheStudentProposal1!.Id,
-			AssistantTeacher2 = studentProposal.AssistantTeacherOfTheStudentProposal2!.Id,
-			AssistantTeacher3 = studentProposal.AssistantTeacherOfTheStudentProposal3!.Id,
+			AssistantTeacher1 = studentProposal.AssistantTeacher1OfTheStudentProposal?.Id,
+			AssistantTeacher2 = studentProposal.AssistantTeacher2OfTheStudentProposal?.Id,
+			AssistantTeacher3 = studentProposal.AssistantTeacher3OfTheStudentProposal?.Id,
 		};
 		return this.View(editViewModel);
 	}
 
 	[HttpPost, ValidateAntiForgeryToken]
 	public async Task<IActionResult> Edit([FromForm] EditViewModel model) {
+		var guideTeachers = (
+			await this._userManager.GetUsersInRoleAsync(Roles.GuideTeacher.ToString()))
+			.OrderBy(gt => gt.LastName)
+			.ToList();
+		var assistantTeachers1 = (
+			await this._userManager.GetUsersInRoleAsync(Roles.AssistantTeacher.ToString()))
+			.OrderBy(at => at.LastName)
+			.ToList();
+		var assistantTeachers2 = (
+			await this._userManager.GetUsersInRoleAsync(Roles.AssistantTeacher.ToString()))
+			.OrderBy(at => at.LastName)
+			.ToList();
+		var assistantTeachers3 = (
+			await this._userManager.GetUsersInRoleAsync(Roles.AssistantTeacher.ToString()))
+			.OrderBy(at => at.LastName)
+			.ToList();
+		this.ViewData["GuideTeachers"] = guideTeachers.Select(gt => new SelectListItem {
+			Text = $"{gt.FirstName} {gt.LastName}",
+			Value = gt.Id.ToString()
+		});
+		this.ViewData["AssistantTeachers1"] = assistantTeachers1.Select(gt => new SelectListItem {
+			Text = $"{gt.FirstName} {gt.LastName}",
+			Value = gt.Id.ToString()
+		});
+		this.ViewData["AssistantTeachers2"] = assistantTeachers2.Select(gt => new SelectListItem {
+			Text = $"{gt.FirstName} {gt.LastName}",
+			Value = gt.Id.ToString()
+		});
+		this.ViewData["AssistantTeachers3"] = assistantTeachers3.Select(gt => new SelectListItem {
+			Text = $"{gt.FirstName} {gt.LastName}",
+			Value = gt.Id.ToString()
+		});
 		if (!this.ModelState.IsValid) {
 			this.ViewBag.WarningMessage = "Revisa que los campos estén correctos.";
-			return this.View(new CreateViewModel {
+			return this.View(new EditViewModel {
 				Title = model.Title,
 				Description = model.Description,
 			});
@@ -295,9 +328,9 @@ public class ProposalController : Controller {
 			.Include(sp => sp.StudentOwnerOfTheStudentProposal)
 			.Where(sp => sp.StudentOwnerOfTheStudentProposal == student)
 			.Include(sp => sp.GuideTeacherOfTheStudentProposal)
-			.Include(sp => sp.AssistantTeacherOfTheStudentProposal1)
-			.Include(sp => sp.AssistantTeacherOfTheStudentProposal2)
-			.Include(sp => sp.AssistantTeacherOfTheStudentProposal3)
+			.Include(sp => sp.AssistantTeacher1OfTheStudentProposal)
+			.Include(sp => sp.AssistantTeacher2OfTheStudentProposal)
+			.Include(sp => sp.AssistantTeacher3OfTheStudentProposal)
 			.FirstOrDefaultAsync(sp => sp.Id.ToString() == model.Id);
 		if (studentProposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
@@ -329,63 +362,63 @@ public class ProposalController : Controller {
 		}
 		if (assistantTeacher1 is not null && guideTeacher == assistantTeacher1) {
 			this.ViewBag.WarningMessage = "El profesor guía no puede ser un profesor co-guía a la vez.";
-			return this.View(new CreateViewModel {
+			return this.View(new EditViewModel {
 				Title = model.Title,
 				Description = model.Description,
 			});
 		}
 		if (assistantTeacher1 is not null && assistantTeacher2 is not null && assistantTeacher1 == assistantTeacher2) {
 			this.ViewBag.WarningMessage = "El profesor co-guía no puede repetirse más de una vez.";
-			return this.View(new CreateViewModel {
+			return this.View(new EditViewModel {
 				Title = model.Title,
 				Description = model.Description,
 			});
 		}
 		if (assistantTeacher1 is not null && assistantTeacher3 is not null && assistantTeacher1 == assistantTeacher3) {
 			this.ViewBag.WarningMessage = "El profesor co-guía no puede repetirse más de una vez.";
-			return this.View(new CreateViewModel {
+			return this.View(new EditViewModel {
 				Title = model.Title,
 				Description = model.Description,
 			});
 		}
 		if (assistantTeacher2 is not null && guideTeacher == assistantTeacher2) {
 			this.ViewBag.WarningMessage = "El profesor guía no puede ser un profesor co-guía a la vez.";
-			return this.View(new CreateViewModel {
+			return this.View(new EditViewModel {
 				Title = model.Title,
 				Description = model.Description,
 			});
 		}
 		if (assistantTeacher2 is not null && assistantTeacher1 is not null && assistantTeacher2 == assistantTeacher1) {
 			this.ViewBag.WarningMessage = "El profesor co-guía no puede repetirse más de una vez.";
-			return this.View(new CreateViewModel {
+			return this.View(new EditViewModel {
 				Title = model.Title,
 				Description = model.Description,
 			});
 		}
 		if (assistantTeacher2 is not null && assistantTeacher3 is not null && assistantTeacher2 == assistantTeacher3) {
 			this.ViewBag.WarningMessage = "El profesor co-guía no puede repetirse más de una vez.";
-			return this.View(new CreateViewModel {
+			return this.View(new EditViewModel {
 				Title = model.Title,
 				Description = model.Description,
 			});
 		}
 		if (assistantTeacher3 is not null && guideTeacher == assistantTeacher3) {
 			this.ViewBag.WarningMessage = "El profesor guía no puede ser un profesor co-guía a la vez.";
-			return this.View(new CreateViewModel {
+			return this.View(new EditViewModel {
 				Title = model.Title,
 				Description = model.Description,
 			});
 		}
 		if (assistantTeacher3 is not null && assistantTeacher1 is not null && assistantTeacher3 == assistantTeacher1) {
 			this.ViewBag.WarningMessage = "El profesor co-guía no puede repetirse más de una vez.";
-			return this.View(new CreateViewModel {
+			return this.View(new EditViewModel {
 				Title = model.Title,
 				Description = model.Description,
 			});
 		}
 		if (assistantTeacher3 is not null && assistantTeacher2 is not null && assistantTeacher3 == assistantTeacher2) {
 			this.ViewBag.WarningMessage = "El profesor co-guía no puede repetirse más de una vez.";
-			return this.View(new CreateViewModel {
+			return this.View(new EditViewModel {
 				Title = model.Title,
 				Description = model.Description,
 			});
@@ -393,13 +426,13 @@ public class ProposalController : Controller {
 		studentProposal.Title = model.Title;
 		studentProposal.Description = model.Description;
 		studentProposal.GuideTeacherOfTheStudentProposal = guideTeacher;
-		studentProposal.AssistantTeacherOfTheStudentProposal1 = assistantTeacher1;
-		studentProposal.AssistantTeacherOfTheStudentProposal2 = assistantTeacher2;
-		studentProposal.AssistantTeacherOfTheStudentProposal3 = assistantTeacher3;
+		studentProposal.AssistantTeacher1OfTheStudentProposal = assistantTeacher1;
+		studentProposal.AssistantTeacher2OfTheStudentProposal = assistantTeacher2;
+		studentProposal.AssistantTeacher3OfTheStudentProposal = assistantTeacher3;
 		studentProposal.UpdatedAt = DateTimeOffset.Now;
 		_ = this._dbContext.StudentProposals.Update(studentProposal);
 		_ = await this._dbContext.SaveChangesAsync();
-		this.TempData["SuccessMessage"] = "Tu propuesta ha sido actualizada correctamente.";
+		this.ViewBag.SuccessMessage = "Tu propuesta ha sido actualizada correctamente.";
 		return this.View(model);
 	}
 
@@ -410,11 +443,36 @@ public class ProposalController : Controller {
 			return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
 		}
 		var studentProposal = await this._dbContext.StudentProposals.AsNoTracking()
+			.Where(sp => sp.StudentOwnerOfTheStudentProposal == student)
 			.FirstOrDefaultAsync(sp => sp.Id.ToString() == id);
 		if (studentProposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
 			return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
 		}
-		
+		var deleteViewModel = new DeleteViewModel {
+			Id = id,
+			Title = studentProposal.Title,
+		};
+		return this.View(deleteViewModel);
+	}
+
+	[HttpPost, ValidateAntiForgeryToken]
+	public async Task<IActionResult> Delete([FromForm] DeleteViewModel model) {
+		var student = await this._userManager.GetUserAsync(this.User);
+		if (student is null) {
+			this.TempData["ErrorMessage"] = "Error al obtener al estudiante.";
+			return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
+		}
+		var studentProposal = await this._dbContext.StudentProposals.AsNoTracking()
+			.Where(sp => sp.StudentOwnerOfTheStudentProposal == student)
+			.FirstOrDefaultAsync(sp => sp.Id.ToString() == model.Id);
+		if (studentProposal is null) {
+			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
+			return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
+		}
+		_ = this._dbContext.StudentProposals.Remove(studentProposal);
+		_ = this._dbContext.SaveChangesAsync();
+		this.TempData["SuccessMessage"] = "Tu propuesta ha sido eliminada correctamente.";
+		return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
 	}
 }
