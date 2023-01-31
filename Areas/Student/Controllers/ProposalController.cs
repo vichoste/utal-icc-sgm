@@ -255,7 +255,7 @@ public class ProposalController : Controller {
 		}
 		var studentProposal = await this._dbContext.StudentProposals.AsNoTracking()
 			.Include(sp => sp.StudentOwnerOfTheStudentProposal).AsNoTracking()
-			.Where(sp => sp.StudentOwnerOfTheStudentProposal == student).AsNoTracking()
+			.Where(sp => sp.StudentOwnerOfTheStudentProposal == student && sp.ProposalStatus == StudentProposal.Status.Draft)
 			.Include(sp => sp.GuideTeacherOfTheStudentProposal).AsNoTracking()
 			.Include(sp => sp.AssistantTeacher1OfTheStudentProposal).AsNoTracking()
 			.Include(sp => sp.AssistantTeacher2OfTheStudentProposal).AsNoTracking()
@@ -326,7 +326,7 @@ public class ProposalController : Controller {
 		}
 		var studentProposal = await this._dbContext.StudentProposals
 			.Include(sp => sp.StudentOwnerOfTheStudentProposal)
-			.Where(sp => sp.StudentOwnerOfTheStudentProposal == student)
+			.Where(sp => sp.StudentOwnerOfTheStudentProposal == student && sp.ProposalStatus == StudentProposal.Status.Draft)
 			.Include(sp => sp.GuideTeacherOfTheStudentProposal)
 			.Include(sp => sp.AssistantTeacher1OfTheStudentProposal)
 			.Include(sp => sp.AssistantTeacher2OfTheStudentProposal)
@@ -443,7 +443,7 @@ public class ProposalController : Controller {
 			return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
 		}
 		var studentProposal = await this._dbContext.StudentProposals.AsNoTracking()
-			.Where(sp => sp.StudentOwnerOfTheStudentProposal == student)
+			.Where(sp => sp.StudentOwnerOfTheStudentProposal == student && sp.ProposalStatus == StudentProposal.Status.Draft)
 			.FirstOrDefaultAsync(sp => sp.Id.ToString() == id);
 		if (studentProposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
@@ -464,7 +464,7 @@ public class ProposalController : Controller {
 			return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
 		}
 		var studentProposal = await this._dbContext.StudentProposals.AsNoTracking()
-			.Where(sp => sp.StudentOwnerOfTheStudentProposal == student)
+			.Where(sp => sp.StudentOwnerOfTheStudentProposal == student && sp.ProposalStatus == StudentProposal.Status.Draft)
 			.FirstOrDefaultAsync(sp => sp.Id.ToString() == model.Id);
 		if (studentProposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
