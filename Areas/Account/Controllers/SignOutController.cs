@@ -14,6 +14,7 @@ public class SignOutController : Controller {
 	public async Task<IActionResult> Index() {
 		if (this.User.Identity!.IsAuthenticated) {
 			await this._signInManager.SignOutAsync();
+			this.TempData["SuccessMessage"] = "Se ha cerrado tu sesión correctamente.";
 		}
 		return this.RedirectToAction("Index", "Home", new { area = "" });
 	}

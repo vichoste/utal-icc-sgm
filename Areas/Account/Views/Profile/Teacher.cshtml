@@ -7,13 +7,7 @@
 }
 
 <div class="container">
-	@if (this.ViewBag.SuccessMessage is not null) {
-		<div class="row justify-content-center">
-			<div class="alert alert-success" role="alert">
-				@this.ViewBag.SuccessMessage
-			</div>
-		</div>
-	}
+	<partial name="_Alerts" />
 	<div class="row justify-content-center">
 		<div class="col-10">
 			<div class="card">

@@ -9,13 +9,16 @@
 	var userSession = await this.UserManager.GetUserAsync(this.User);
 }
 
-<div class="text-center">
-	@if (!this.User.Identity!.IsAuthenticated) {
-		<h1 class="display-4">¡Bienvenido!</h1>
-		<h3 class="display-6">Por favor inicia sesión para ingresar a la plataforma.</h3>
-	} else if (userSession!.IsDeactivated) {
-		<h1 class="display-4">Tu cuenta está desactivada.</h1>
-	} else {
-		<h1 class="display-4">¡Bienvenido @userSession.FirstName!</h1>
-	}
+<div class="container">
+	<partial name="_Alerts" />
+	<div class="text-center">
+		@if (!this.User.Identity!.IsAuthenticated) {
+			<h1 class="display-4">¡Bienvenido!</h1>
+			<h3 class="display-6">Por favor, inicia sesión para ingresar a la plataforma.</h3>
+		} else if (userSession!.IsDeactivated) {
+			<h1 class="display-4">Tu cuenta está desactivada.</h1>
+		} else {
+			<h1 class="display-4">¡Bienvenido @userSession.FirstName!</h1>
+		}
+	</div>
 </div>

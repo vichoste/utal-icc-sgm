@@ -20,17 +20,12 @@ public class ProfileController : Controller {
 	}
 
 	public async Task<IActionResult> Index() {
-		if (!this.User.Identity!.IsAuthenticated) {
-			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
-		}
 		var applicationUser = await this._userManager.GetUserAsync(this.User);
 		if (applicationUser is null) {
-			this.TempData["ErrorMessage"] = "Error al obtener al usuario.";
-			return this.View();
+			return this.RedirectToAction("Index", "Home", new { area = "" });
 		}
 		if (applicationUser.IsDeactivated) {
-			this.TempData["ErrorMessage"] = "Error al obtener al usuario.";
-			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
+			return this.RedirectToAction("Index", "Home", new { area = "" });
 		}
 		var indexViewModel = new IndexViewModel {
 			FirstName = applicationUser!.FirstName,
@@ -47,21 +42,16 @@ public class ProfileController : Controller {
 
 	[HttpPost, ValidateAntiForgeryToken]
 	public async Task<IActionResult> ChangePassword([FromForm] ChangePasswordViewModel model) {
-		if (!this.User.Identity!.IsAuthenticated) {
-			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
-		}
 		var applicationUser = await this._userManager.GetUserAsync(this.User);
 		if (applicationUser is null) {
-			this.TempData["ErrorMessage"] = "Error al obtener al usuario.";
-			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
+			return this.RedirectToAction("Index", "Home", new { area = "" });
 		}
 		if (applicationUser.IsDeactivated) {
-			this.TempData["ErrorMessage"] = "Error al obtener al usuario.";
-			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
+			return this.RedirectToAction("Index", "Home", new { area = "" });
 		}
 		var passwordResult = await this._userManager.ChangePasswordAsync(applicationUser!, model.CurrentPassword!, model.NewPassword!);
 		if (!passwordResult.Succeeded) {
-			this.ViewBag.ErrorMessage = "Tu contraseña no se pudo cambiar.";
+			this.ViewBag.ErrorMessage = "Contraseña incorrecta.";
 			this.ViewBag.ErrorMessages = passwordResult.Errors.Select(e => e.Description).ToList();
 			return this.View(model);
 		}
@@ -73,16 +63,12 @@ public class ProfileController : Controller {
 
 	[Authorize(Roles = "Student")]
 	public async Task<IActionResult> Student() {
-		if (!this.User.Identity!.IsAuthenticated) {
-			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
-		}
-		if (await this._userManager.GetUserAsync(this.User) is not ApplicationUser student) {
-			this.TempData["ErrorMessage"] = "Error al obtener al usuario.";
-			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
+		var student = await this._userManager.GetUserAsync(this.User);
+		if (student is null) {
+			return this.RedirectToAction("Index", "Home", new { area = "" });
 		}
 		if (student.IsDeactivated) {
-			this.TempData["ErrorMessage"] = "Error al obtener al usuario.";
-			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
+			return this.RedirectToAction("Index", "Home", new { area = "" });
 		}
 		var studentViewModel = new StudentViewModel {
 			UniversityId = student.StudentUniversityId,
@@ -95,15 +81,12 @@ public class ProfileController : Controller {
 
 	[Authorize(Roles = "Student"), HttpPost, ValidateAntiForgeryToken]
 	public async Task<IActionResult> Student([FromForm] StudentViewModel model) {
-		if (!this.User.Identity!.IsAuthenticated) {
-			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
-		}
-		if (await this._userManager.GetUserAsync(this.User) is not ApplicationUser student) {
-			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
+		var student = await this._userManager.GetUserAsync(this.User);
+		if (student is null) {
+			return this.RedirectToAction("Index", "Home", new { area = "" });
 		}
 		if (student.IsDeactivated) {
-			this.TempData["ErrorMessage"] = "Error al obtener al usuario.";
-			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
+			return this.RedirectToAction("Index", "Home", new { area = "" });
 		}
 		student.StudentRemainingCourses = model.RemainingCourses;
 		student.StudentIsDoingThePractice = model.IsDoingThePractice;
@@ -122,15 +105,12 @@ public class ProfileController : Controller {
 
 	[Authorize(Roles = "Teacher")]
 	public async Task<IActionResult> Teacher() {
-		if (!this.User.Identity!.IsAuthenticated) {
-			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
-		}
-		if (await this._userManager.GetUserAsync(this.User) is not ApplicationUser teacher) {
-			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
+		var teacher = await this._userManager.GetUserAsync(this.User);
+		if (teacher is null) {
+			return this.RedirectToAction("Index", "Home", new { area = "" });
 		}
 		if (teacher.IsDeactivated) {
-			this.TempData["ErrorMessage"] = "Error al obtener al usuario.";
-			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
+			return this.RedirectToAction("Index", "Home", new { area = "" });
 		}
 		var teacherViewModel = new TeacherViewModel {
 			Office = teacher.TeacherOffice,
@@ -142,15 +122,12 @@ public class ProfileController : Controller {
 
 	[Authorize(Roles = "Teacher"), HttpPost, ValidateAntiForgeryToken]
 	public async Task<IActionResult> Teacher([FromForm] TeacherViewModel model) {
-		if (!this.User.Identity!.IsAuthenticated) {
-			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
-		}
-		if (await this._userManager.GetUserAsync(this.User) is not ApplicationUser teacher) {
-			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
+		var teacher = await this._userManager.GetUserAsync(this.User);
+		if (teacher is null) {
+			return this.RedirectToAction("Index", "Home", new { area = "" });
 		}
 		if (teacher.IsDeactivated) {
-			this.TempData["ErrorMessage"] = "Error al obtener al usuario.";
-			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
+			return this.RedirectToAction("Index", "Home", new { area = "" });
 		}
 		teacher.TeacherOffice = model.Office;
 		teacher.TeacherSchedule = model.Schedule;
