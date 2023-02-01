@@ -159,15 +159,26 @@
 					<tbody>
 						@foreach (var item in this.Model) {
 							<tr>
-								<td>@item.FirstName</td>
-								<td>@item.LastName</td>
-								<td>@item.UniversityId</td>
-								<td>@item.Rut</td>
-								<td>@item.Email</td>
-								<td>
-									@this.Html.ActionLink("Editar", "Edit", "Student", new { area = "DirectorTeacher", id = item.Id }, new { @class = "btn btn-yellow mb-3"})
-									@this.Html.ActionLink("Eliminar", "Delete", "Student", new { area = "DirectorTeacher", id = item.Id }, new { @class = "btn btn-danger mb-3"})
-								</td>
+								@if (item.IsDeactivated) {
+									<td class="text-muted">@item.FirstName</td>
+									<td class="text-muted">@item.LastName</td>
+									<td class="text-muted">@item.UniversityId</td>
+									<td class="text-muted">@item.Rut</td>
+									<td class="text-muted">@item.Email</td>
+									<td>
+										@this.Html.ActionLink("Activar", "ToggleActivation", "Student", new { area = "DirectorTeacher", id = item.Id }, new { @class = "btn btn-success mb-3" })
+									</td>
+								} else {
+									<td>@item.FirstName</td>
+									<td>@item.LastName</td>
+									<td>@item.UniversityId</td>
+									<td>@item.Rut</td>
+									<td>@item.Email</td>
+									<td>
+										@this.Html.ActionLink("Editar", "Edit", "Student", new { area = "DirectorTeacher", id = item.Id }, new { @class = "btn btn-yellow mb-3" })
+										@this.Html.ActionLink("Desactivar", "ToggleActivation", "Student", new { area = "DirectorTeacher", id = item.Id }, new { @class = "btn btn-danger mb-3" })
+									</td>
+								}
 							</tr>
 						}
 					</tbody>

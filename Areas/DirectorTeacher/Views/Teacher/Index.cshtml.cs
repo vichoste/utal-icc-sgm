@@ -15,4 +15,6 @@ public class IndexViewModel {
 	public string? Email { get; set; }
 	[Display(Name = "¿Es director de carrera?")]
 	public bool IsDirectorTeacher { get; set; }
+	[Display(Name = "Deshabilitado")]
+	public bool IsDeactivated { get; set; }
 }

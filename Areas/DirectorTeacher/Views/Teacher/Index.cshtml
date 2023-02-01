@@ -154,19 +154,29 @@
 					<tbody>
 						@foreach (var item in this.Model) {
 							<tr>
-								<td>@item.FirstName</td>
-								<td>@item.LastName</td>
-								<td>@item.Rut</td>
-								<td>@item.Email</td>
-								<td>
-									@this.Html.ActionLink("Editar", "Edit", "Teacher", new { area = "DirectorTeacher", id = item.Id }, new { @class = "btn btn-yellow mb-3"})
-									@this.Html.ActionLink("Eliminar", "Delete", "Teacher", new { area = "DirectorTeacher", id = item.Id }, new { @class = "btn btn-danger mb-3"})
-									@if (item.IsDirectorTeacher) {
-										<a asp-action="Index" asp-route-sortOrder="@this.ViewData["CurrentSort"]" asp-route-pageNumber="@(this.Model.PageIndex)" asp-route-currentFilter="@this.ViewData["CurrentFilter"]" class="btn btn-info mb-3">Es director de carrera</a>
-									} else {
-										@this.Html.ActionLink("No es director de carrera", "Transfer", "Teacher", new { area = "DirectorTeacher", currentDirectorTeacherId = this.Model.ApplicationUserId , newDirectorTeacherId = item.Id }, new { @class = "btn btn-default mb-3" })
-									}
-								</td>
+								@if (item.IsDeactivated) {
+									<td class="text-muted">@item.FirstName</td>
+									<td class="text-muted">@item.LastName</td>
+									<td class="text-muted">@item.Rut</td>
+									<td class="text-muted">@item.Email</td>
+									<td>
+										@this.Html.ActionLink("Activar", "ToggleActivation", "Teacher", new { area = "DirectorTeacher", id = item.Id }, new { @class = "btn btn-success mb-3"})
+									</td>
+								} else {
+									<td>@item.FirstName</td>
+									<td>@item.LastName</td>
+									<td>@item.Rut</td>
+									<td>@item.Email</td>
+									<td>
+										@this.Html.ActionLink("Editar", "Edit", "Teacher", new { area = "DirectorTeacher", id = item.Id }, new { @class = "btn btn-yellow mb-3"})
+										@this.Html.ActionLink("Desactivar", "ToggleActivation", "Teacher", new { area = "DirectorTeacher", id = item.Id }, new { @class = "btn btn-danger mb-3"})
+										@if (item.IsDirectorTeacher) {
+											<a asp-action="Index" asp-route-sortOrder="@this.ViewData["CurrentSort"]" asp-route-pageNumber="@(this.Model.PageIndex)" asp-route-currentFilter="@this.ViewData["CurrentFilter"]" class="btn btn-info mb-3">Es director de carrera</a>
+										} else {
+											@this.Html.ActionLink("No es director de carrera", "Transfer", "Teacher", new { area = "DirectorTeacher", currentDirectorTeacherId = this.Model.ApplicationUserId , newDirectorTeacherId = item.Id }, new { @class = "btn btn-default mb-3" })
+										}
+									</td>
+								}
 							</tr>
 						}
 					</tbody>

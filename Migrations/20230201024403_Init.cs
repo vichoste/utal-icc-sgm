@@ -35,6 +35,7 @@ namespace Utal.Icc.Sgm.Migrations
                     Rut = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     UpdatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    IsDeactivated = table.Column<bool>(type: "bit", nullable: false),
                     StudentUniversityId = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     StudentRemainingCourses = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     StudentIsDoingThePractice = table.Column<bool>(type: "bit", nullable: false),

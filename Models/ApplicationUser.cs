@@ -23,6 +23,7 @@ public class ApplicationUser : IdentityUser {
 	public string? Rut { get; set; }
 	public DateTimeOffset CreatedAt { get; set; }
 	public DateTimeOffset? UpdatedAt { get; set; }
+	public bool IsDeactivated { get; set; }
 	#endregion
 	#region Student
 	public string? StudentUniversityId { get; set; }

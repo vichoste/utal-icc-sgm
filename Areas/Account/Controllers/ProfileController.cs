@@ -28,6 +28,10 @@ public class ProfileController : Controller {
 			this.TempData["ErrorMessage"] = "Error al obtener al usuario.";
 			return this.View();
 		}
+		if (applicationUser.IsDeactivated) {
+			this.TempData["ErrorMessage"] = "Error al obtener al usuario.";
+			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
+		}
 		var indexViewModel = new IndexViewModel {
 			FirstName = applicationUser!.FirstName,
 			LastName = applicationUser.LastName,
@@ -48,6 +52,11 @@ public class ProfileController : Controller {
 		}
 		var applicationUser = await this._userManager.GetUserAsync(this.User);
 		if (applicationUser is null) {
+			this.TempData["ErrorMessage"] = "Error al obtener al usuario.";
+			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
+		}
+		if (applicationUser.IsDeactivated) {
+			this.TempData["ErrorMessage"] = "Error al obtener al usuario.";
 			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
 		}
 		var passwordResult = await this._userManager.ChangePasswordAsync(applicationUser!, model.CurrentPassword!, model.NewPassword!);
@@ -68,6 +77,11 @@ public class ProfileController : Controller {
 			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
 		}
 		if (await this._userManager.GetUserAsync(this.User) is not ApplicationUser student) {
+			this.TempData["ErrorMessage"] = "Error al obtener al usuario.";
+			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
+		}
+		if (student.IsDeactivated) {
+			this.TempData["ErrorMessage"] = "Error al obtener al usuario.";
 			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
 		}
 		var studentViewModel = new StudentViewModel {
@@ -85,6 +99,10 @@ public class ProfileController : Controller {
 			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
 		}
 		if (await this._userManager.GetUserAsync(this.User) is not ApplicationUser student) {
+			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
+		}
+		if (student.IsDeactivated) {
+			this.TempData["ErrorMessage"] = "Error al obtener al usuario.";
 			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
 		}
 		student.StudentRemainingCourses = model.RemainingCourses;
@@ -110,6 +128,10 @@ public class ProfileController : Controller {
 		if (await this._userManager.GetUserAsync(this.User) is not ApplicationUser teacher) {
 			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
 		}
+		if (teacher.IsDeactivated) {
+			this.TempData["ErrorMessage"] = "Error al obtener al usuario.";
+			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
+		}
 		var teacherViewModel = new TeacherViewModel {
 			Office = teacher.TeacherOffice,
 			Schedule = teacher.TeacherSchedule,
@@ -124,6 +146,10 @@ public class ProfileController : Controller {
 			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
 		}
 		if (await this._userManager.GetUserAsync(this.User) is not ApplicationUser teacher) {
+			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
+		}
+		if (teacher.IsDeactivated) {
+			this.TempData["ErrorMessage"] = "Error al obtener al usuario.";
 			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
 		}
 		teacher.TeacherOffice = model.Office;

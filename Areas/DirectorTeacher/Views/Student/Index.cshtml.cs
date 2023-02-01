@@ -15,4 +15,6 @@ public class IndexViewModel {
 	public string? Rut { get; set; }
 	[Display(Name = "E-mail")]
 	public string? Email { get; set; }
+	[Display(Name = "Deshabilitado")]
+	public bool IsDeactivated { get; set; }
 }

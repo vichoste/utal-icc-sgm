@@ -24,6 +24,15 @@ public class ProposalController : Controller {
 	}
 
 	public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
+		var student = await this._userManager.GetUserAsync(this.User);
+		if (student is null) {
+			this.ViewBag.ErrorMessage = "Error al obtener al estudiante.";
+			return this.View();
+		}
+		if (student.IsDeactivated) {
+			this.TempData["ErrorMessage"] = "Error al obtener al estudiante.";
+			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
+		}
 		this.ViewData["TitleSortParam"] = sortOrder == "Title" ? "TitleDesc" : "Title";
 		if (searchString is not null) {
 			pageNumber = 1;
@@ -31,13 +40,6 @@ public class ProposalController : Controller {
 			searchString = currentFilter;
 		}
 		this.ViewData["CurrentFilter"] = searchString;
-		var student = this._dbContext.Users.AsNoTracking()
-			.Include(s => s.StudentProposalsWhichIOwn).AsNoTracking()
-			.FirstOrDefault(s => s.Id == this._userManager.GetUserId(this.User));
-		if (student is null) {
-			this.ViewBag.ErrorMessage = "Error al obtener al estudiante.";
-			return this.View();
-		}
 		var orderedProposals = sortOrder switch {
 			"Title" => student.StudentProposalsWhichIOwn!.OrderBy(sp => sp.Title),
 			"TitleDesc" => student.StudentProposalsWhichIOwn!.OrderByDescending(sp => sp.Title),
@@ -60,6 +62,15 @@ public class ProposalController : Controller {
 	}
 
 	public async Task<IActionResult> Create() {
+		var student = await this._userManager.GetUserAsync(this.User);
+		if (student is null) {
+			this.ViewBag.ErrorMessage = "Error al obtener al estudiante.";
+			return this.View();
+		}
+		if (student.IsDeactivated) {
+			this.TempData["ErrorMessage"] = "Error al obtener al estudiante.";
+			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
+		}
 		var guideTeachers = (
 			await this._userManager.GetUsersInRoleAsync(Roles.GuideTeacher.ToString()))
 			.OrderBy(gt => gt.LastName)
@@ -97,6 +108,15 @@ public class ProposalController : Controller {
 
 	[HttpPost, ValidateAntiForgeryToken]
 	public async Task<IActionResult> Create([FromForm] CreateViewModel model) {
+		var student = await this._userManager.GetUserAsync(this.User);
+		if (student is null) {
+			this.ViewBag.ErrorMessage = "Error al obtener al estudiante.";
+			return this.View();
+		}
+		if (student.IsDeactivated) {
+			this.TempData["ErrorMessage"] = "Error al obtener al estudiante.";
+			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
+		}
 		if (!this.ModelState.IsValid) {
 			this.ViewBag.WarningMessage = "Revisa que los campos estén correctos.";
 			return this.View(new CreateViewModel {
@@ -104,10 +124,9 @@ public class ProposalController : Controller {
 				Description = model.Description,
 			});
 		}
-		var student = await this._userManager.GetUserAsync(this.User);
 		var guideTeacher = await this._userManager.FindByIdAsync(model.GuideTeacher!.ToString());
-		if (student is null || guideTeacher is null) {
-			this.TempData["ErrorMessage"] = "Error al obtener a los involucrados.";
+		if (guideTeacher is null) {
+			this.TempData["ErrorMessage"] = "Error al obtener al profesor.";
 			return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
 		}
 		ApplicationUser? assistantTeacher1 = null;
@@ -216,6 +235,15 @@ public class ProposalController : Controller {
 	}
 
 	public async Task<IActionResult> Edit(string id) {
+		var student = await this._userManager.GetUserAsync(this.User);
+		if (student is null) {
+			this.ViewBag.ErrorMessage = "Error al obtener al estudiante.";
+			return this.View();
+		}
+		if (student.IsDeactivated) {
+			this.TempData["ErrorMessage"] = "Error al obtener al estudiante.";
+			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
+		}
 		var guideTeachers = (
 			await this._userManager.GetUsersInRoleAsync(Roles.GuideTeacher.ToString()))
 			.OrderBy(gt => gt.LastName)
@@ -248,11 +276,6 @@ public class ProposalController : Controller {
 			Text = $"{gt.FirstName} {gt.LastName}",
 			Value = gt.Id.ToString()
 		});
-		var student = await this._userManager.GetUserAsync(this.User);
-		if (student is null) {
-			this.TempData["ErrorMessage"] = "Error al obtener al estudiante.";
-			return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
-		}
 		var studentProposal = await this._dbContext.StudentProposals.AsNoTracking()
 			.Include(sp => sp.StudentOwnerOfTheStudentProposal).AsNoTracking()
 			.Where(sp => sp.StudentOwnerOfTheStudentProposal == student && sp.ProposalStatus == StudentProposal.Status.Draft)
@@ -279,6 +302,15 @@ public class ProposalController : Controller {
 
 	[HttpPost, ValidateAntiForgeryToken]
 	public async Task<IActionResult> Edit([FromForm] EditViewModel model) {
+		var student = await this._userManager.GetUserAsync(this.User);
+		if (student is null) {
+			this.ViewBag.ErrorMessage = "Error al obtener al estudiante.";
+			return this.View();
+		}
+		if (student.IsDeactivated) {
+			this.TempData["ErrorMessage"] = "Error al obtener al estudiante.";
+			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
+		}
 		var guideTeachers = (
 			await this._userManager.GetUsersInRoleAsync(Roles.GuideTeacher.ToString()))
 			.OrderBy(gt => gt.LastName)
@@ -318,10 +350,9 @@ public class ProposalController : Controller {
 				Description = model.Description,
 			});
 		}
-		var student = await this._userManager.GetUserAsync(this.User);
 		var guideTeacher = await this._userManager.FindByIdAsync(model.GuideTeacher!.ToString());
-		if (student is null || guideTeacher is null) {
-			this.TempData["ErrorMessage"] = "Error al obtener a los involucrados.";
+		if (guideTeacher is null) {
+			this.TempData["ErrorMessage"] = "Error al obtener al profesor guía.";
 			return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
 		}
 		var studentProposal = await this._dbContext.StudentProposals
@@ -342,21 +373,21 @@ public class ProposalController : Controller {
 		if (!model.AssistantTeacher1.IsNullOrEmpty()) {
 			assistantTeacher1 = await this._userManager.FindByIdAsync(model.AssistantTeacher1!.ToString());
 			if (assistantTeacher1 is null) {
-				this.TempData["ErrorMessage"] = "Error al obtener a los involucrados.";
+				this.TempData["ErrorMessage"] = "Error al obtener al primer profesor co-guía.";
 				return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
 			}
 		}
 		if (!model.AssistantTeacher2.IsNullOrEmpty()) {
 			assistantTeacher2 = await this._userManager.FindByIdAsync(model.AssistantTeacher2!.ToString());
 			if (assistantTeacher2 is null) {
-				this.TempData["ErrorMessage"] = "Error al obtener a los involucrados.";
+				this.TempData["ErrorMessage"] = "Error al obtener al segundo profesor co-guía.";
 				return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
 			}
 		}
 		if (!model.AssistantTeacher3.IsNullOrEmpty()) {
 			assistantTeacher3 = await this._userManager.FindByIdAsync(model.AssistantTeacher3!.ToString());
 			if (assistantTeacher3 is null) {
-				this.TempData["ErrorMessage"] = "Error al obtener a los involucrados.";
+				this.TempData["ErrorMessage"] = "Error al obtener al tercer profesor co-guía.";
 				return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
 			}
 		}
@@ -439,8 +470,12 @@ public class ProposalController : Controller {
 	public async Task<IActionResult> Delete(string id) {
 		var student = await this._userManager.GetUserAsync(this.User);
 		if (student is null) {
+			this.ViewBag.ErrorMessage = "Error al obtener al estudiante.";
+			return this.View();
+		}
+		if (student.IsDeactivated) {
 			this.TempData["ErrorMessage"] = "Error al obtener al estudiante.";
-			return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
+			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
 		}
 		var studentProposal = await this._dbContext.StudentProposals.AsNoTracking()
 			.Where(sp => sp.StudentOwnerOfTheStudentProposal == student && sp.ProposalStatus == StudentProposal.Status.Draft)
@@ -451,7 +486,7 @@ public class ProposalController : Controller {
 		}
 		var deleteViewModel = new DeleteViewModel {
 			Id = id,
-			Title = studentProposal.Title,
+			Title = studentProposal.Title
 		};
 		return this.View(deleteViewModel);
 	}
@@ -460,8 +495,12 @@ public class ProposalController : Controller {
 	public async Task<IActionResult> Delete([FromForm] DeleteViewModel model) {
 		var student = await this._userManager.GetUserAsync(this.User);
 		if (student is null) {
+			this.ViewBag.ErrorMessage = "Error al obtener al estudiante.";
+			return this.View();
+		}
+		if (student.IsDeactivated) {
 			this.TempData["ErrorMessage"] = "Error al obtener al estudiante.";
-			return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
+			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
 		}
 		var studentProposal = await this._dbContext.StudentProposals.AsNoTracking()
 			.Where(sp => sp.StudentOwnerOfTheStudentProposal == student && sp.ProposalStatus == StudentProposal.Status.Draft)

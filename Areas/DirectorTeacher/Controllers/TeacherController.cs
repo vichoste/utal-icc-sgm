@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 using Utal.Icc.Sgm.Areas.DirectorTeacher.Views.Teacher;
+using Utal.Icc.Sgm.Data;
 using Utal.Icc.Sgm.Models;
 
 using static Utal.Icc.Sgm.Models.ApplicationUser;
@@ -22,6 +23,15 @@ public class TeacherController : Controller {
 	}
 
 	public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
+		var teacherSession = await this._userManager.GetUserAsync(this.User);
+		if (teacherSession is null) {
+			this.TempData["ErrorMessage"] = "Error al obtener al profesor de la sesión actual.";
+			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
+		}
+		if (teacherSession.IsDeactivated) {
+			this.TempData["ErrorMessage"] = "Error al obtener al profesor de la sesión actual.";
+			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
+		}
 		this.ViewData["FirstNameSortParam"] = sortOrder == "FirstName" ? "FirstNameDesc" : "FirstName";
 		this.ViewData["LastNameSortParam"] = sortOrder == "LastName" ? "LastNameDesc" : "LastName";
 		this.ViewData["UniversityIdSortParam"] = sortOrder == "StudentUniversityId" ? "UniversityIdDesc" : "StudentUniversityId";
@@ -57,15 +67,36 @@ public class TeacherController : Controller {
 			Rut = t.Rut,
 			Email = t.Email,
 			IsDirectorTeacher = await this._userManager.IsInRoleAsync(t, Roles.DirectorTeacher.ToString()),
+			IsDeactivated = t.IsDeactivated
 		}).Select(t => t.Result);
 		var pageSize = 6;
 		return this.View(PaginatedList<IndexViewModel>.Create((await this._userManager.GetUserAsync(this.User))!.Id, indexViewModels.AsQueryable(), pageNumber ?? 1, pageSize));
 	}
 
-	public IActionResult Create() => this.View();
+	public async Task<IActionResult> Create() {
+		var teacherSession = await this._userManager.GetUserAsync(this.User);
+		if (teacherSession is null) {
+			this.TempData["ErrorMessage"] = "Error al obtener al profesor de la sesión actual.";
+			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
+		}
+		if (teacherSession.IsDeactivated) {
+			this.TempData["ErrorMessage"] = "Error al obtener al profesor de la sesión actual.";
+			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
+		}
+		return this.View();
+	}
 
 	[HttpPost, ValidateAntiForgeryToken]
 	public async Task<IActionResult> Create([FromForm] CreateViewModel model) {
+		var teacherSession = await this._userManager.GetUserAsync(this.User);
+		if (teacherSession is null) {
+			this.TempData["ErrorMessage"] = "Error al obtener al profesor de la sesión actual.";
+			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
+		}
+		if (teacherSession.IsDeactivated) {
+			this.TempData["ErrorMessage"] = "Error al obtener al profesor de la sesión actual.";
+			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
+		}
 		if (!this.ModelState.IsValid) {
 			this.ViewBag.WarningMessage = "Revisa que los campos estén correctos.";
 			return this.View(model);
@@ -76,6 +107,7 @@ public class TeacherController : Controller {
 			Rut = model.Rut,
 			CreatedAt = DateTimeOffset.Now,
 			UpdatedAt = DateTimeOffset.Now,
+			IsDeactivated = false
 		};
 		await this._userStore.SetUserNameAsync(teacher, model.Email, CancellationToken.None);
 		await this._emailStore.SetEmailAsync(teacher, model.Email, CancellationToken.None);
@@ -100,8 +132,21 @@ public class TeacherController : Controller {
 	}
 
 	public async Task<IActionResult> Edit(string id) {
+		var teacherSession = await this._userManager.GetUserAsync(this.User);
+		if (teacherSession is null) {
+			this.TempData["ErrorMessage"] = "Error al obtener al profesor de la sesión actual.";
+			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
+		}
+		if (teacherSession.IsDeactivated) {
+			this.TempData["ErrorMessage"] = "Error al obtener al profesor de la sesión actual.";
+			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
+		}
 		var teacher = await this._userManager.FindByIdAsync(id);
 		if (teacher is null) {
+			this.TempData["ErrorMessage"] = "Error al obtener al profesor.";
+			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
+		}
+		if (teacher.IsDeactivated) {
 			this.TempData["ErrorMessage"] = "Error al obtener al profesor.";
 			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
 		}
@@ -124,11 +169,25 @@ public class TeacherController : Controller {
 
 	[HttpPost, ValidateAntiForgeryToken]
 	public async Task<IActionResult> Edit([FromForm] EditViewModel model) {
+		var teacherSession = await this._userManager.GetUserAsync(this.User);
+		if (teacherSession is null) {
+			this.TempData["ErrorMessage"] = "Error al obtener al profesor de la sesión actual.";
+			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
+		}
+		if (teacherSession.IsDeactivated) {
+			this.TempData["ErrorMessage"] = "Error al obtener al profesor de la sesión actual.";
+			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
+		}
 		var teacher = await this._userManager.FindByIdAsync(model.Id!.ToString()!);
 		if (teacher is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener al profesor.";
 			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
 		}
+		if (teacher.IsDeactivated) {
+			this.TempData["ErrorMessage"] = "Error al obtener al profesor.";
+			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
+		}
+		var roles = (await this._userManager.GetRolesAsync(teacher)).ToList();
 		await this._userStore.SetUserNameAsync(teacher, userName: model.Email, CancellationToken.None);
 		await this._emailStore.SetEmailAsync(teacher, model.Email, CancellationToken.None);
 		teacher.FirstName = model.FirstName;
@@ -136,7 +195,6 @@ public class TeacherController : Controller {
 		teacher.Rut = model.Rut;
 		teacher.UpdatedAt = DateTimeOffset.Now;
 		_ = await this._userManager.UpdateAsync(teacher);
-		var roles = (await this._userManager.GetRolesAsync(teacher)).ToList();
 		if (roles.Contains(Roles.Teacher.ToString())) {
 			_ = roles.Remove(Roles.Teacher.ToString());
 		}
@@ -194,41 +252,71 @@ public class TeacherController : Controller {
 		return this.View(editViewModel);
 	}
 
-	public async Task<IActionResult> Delete(string id) {
+	public async Task<IActionResult> ToggleActivation(string id) {
+		var teacherSession = await this._userManager.GetUserAsync(this.User);
+		if (teacherSession is null) {
+			this.TempData["ErrorMessage"] = "Error al obtener al profesor de la sesión actual.";
+			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
+		}
+		if (teacherSession.IsDeactivated) {
+			this.TempData["ErrorMessage"] = "Error al obtener al profesor de la sesión actual.";
+			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
+		}
 		var teacher = await this._userManager.FindByIdAsync(id);
 		if (teacher is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener al profesor.";
 			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
 		}
-		var deleteViewModel = new DeleteViewModel {
+		var toggleActivationModel = new ToggleActivationViewModel {
 			Id = teacher.Id,
-			Email = teacher.Email
+			Email = teacher.Email,
+			IsDeactivated = teacher.IsDeactivated
 		};
-		return this.View(deleteViewModel);
+		return this.View(toggleActivationModel);
 	}
 
 	[HttpPost, ValidateAntiForgeryToken]
-	public async Task<IActionResult> Delete([FromForm] DeleteViewModel model) {
+	public async Task<IActionResult> ToggleActivation([FromForm] ToggleActivationViewModel model) {
+		var teacherSession = await this._userManager.GetUserAsync(this.User);
+		if (teacherSession is null) {
+			this.TempData["ErrorMessage"] = "Error al obtener al profesor de la sesión actual.";
+			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
+		}
+		if (teacherSession.IsDeactivated) {
+			this.TempData["ErrorMessage"] = "Error al obtener al profesor de la sesión actual.";
+			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
+		}
 		var teacher = await this._userManager.FindByIdAsync(model.Id!.ToString()!);
 		if (teacher is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener al profesor.";
 			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
 		}
 		if (teacher!.Id == this._userManager.GetUserId(this.User)) {
-			this.TempData["ErrorMessage"] = "No te puedes eliminar a tí mismo.";
+			this.TempData["ErrorMessage"] = !model.IsDeactivated ? "No te puedes desactivar a tí mismo." : "¡No deberías haber llegado a este punto!";
 			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
 		}
 		var roles = (await this._userManager.GetRolesAsync(teacher)).ToList();
 		if (roles.Contains(Roles.DirectorTeacher.ToString())) {
-			this.TempData["ErrorMessage"] = "No puedes eliminar al director de carrera actual.";
+			this.TempData["ErrorMessage"] = !model.IsDeactivated ? "No puedes desactivar al director de carrera actual." : "¡No deberías haber llegado a este punto!";
 			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
 		}
-		_ = await this._userManager.DeleteAsync(teacher);
-		this.TempData["SuccessMessage"] = "Profesor eliminado correctamente.";
+		teacher.IsDeactivated = !model.IsDeactivated;
+		teacher.UpdatedAt = DateTimeOffset.Now;
+		_ = await this._userManager.UpdateAsync(teacher);
+		this.TempData["SuccessMessage"] = !model.IsDeactivated ? "Profesor desactivado correctamente." : "Profesor activado correctamente.";
 		return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
 	}
 
 	public async Task<IActionResult> Transfer(string currentDirectorTeacherId, string newDirectorTeacherId) {
+		var teacherSession = await this._userManager.GetUserAsync(this.User);
+		if (teacherSession is null) {
+			this.TempData["ErrorMessage"] = "Error al obtener al profesor de la sesión actual.";
+			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
+		}
+		if (teacherSession.IsDeactivated) {
+			this.TempData["ErrorMessage"] = "Error al obtener al profesor de la sesión actual.";
+			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
+		}
 		var currentDirectorTeacher = await this._userManager.FindByIdAsync(currentDirectorTeacherId);
 		var newDirectorTeacher = await this._userManager.FindByIdAsync(newDirectorTeacherId);
 		if (currentDirectorTeacher is null) {
@@ -239,9 +327,13 @@ public class TeacherController : Controller {
 			this.TempData["ErrorMessage"] = "Error al obtener al profesor objetivo.";
 			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
 		}
+		if (newDirectorTeacher.IsDeactivated) {
+			this.TempData["ErrorMessage"] = "Error al obtener al profesor objetivo.";
+			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
+		}
 		var transferViewModel = new TransferViewModel {
 			CurrentDirectorTeacherId = currentDirectorTeacher.Id.ToString(),
-			NewDirectorTeacherId = newDirectorTeacher.Id.ToString(),
+			NewDirectorTeacherId = newDirectorTeacher!.Id.ToString(),
 			NewDirectorTeacherEmail = newDirectorTeacher.Email
 		};
 		return this.View(transferViewModel);
@@ -249,6 +341,15 @@ public class TeacherController : Controller {
 
 	[HttpPost, ValidateAntiForgeryToken]
 	public async Task<IActionResult> Transfer([FromForm] TransferViewModel model) {
+		var teacherSession = await this._userManager.GetUserAsync(this.User);
+		if (teacherSession is null) {
+			this.TempData["ErrorMessage"] = "Error al obtener al profesor de la sesión actual.";
+			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
+		}
+		if (teacherSession.IsDeactivated) {
+			this.TempData["ErrorMessage"] = "Error al obtener al profesor de la sesión actual.";
+			return this.RedirectToAction("Index", "SignIn", new { area = "Account" });
+		}
 		var currentDirectorTeacher = await this._userManager.FindByIdAsync(model.CurrentDirectorTeacherId!);
 		if (currentDirectorTeacher is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener al director de carrera actual.";
@@ -262,6 +363,10 @@ public class TeacherController : Controller {
 		var newDirectorTeacher = await this._userManager.FindByIdAsync(model.NewDirectorTeacherId!);
 		if (newDirectorTeacher is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener al nuevo director de carrera actual.";
+			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
+		}
+		if (newDirectorTeacher.IsDeactivated) {
+			this.TempData["ErrorMessage"] = "Error al obtener al profesor objetivo.";
 			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
 		}
 		if (currentDirectorTeacher == newDirectorTeacher) {
