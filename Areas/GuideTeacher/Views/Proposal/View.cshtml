@@ -27,8 +27,28 @@
 									@this.Html.DisplayFor(m => m.Description, new { @class = "form-control" })
 								</div>
 								<div class="form-group mb-3">
-									@this.Html.LabelFor(m => m.Student, new { @class = "form-label" }):
-									@this.Html.DisplayFor(m => m.Student, new { @class = "form-control" })
+									@this.Html.LabelFor(m => m.StudentName, new { @class = "form-label" }):
+									@this.Html.DisplayFor(m => m.StudentName, new { @class = "form-control" })
+								</div>
+								<div class="form-group mb-3">
+									@this.Html.LabelFor(m => m.StudentRemainingCourses, new { @class = "form-label" }):
+									@this.Html.DisplayFor(m => m.StudentRemainingCourses, new { @class = "form-control" })
+								</div>
+								<div class="form-group mb-3">
+									@this.Html.LabelFor(m => m.StudentIsDoingThePractice, new { @class = "form-label" }):
+									@if (this.Model.StudentIsDoingThePractice) {
+										<b class="text-info">Sí</b>
+									} else {
+										<b>No</b>
+									}
+								</div>
+								<div class="form-group mb-3">
+									@this.Html.LabelFor(m => m.StudentIsWorking, new { @class = "form-label" }):
+									@if (this.Model.StudentIsWorking) {
+										<b class="text-info">Sí</b>
+									} else {
+										<b>No</b>
+									}
 								</div>
 								<div class="form-group mb-3">
 									@this.Html.LabelFor(m => m.AssistantTeacher1, new { @class = "form-label" }):

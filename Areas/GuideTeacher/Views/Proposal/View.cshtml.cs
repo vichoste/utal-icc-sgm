@@ -9,8 +9,16 @@ public class ViewModel {
 	public string? Title { get; set; }
 	[Display(Name = "Descripción")]
 	public string? Description { get; set; }
-	[Display(Name = "Estudiante"), Required]
-	public string? Student { get; set; }
+	[Display(Name = "Nombre del estudiante"), Required]
+	public string? StudentName { get; set; }
+	[DataType(DataType.EmailAddress), Display(Name = "E-mail del estudiante"), EmailAddress]
+	public string? StudentEmail { get; set; }
+	[Display(Name = "Cursos restantes del estudiante")]
+	public string? StudentRemainingCourses { get; set; }
+	[Display(Name = "¿El estudiante está haciendo la práctica?")]
+	public bool StudentIsDoingThePractice { get; set; }
+	[Display(Name = "¿El estudiante está trabajando?")]
+	public bool StudentIsWorking { get; set; }
 	[Display(Name = "Primer profesor co-guía")]
 	public string? AssistantTeacher1 { get; set; }
 	[Display(Name = "Segundo profesor co-guía")]
