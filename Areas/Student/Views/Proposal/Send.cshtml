@@ -5,3 +5,30 @@
 @{
 	this.ViewData["Title"] = "Enviar propuesta";
 }
+
+<div class="container">
+	<partial name="_Alerts" />
+	<div class="row justify-content-center">
+		<div class="col-10">
+			<div class="card">
+				<div class="card-header text-center">@this.ViewData["Title"]</div>
+				<div class="card-body text-center">
+					<p>¿Deseas <b class="text-primary">enviar</b> tu propuesta llamada <b>"@this.Html.DisplayFor(m => m.Title)"</b> al profesor guía?</p>
+					@using (this.Html.BeginForm("Send", "Proposal", new { area = "Student" })) {
+						@this.Html.AntiForgeryToken()
+						@this.Html.HiddenFor(m => m.Id)
+						@this.Html.HiddenFor(m => m.Title)
+						<div class="row text-center">
+							<div class="col">
+								<div class="btn-group">
+									@this.Html.ActionLink("No", "Index", "Proposal", new { area = "Student" }, new { @class = "btn btn-secondary" })
+									<button type="submit" class="btn btn-primary">Sí</button>
+								</div>
+							</div>
+						</div>
+					}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

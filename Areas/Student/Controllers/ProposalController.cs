@@ -534,4 +534,48 @@ public class ProposalController : Controller {
 		this.TempData["SuccessMessage"] = "Tu propuesta ha sido eliminada correctamente.";
 		return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
 	}
+
+	public async Task<IActionResult> Send(string id) {
+		var student = await this._userManager.GetUserAsync(this.User);
+		if (student is null) {
+			return this.RedirectToAction("Index", "Home", new { area = "" });
+		}
+		if (student.IsDeactivated) {
+			return this.RedirectToAction("Index", "Home", new { area = "" });
+		}
+		var studentProposal = await this._dbContext.StudentProposals.AsNoTracking()
+			.Where(sp => sp.StudentOwnerOfTheStudentProposal == student && sp.ProposalStatus == StudentProposal.Status.Draft)
+			.FirstOrDefaultAsync(sp => sp.Id.ToString() == id);
+		if (studentProposal is null) {
+			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
+			return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
+		}
+		var sendViewModel = new SendViewModel {
+			Id = id,
+			Title = studentProposal.Title
+		};
+		return this.View(sendViewModel);
+	}
+
+	[HttpPost, ValidateAntiForgeryToken]
+	public async Task<IActionResult> Send([FromForm] SendViewModel model) {
+		var student = await this._userManager.GetUserAsync(this.User);
+		if (student is null) {
+			return this.RedirectToAction("Index", "Home", new { area = "" });
+		}
+		if (student.IsDeactivated) {
+			return this.RedirectToAction("Index", "Home", new { area = "" });
+		}
+		var studentProposal = await this._dbContext.StudentProposals.AsNoTracking()
+			.Where(sp => sp.StudentOwnerOfTheStudentProposal == student && sp.ProposalStatus == StudentProposal.Status.Draft)
+			.FirstOrDefaultAsync(sp => sp.Id.ToString() == model.Id);
+		if (studentProposal is null) {
+			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
+			return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
+		}
+		studentProposal.ProposalStatus = StudentProposal.Status.Sent;
+		_ = this._dbContext.SaveChangesAsync();
+		this.TempData["SuccessMessage"] = "Tu propuesta ha sido enviada correctamente.";
+		return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
+	}
 }
