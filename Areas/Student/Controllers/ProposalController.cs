@@ -574,7 +574,8 @@ public class ProposalController : Controller {
 			return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
 		}
 		studentProposal.ProposalStatus = StudentProposal.Status.Sent;
-		_ = this._dbContext.SaveChangesAsync();
+		_ = this._dbContext.StudentProposals.Update(studentProposal);
+		_ = await this._dbContext.SaveChangesAsync();
 		this.TempData["SuccessMessage"] = "Tu propuesta ha sido enviada correctamente.";
 		return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
 	}
