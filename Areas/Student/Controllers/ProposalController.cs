@@ -373,6 +373,8 @@ public class ProposalController : Controller {
 			AssistantTeacher1 = studentProposal.AssistantTeacher1OfTheStudentProposal?.Id,
 			AssistantTeacher2 = studentProposal.AssistantTeacher2OfTheStudentProposal?.Id,
 			AssistantTeacher3 = studentProposal.AssistantTeacher3OfTheStudentProposal?.Id,
+			CreatedAt = studentProposal.CreatedAt,
+			UpdatedAt = studentProposal.UpdatedAt
 		};
 		return this.View(editViewModel);
 	}
@@ -446,6 +448,8 @@ public class ProposalController : Controller {
 			return this.View(new EditViewModel {
 				Title = model.Title,
 				Description = model.Description,
+				CreatedAt = studentProposal.CreatedAt,
+				UpdatedAt = studentProposal.UpdatedAt
 			});
 		}
 		if (guideTeacher.IsDeactivated) {
@@ -453,6 +457,8 @@ public class ProposalController : Controller {
 			return this.View(new EditViewModel {
 				Title = model.Title,
 				Description = model.Description,
+				CreatedAt = studentProposal.CreatedAt,
+				UpdatedAt = studentProposal.UpdatedAt
 			});
 		}
 		if (studentProposal.ProposalStatus != StudentProposal.Status.Draft) {
@@ -460,6 +466,8 @@ public class ProposalController : Controller {
 			return this.View(new EditViewModel {
 				Title = model.Title,
 				Description = model.Description,
+				CreatedAt = studentProposal.CreatedAt,
+				UpdatedAt = studentProposal.UpdatedAt
 			});
 		}
 		ApplicationUser? assistantTeacher1 = null;
@@ -472,6 +480,8 @@ public class ProposalController : Controller {
 				return this.View(new EditViewModel {
 					Title = model.Title,
 					Description = model.Description,
+					CreatedAt = studentProposal.CreatedAt,
+					UpdatedAt = studentProposal.UpdatedAt
 				});
 			}
 			if (assistantTeacher1.IsDeactivated) {
@@ -479,6 +489,8 @@ public class ProposalController : Controller {
 				return this.View(new EditViewModel {
 					Title = model.Title,
 					Description = model.Description,
+					CreatedAt = studentProposal.CreatedAt,
+					UpdatedAt = studentProposal.UpdatedAt
 				});
 			}
 		}
@@ -489,6 +501,8 @@ public class ProposalController : Controller {
 				return this.View(new EditViewModel {
 					Title = model.Title,
 					Description = model.Description,
+					CreatedAt = studentProposal.CreatedAt,
+					UpdatedAt = studentProposal.UpdatedAt
 				});
 			}
 			if (assistantTeacher2.IsDeactivated) {
@@ -496,6 +510,8 @@ public class ProposalController : Controller {
 				return this.View(new EditViewModel {
 					Title = model.Title,
 					Description = model.Description,
+					CreatedAt = studentProposal.CreatedAt,
+					UpdatedAt = studentProposal.UpdatedAt
 				});
 			}
 		}
@@ -506,6 +522,8 @@ public class ProposalController : Controller {
 				return this.View(new EditViewModel {
 					Title = model.Title,
 					Description = model.Description,
+					CreatedAt = studentProposal.CreatedAt,
+					UpdatedAt = studentProposal.UpdatedAt
 				});
 			}
 			if (assistantTeacher3.IsDeactivated) {
@@ -513,6 +531,8 @@ public class ProposalController : Controller {
 				return this.View(new EditViewModel {
 					Title = model.Title,
 					Description = model.Description,
+					CreatedAt = studentProposal.CreatedAt,
+					UpdatedAt = studentProposal.UpdatedAt
 				});
 			}
 		}
@@ -521,6 +541,8 @@ public class ProposalController : Controller {
 			return this.View(new EditViewModel {
 				Title = model.Title,
 				Description = model.Description,
+				CreatedAt = studentProposal.CreatedAt,
+				UpdatedAt = studentProposal.UpdatedAt
 			});
 		}
 		if (assistantTeacher1 is not null && assistantTeacher2 is not null && assistantTeacher1 == assistantTeacher2) {
@@ -528,6 +550,8 @@ public class ProposalController : Controller {
 			return this.View(new EditViewModel {
 				Title = model.Title,
 				Description = model.Description,
+				CreatedAt = studentProposal.CreatedAt,
+				UpdatedAt = studentProposal.UpdatedAt
 			});
 		}
 		if (assistantTeacher1 is not null && assistantTeacher3 is not null && assistantTeacher1 == assistantTeacher3) {
@@ -535,6 +559,8 @@ public class ProposalController : Controller {
 			return this.View(new EditViewModel {
 				Title = model.Title,
 				Description = model.Description,
+				CreatedAt = studentProposal.CreatedAt,
+				UpdatedAt = studentProposal.UpdatedAt
 			});
 		}
 		if (assistantTeacher2 is not null && guideTeacher == assistantTeacher2) {
@@ -542,6 +568,8 @@ public class ProposalController : Controller {
 			return this.View(new EditViewModel {
 				Title = model.Title,
 				Description = model.Description,
+				CreatedAt = studentProposal.CreatedAt,
+				UpdatedAt = studentProposal.UpdatedAt
 			});
 		}
 		if (assistantTeacher2 is not null && assistantTeacher1 is not null && assistantTeacher2 == assistantTeacher1) {
@@ -549,6 +577,8 @@ public class ProposalController : Controller {
 			return this.View(new EditViewModel {
 				Title = model.Title,
 				Description = model.Description,
+				CreatedAt = studentProposal.CreatedAt,
+				UpdatedAt = studentProposal.UpdatedAt
 			});
 		}
 		if (assistantTeacher2 is not null && assistantTeacher3 is not null && assistantTeacher2 == assistantTeacher3) {
@@ -556,6 +586,8 @@ public class ProposalController : Controller {
 			return this.View(new EditViewModel {
 				Title = model.Title,
 				Description = model.Description,
+				CreatedAt = studentProposal.CreatedAt,
+				UpdatedAt = studentProposal.UpdatedAt
 			});
 		}
 		if (assistantTeacher3 is not null && guideTeacher == assistantTeacher3) {
@@ -563,6 +595,8 @@ public class ProposalController : Controller {
 			return this.View(new EditViewModel {
 				Title = model.Title,
 				Description = model.Description,
+				CreatedAt = studentProposal.CreatedAt,
+				UpdatedAt = studentProposal.UpdatedAt
 			});
 		}
 		if (assistantTeacher3 is not null && assistantTeacher1 is not null && assistantTeacher3 == assistantTeacher1) {
@@ -570,6 +604,8 @@ public class ProposalController : Controller {
 			return this.View(new EditViewModel {
 				Title = model.Title,
 				Description = model.Description,
+				CreatedAt = studentProposal.CreatedAt,
+				UpdatedAt = studentProposal.UpdatedAt
 			});
 		}
 		if (assistantTeacher3 is not null && assistantTeacher2 is not null && assistantTeacher3 == assistantTeacher2) {
@@ -577,6 +613,8 @@ public class ProposalController : Controller {
 			return this.View(new EditViewModel {
 				Title = model.Title,
 				Description = model.Description,
+				CreatedAt = studentProposal.CreatedAt,
+				UpdatedAt = studentProposal.UpdatedAt
 			});
 		}
 		studentProposal.Title = model.Title;
@@ -589,7 +627,18 @@ public class ProposalController : Controller {
 		_ = this._dbContext.StudentProposals.Update(studentProposal);
 		_ = await this._dbContext.SaveChangesAsync();
 		this.ViewBag.SuccessMessage = "Tu propuesta ha sido actualizada correctamente.";
-		return this.View(model);
+		var editViewModel = new EditViewModel {
+			Id = studentProposal.Id.ToString(),
+			Title = studentProposal!.Title,
+			Description = studentProposal.Description,
+			GuideTeacher = studentProposal.GuideTeacherOfTheStudentProposal!.Id,
+			AssistantTeacher1 = studentProposal.AssistantTeacher1OfTheStudentProposal?.Id,
+			AssistantTeacher2 = studentProposal.AssistantTeacher2OfTheStudentProposal?.Id,
+			AssistantTeacher3 = studentProposal.AssistantTeacher3OfTheStudentProposal?.Id,
+			CreatedAt = studentProposal.CreatedAt,
+			UpdatedAt = studentProposal.UpdatedAt
+		};
+		return this.View(editViewModel);
 	}
 
 	public async Task<IActionResult> Delete(string id) {
@@ -695,6 +744,7 @@ public class ProposalController : Controller {
 			return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
 		}
 		studentProposal.ProposalStatus = StudentProposal.Status.Sent;
+		studentProposal.UpdatedAt = DateTimeOffset.Now;
 		_ = this._dbContext.StudentProposals.Update(studentProposal);
 		_ = await this._dbContext.SaveChangesAsync();
 		this.TempData["SuccessMessage"] = "Tu propuesta ha sido enviada correctamente.";

@@ -23,7 +23,7 @@
 				@this.Html.HiddenFor(m => m.IsDeactivated)
 				<h6 class="card-subtitle mb-3 text-muted">@this.Html.DisplayFor(m => m.Email)</h6>
 				<div>
-					@this.Html.ActionLink("Volver al inicio", "Index", "Student", new { area = "DirectorTeacher" }, new { @class = "btn btn-secondary" })
+					@this.Html.ActionLink("Cancelar", "Index", "Student", new { area = "DirectorTeacher" }, new { @class = "btn btn-secondary" })
 					@if (!this.Model.IsDeactivated) {
 						<button type="submit" class="btn btn-danger">Desactivar</button>
 					} else {

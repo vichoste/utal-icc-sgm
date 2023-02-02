@@ -17,7 +17,7 @@
 				@this.Html.HiddenFor(m => m.Id)
 				<h6 class="card-subtitle mb-3 text-muted">@this.Html.DisplayFor(m => m.Title)</h6>
 				<div>
-					@this.Html.ActionLink("Volver al inicio", "Index", "Proposal", new { area = "Student" }, new { @class = "btn btn-secondary" })
+					@this.Html.ActionLink("Cancelar", "Index", "Proposal", new { area = "Student" }, new { @class = "btn btn-secondary" })
 					<button type="submit" class="btn btn-danger">Eliminar</button>
 				</div>
 			}

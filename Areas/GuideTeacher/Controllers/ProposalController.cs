@@ -68,4 +68,36 @@ public class ProposalController : Controller {
 		var pageSize = 6;
 		return this.View(PaginatedList<IndexViewModel>.Create((await this._userManager.GetUserAsync(this.User))!.Id, indexViewModels.AsQueryable(), pageNumber ?? 1, pageSize));
 	}
+
+	public new async Task<IActionResult> View(string id) {
+		var teacher = await this._userManager.GetUserAsync(this.User);
+		if (teacher is null) {
+			return this.RedirectToAction("Index", "Home", new { area = "" });
+		}
+		if (teacher.IsDeactivated) {
+			return this.RedirectToAction("Index", "Home", new { area = "" });
+		}
+		var studentProposal = await this._dbContext.StudentProposals.AsNoTracking()
+			.Include(sp => sp.StudentOwnerOfTheStudentProposal).AsNoTracking()
+			.Include(sp => sp.AssistantTeacher1OfTheStudentProposal).AsNoTracking()
+			.Include(sp => sp.AssistantTeacher2OfTheStudentProposal).AsNoTracking()
+			.Include(sp => sp.AssistantTeacher3OfTheStudentProposal).AsNoTracking()
+			.FirstOrDefaultAsync(sp => sp.Id.ToString() == id);
+		if (studentProposal is null) {
+			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
+			return this.RedirectToAction("Index", "Proposal", new { area = "GuideTeacher" });
+		}
+		var viewModel = new ViewModel {
+			Id = id,
+			Title = studentProposal.Title,
+			Description = studentProposal.Description,
+			Student = $"{studentProposal.StudentOwnerOfTheStudentProposal!.FirstName} {studentProposal.StudentOwnerOfTheStudentProposal!.LastName}",
+			AssistantTeacher1 = studentProposal.AssistantTeacher1OfTheStudentProposal is null ? "No asignado" : $"{studentProposal.AssistantTeacher1OfTheStudentProposal!.FirstName} {studentProposal.AssistantTeacher1OfTheStudentProposal!.LastName}",
+			AssistantTeacher2 = studentProposal.AssistantTeacher2OfTheStudentProposal is null ? "No asignado" : $"{studentProposal.AssistantTeacher2OfTheStudentProposal!.FirstName} {studentProposal.AssistantTeacher2OfTheStudentProposal!.LastName}",
+			AssistantTeacher3 = studentProposal.AssistantTeacher3OfTheStudentProposal is null ? "No asignado" : $"{studentProposal.AssistantTeacher3OfTheStudentProposal!.FirstName} {studentProposal.AssistantTeacher3OfTheStudentProposal!.LastName}",
+			CreatedAt = studentProposal.CreatedAt,
+			UpdatedAt = studentProposal.UpdatedAt,
+		};
+		return this.View(viewModel);
+	}
 }
