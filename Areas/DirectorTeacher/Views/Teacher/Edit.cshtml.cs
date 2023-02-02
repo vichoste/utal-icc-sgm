@@ -21,8 +21,8 @@ public class EditViewModel {
 	public bool IsCourseTeacher { get; set; }
 	[Display(Name = "Profesor de comité")]
 	public bool IsCommitteeTeacher { get; set; }
-	[Display(Name = "Creado")]
+	[Display(Name = "Creado"), Required]
 	public DateTimeOffset? CreatedAt { get; set; }
-	[Display(Name = "Actualizado")]
+	[Display(Name = "Actualizado"), Required]
 	public DateTimeOffset? UpdatedAt { get; set; }
 }

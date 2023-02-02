@@ -1,4 +1,5 @@
 ﻿@using Utal.Icc.Sgm
+@using Utal.Icc.Sgm.Models
 @using Utal.Icc.Sgm.Areas.Student.Views.Proposal
 @using Utal.Icc.Sgm.Views.Shared
 
@@ -61,10 +62,11 @@
 									}
 								</td>
 								<td>
-									@this.Html.ActionLink("Editar", "Edit", "Proposal", new { area = "Student", id = item.Id }, new { @class = "btn btn-yellow mb-3"})
-									@this.Html.ActionLink("Eliminar", "Delete", "Proposal", new { area = "Student", id = item.Id }, new { @class = "btn btn-danger mb-3"})
-									@this.Html.ActionLink("Enviar a profesor", "Send", "Proposal", new { area = "Student", id = item.Id }, new { @class = "btn btn-primary mb-3"})
-									@if (item.ProposalStatus == "Accepted") {
+									@if (item.ProposalStatus == StudentProposal.Status.Draft.ToString()) {
+										@this.Html.ActionLink("Editar", "Edit", "Proposal", new { area = "Student", id = item.Id }, new { @class = "btn btn-yellow mb-3"})
+										@this.Html.ActionLink("Eliminar", "Delete", "Proposal", new { area = "Student", id = item.Id }, new { @class = "btn btn-danger mb-3"})
+										@this.Html.ActionLink("Enviar a profesor", "Send", "Proposal", new { area = "Student", id = item.Id }, new { @class = "btn btn-primary mb-3"})
+									} else if (item.ProposalStatus == StudentProposal.Status.Accepted.ToString()) {
 										@this.Html.ActionLink("Confirmar propuesta", "Confirm", "Proposal", new { area = "Student", id = item.Id }, new { @class = "btn btn-success mb-3"})
 									}
 								</td>

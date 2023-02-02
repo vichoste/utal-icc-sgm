@@ -7,6 +7,6 @@ public class ToggleActivationViewModel {
 	public string? Id { get; set; }
 	[DataType(DataType.EmailAddress), Display(Name = "E-mail"), EmailAddress, Required]
 	public string? Email { get; set; }
-	[Display(Name = "Deshabilitado")]
+	[Display(Name = "Deshabilitado"), Required]
 	public bool IsDeactivated { get; set; }
 }

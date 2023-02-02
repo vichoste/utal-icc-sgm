@@ -322,7 +322,7 @@ public class TeacherController : Controller {
 		var transferViewModel = new TransferViewModel {
 			CurrentDirectorTeacherId = currentDirectorTeacher.Id.ToString(),
 			NewDirectorTeacherId = newDirectorTeacher!.Id.ToString(),
-			NewDirectorTeacherEmail = newDirectorTeacher.Email
+			NewDirectorTeacherName = $"{newDirectorTeacher.FirstName} {newDirectorTeacher.LastName}"
 		};
 		return this.View(transferViewModel);
 	}

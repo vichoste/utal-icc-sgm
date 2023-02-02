@@ -15,8 +15,8 @@ public class EditViewModel {
 	public string? Rut { get; set; }
 	[DataType(DataType.EmailAddress), Display(Name = "E-mail"), EmailAddress]
 	public string? Email { get; set; }
-	[Display(Name = "Creado")]
+	[Display(Name = "Creado"), Required]
 	public DateTimeOffset? CreatedAt { get; set; }
-	[Display(Name = "Actualizado")]
+	[Display(Name = "Actualizado"), Required]
 	public DateTimeOffset? UpdatedAt { get; set; }
 }
