@@ -48,8 +48,7 @@ public class ProposalController : Controller {
 		var filteredAndOrderedProposals = orderedProposals.ToList();
 		if (!string.IsNullOrEmpty(searchString)) {
 			filteredAndOrderedProposals = orderedProposals
-				.Where(sp => sp.Title!.ToUpper()
-					.Contains(searchString.ToUpper()))
+				.Where(sp => sp.Title!.ToUpper().Contains(searchString.ToUpper()))
 				.ToList();
 		}
 		var indexViewModels = filteredAndOrderedProposals.Select(sp => new IndexViewModel {

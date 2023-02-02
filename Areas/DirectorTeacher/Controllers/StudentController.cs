@@ -65,7 +65,14 @@ public class StudentController : Controller {
 		};
 		var filteredAndOrderedStudents = orderedStudents.ToList();
 		if (!string.IsNullOrEmpty(searchString)) {
-			filteredAndOrderedStudents = orderedStudents.Where(s => s.FirstName!.ToUpper().Contains(searchString.ToUpper()) || s.LastName!.ToUpper().Contains(searchString.ToUpper()) || s.StudentUniversityId!.ToUpper().Contains(searchString) || s.Rut!.ToUpper().Contains(searchString.ToUpper()) || s.Email == searchString).ToList();
+			filteredAndOrderedStudents = orderedStudents
+				.Where(
+					s => s.FirstName!.ToUpper().Contains(searchString.ToUpper())
+					|| s.LastName!.ToUpper().Contains(searchString.ToUpper())
+					|| s.StudentUniversityId!.ToUpper().Contains(searchString)
+					|| s.Rut!.ToUpper().Contains(searchString.ToUpper())
+					|| s.Email == searchString)
+				.ToList();
 		}
 		var indexViewModels = filteredAndOrderedStudents.Select(s => new IndexViewModel {
 			Id = s.Id,

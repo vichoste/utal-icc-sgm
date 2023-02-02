@@ -56,7 +56,13 @@ public class TeacherController : Controller {
 		};
 		var filteredAndOrderedTeachers = orderedTeachers.ToList();
 		if (!string.IsNullOrEmpty(searchString)) {
-			filteredAndOrderedTeachers = orderedTeachers.Where(t => t.FirstName!.ToUpper().Contains(searchString.ToUpper()) || t.LastName!.ToUpper().Contains(searchString.ToUpper()) || t.Rut!.ToUpper().Contains(searchString.ToUpper()) || t.Email == searchString).ToList();
+			filteredAndOrderedTeachers = orderedTeachers
+				.Where(
+					t => t.FirstName!.ToUpper().Contains(searchString.ToUpper())
+					|| t.LastName!.ToUpper().Contains(searchString.ToUpper())
+					|| t.Rut!.ToUpper().Contains(searchString.ToUpper())
+					|| t.Email == searchString)
+				.ToList();
 		}
 		var indexViewModels = filteredAndOrderedTeachers.Select(async t => new IndexViewModel {
 			Id = t.Id,

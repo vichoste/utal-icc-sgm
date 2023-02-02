@@ -22,9 +22,4 @@
 		<PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<Folder Include="Areas\GuideTeacher\Controllers\" />
-		<Folder Include="Areas\GuideTeacher\Views\" />
-	</ItemGroup>
-
 </Project>
