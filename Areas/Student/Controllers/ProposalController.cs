@@ -71,18 +71,22 @@ public class ProposalController : Controller {
 		}
 		var guideTeachers = (
 			await this._userManager.GetUsersInRoleAsync(Roles.GuideTeacher.ToString()))
+			.Where(gt => !gt.IsDeactivated)
 			.OrderBy(gt => gt.LastName)
 			.ToList();
 		var assistantTeachers1 = (
 			await this._userManager.GetUsersInRoleAsync(Roles.AssistantTeacher.ToString()))
+			.Where(gt => !gt.IsDeactivated)
 			.OrderBy(at => at.LastName)
 			.ToList();
 		var assistantTeachers2 = (
 			await this._userManager.GetUsersInRoleAsync(Roles.AssistantTeacher.ToString()))
+			.Where(gt => !gt.IsDeactivated)
 			.OrderBy(at => at.LastName)
 			.ToList();
 		var assistantTeachers3 = (
 			await this._userManager.GetUsersInRoleAsync(Roles.AssistantTeacher.ToString()))
+			.Where(gt => !gt.IsDeactivated)
 			.OrderBy(at => at.LastName)
 			.ToList();
 		this.ViewData["GuideTeachers"] = guideTeachers.Select(gt => new SelectListItem {
@@ -122,18 +126,22 @@ public class ProposalController : Controller {
 		}
 		var guideTeachers = (
 			await this._userManager.GetUsersInRoleAsync(Roles.GuideTeacher.ToString()))
+			.Where(gt => !gt.IsDeactivated)
 			.OrderBy(gt => gt.LastName)
 			.ToList();
 		var assistantTeachers1 = (
 			await this._userManager.GetUsersInRoleAsync(Roles.AssistantTeacher.ToString()))
+			.Where(gt => !gt.IsDeactivated)
 			.OrderBy(at => at.LastName)
 			.ToList();
 		var assistantTeachers2 = (
 			await this._userManager.GetUsersInRoleAsync(Roles.AssistantTeacher.ToString()))
+			.Where(gt => !gt.IsDeactivated)
 			.OrderBy(at => at.LastName)
 			.ToList();
 		var assistantTeachers3 = (
 			await this._userManager.GetUsersInRoleAsync(Roles.AssistantTeacher.ToString()))
+			.Where(gt => !gt.IsDeactivated)
 			.OrderBy(at => at.LastName)
 			.ToList();
 		this.ViewData["GuideTeachers"] = guideTeachers.Select(gt => new SelectListItem {
@@ -154,12 +162,18 @@ public class ProposalController : Controller {
 		});
 		var guideTeacher = await this._userManager.FindByIdAsync(model.GuideTeacher!.ToString());
 		if (guideTeacher is null) {
-			this.TempData["ErrorMessage"] = "Error al obtener al profesor guía.";
-			return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
+			this.ViewBag.ErrorMessage = "Error al obtener al profesor guía.";
+			return this.View(new CreateViewModel {
+				Title = model.Title,
+				Description = model.Description,
+			});
 		}
 		if (guideTeacher.IsDeactivated) {
-			this.TempData["ErrorMessage"] = $"El profesor guía candidato está desactivado.";
-			return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
+			this.ViewBag.ErrorMessage = $"El profesor guía candidato está desactivado.";
+			return this.View(new CreateViewModel {
+				Title = model.Title,
+				Description = model.Description,
+			});
 		}
 		ApplicationUser? assistantTeacher1 = null;
 		ApplicationUser? assistantTeacher2 = null;
@@ -167,34 +181,52 @@ public class ProposalController : Controller {
 		if (!model.AssistantTeacher1.IsNullOrEmpty()) {
 			assistantTeacher1 = await this._userManager.FindByIdAsync(model.AssistantTeacher1!.ToString());
 			if (assistantTeacher1 is null) {
-				this.TempData["ErrorMessage"] = "Error al obtener al primer profesor co-guía.";
-				return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
+				this.ViewBag.ErrorMessage = "Error al obtener al primer profesor co-guía.";
+				return this.View(new CreateViewModel {
+					Title = model.Title,
+					Description = model.Description,
+				});
 			}
 			if (assistantTeacher1.IsDeactivated) {
-				this.TempData["ErrorMessage"] = $"El primer profesor co-guía está desactivado.";
-				return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
+				this.ViewBag.ErrorMessage = $"El primer profesor co-guía está desactivado.";
+				return this.View(new CreateViewModel {
+					Title = model.Title,
+					Description = model.Description,
+				});
 			}
 		}
 		if (!model.AssistantTeacher2.IsNullOrEmpty()) {
 			assistantTeacher2 = await this._userManager.FindByIdAsync(model.AssistantTeacher2!.ToString());
 			if (assistantTeacher2 is null) {
-				this.TempData["ErrorMessage"] = "Error al obtener al segundo profesor co-guía.";
-				return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
+				this.ViewBag.ErrorMessage = "Error al obtener al segundo profesor co-guía.";
+				return this.View(new CreateViewModel {
+					Title = model.Title,
+					Description = model.Description,
+				});
 			}
 			if (assistantTeacher2.IsDeactivated) {
-				this.TempData["ErrorMessage"] = $"El segundo profesor co-guía está desactivado.";
-				return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
+				this.ViewBag.ErrorMessage = $"El segundo profesor co-guía está desactivado.";
+				return this.View(new CreateViewModel {
+					Title = model.Title,
+					Description = model.Description,
+				});
 			}
 		}
 		if (!model.AssistantTeacher3.IsNullOrEmpty()) {
 			assistantTeacher3 = await this._userManager.FindByIdAsync(model.AssistantTeacher3!.ToString());
 			if (assistantTeacher3 is null) {
-				this.TempData["ErrorMessage"] = "Error al obtener al tercer profesor co-guía.";
-				return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
+				this.ViewBag.ErrorMessage = "Error al obtener al tercer profesor co-guía.";
+				return this.View(new CreateViewModel {
+					Title = model.Title,
+					Description = model.Description,
+				});
 			}
 			if (assistantTeacher3.IsDeactivated) {
-				this.TempData["ErrorMessage"] = $"El tercer profesor co-guía está desactivado.";
-				return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
+				this.ViewBag.ErrorMessage = $"El tercer profesor co-guía está desactivado.";
+				return this.View(new CreateViewModel {
+					Title = model.Title,
+					Description = model.Description,
+				});
 			}
 		}
 		if (assistantTeacher1 is not null && guideTeacher == assistantTeacher1) {
@@ -398,15 +430,6 @@ public class ProposalController : Controller {
 				Description = model.Description,
 			});
 		}
-		var guideTeacher = await this._userManager.FindByIdAsync(model.GuideTeacher!.ToString());
-		if (guideTeacher is null) {
-			this.TempData["ErrorMessage"] = "Error al obtener al profesor guía.";
-			return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
-		}
-		if (guideTeacher.IsDeactivated) {
-			this.TempData["ErrorMessage"] = $"El profesor guía candidato está desactivado.";
-			return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
-		}
 		var studentProposal = await this._dbContext.StudentProposals
 			.Include(sp => sp.StudentOwnerOfTheStudentProposal)
 			.Include(sp => sp.GuideTeacherOfTheStudentProposal)
@@ -418,9 +441,27 @@ public class ProposalController : Controller {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
 			return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
 		}
+		var guideTeacher = await this._userManager.FindByIdAsync(model.GuideTeacher!.ToString());
+		if (guideTeacher is null) {
+			this.ViewBag.ErrorMessage = "Error al obtener al profesor guía.";
+			return this.View(new EditViewModel {
+				Title = model.Title,
+				Description = model.Description,
+			});
+		}
+		if (guideTeacher.IsDeactivated) {
+			this.ViewBag.ErrorMessage = $"El profesor guía candidato está desactivado.";
+			return this.View(new EditViewModel {
+				Title = model.Title,
+				Description = model.Description,
+			});
+		}
 		if (studentProposal.ProposalStatus != StudentProposal.Status.Draft) {
-			this.TempData["ErrorMessage"] = "La propuesta no puede ser editada ya que no es un borrador.";
-			return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
+			this.ViewBag.ErrorMessage = "La propuesta no puede ser editada ya que no es un borrador.";
+			return this.View(new EditViewModel {
+				Title = model.Title,
+				Description = model.Description,
+			});
 		}
 		ApplicationUser? assistantTeacher1 = null;
 		ApplicationUser? assistantTeacher2 = null;
@@ -428,34 +469,52 @@ public class ProposalController : Controller {
 		if (!model.AssistantTeacher1.IsNullOrEmpty()) {
 			assistantTeacher1 = await this._userManager.FindByIdAsync(model.AssistantTeacher1!.ToString());
 			if (assistantTeacher1 is null) {
-				this.TempData["ErrorMessage"] = "Error al obtener al primer profesor co-guía.";
-				return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
+				this.ViewBag.ErrorMessage = "Error al obtener al primer profesor co-guía.";
+				return this.View(new EditViewModel {
+					Title = model.Title,
+					Description = model.Description,
+				});
 			}
 			if (assistantTeacher1.IsDeactivated) {
-				this.TempData["ErrorMessage"] = $"El primer profesor co-guía candidato está desactivado.";
-				return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
+				this.ViewBag.ErrorMessage = $"El primer profesor co-guía candidato está desactivado.";
+				return this.View(new EditViewModel {
+					Title = model.Title,
+					Description = model.Description,
+				});
 			}
 		}
 		if (!model.AssistantTeacher2.IsNullOrEmpty()) {
 			assistantTeacher2 = await this._userManager.FindByIdAsync(model.AssistantTeacher2!.ToString());
 			if (assistantTeacher2 is null) {
-				this.TempData["ErrorMessage"] = "Error al obtener al segundo profesor co-guía.";
-				return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
+				this.ViewBag.ErrorMessage = "Error al obtener al segundo profesor co-guía.";
+				return this.View(new EditViewModel {
+					Title = model.Title,
+					Description = model.Description,
+				});
 			}
 			if (assistantTeacher2.IsDeactivated) {
-				this.TempData["ErrorMessage"] = $"El segundo profesor co-guía candidato está desactivado.";
-				return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
+				this.ViewBag.ErrorMessage = $"El segundo profesor co-guía candidato está desactivado.";
+				return this.View(new EditViewModel {
+					Title = model.Title,
+					Description = model.Description,
+				});
 			}
 		}
 		if (!model.AssistantTeacher3.IsNullOrEmpty()) {
 			assistantTeacher3 = await this._userManager.FindByIdAsync(model.AssistantTeacher3!.ToString());
 			if (assistantTeacher3 is null) {
-				this.TempData["ErrorMessage"] = "Error al obtener al tercer profesor co-guía.";
-				return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
+				this.ViewBag.ErrorMessage = "Error al obtener al tercer profesor co-guía.";
+				return this.View(new EditViewModel {
+					Title = model.Title,
+					Description = model.Description,
+				});
 			}
 			if (assistantTeacher3.IsDeactivated) {
-				this.TempData["ErrorMessage"] = $"El tercer profesor co-guía candidato está desactivado.";
-				return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
+				this.ViewBag.ErrorMessage = $"El tercer profesor co-guía candidato está desactivado.";
+				return this.View(new EditViewModel {
+					Title = model.Title,
+					Description = model.Description,
+				});
 			}
 		}
 		if (assistantTeacher1 is not null && guideTeacher == assistantTeacher1) {

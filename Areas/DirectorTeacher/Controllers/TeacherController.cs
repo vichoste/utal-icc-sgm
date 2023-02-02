@@ -79,7 +79,7 @@ public class TeacherController : Controller {
 		if (teacherSession.IsDeactivated) {
 			return this.RedirectToAction("Index", "Home", new { area = "" });
 		}
-		return this.View();
+		return this.View(new CreateViewModel());
 	}
 
 	[HttpPost, ValidateAntiForgeryToken]
