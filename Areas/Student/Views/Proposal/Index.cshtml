@@ -66,6 +66,8 @@
 										@this.Html.ActionLink("Editar", "Edit", "Proposal", new { area = "Student", id = item.Id }, new { @class = "btn btn-yellow mb-3"})
 										@this.Html.ActionLink("Eliminar", "Delete", "Proposal", new { area = "Student", id = item.Id }, new { @class = "btn btn-danger mb-3"})
 										@this.Html.ActionLink("Enviar", "Send", "Proposal", new { area = "Student", id = item.Id }, new { @class = "btn btn-primary mb-3"})
+									} else if (item.ProposalStatus == StudentProposal.Status.Sent.ToString()) {
+										<p class="text-muted">Debes esperar a que el profesor guía de esta propuesta apruebe o rechace esta propuesta.</p>
 									} else if (item.ProposalStatus == StudentProposal.Status.Accepted.ToString()) {
 										@this.Html.ActionLink("Confirmar propuesta", "Confirm", "Proposal", new { area = "Student", id = item.Id }, new { @class = "btn btn-success mb-3"})
 									}

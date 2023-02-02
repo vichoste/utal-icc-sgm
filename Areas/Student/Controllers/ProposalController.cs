@@ -121,9 +121,9 @@ public class ProposalController : Controller {
 			});
 		}
 		var guideTeachers = (
-	await this._userManager.GetUsersInRoleAsync(Roles.GuideTeacher.ToString()))
-	.OrderBy(gt => gt.LastName)
-	.ToList();
+			await this._userManager.GetUsersInRoleAsync(Roles.GuideTeacher.ToString()))
+			.OrderBy(gt => gt.LastName)
+			.ToList();
 		var assistantTeachers1 = (
 			await this._userManager.GetUsersInRoleAsync(Roles.AssistantTeacher.ToString()))
 			.OrderBy(at => at.LastName)
@@ -154,7 +154,11 @@ public class ProposalController : Controller {
 		});
 		var guideTeacher = await this._userManager.FindByIdAsync(model.GuideTeacher!.ToString());
 		if (guideTeacher is null) {
-			this.TempData["ErrorMessage"] = "Error al obtener al profesor.";
+			this.TempData["ErrorMessage"] = "Error al obtener al profesor guía.";
+			return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
+		}
+		if (guideTeacher.IsDeactivated) {
+			this.TempData["ErrorMessage"] = $"El profesor guía candidato está desactivado.";
 			return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
 		}
 		ApplicationUser? assistantTeacher1 = null;
@@ -163,21 +167,33 @@ public class ProposalController : Controller {
 		if (!model.AssistantTeacher1.IsNullOrEmpty()) {
 			assistantTeacher1 = await this._userManager.FindByIdAsync(model.AssistantTeacher1!.ToString());
 			if (assistantTeacher1 is null) {
-				this.TempData["ErrorMessage"] = "Error al obtener a los involucrados.";
+				this.TempData["ErrorMessage"] = "Error al obtener al primer profesor co-guía.";
+				return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
+			}
+			if (assistantTeacher1.IsDeactivated) {
+				this.TempData["ErrorMessage"] = $"El primer profesor co-guía está desactivado.";
 				return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
 			}
 		}
 		if (!model.AssistantTeacher2.IsNullOrEmpty()) {
 			assistantTeacher2 = await this._userManager.FindByIdAsync(model.AssistantTeacher2!.ToString());
 			if (assistantTeacher2 is null) {
-				this.TempData["ErrorMessage"] = "Error al obtener a los involucrados.";
+				this.TempData["ErrorMessage"] = "Error al obtener al segundo profesor co-guía.";
+				return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
+			}
+			if (assistantTeacher2.IsDeactivated) {
+				this.TempData["ErrorMessage"] = $"El segundo profesor co-guía está desactivado.";
 				return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
 			}
 		}
 		if (!model.AssistantTeacher3.IsNullOrEmpty()) {
 			assistantTeacher3 = await this._userManager.FindByIdAsync(model.AssistantTeacher3!.ToString());
 			if (assistantTeacher3 is null) {
-				this.TempData["ErrorMessage"] = "Error al obtener a los involucrados.";
+				this.TempData["ErrorMessage"] = "Error al obtener al tercer profesor co-guía.";
+				return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
+			}
+			if (assistantTeacher3.IsDeactivated) {
+				this.TempData["ErrorMessage"] = $"El tercer profesor co-guía está desactivado.";
 				return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
 			}
 		}
@@ -272,18 +288,22 @@ public class ProposalController : Controller {
 		}
 		var guideTeachers = (
 			await this._userManager.GetUsersInRoleAsync(Roles.GuideTeacher.ToString()))
+			.Where(gt => !gt.IsDeactivated)
 			.OrderBy(gt => gt.LastName)
 			.ToList();
 		var assistantTeachers1 = (
 			await this._userManager.GetUsersInRoleAsync(Roles.AssistantTeacher.ToString()))
+			.Where(gt => !gt.IsDeactivated)
 			.OrderBy(at => at.LastName)
 			.ToList();
 		var assistantTeachers2 = (
 			await this._userManager.GetUsersInRoleAsync(Roles.AssistantTeacher.ToString()))
+			.Where(gt => !gt.IsDeactivated)
 			.OrderBy(at => at.LastName)
 			.ToList();
 		var assistantTeachers3 = (
 			await this._userManager.GetUsersInRoleAsync(Roles.AssistantTeacher.ToString()))
+			.Where(gt => !gt.IsDeactivated)
 			.OrderBy(at => at.LastName)
 			.ToList();
 		this.ViewData["GuideTeachers"] = guideTeachers.Select(gt => new SelectListItem {
@@ -337,18 +357,22 @@ public class ProposalController : Controller {
 		}
 		var guideTeachers = (
 			await this._userManager.GetUsersInRoleAsync(Roles.GuideTeacher.ToString()))
+			.Where(gt => !gt.IsDeactivated)
 			.OrderBy(gt => gt.LastName)
 			.ToList();
 		var assistantTeachers1 = (
 			await this._userManager.GetUsersInRoleAsync(Roles.AssistantTeacher.ToString()))
+			.Where(gt => !gt.IsDeactivated)
 			.OrderBy(at => at.LastName)
 			.ToList();
 		var assistantTeachers2 = (
 			await this._userManager.GetUsersInRoleAsync(Roles.AssistantTeacher.ToString()))
+			.Where(gt => !gt.IsDeactivated)
 			.OrderBy(at => at.LastName)
 			.ToList();
 		var assistantTeachers3 = (
 			await this._userManager.GetUsersInRoleAsync(Roles.AssistantTeacher.ToString()))
+			.Where(gt => !gt.IsDeactivated)
 			.OrderBy(at => at.LastName)
 			.ToList();
 		this.ViewData["GuideTeachers"] = guideTeachers.Select(gt => new SelectListItem {
@@ -379,9 +403,12 @@ public class ProposalController : Controller {
 			this.TempData["ErrorMessage"] = "Error al obtener al profesor guía.";
 			return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
 		}
+		if (guideTeacher.IsDeactivated) {
+			this.TempData["ErrorMessage"] = $"El profesor guía candidato está desactivado.";
+			return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
+		}
 		var studentProposal = await this._dbContext.StudentProposals
 			.Include(sp => sp.StudentOwnerOfTheStudentProposal)
-			.Where(sp => sp.StudentOwnerOfTheStudentProposal == student && sp.ProposalStatus == StudentProposal.Status.Draft)
 			.Include(sp => sp.GuideTeacherOfTheStudentProposal)
 			.Include(sp => sp.AssistantTeacher1OfTheStudentProposal)
 			.Include(sp => sp.AssistantTeacher2OfTheStudentProposal)
@@ -389,6 +416,10 @@ public class ProposalController : Controller {
 			.FirstOrDefaultAsync(sp => sp.Id.ToString() == model.Id);
 		if (studentProposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
+			return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
+		}
+		if (studentProposal.ProposalStatus != StudentProposal.Status.Draft) {
+			this.TempData["ErrorMessage"] = "La propuesta no puede ser editada ya que no es un borrador.";
 			return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
 		}
 		ApplicationUser? assistantTeacher1 = null;
@@ -400,6 +431,10 @@ public class ProposalController : Controller {
 				this.TempData["ErrorMessage"] = "Error al obtener al primer profesor co-guía.";
 				return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
 			}
+			if (assistantTeacher1.IsDeactivated) {
+				this.TempData["ErrorMessage"] = $"El primer profesor co-guía candidato está desactivado.";
+				return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
+			}
 		}
 		if (!model.AssistantTeacher2.IsNullOrEmpty()) {
 			assistantTeacher2 = await this._userManager.FindByIdAsync(model.AssistantTeacher2!.ToString());
@@ -407,11 +442,19 @@ public class ProposalController : Controller {
 				this.TempData["ErrorMessage"] = "Error al obtener al segundo profesor co-guía.";
 				return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
 			}
+			if (assistantTeacher2.IsDeactivated) {
+				this.TempData["ErrorMessage"] = $"El segundo profesor co-guía candidato está desactivado.";
+				return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
+			}
 		}
 		if (!model.AssistantTeacher3.IsNullOrEmpty()) {
 			assistantTeacher3 = await this._userManager.FindByIdAsync(model.AssistantTeacher3!.ToString());
 			if (assistantTeacher3 is null) {
 				this.TempData["ErrorMessage"] = "Error al obtener al tercer profesor co-guía.";
+				return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
+			}
+			if (assistantTeacher3.IsDeactivated) {
+				this.TempData["ErrorMessage"] = $"El tercer profesor co-guía candidato está desactivado.";
 				return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
 			}
 		}
@@ -568,9 +611,29 @@ public class ProposalController : Controller {
 		}
 		var studentProposal = await this._dbContext.StudentProposals.AsNoTracking()
 			.Where(sp => sp.StudentOwnerOfTheStudentProposal == student && sp.ProposalStatus == StudentProposal.Status.Draft)
+			.Include(sp => sp.GuideTeacherOfTheStudentProposal)
+			.Include(sp => sp.AssistantTeacher1OfTheStudentProposal)
+			.Include(sp => sp.AssistantTeacher2OfTheStudentProposal)
+			.Include(sp => sp.AssistantTeacher3OfTheStudentProposal)
 			.FirstOrDefaultAsync(sp => sp.Id.ToString() == model.Id);
 		if (studentProposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
+			return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
+		}
+		if (studentProposal.GuideTeacherOfTheStudentProposal is not null && studentProposal.GuideTeacherOfTheStudentProposal.IsDeactivated) {
+			this.TempData["ErrorMessage"] = "El profesor guía está desactivado.";
+			return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
+		}
+		if (studentProposal.AssistantTeacher1OfTheStudentProposal is not null && studentProposal.AssistantTeacher1OfTheStudentProposal.IsDeactivated) {
+			this.TempData["ErrorMessage"] = "El profesor co-guía 1 está desactivado.";
+			return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
+		}
+		if (studentProposal.AssistantTeacher2OfTheStudentProposal is not null && studentProposal.AssistantTeacher2OfTheStudentProposal.IsDeactivated) {
+			this.TempData["ErrorMessage"] = "El profesor co-guía 2 está desactivado.";
+			return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
+		}
+		if (studentProposal.AssistantTeacher3OfTheStudentProposal is not null && studentProposal.AssistantTeacher3OfTheStudentProposal.IsDeactivated) {
+			this.TempData["ErrorMessage"] = "El profesor co-guía 3 está desactivado.";
 			return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
 		}
 		studentProposal.ProposalStatus = StudentProposal.Status.Sent;
