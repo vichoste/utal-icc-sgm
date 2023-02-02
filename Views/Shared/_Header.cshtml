@@ -33,7 +33,7 @@
 							<i class="fa-solid fa fa-user-graduate"></i>
 						}
 					</div>
-					<div class="menu-text">¡Hola @((await this.UserManager.GetUserAsync(this.User))!.FirstName)!</div>
+					<div class="menu-text">¡Hola @((await this.UserManager.GetUserAsync(this.User))?.FirstName)!</div>
 				} else {
 					<div class="menu-img">
 						<i class="fa-solid fa-fingerprint"></i>

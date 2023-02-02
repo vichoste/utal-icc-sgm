@@ -95,7 +95,7 @@ public class StudentController : Controller {
 		if (teacherSession.IsDeactivated) {
 			return this.RedirectToAction("Index", "Home", new { area = "" });
 		}
-		return this.View(new CreateViewModel());
+		return this.View(new InputViewModel());
 	}
 
 	[HttpPost]

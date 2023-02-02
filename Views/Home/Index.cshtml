@@ -12,13 +12,13 @@
 <div class="container">
 	<partial name="_Alerts" />
 	<div class="text-center">
-		@if (!this.User.Identity!.IsAuthenticated) {
+		@if (!this.User.Identity!.IsAuthenticated || userSession is null) {
 			<h1 class="display-4">¡Bienvenido!</h1>
 			<h3 class="display-6">Por favor, inicia sesión para ingresar a la plataforma.</h3>
-		} else if (userSession!.IsDeactivated) {
+		} else if (userSession is not null && userSession.IsDeactivated) {
 			<h1 class="display-4">Tu cuenta está desactivada.</h1>
-		} else {
-			<h1 class="display-4">¡Bienvenido @userSession.FirstName!</h1>
+		} else if (userSession is not null) {
+			<h1 class="display-4">¡Bienvenido @(userSession?.FirstName)!</h1>
 		}
 	</div>
 </div>
