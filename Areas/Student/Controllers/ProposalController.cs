@@ -750,4 +750,28 @@ public class ProposalController : Controller {
 		this.TempData["SuccessMessage"] = "Tu propuesta ha sido enviada correctamente.";
 		return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
 	}
+
+	public async Task<IActionResult> ViewRejectionReason(string id) {
+		var student = await this._userManager.GetUserAsync(this.User);
+		if (student is null) {
+			return this.RedirectToAction("Index", "Home", new { area = "" });
+		}
+		if (student.IsDeactivated) {
+			return this.RedirectToAction("Index", "Home", new { area = "" });
+		}
+		var studentProposal = await this._dbContext.StudentProposals.AsNoTracking()
+			.Where(sp => sp.StudentOwnerOfTheStudentProposal == student && sp.ProposalStatus == StudentProposal.Status.Rejected)
+			.FirstOrDefaultAsync(sp => sp.Id.ToString() == id);
+		if (studentProposal is null) {
+			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
+			return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
+		}
+		var viewRejectionReasonViewModel = new ViewRejectionReasonViewModel {
+			Id = id,
+			Title = studentProposal.Title,
+			Description = studentProposal.Description,
+			Reason = studentProposal.RejectionReason
+		};
+		return this.View(viewRejectionReasonViewModel);
+	}
 }

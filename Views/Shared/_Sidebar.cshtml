@@ -127,14 +127,6 @@
 					</div>
 				</div>
 			}
-			@if (this.User.IsInRole(Roles.Teacher.ToString())) {
-				<div class="menu-item">
-					<a href="#" class="menu-link">
-						<span class="menu-icon"><i class="fa fa-user-tie"></i></span>
-						<span class="menu-text">Profesor</span>
-					</a>
-				</div>
-			}
 			@if (this.User.IsInRole(Roles.EngineerStudent.ToString())) {
 				<div class="menu-item">
 					<a href="#" class="menu-link">
