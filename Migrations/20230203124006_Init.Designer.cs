@@ -12,7 +12,7 @@ using Utal.Icc.Sgm.Data;
 namespace Utal.Icc.Sgm.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230201024403_Init")]
+    [Migration("20230203124006_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -288,6 +288,9 @@ namespace Utal.Icc.Sgm.Migrations
 
                     b.Property<int?>("ProposalStatus")
                         .HasColumnType("int");
+
+                    b.Property<string>("RejectionReason")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()

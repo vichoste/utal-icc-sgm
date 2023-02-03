@@ -22,6 +22,7 @@ public class StudentProposal {
 	public virtual ApplicationUser? AssistantTeacher1OfTheStudentProposal { get; set; }
 	public virtual ApplicationUser? AssistantTeacher2OfTheStudentProposal { get; set; }
 	public virtual ApplicationUser? AssistantTeacher3OfTheStudentProposal { get; set; }
+	public string? RejectionReason { get; set; }
 	[Timestamp]
 	public byte[]? RowVersion { get; set; }
 }

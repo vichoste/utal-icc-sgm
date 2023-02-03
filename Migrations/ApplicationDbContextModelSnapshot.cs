@@ -286,6 +286,9 @@ namespace Utal.Icc.Sgm.Migrations
                     b.Property<int?>("ProposalStatus")
                         .HasColumnType("int");
 
+                    b.Property<string>("RejectionReason")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
                         .ValueGeneratedOnAddOrUpdate()

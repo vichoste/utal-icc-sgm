@@ -38,9 +38,9 @@ public class ProposalController : Controller {
 		}
 		this.ViewData["CurrentFilter"] = searchString;
 		var studentProposals = this._dbContext.StudentProposals.AsNoTracking()
+			.Where(sp => sp.GuideTeacherOfTheStudentProposal == teacher && sp.ProposalStatus == StudentProposal.Status.Sent)
 			.Include(sp => sp.GuideTeacherOfTheStudentProposal).AsNoTracking()
-			.Include(sp => sp.StudentOwnerOfTheStudentProposal).AsNoTracking()
-			.Where(sp => sp.GuideTeacherOfTheStudentProposal == teacher && sp.ProposalStatus == StudentProposal.Status.Sent);
+			.Include(sp => sp.StudentOwnerOfTheStudentProposal).AsNoTracking();
 		var orderedProposals = sortOrder switch {
 			"Title" => studentProposals.OrderBy(sp => sp.Title),
 			"TitleDesc" => studentProposals.OrderByDescending(sp => sp.Title),
@@ -78,6 +78,7 @@ public class ProposalController : Controller {
 			return this.RedirectToAction("Index", "Home", new { area = "" });
 		}
 		var studentProposal = await this._dbContext.StudentProposals.AsNoTracking()
+			.Where(sp => sp.GuideTeacherOfTheStudentProposal == teacher && sp.ProposalStatus == StudentProposal.Status.Sent)
 			.Include(sp => sp.StudentOwnerOfTheStudentProposal).AsNoTracking()
 			.Include(sp => sp.AssistantTeacher1OfTheStudentProposal).AsNoTracking()
 			.Include(sp => sp.AssistantTeacher2OfTheStudentProposal).AsNoTracking()
@@ -103,5 +104,51 @@ public class ProposalController : Controller {
 			UpdatedAt = studentProposal.UpdatedAt,
 		};
 		return this.View(viewModel);
+	}
+	public async Task<IActionResult> Reject(string id) {
+		var teacher = await this._userManager.GetUserAsync(this.User);
+		if (teacher is null) {
+			return this.RedirectToAction("Index", "Home", new { area = "" });
+		}
+		if (teacher.IsDeactivated) {
+			return this.RedirectToAction("Index", "Home", new { area = "" });
+		}
+		var studentProposal = await this._dbContext.StudentProposals.AsNoTracking()
+			.Where(sp => sp.GuideTeacherOfTheStudentProposal == teacher && sp.ProposalStatus == StudentProposal.Status.Sent)
+			.FirstOrDefaultAsync(sp => sp.Id.ToString() == id);
+		if (studentProposal is null) {
+			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
+			return this.RedirectToAction("Index", "Proposal", new { area = "GuideTeacher" });
+		}
+		var rejectViewModel = new RejectViewModel {
+			Id = id,
+			Title = studentProposal.Title,
+		};
+		return this.View(rejectViewModel);
+	}
+
+	[HttpPost, ValidateAntiForgeryToken]
+	public async Task<IActionResult> Reject([FromForm] RejectViewModel model) {
+		var teacher = await this._userManager.GetUserAsync(this.User);
+		if (teacher is null) {
+			return this.RedirectToAction("Index", "Home", new { area = "" });
+		}
+		if (teacher.IsDeactivated) {
+			return this.RedirectToAction("Index", "Home", new { area = "" });
+		}
+		var studentProposal = await this._dbContext.StudentProposals.AsNoTracking()
+			.Where(sp => sp.GuideTeacherOfTheStudentProposal == teacher && sp.ProposalStatus == StudentProposal.Status.Sent)
+			.FirstOrDefaultAsync(sp => sp.Id.ToString() == model.Id);
+		if (studentProposal is null) {
+			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
+			return this.RedirectToAction("Index", "Proposal", new { area = "GuideTeacher" });
+		}
+		studentProposal.ProposalStatus = StudentProposal.Status.Rejected;
+		studentProposal.RejectionReason = model.Reason;
+		studentProposal.UpdatedAt = DateTimeOffset.Now;
+		_ = this._dbContext.StudentProposals.Update(studentProposal);
+		_ = await this._dbContext.SaveChangesAsync();
+		this.TempData["SuccessMessage"] = "La propuesta ha sido rechazada correctamente.";
+		return this.RedirectToAction("Index", "Proposal", new { area = "GuideTeacher" });
 	}
 }
