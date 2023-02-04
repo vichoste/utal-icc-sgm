@@ -1,4 +1,6 @@
 ﻿@using Utal.Icc.Sgm.Areas.Student.Views.StudentProposal
+@using Utal.Icc.Sgm.Models
+@using static Utal.Icc.Sgm.Models.ApplicationUser
 
 @model SendViewModel
 
@@ -13,7 +15,7 @@
 			<div class="card">
 				<div class="card-header text-center">@this.ViewData["Title"]</div>
 				<div class="card-body text-center">
-					@using (this.Html.BeginForm("Send", "StudentProposal", new { area = "Student" })) {
+					@using (this.Html.BeginForm("Send", nameof(StudentProposal), new { area = nameof(Roles.Student) })) {
 						@this.Html.AntiForgeryToken()
 						@this.Html.HiddenFor(m => m.Id)
 						@this.Html.HiddenFor(m => m.Title)
@@ -23,7 +25,7 @@
 						<div class="row text-center">
 							<div class="col">
 								<div class="btn-group">
-									@this.Html.ActionLink("No", "Index", "StudentProposal", new { area = "Student" }, new { @class = "btn btn-secondary" })
+									@this.Html.ActionLink("No", "Index", nameof(StudentProposal), new { area = nameof(Roles.Student) }, new { @class = "btn btn-secondary" })
 									<button type="submit" class="btn btn-primary">Sí</button>
 								</div>
 							</div>

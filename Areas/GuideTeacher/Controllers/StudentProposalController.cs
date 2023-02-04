@@ -8,9 +8,11 @@ using Utal.Icc.Sgm.Data;
 
 using Utal.Icc.Sgm.Models;
 
+using static Utal.Icc.Sgm.Models.ApplicationUser;
+
 namespace Utal.Icc.Sgm.Areas.GuideTeacher.Controllers;
 
-[Area("GuideTeacher"), Authorize(Roles = "GuideTeacher")]
+[Area(nameof(Roles.GuideTeacher)), Authorize(Roles = nameof(Roles.GuideTeacher))]
 public class StudentProposalController : Controller {
 	private readonly ApplicationDbContext _dbContext;
 	private readonly UserManager<ApplicationUser> _userManager;
@@ -101,7 +103,7 @@ public class StudentProposalController : Controller {
 			.FirstOrDefaultAsync(sp => sp.Id == id);
 		if (studentProposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
-			return this.RedirectToAction("Index", "StudentProposal", new { area = "GuideTeacher" });
+			return this.RedirectToAction("Index", nameof(StudentProposal), new { area = nameof(Roles.GuideTeacher) });
 		}
 		var viewModel = new ViewModel {
 			Id = id,
@@ -131,7 +133,7 @@ public class StudentProposalController : Controller {
 			.FirstOrDefaultAsync(sp => sp.Id == id);
 		if (studentProposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
-			return this.RedirectToAction("Index", "StudentProposal", new { area = "GuideTeacher" });
+			return this.RedirectToAction("Index", nameof(StudentProposal), new { area = nameof(Roles.GuideTeacher) });
 		}
 		var rejectViewModel = new RejectViewModel {
 			Id = id,
@@ -151,7 +153,7 @@ public class StudentProposalController : Controller {
 			.FirstOrDefaultAsync(sp => sp.Id == model.Id);
 		if (studentProposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
-			return this.RedirectToAction("Index", "StudentProposal", new { area = "GuideTeacher" });
+			return this.RedirectToAction("Index", nameof(StudentProposal), new { area = nameof(Roles.GuideTeacher) });
 		}
 		studentProposal.ProposalStatus = StudentProposal.Status.RejectedByGuideTeacher;
 		studentProposal.RejectionReason = model.Reason;
@@ -159,7 +161,7 @@ public class StudentProposalController : Controller {
 		_ = this._dbContext.StudentProposals.Update(studentProposal);
 		_ = await this._dbContext.SaveChangesAsync();
 		this.TempData["SuccessMessage"] = "La propuesta ha sido rechazada correctamente.";
-		return this.RedirectToAction("Index", "StudentProposal", new { area = "GuideTeacher" });
+		return this.RedirectToAction("Index", nameof(StudentProposal), new { area = nameof(Roles.GuideTeacher) });
 	}
 
 	public async Task<IActionResult> Approve(string id) {
@@ -172,7 +174,7 @@ public class StudentProposalController : Controller {
 			.FirstOrDefaultAsync(sp => sp.Id == id);
 		if (studentProposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
-			return this.RedirectToAction("Index", "StudentProposal", new { area = "GuideTeacher" });
+			return this.RedirectToAction("Index", nameof(StudentProposal), new { area = nameof(Roles.GuideTeacher) });
 		}
 		var approveViewModel = new ApproveViewModel {
 			Id = id,
@@ -192,13 +194,13 @@ public class StudentProposalController : Controller {
 			.FirstOrDefaultAsync(sp => sp.Id == model.Id);
 		if (studentProposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
-			return this.RedirectToAction("Index", "StudentProposal", new { area = "GuideTeacher" });
+			return this.RedirectToAction("Index", nameof(StudentProposal), new { area = nameof(Roles.GuideTeacher) });
 		}
 		studentProposal.ProposalStatus = StudentProposal.Status.ApprovedByGuideTeacher;
 		studentProposal.UpdatedAt = DateTimeOffset.Now;
 		_ = this._dbContext.StudentProposals.Update(studentProposal);
 		_ = await this._dbContext.SaveChangesAsync();
 		this.TempData["SuccessMessage"] = "La propuesta ha sido aceptada correctamente.";
-		return this.RedirectToAction("Index", "StudentProposal", new { area = "GuideTeacher" });
+		return this.RedirectToAction("Index", nameof(StudentProposal), new { area = nameof(Roles.GuideTeacher) });
 	}
 }

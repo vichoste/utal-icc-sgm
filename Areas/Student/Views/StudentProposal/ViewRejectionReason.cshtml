@@ -1,4 +1,6 @@
 ﻿@using Utal.Icc.Sgm.Areas.Student.Views.StudentProposal
+@using Utal.Icc.Sgm.Models
+@using static Utal.Icc.Sgm.Models.ApplicationUser
 
 @model ViewRejectionReasonViewModel
 
@@ -50,7 +52,7 @@
 								<div class="row text-center">
 									<div class="col">
 										<div class="btn-group">
-											@this.Html.ActionLink("Volver", "Index", "StudentProposal", new { area = "Student" }, new { @class = "btn btn-secondary" })
+											@this.Html.ActionLink("Volver", "Index", nameof(StudentProposal), new { area = nameof(Roles.Student) }, new { @class = "btn btn-secondary" })
 										</div>
 									</div>
 								</div>

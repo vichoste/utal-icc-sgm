@@ -11,7 +11,7 @@ using static Utal.Icc.Sgm.Models.ApplicationUser;
 
 namespace Utal.Icc.Sgm.Areas.DirectorTeacher.Controllers;
 
-[Area("DirectorTeacher"), Authorize(Roles = "DirectorTeacher")]
+[Area(nameof(Roles.DirectorTeacher)), Authorize(Roles = nameof(Roles.DirectorTeacher))]
 public class TeacherController : Controller {
 	private readonly UserManager<ApplicationUser> _userManager;
 	private readonly IUserStore<ApplicationUser> _userStore;
@@ -127,7 +127,7 @@ public class TeacherController : Controller {
 		}
 		_ = await this._userManager.AddToRolesAsync(teacher, rankRoles);
 		this.TempData["SuccessMessage"] = "Profesor creado correctamente.";
-		return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
+		return this.RedirectToAction("Index", nameof(Roles.Teacher), new { area = nameof(Roles.DirectorTeacher) });
 	}
 
 	public async Task<IActionResult> Edit(string id) {
@@ -136,7 +136,7 @@ public class TeacherController : Controller {
 		}
 		if (await this.CheckApplicationUser(id) is not ApplicationUser teacher) {
 			this.TempData["ErrorMessage"] = "Error al obtener al profesor.";
-			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
+			return this.RedirectToAction("Index", nameof(Roles.Teacher), new { area = nameof(Roles.DirectorTeacher) });
 		}
 		var editViewModel = new EditViewModel {
 			Id = id,
@@ -162,7 +162,7 @@ public class TeacherController : Controller {
 		}
 		if (await this.CheckApplicationUser(model.Id!) is not ApplicationUser teacher) {
 			this.TempData["ErrorMessage"] = "Error al obtener al profesor.";
-			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
+			return this.RedirectToAction("Index", nameof(Roles.Teacher), new { area = nameof(Roles.DirectorTeacher) });
 		}
 		var roles = (await this._userManager.GetRolesAsync(teacher)).ToList();
 		await this._userStore.SetUserNameAsync(teacher, userName: model.Email, CancellationToken.None);
@@ -234,7 +234,7 @@ public class TeacherController : Controller {
 		}
 		if (await this.CheckApplicationUser(id) is not ApplicationUser teacher) {
 			this.TempData["ErrorMessage"] = "Error al obtener al profesor.";
-			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
+			return this.RedirectToAction("Index", nameof(Roles.Teacher), new { area = nameof(Roles.DirectorTeacher) });
 		}
 		var toggleActivationModel = new ToggleActivationViewModel {
 			Id = teacher.Id,
@@ -251,22 +251,22 @@ public class TeacherController : Controller {
 		}
 		if (await this.CheckApplicationUser(model.Id!) is not ApplicationUser teacher) {
 			this.TempData["ErrorMessage"] = "Error al obtener al profesor.";
-			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
+			return this.RedirectToAction("Index", nameof(Roles.Teacher), new { area = nameof(Roles.DirectorTeacher) });
 		}
 		if (teacher!.Id == this._userManager.GetUserId(this.User)) {
 			this.TempData["ErrorMessage"] = !model.IsDeactivated ? "No te puedes desactivar a tí mismo." : "¡No deberías haber llegado a este punto!";
-			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
+			return this.RedirectToAction("Index", nameof(Roles.Teacher), new { area = nameof(Roles.DirectorTeacher) });
 		}
 		var roles = (await this._userManager.GetRolesAsync(teacher)).ToList();
 		if (roles.Contains(Roles.DirectorTeacher.ToString())) {
 			this.TempData["ErrorMessage"] = !model.IsDeactivated ? "No puedes desactivar al director de carrera actual." : "¡No deberías haber llegado a este punto!";
-			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
+			return this.RedirectToAction("Index", nameof(Roles.Teacher), new { area = nameof(Roles.DirectorTeacher) });
 		}
 		teacher.IsDeactivated = !model.IsDeactivated;
 		teacher.UpdatedAt = DateTimeOffset.Now;
 		_ = await this._userManager.UpdateAsync(teacher);
 		this.TempData["SuccessMessage"] = !model.IsDeactivated ? "Profesor desactivado correctamente." : "Profesor activado correctamente.";
-		return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
+		return this.RedirectToAction("Index", nameof(Roles.Teacher), new { area = nameof(Roles.DirectorTeacher) });
 	}
 
 	public async Task<IActionResult> Transfer(string currentDirectorTeacherId, string newDirectorTeacherId) {
@@ -283,7 +283,7 @@ public class TeacherController : Controller {
 		};
 		if (!check) {
 			this.TempData["ErrorMessage"] = "Revisa los profesores fuente y objetivo antes de hacer la transferencia.";
-			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
+			return this.RedirectToAction("Index", nameof(Roles.Teacher), new { area = nameof(Roles.DirectorTeacher) });
 		}
 		var transferViewModel = new TransferViewModel {
 			CurrentDirectorTeacherId = currentDirectorTeacher!.Id,
@@ -304,20 +304,20 @@ public class TeacherController : Controller {
 		}
 		if (await this.CheckApplicationUser(model.CurrentDirectorTeacherId!) is not ApplicationUser currentDirectorTeacher) {
 			this.TempData["ErrorMessage"] = "Error al obtener al profesor fuente.";
-			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
+			return this.RedirectToAction("Index", nameof(Roles.Teacher), new { area = nameof(Roles.DirectorTeacher) });
 		}
 		var currentDirectorTeacherRoles = (await this._userManager.GetRolesAsync(currentDirectorTeacher)).ToList();
 		if (!currentDirectorTeacherRoles.Contains(Roles.DirectorTeacher.ToString())) {
 			this.TempData["ErrorMessage"] = "El profesor fuente no es director de carrera.";
-			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
+			return this.RedirectToAction("Index", nameof(Roles.Teacher), new { area = nameof(Roles.DirectorTeacher) });
 		}
 		if (await this.CheckApplicationUser(model.NewDirectorTeacherId!) is not ApplicationUser newDirectorTeacher) {
 			this.TempData["ErrorMessage"] = "Error al obtener al profesor objetivo.";
-			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
+			return this.RedirectToAction("Index", nameof(Roles.Teacher), new { area = nameof(Roles.DirectorTeacher) });
 		}
 		if (currentDirectorTeacher == newDirectorTeacher) {
 			this.TempData["ErrorMessage"] = "Ambos profesores involucrados en la transferencia son el mismo.";
-			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
+			return this.RedirectToAction("Index", nameof(Roles.Teacher), new { area = nameof(Roles.DirectorTeacher) });
 		}
 		_ = await this._userManager.RemoveFromRoleAsync(currentDirectorTeacher, Roles.DirectorTeacher.ToString());
 		_ = await this._userManager.AddToRoleAsync(newDirectorTeacher, Roles.DirectorTeacher.ToString());
@@ -325,6 +325,6 @@ public class TeacherController : Controller {
 		newDirectorTeacher.UpdatedAt = DateTimeOffset.Now;
 		_ = await this._userManager.UpdateAsync(currentDirectorTeacher);
 		this.TempData["SuccessMessage"] = "Director de carrera transferido correctamente.";
-		return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
+		return this.RedirectToAction("Index", nameof(Roles.Teacher), new { area = nameof(Roles.DirectorTeacher) });
 	}
 }

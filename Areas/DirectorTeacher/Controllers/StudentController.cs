@@ -17,7 +17,7 @@ using static Utal.Icc.Sgm.Models.ApplicationUser;
 
 namespace Utal.Icc.Sgm.Areas.DirectorTeacher.Controllers;
 
-[Area("DirectorTeacher"), Authorize(Roles = "DirectorTeacher")]
+[Area(nameof(Roles.DirectorTeacher)), Authorize(Roles = nameof(Roles.DirectorTeacher))]
 public class StudentController : Controller {
 	private readonly UserManager<ApplicationUser> _userManager;
 	private readonly IUserStore<ApplicationUser> _userStore;
@@ -134,10 +134,10 @@ public class StudentController : Controller {
 			if (successMessages.Any()) {
 				this.TempData["SuccessMessages"] = successMessages;
 			}
-			return this.RedirectToAction("Index", "Student", new { area = "DirectorTeacher" });
+			return this.RedirectToAction("Index", nameof(Roles.Student), new { area = nameof(Roles.DirectorTeacher) });
 		} catch {
 			this.TempData["ErrorMessage"] = "Error al importar el archivo CSV.";
-			return this.RedirectToAction("Index", "Student", new { area = "DirectorTeacher" });
+			return this.RedirectToAction("Index", nameof(Roles.Student), new { area = nameof(Roles.DirectorTeacher) });
 		}
 	}
 
@@ -147,7 +147,7 @@ public class StudentController : Controller {
 		}
 		if (await this.CheckApplicationUser(id) is not ApplicationUser student) {
 			this.TempData["ErrorMessage"] = "Error al obtener al estudiante.";
-			return this.RedirectToAction("Index", "Student", new { area = "DirectorTeacher" });
+			return this.RedirectToAction("Index", nameof(Roles.Student), new { area = nameof(Roles.DirectorTeacher) });
 		}
 		var editViewModel = new EditViewModel {
 			Id = id,
@@ -169,7 +169,7 @@ public class StudentController : Controller {
 		}
 		if (await this.CheckApplicationUser(model.Id!) is not ApplicationUser student) {
 			this.TempData["ErrorMessage"] = "Error al obtener al estudiante.";
-			return this.RedirectToAction("Index", "Student", new { area = "DirectorTeacher" });
+			return this.RedirectToAction("Index", nameof(Roles.Student), new { area = nameof(Roles.DirectorTeacher) });
 		}
 		await this._userStore.SetUserNameAsync(student, model.Email, CancellationToken.None);
 		await this._emailStore.SetEmailAsync(student, model.Email, CancellationToken.None);
@@ -199,7 +199,7 @@ public class StudentController : Controller {
 		}
 		if (await this.CheckApplicationUser(id) is not ApplicationUser student) {
 			this.TempData["ErrorMessage"] = "Error al obtener al estudiante.";
-			return this.RedirectToAction("Index", "Student", new { area = "DirectorTeacher" });
+			return this.RedirectToAction("Index", nameof(Roles.Student), new { area = nameof(Roles.DirectorTeacher) });
 		}
 		var toggleActivationModel = new ToggleActivationViewModel {
 			Id = student.Id,
@@ -216,12 +216,12 @@ public class StudentController : Controller {
 		}
 		if (await this.CheckApplicationUser(model.Id!) is not ApplicationUser student) {
 			this.TempData["ErrorMessage"] = "Error al obtener al estudiante.";
-			return this.RedirectToAction("Index", "Student", new { area = "DirectorTeacher" });
+			return this.RedirectToAction("Index", nameof(Roles.Student), new { area = nameof(Roles.DirectorTeacher) });
 		}
 		student.IsDeactivated = !model.IsDeactivated;
 		student.UpdatedAt = DateTimeOffset.Now;
 		_ = await this._userManager.UpdateAsync(student);
 		this.TempData["SuccessMessage"] = !model.IsDeactivated ? "Estudiante desactivado correctamente." : "Estudiante activado correctamente.";
-		return this.RedirectToAction("Index", "Student", new { area = "DirectorTeacher" });
+		return this.RedirectToAction("Index", nameof(Roles.Student), new { area = nameof(Roles.DirectorTeacher) });
 	}
 }

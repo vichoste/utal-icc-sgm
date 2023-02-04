@@ -194,7 +194,7 @@ public class StudentProposalController : Controller {
 		_ = await this._dbContext.StudentProposals.AddAsync(studentProposal);
 		_ = await this._dbContext.SaveChangesAsync();
 		this.TempData["SuccessMessage"] = "Tu propuesta ha sido registrada correctamente.";
-		return this.RedirectToAction("Index", "StudentProposal", new { area = "Student" });
+		return this.RedirectToAction("Index", nameof(StudentProposal), new { area = nameof(Roles.Student) });
 	}
 
 	public async Task<IActionResult> Edit(string id) {
@@ -212,7 +212,7 @@ public class StudentProposalController : Controller {
 			.FirstOrDefaultAsync(sp => sp.Id == id);
 		if (studentProposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
-			return this.RedirectToAction("Index", "StudentProposal", new { area = "Student" });
+			return this.RedirectToAction("Index", nameof(StudentProposal), new { area = nameof(Roles.Student) });
 		}
 		var editViewModel = new EditViewModel {
 			Id = id,
@@ -250,7 +250,7 @@ public class StudentProposalController : Controller {
 			.FirstOrDefaultAsync(sp => sp.Id == model.Id);
 		if (studentProposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
-			return this.RedirectToAction("Index", "StudentProposal", new { area = "Student" });
+			return this.RedirectToAction("Index", nameof(StudentProposal), new { area = nameof(Roles.Student) });
 		}
 		if (await this.CheckApplicationUser(model.GuideTeacher!) is not ApplicationUser guideTeacher) {
 			this.ViewBag.WarningMessage = "Revisa tu selección del profesor guía.";
@@ -322,7 +322,7 @@ public class StudentProposalController : Controller {
 			.FirstOrDefaultAsync(sp => sp.Id == id);
 		if (studentProposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
-			return this.RedirectToAction("Index", "StudentProposal", new { area = "Student" });
+			return this.RedirectToAction("Index", nameof(StudentProposal), new { area = nameof(Roles.Student) });
 		}
 		var deleteViewModel = new DeleteViewModel {
 			Id = id,
@@ -341,12 +341,12 @@ public class StudentProposalController : Controller {
 			.FirstOrDefaultAsync(sp => sp.Id == model.Id);
 		if (studentProposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
-			return this.RedirectToAction("Index", "StudentProposal", new { area = "Student" });
+			return this.RedirectToAction("Index", nameof(StudentProposal), new { area = nameof(Roles.Student) });
 		}
 		_ = this._dbContext.StudentProposals.Remove(studentProposal);
 		_ = this._dbContext.SaveChangesAsync();
 		this.TempData["SuccessMessage"] = "Tu propuesta ha sido eliminada correctamente.";
-		return this.RedirectToAction("Index", "StudentProposal", new { area = "Student" });
+		return this.RedirectToAction("Index", nameof(StudentProposal), new { area = nameof(Roles.Student) });
 	}
 
 	public async Task<IActionResult> Send(string id) {
@@ -359,7 +359,7 @@ public class StudentProposalController : Controller {
 			.FirstOrDefaultAsync(sp => sp.Id == id);
 		if (studentProposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
-			return this.RedirectToAction("Index", "StudentProposal", new { area = "Student" });
+			return this.RedirectToAction("Index", nameof(StudentProposal), new { area = nameof(Roles.Student) });
 		}
 		var sendViewModel = new SendViewModel {
 			Id = id,
@@ -383,7 +383,7 @@ public class StudentProposalController : Controller {
 			.FirstOrDefaultAsync(sp => sp.Id == model.Id);
 		if (studentProposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
-			return this.RedirectToAction("Index", "StudentProposal", new { area = "Student" });
+			return this.RedirectToAction("Index", nameof(StudentProposal), new { area = nameof(Roles.Student) });
 		}
 		var teacherCheck = (studentProposal.GuideTeacherOfTheStudentProposal, studentProposal.AssistantTeacher1OfTheStudentProposal, studentProposal.AssistantTeacher2OfTheStudentProposal, studentProposal.AssistantTeacher3OfTheStudentProposal) switch {
 			(ApplicationUser teacher, _, _, _) when teacher.IsDeactivated => "El profesor guía está desactivado.",
@@ -394,14 +394,14 @@ public class StudentProposalController : Controller {
 		};
 		if (teacherCheck is not null) {
 			this.TempData["ErrorMessage"] = teacherCheck;
-			return this.RedirectToAction("Index", "StudentProposal", new { area = "Student" });
+			return this.RedirectToAction("Index", nameof(StudentProposal), new { area = nameof(Roles.Student) });
 		}
 		studentProposal.ProposalStatus = StudentProposal.Status.SentToGuideTeacher;
 		studentProposal.UpdatedAt = DateTimeOffset.Now;
 		_ = this._dbContext.StudentProposals.Update(studentProposal);
 		_ = await this._dbContext.SaveChangesAsync();
 		this.TempData["SuccessMessage"] = "Tu propuesta ha sido enviada correctamente.";
-		return this.RedirectToAction("Index", "StudentProposal", new { area = "Student" });
+		return this.RedirectToAction("Index", nameof(StudentProposal), new { area = nameof(Roles.Student) });
 	}
 
 	public async Task<IActionResult> ViewRejectionReason(string id) {
@@ -414,7 +414,7 @@ public class StudentProposalController : Controller {
 			.FirstOrDefaultAsync(sp => sp.Id == id);
 		if (studentProposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
-			return this.RedirectToAction("Index", "StudentProposal", new { area = "Student" });
+			return this.RedirectToAction("Index", nameof(StudentProposal), new { area = nameof(Roles.Student) });
 		}
 		var viewRejectionReasonViewModel = new ViewRejectionReasonViewModel {
 			Id = id,
@@ -441,7 +441,7 @@ public class StudentProposalController : Controller {
 			.FirstOrDefaultAsync(sp => sp.Id == id);
 		if (studentProposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
-			return this.RedirectToAction("Index", "StudentProposal", new { area = "Student" });
+			return this.RedirectToAction("Index", nameof(StudentProposal), new { area = nameof(Roles.Student) });
 		}
 		var confirmViewModel = new ConfirmViewModel {
 			Id = id,

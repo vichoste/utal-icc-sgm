@@ -2,6 +2,7 @@
 @using Utal.Icc.Sgm.Models
 @using Utal.Icc.Sgm.Areas.Student.Views.StudentProposal
 @using Utal.Icc.Sgm.Views.Shared
+@using static Utal.Icc.Sgm.Models.ApplicationUser
 
 @model PaginatedList<IndexViewModel>
 
@@ -16,10 +17,10 @@
 			<h2>@this.ViewData["Title"]</h2>
 		</div>
 		<div class="col-12 col-md-2 mb-3">
-			@this.Html.ActionLink("Crear propuesta", "Create", "StudentProposal", new { area = "Student" }, new { @class = "btn btn-success"})
+			@this.Html.ActionLink("Crear propuesta", "Create", nameof(StudentProposal), new { area = nameof(Roles.Student) }, new { @class = "btn btn-success"})
 		</div>
 		<div class="col-12 mb-3">
-			<partial name="_Filter" , model=@(new FilterPartialViewModel("Index", "StudentProposal", "Student")) />
+			<partial name="_Filter" , model=@(new FilterPartialViewModel("Index", nameof(StudentProposal), nameof(Roles.Student))) />
 		</div>
 	</div>
 	<div class="row justify-content-center">
@@ -69,15 +70,15 @@
 								</td>
 								<td>
 									@if (item.ProposalStatus == StudentProposal.Status.Draft.ToString()) {
-										@this.Html.ActionLink("Editar", "Edit", "StudentProposal", new { area = "Student", id = item.Id }, new { @class = "btn btn-yellow mb-3"})
-										@this.Html.ActionLink("Eliminar", "Delete", "StudentProposal", new { area = "Student", id = item.Id }, new { @class = "btn btn-danger mb-3"})
-										@this.Html.ActionLink("Enviar", "Send", "StudentProposal", new { area = "Student", id = item.Id }, new { @class = "btn btn-primary mb-3"})
+										@this.Html.ActionLink("Editar", "Edit", nameof(StudentProposal), new { area = nameof(Roles.Student), id = item.Id }, new { @class = "btn btn-yellow mb-3"})
+										@this.Html.ActionLink("Eliminar", "Delete", nameof(StudentProposal), new { area = nameof(Roles.Student), id = item.Id }, new { @class = "btn btn-danger mb-3"})
+										@this.Html.ActionLink("Enviar", "Send", nameof(StudentProposal), new { area = nameof(Roles.Student), id = item.Id }, new { @class = "btn btn-primary mb-3"})
 									} else if (item.ProposalStatus == StudentProposal.Status.SentToGuideTeacher.ToString()) {
 										<p class="text-muted">Debes esperar a que el profesor guía apruebe o rechace esta propuesta.</p>
 									} else if (item.ProposalStatus == StudentProposal.Status.ApprovedByGuideTeacher.ToString()) {
-										@this.Html.ActionLink("Confirmar", "Confirm", "StudentProposal", new { area = "Student", id = item.Id }, new { @class = "btn btn-success mb-3"})
+										@this.Html.ActionLink("Confirmar", "Confirm", nameof(StudentProposal), new { area = nameof(Roles.Student), id = item.Id }, new { @class = "btn btn-success mb-3"})
 									} else if (item.ProposalStatus == StudentProposal.Status.RejectedByGuideTeacher.ToString()) {
-										@this.Html.ActionLink("Ver razón", "ViewRejectionReason", "StudentProposal", new { area = "Student", id = item.Id }, new { @class = "btn btn-danger mb-3"})
+										@this.Html.ActionLink("Ver razón", "ViewRejectionReason", nameof(StudentProposal), new { area = nameof(Roles.Student), id = item.Id }, new { @class = "btn btn-danger mb-3"})
 									}
 								</td>
 							</tr>

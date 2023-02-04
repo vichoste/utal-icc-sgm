@@ -2,6 +2,7 @@
 @using Utal.Icc.Sgm.Models
 @using Utal.Icc.Sgm.Areas.GuideTeacher.Views.Proposal
 @using Utal.Icc.Sgm.Views.Shared
+@using static Utal.Icc.Sgm.Models.ApplicationUser
 
 @model PaginatedList<IndexViewModel>
 
@@ -16,7 +17,7 @@
 			<h2>@this.ViewData["Title"]</h2>
 		</div>
 		<div class="col-12 mb-3">
-			<partial name="_Filter" , model=@(new FilterPartialViewModel("Index", "StudentProposal", "GuideTeacher")) />
+			<partial name="_Filter" , model=@(new FilterPartialViewModel("Index", nameof(StudentProposal), nameof(Roles.GuideTeacher))) />
 		</div>
 	</div>
 	<div class="row justify-content-center">
@@ -66,11 +67,9 @@
 								</td>
 								<td>
 									@if (item.ProposalStatus == StudentProposal.Status.SentToGuideTeacher.ToString()) {
-										@this.Html.ActionLink("Ver", "View", "StudentProposal", new { area = "GuideTeacher", id = item.Id }, new { @class = "btn btn-yellow mb-3"})
+										@this.Html.ActionLink("Ver", "View", nameof(StudentProposal), new { area = nameof(Roles.GuideTeacher), id = item.Id }, new { @class = "btn btn-yellow mb-3"})
 									} else if (item.ProposalStatus == StudentProposal.Status.ApprovedByGuideTeacher.ToString()) {
 										<p class="text-muted">Debes esperar a que el estudiante confirme esta propuesta.</p>
-									} else if (item.ProposalStatus == StudentProposal.Status.Confirmed.ToString()) {
-										<p class="text-success">Confirmada.</p>
 									}
 								</td>
 							</tr>
