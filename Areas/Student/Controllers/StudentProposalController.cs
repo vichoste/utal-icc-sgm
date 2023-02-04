@@ -128,7 +128,7 @@ public class StudentProposalController : Controller {
 	}
 
 	public async Task<IActionResult> Create() {
-		if (await this.CheckStudentSession() is not ApplicationUser student) {
+		if (await this.CheckStudentSession() is null) {
 			return this.RedirectToAction("Index", "Home", new { area = "" });
 		}
 		await this.PopulateTeachers();
