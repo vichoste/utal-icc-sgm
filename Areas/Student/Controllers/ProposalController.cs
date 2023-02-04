@@ -292,6 +292,7 @@ public class ProposalController : Controller {
 			});
 		}
 		var studentProposal = new StudentProposal {
+			Id = Guid.NewGuid().ToString(),
 			Title = model.Title,
 			Description = model.Description,
 			StudentOwnerOfTheStudentProposal = student,
@@ -761,6 +762,7 @@ public class ProposalController : Controller {
 		}
 		var studentProposal = await this._dbContext.StudentProposals.AsNoTracking()
 			.Where(sp => sp.StudentOwnerOfTheStudentProposal == student && sp.ProposalStatus == StudentProposal.Status.Rejected)
+			.Include(sp => sp.GuideTeacherOfTheStudentProposal)
 			.FirstOrDefaultAsync(sp => sp.Id == id);
 		if (studentProposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
@@ -770,7 +772,10 @@ public class ProposalController : Controller {
 			Id = id,
 			Title = studentProposal.Title,
 			Description = studentProposal.Description,
-			Reason = studentProposal.RejectionReason
+			RejectedBy = $"{studentProposal.GuideTeacherOfTheStudentProposal!.FirstName} {studentProposal.GuideTeacherOfTheStudentProposal!.LastName}",
+			Reason = studentProposal.RejectionReason,
+			CreatedAt = studentProposal.CreatedAt,
+			UpdatedAt = studentProposal.UpdatedAt
 		};
 		return this.View(viewRejectionReasonViewModel);
 	}

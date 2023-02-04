@@ -71,7 +71,7 @@
 									} else if (item.ProposalStatus == StudentProposal.Status.Accepted.ToString()) {
 										@this.Html.ActionLink("Confirmar", "Confirm", "Proposal", new { area = "Student", id = item.Id }, new { @class = "btn btn-success mb-3"})
 									} else if (item.ProposalStatus == StudentProposal.Status.Rejected.ToString()) {
-										@this.Html.ActionLink("Ver razón", "ViewRejectionReason", "Proposal", new { area = "Student", id = item.Id }, new { @class = "btn btn-info mb-3"})
+										@this.Html.ActionLink("Ver razón", "ViewRejectionReason", "Proposal", new { area = "Student", id = item.Id }, new { @class = "btn btn-danger mb-3"})
 									}
 								</td>
 							</tr>
