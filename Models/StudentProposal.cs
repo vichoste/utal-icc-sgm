@@ -19,17 +19,18 @@ public class StudentProposal {
 	public DateTimeOffset? CreatedAt { get; set; }
 	public DateTimeOffset? UpdatedAt { get; set; }
 	#endregion
+	#region FKs
 	public virtual ApplicationUser? StudentOwnerOfTheStudentProposal { get; set; }
 	public virtual ApplicationUser? GuideTeacherOfTheStudentProposal { get; set; }
 	public virtual ApplicationUser? AssistantTeacher1OfTheStudentProposal { get; set; }
 	public virtual ApplicationUser? AssistantTeacher2OfTheStudentProposal { get; set; }
 	public virtual ApplicationUser? AssistantTeacher3OfTheStudentProposal { get; set; }
+	#endregion
 	#region Rejected
 	public string? RejectionReason { get; set; }
 	#endregion
 	#region Accepted
 	public bool ConfirmedByStudent { get; set; }
-	public bool ConfirmedByGuideTeacher { get; set; }
 	#endregion
 	[Timestamp]
 	public byte[]? RowVersion { get; set; }

@@ -810,4 +810,69 @@ public class ProposalController : Controller {
 		};
 		return this.View(viewRejectionReasonViewModel);
 	}
+
+	public async Task<IActionResult> Confirm(string id) {
+		var student = await this._userManager.GetUserAsync(this.User);
+		if (student is null) {
+			return this.RedirectToAction("Index", "Home", new { area = "" });
+		}
+		if (student.IsDeactivated) {
+			return this.RedirectToAction("Index", "Home", new { area = "" });
+		}
+		var studentProposal = await this._dbContext.StudentProposals.AsNoTracking()
+			.Where(sp => sp.StudentOwnerOfTheStudentProposal == student && sp.ProposalStatus == StudentProposal.Status.Approved)
+			.Include(sp => sp.GuideTeacherOfTheStudentProposal).AsNoTracking()
+			.Include(sp => sp.AssistantTeacher1OfTheStudentProposal).AsNoTracking()
+			.Include(sp => sp.AssistantTeacher2OfTheStudentProposal).AsNoTracking()
+			.Include(sp => sp.AssistantTeacher3OfTheStudentProposal).AsNoTracking()
+			.FirstOrDefaultAsync(sp => sp.Id == id);
+		if (studentProposal is null) {
+			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
+			return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
+		}
+		var confirmViewModel = new ConfirmViewModel {
+			Id = id,
+			Title = studentProposal.Title,
+			Description = studentProposal.Description,
+			GuideTeacherName = $"{studentProposal.GuideTeacherOfTheStudentProposal!.FirstName} {studentProposal.GuideTeacherOfTheStudentProposal!.LastName}",
+			GuideTeacherEmail = studentProposal.GuideTeacherOfTheStudentProposal!.Email,
+			GuideTeacherOffice = studentProposal.GuideTeacherOfTheStudentProposal!.TeacherOffice,
+			GuideTeacherSchedule = studentProposal.GuideTeacherOfTheStudentProposal!.TeacherSchedule,
+			GuideTeacherSpecialization = studentProposal.GuideTeacherOfTheStudentProposal!.TeacherSpecialization,
+			AssistantTeacher1 = studentProposal.AssistantTeacher1OfTheStudentProposal is not null ? $"{studentProposal.AssistantTeacher1OfTheStudentProposal!.FirstName} {studentProposal.AssistantTeacher1OfTheStudentProposal!.LastName}" : "No asignado",
+			AssistantTeacher2 = studentProposal.AssistantTeacher2OfTheStudentProposal is not null ? $"{studentProposal.AssistantTeacher2OfTheStudentProposal!.FirstName} {studentProposal.AssistantTeacher2OfTheStudentProposal!.LastName}" : "No asignado",
+			AssistantTeacher3 = studentProposal.AssistantTeacher3OfTheStudentProposal is not null ? $"{studentProposal.AssistantTeacher3OfTheStudentProposal!.FirstName} {studentProposal.AssistantTeacher3OfTheStudentProposal!.LastName}" : "No asignado",
+			CreatedAt = studentProposal.CreatedAt,
+			UpdatedAt = studentProposal.UpdatedAt
+		};
+		return this.View(confirmViewModel);
+	}
+
+	[HttpPost, ValidateAntiForgeryToken]
+	public async Task<IActionResult> Confirm([FromForm] ConfirmViewModel model) {
+		var student = await this._userManager.GetUserAsync(this.User);
+		if (student is null) {
+			return this.RedirectToAction("Index", "Home", new { area = "" });
+		}
+		if (student.IsDeactivated) {
+			return this.RedirectToAction("Index", "Home", new { area = "" });
+		}
+		var studentProposal = await this._dbContext.StudentProposals.AsNoTracking()
+			.Where(sp => sp.StudentOwnerOfTheStudentProposal == student && sp.ProposalStatus == StudentProposal.Status.Approved)
+			.Include(sp => sp.GuideTeacherOfTheStudentProposal).AsNoTracking()
+			.Include(sp => sp.AssistantTeacher1OfTheStudentProposal).AsNoTracking()
+			.Include(sp => sp.AssistantTeacher2OfTheStudentProposal).AsNoTracking()
+			.Include(sp => sp.AssistantTeacher3OfTheStudentProposal).AsNoTracking()
+			.FirstOrDefaultAsync(sp => sp.Id == model.Id);
+		if (studentProposal is null) {
+			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
+			return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
+		}
+		studentProposal.ProposalStatus = StudentProposal.Status.Confirmed;
+		studentProposal.UpdatedAt = DateTimeOffset.Now;
+		_ = this._dbContext.StudentProposals.Update(studentProposal);
+		_ = await this._dbContext.SaveChangesAsync();
+		this.TempData["SuccessMessage"] = "Tu propuesta ha sido confirmada correctamente.";
+		return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
+	}
 }

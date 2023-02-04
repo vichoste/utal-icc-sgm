@@ -68,7 +68,9 @@
 									@if (item.ProposalStatus == StudentProposal.Status.Sent.ToString()) {
 										@this.Html.ActionLink("Ver", "View", "Proposal", new { area = "GuideTeacher", id = item.Id }, new { @class = "btn btn-yellow mb-3"})
 									} else if (item.ProposalStatus == StudentProposal.Status.Approved.ToString()) {
-										@this.Html.ActionLink("Confirmar", "Confirm", "Proposal", new { area = "GuideTeacher", id = item.Id }, new { @class = "btn btn-success mb-3"})
+										<p class="text-muted">Debes esperar a que el estudiante confirme esta propuesta.</p>
+									} else if (item.ProposalStatus == StudentProposal.Status.Confirmed.ToString()) {
+										<p class="text-success">Confirmada.</p>
 									}
 								</td>
 							</tr>
