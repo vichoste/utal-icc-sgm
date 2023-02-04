@@ -15,7 +15,6 @@
 				<div class="card-body">
 					@using (this.Html.BeginForm("Teacher", "Profile", new { area = "Account" })) {
 						@this.Html.AntiForgeryToken()
-						@this.Html.HiddenFor(m => m.Id)
 						<div class="row">
 							<div class="col">
 								<div class="form-group mb-3">
