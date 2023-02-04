@@ -30,35 +30,47 @@ public class StudentProposalController : Controller {
 		return applicationUser is null || applicationUser.IsDeactivated ? null! : applicationUser;
 	}
 
-	protected void SetSortParameters(string sortOrder, params string[] sortParameters) {
-		foreach (var sortParameter in sortParameters) {
-			this.ViewData[$"{sortParameter}SortParam"] = sortOrder == sortParameter ? $"{sortParameter}Desc" : sortParameter;
+	protected void SetSortProperties(string sortOrder, params string[] parameters) {
+		foreach (var parameter in parameters) {
+			this.ViewData[$"{parameter}SortParam"] = sortOrder == parameter ? $"{parameter}Desc" : parameter;
 		}
+		this.ViewData["CurrentSort"] = sortOrder;
 	}
 
-	protected IOrderedQueryable<StudentProposal> OrderProposals(string sortOrder, IQueryable<StudentProposal> studentProposals, params string[] sortParameters) {
-		foreach (var sortParameter in sortParameters) {
-			if (sortParameter == sortOrder) {
-				return studentProposals.OrderBy(sp => sp.GetType().GetProperty(sortParameter));
-			} else if ($"{sortParameter}Desc" == sortOrder) {
-				return studentProposals.OrderByDescending(sp => sp.GetType().GetProperty(sortParameter));
+	protected IOrderedQueryable<StudentProposal> OrderProposals(string sortOrder, IQueryable<StudentProposal> studentProposals, params string[] parameters) {
+		foreach (var parameter in parameters) {
+			if (parameter == sortOrder) {
+				return studentProposals.OrderBy(sp => sp.GetType().GetProperty(parameter));
+			} else if ($"{parameter}Desc" == sortOrder) {
+				return studentProposals.OrderByDescending(sp => sp.GetType().GetProperty(parameter));
 			}
 		}
-		return studentProposals.OrderBy(sp => sp.GetType().GetProperty(sortParameters[0]));
+		return studentProposals.OrderBy(sp => sp.GetType().GetProperty(parameters[0]));
 	}
 
-	protected List<StudentProposal> FilterProposals(string searchString, IQueryable<StudentProposal> studentProposals) => !string.IsNullOrEmpty(searchString)
-		? studentProposals
-			.Where(sp => sp.Title!.ToUpper().Contains(searchString.ToUpper()))
-			.ToList()
-		: studentProposals.ToList();
+	protected List<IndexViewModel> FilterProposals(string searchString, string includeProperty, IQueryable<StudentProposal> studentProposals, params string[] parameters) {
+		var result = new List<IndexViewModel>();
+		foreach (var parameter in parameters) {
+			var partials = studentProposals
+					.Where(sp => (sp.GetType().GetProperty(parameter)!.GetValue(sp, null) as string)!.Contains(searchString))
+					.Include(sp => sp.GetType().GetProperty(includeProperty))
+					.Select(sp => new IndexViewModel {
+				Id = sp.Id,
+				Title = sp.Title,
+				Student = $"{(sp.GetType().GetProperty(includeProperty)!.GetValue(sp, null) as ApplicationUser)!.FirstName} {(sp.GetType().GetProperty(includeProperty)!.GetValue(sp, null) as ApplicationUser)!.LastName}",
+				ProposalStatus = sp.ProposalStatus.ToString(),
+			});
+			result.AddRange(partials);
+		}
+		return result;
+	}
 
 	public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
 		if (await this.CheckTeacherSession() is not ApplicationUser teacher) {
 			return this.RedirectToAction("Index", "Home", new { area = "" });
 		}
-		var sortParameters = new[] { "Title", "StudentLastName" };
-		this.SetSortParameters(sortOrder, sortParameters);
+		var properties = new[] { "Title", "StudentLastName" };
+		this.SetSortProperties(sortOrder, properties);
 		if (searchString is not null) {
 			pageNumber = 1;
 		} else {
@@ -70,14 +82,8 @@ public class StudentProposalController : Controller {
 				sp.ProposalStatus == StudentProposal.Status.SentToGuideTeacher
 				|| sp.ProposalStatus == StudentProposal.Status.ApprovedByGuideTeacher))
 			.Include(sp => sp.StudentOwnerOfTheStudentProposal).AsNoTracking();
-		var orderedProposals = this.OrderProposals(sortOrder, studentProposals, sortParameters);
-		var filteredAndOrderedProposals = this.FilterProposals(searchString, orderedProposals);
-		var indexViewModels = filteredAndOrderedProposals.Select(sp => new IndexViewModel {
-			Id = sp.Id,
-			Title = sp.Title,
-			Student = $"{sp.StudentOwnerOfTheStudentProposal!.FirstName} {sp.StudentOwnerOfTheStudentProposal!.LastName}",
-			ProposalStatus = sp.ProposalStatus.ToString(),
-		});
+		var orderedProposals = this.OrderProposals(sortOrder, studentProposals, properties);
+		var indexViewModels = this.FilterProposals(searchString, nameof(StudentProposal.StudentOwnerOfTheStudentProposal), orderedProposals, properties);
 		var pageSize = 6;
 		return this.View(PaginatedList<IndexViewModel>.Create((await this._userManager.GetUserAsync(this.User))!.Id, indexViewModels.AsQueryable(), pageNumber ?? 1, pageSize));
 	}

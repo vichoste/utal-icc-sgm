@@ -26,17 +26,17 @@
 					</a>
 					<div class="menu-submenu">
 						<div class="menu-item">
-							<a href="@this.Url.Action("Index", "Student", new { area = "DirectorTeacher" })" class="menu-link">
+							<a href="@this.Url.Action("Index", nameof(Roles.Student), new { area = nameof(Roles.DirectorTeacher) })" class="menu-link">
 								<span class="menu-text">Estudiantes</span>
 							</a>
 						</div>
 						<div class="menu-item">
-							<a href="@this.Url.Action("Index", "Teacher", new { area = "DirectorTeacher" })" class="menu-link">
+							<a href="@this.Url.Action("Index", nameof(Roles.Teacher), new { area = nameof(Roles.DirectorTeacher) })" class="menu-link">
 								<span class="menu-text">Profesores</span>
 							</a>
 						</div>
 						<div class="menu-item">
-							<a href="@this.Url.Action("Index", "Course", new { area = "DirectorTeacher" })" class="menu-link">
+							<a href="@this.Url.Action("Index", "Course", new { area = nameof(Roles.DirectorTeacher) })" class="menu-link">
 								<span class="menu-text">Cursos</span>
 							</a>
 						</div>
@@ -52,12 +52,12 @@
 					</a>
 					<div class="menu-submenu">
 						<div class="menu-item">
-							<a href="@this.Url.Action("Index", "Request", new { area = "CommitteeTeacher" })" class="menu-link">
+							<a href="@this.Url.Action("Index", "Request", new { area = nameof(Roles.CommitteeTeacher) })" class="menu-link">
 								<span class="menu-text">Solicitudes</span>
 							</a>
 						</div>
 						<div class="menu-item">
-							<a href="@this.Url.Action("Index", "Teacher", new { area = "CommitteeTeacher" })" class="menu-link">
+							<a href="@this.Url.Action("Index", nameof(Roles.Teacher), new { area = nameof(Roles.CommitteeTeacher) })" class="menu-link">
 								<span class="menu-text">Profesores</span>
 							</a>
 						</div>
@@ -73,7 +73,7 @@
 					</a>
 					<div class="menu-submenu">
 						<div class="menu-item">
-							<a href="@this.Url.Action("Index", "Course", new { area = "CourseTeacher" })" class="menu-link">
+							<a href="@this.Url.Action("Index", "Course", new { area = nameof(Roles.CourseTeacher) })" class="menu-link">
 								<span class="menu-text">Mis cursos</span>
 							</a>
 						</div>
@@ -89,22 +89,22 @@
 					</a>
 					<div class="menu-submenu">
 						<div class="menu-item">
-							<a href="@this.Url.Action("Index", "StudentProposal", new { area = "GuideTeacher" })" class="menu-link">
+							<a href="@this.Url.Action("Index", nameof(StudentProposal), new { area = nameof(Roles.GuideTeacher) })" class="menu-link">
 								<span class="menu-text">Propuestas de estudiantes</span>
 							</a>
 						</div>
 						<div class="menu-item">
-							<a href="@this.Url.Action("Index", "GuideTeacherProposal", new { area = "GuideTeacher" })" class="menu-link">
+							<a href="@this.Url.Action("Index", "GuideTeacherProposal", new { area = nameof(Roles.GuideTeacher) })" class="menu-link">
 								<span class="menu-text">Mis propuestas</span>
 							</a>
 						</div>
 						<div class="menu-item">
-							<a href="@this.Url.Action("Index", "Request", new { area = "GuideTeacher" })" class="menu-link">
+							<a href="@this.Url.Action("Index", "Request", new { area = nameof(Roles.GuideTeacher) })" class="menu-link">
 								<span class="menu-text">Nuestras solicitudes</span>
 							</a>
 						</div>
 						<div class="menu-item">
-							<a href="@this.Url.Action("Index", "ThesisStudent", new { area = "GuideTeacher" })" class="menu-link">
+							<a href="@this.Url.Action("Index", nameof(Roles.ThesisStudent), new { area = nameof(Roles.GuideTeacher) })" class="menu-link">
 								<span class="menu-text">Mis memoristas</span>
 							</a>
 						</div>
@@ -120,7 +120,7 @@
 					</a>
 					<div class="menu-submenu">
 						<div class="menu-item">
-							<a href="@this.Url.Action("Index", "ThesisStudent", new { area = "AssistantTeacher" })" class="menu-link">
+							<a href="@this.Url.Action("Index", nameof(Roles.ThesisStudent), new { area = nameof(Roles.AssistantTeacher) })" class="menu-link">
 								<span class="menu-text">Mis memoristas</span>
 							</a>
 						</div>
@@ -152,12 +152,12 @@
 					</a>
 					<div class="menu-submenu">
 						<div class="menu-item">
-							<a href="@this.Url.Action("Index", "Thesis", new { area = "ThesisStudent" })" class="menu-link">
+							<a href="@this.Url.Action("Index", "Thesis", new { area = nameof(Roles.ThesisStudent) })" class="menu-link">
 								<span class="menu-text">Mi memoria de título</span>
 							</a>
 						</div>
 						<div class="menu-item">
-							<a href="@this.Url.Action("Index", "Course", new { area = "ThesisStudent" })" class="menu-link">
+							<a href="@this.Url.Action("Index", "Course", new { area = nameof(Roles.ThesisStudent) })" class="menu-link">
 								<span class="menu-text">Mi curso</span>
 							</a>
 						</div>
@@ -173,17 +173,17 @@
 					</a>
 					<div class="menu-submenu">
 						<div class="menu-item">
-							<a href="@this.Url.Action("Index", "StudentProposal", new { area = "Student" })" class="menu-link">
+							<a href="@this.Url.Action("Index", nameof(StudentProposal), new { area = nameof(Roles.Student) })" class="menu-link">
 								<span class="menu-text">Mis propuestas</span>
 							</a>
 						</div>
 						<div class="menu-item">
-							<a href="@this.Url.Action("Index", "GuideTeacherProposal", new { area = "Student" })" class="menu-link">
+							<a href="@this.Url.Action("Index", "GuideTeacherProposal", new { area = nameof(Roles.Student) })" class="menu-link">
 								<span class="menu-text">Mis postulaciones</span>
 							</a>
 						</div>
 						<div class="menu-item">
-							<a href="@this.Url.Action("Index", "Request", new { area = "Student" })" class="menu-link">
+							<a href="@this.Url.Action("Index", "Request", new { area = nameof(Roles.Student) })" class="menu-link">
 								<span class="menu-text">Nuestras solicitudes</span>
 							</a>
 						</div>

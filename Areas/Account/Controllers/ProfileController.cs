@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 using Utal.Icc.Sgm.Areas.Account.Views.Profile;
 using Utal.Icc.Sgm.Models;
 
+using static Utal.Icc.Sgm.Models.ApplicationUser;
+
 namespace Utal.Icc.Sgm.Areas.Account.Controllers;
 
 [Area("Account")]
@@ -61,7 +63,7 @@ public class ProfileController : Controller {
 		return this.RedirectToAction("Index", "Profile", new { area = "Account" });
 	}
 
-	[Authorize(Roles = "Student")]
+	[Authorize(Roles = nameof(Roles.Student))]
 	public async Task<IActionResult> Student() {
 		var student = await this._userManager.GetUserAsync(this.User);
 		if (student is null) {
@@ -79,7 +81,7 @@ public class ProfileController : Controller {
 		return this.View(studentViewModel);
 	}
 
-	[Authorize(Roles = "Student"), HttpPost, ValidateAntiForgeryToken]
+	[Authorize(Roles = nameof(Roles.Student)), HttpPost, ValidateAntiForgeryToken]
 	public async Task<IActionResult> Student([FromForm] StudentViewModel model) {
 		var student = await this._userManager.GetUserAsync(this.User);
 		if (student is null) {
@@ -103,7 +105,7 @@ public class ProfileController : Controller {
 		return this.View(editViewModel);
 	}
 
-	[Authorize(Roles = "Teacher")]
+	[Authorize(Roles = nameof(Roles.Teacher))]
 	public async Task<IActionResult> Teacher() {
 		var teacher = await this._userManager.GetUserAsync(this.User);
 		if (teacher is null) {
@@ -120,7 +122,7 @@ public class ProfileController : Controller {
 		return this.View(teacherViewModel);
 	}
 
-	[Authorize(Roles = "Teacher"), HttpPost, ValidateAntiForgeryToken]
+	[Authorize(Roles = nameof(Roles.Teacher)), HttpPost, ValidateAntiForgeryToken]
 	public async Task<IActionResult> Teacher([FromForm] TeacherViewModel model) {
 		var teacher = await this._userManager.GetUserAsync(this.User);
 		if (teacher is null) {
