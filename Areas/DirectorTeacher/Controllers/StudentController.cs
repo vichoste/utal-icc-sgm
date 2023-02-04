@@ -6,36 +6,40 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
+
+using NuGet.DependencyResolver;
 
 using Utal.Icc.Sgm.Areas.DirectorTeacher.Views.Student;
 using Utal.Icc.Sgm.Data;
 using Utal.Icc.Sgm.Models;
 
+using static Utal.Icc.Sgm.Models.ApplicationUser;
+
 namespace Utal.Icc.Sgm.Areas.DirectorTeacher.Controllers;
 
 [Area("DirectorTeacher"), Authorize(Roles = "DirectorTeacher")]
 public class StudentController : Controller {
-	private readonly SignInManager<ApplicationUser> _signInManager;
 	private readonly UserManager<ApplicationUser> _userManager;
 	private readonly IUserStore<ApplicationUser> _userStore;
 	private readonly IUserEmailStore<ApplicationUser> _emailStore;
-	private readonly RoleManager<IdentityRole> _roleManager;
-	private readonly ApplicationDbContext _dbContext;
 
-	public StudentController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, RoleManager<IdentityRole> roleManager, ApplicationDbContext dbContext) {
-		this._signInManager = signInManager;
+	public StudentController(UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore) {
 		this._userManager = userManager;
 		this._userStore = userStore;
 		this._emailStore = (IUserEmailStore<ApplicationUser>)this._userStore;
-		this._roleManager = roleManager;
-		this._dbContext = dbContext;
 	}
 
 	public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
+		var teacherSession = await this._userManager.GetUserAsync(this.User);
+		if (teacherSession is null) {
+			return this.RedirectToAction("Index", "Home", new { area = "" });
+		}
+		if (teacherSession.IsDeactivated) {
+			return this.RedirectToAction("Index", "Home", new { area = "" });
+		}
 		this.ViewData["FirstNameSortParam"] = sortOrder == "FirstName" ? "FirstNameDesc" : "FirstName";
 		this.ViewData["LastNameSortParam"] = sortOrder == "LastName" ? "LastNameDesc" : "LastName";
-		this.ViewData["UniversityIdSortParam"] = sortOrder == "UniversityId" ? "UniversityIdDesc" : "UniversityId";
+		this.ViewData["UniversityIdSortParam"] = sortOrder == "StudentUniversityId" ? "UniversityIdDesc" : "StudentUniversityId";
 		this.ViewData["RutSortParam"] = sortOrder == "Rut" ? "RutDesc" : "Rut";
 		this.ViewData["EmailSortParam"] = sortOrder == "Email" ? "EmailDesc" : "Email";
 		this.ViewData["CurrentSort"] = sortOrder;
@@ -45,170 +49,212 @@ public class StudentController : Controller {
 			searchString = currentFilter;
 		}
 		this.ViewData["CurrentFilter"] = searchString;
-		var students = new List<ApplicationUser>();
-		foreach (var applicationUser in this._userManager.Users.Include(a => a.StudentProfile).ToList()) {
-			if (await this._userManager.IsInRoleAsync(applicationUser, Roles.Student.ToString())) {
-				students.Add(applicationUser);
-			}
-		}
-		students = sortOrder switch {
-			"FirstName" => students.OrderBy(a => a.FirstName).ToList(),
-			"FirstNameDesc" => students.OrderByDescending(a => a.FirstName).ToList(),
-			"UniversityId" => students.OrderBy(a => a.StudentProfile!.UniversityId).ToList(),
-			"UniversityIdDesc" => students.OrderByDescending(a => a.StudentProfile!.UniversityId).ToList(),
-			"Rut" => students.OrderBy(a => a.Rut).ToList(),
-			"RutDesc" => students.OrderByDescending(a => a.Rut).ToList(),
-			"Email" => students.OrderBy(a => a.Email).ToList(),
-			"EmailDesc" => students.OrderByDescending(a => a.Email).ToList(),
-			"LastName" => students.OrderBy(a => a.LastName).ToList(),
-			"LastNameDesc" => students.OrderByDescending(a => a.LastName).ToList(),
-			_ => students.OrderBy(a => a.LastName).ToList()
+		var students = await this._userManager.GetUsersInRoleAsync(Roles.Student.ToString());
+		var orderedStudents = sortOrder switch {
+			"FirstName" => students.OrderBy(s => s.FirstName),
+			"FirstNameDesc" => students.OrderByDescending(s => s.FirstName),
+			"StudentUniversityId" => students.OrderBy(s => s.StudentUniversityId),
+			"UniversityIdDesc" => students.OrderByDescending(s => s.StudentUniversityId),
+			"Rut" => students.OrderBy(s => s.Rut),
+			"RutDesc" => students.OrderByDescending(s => s.Rut),
+			"Email" => students.OrderBy(s => s.Email),
+			"EmailDesc" => students.OrderByDescending(s => s.Email),
+			"LastName" => students.OrderBy(s => s.LastName),
+			"LastNameDesc" => students.OrderByDescending(s => s.LastName),
+			_ => students.OrderBy(s => s.LastName)
 		};
+		var filteredAndOrderedStudents = orderedStudents.ToList();
 		if (!string.IsNullOrEmpty(searchString)) {
-			students = students.Where(s => s.FirstName!.ToUpper().Contains(searchString.ToUpper()) || s.LastName!.ToUpper().Contains(searchString.ToUpper()) || s.Rut!.ToUpper().Contains(searchString.ToUpper()) || s.Email == searchString).ToList();
+			filteredAndOrderedStudents = orderedStudents
+				.Where(
+					s => s.FirstName!.ToUpper().Contains(searchString.ToUpper())
+					|| s.LastName!.ToUpper().Contains(searchString.ToUpper())
+					|| s.StudentUniversityId!.ToUpper().Contains(searchString)
+					|| s.Rut!.ToUpper().Contains(searchString.ToUpper())
+					|| s.Email == searchString)
+				.ToList();
 		}
-		var indexViewModels = students.Select(a => new IndexViewModel {
-			Id = a.Id,
-			FirstName = a.FirstName,
-			LastName = a.LastName,
-			UniversityId = a.StudentProfile!.UniversityId,
-			Rut = a.Rut,
-			Email = a.Email
+		var indexViewModels = filteredAndOrderedStudents.Select(s => new IndexViewModel {
+			Id = s.Id,
+			FirstName = s.FirstName,
+			LastName = s.LastName,
+			UniversityId = s.StudentUniversityId,
+			Rut = s.Rut,
+			Email = s.Email,
+			IsDeactivated = s.IsDeactivated
 		});
 		var pageSize = 6;
-		return this.View(PaginatedList<IndexViewModel>.Create(indexViewModels.AsQueryable(), pageNumber ?? 1, pageSize));
+		return this.View(PaginatedList<IndexViewModel>.Create((await this._userManager.GetUserAsync(this.User))!.Id, indexViewModels.AsQueryable(), pageNumber ?? 1, pageSize));
 	}
 
-	public IActionResult Create() => this.View();
+	public async Task<IActionResult> Create() {
+		var teacherSession = await this._userManager.GetUserAsync(this.User);
+		return teacherSession is null
+			? this.RedirectToAction("Index", "Home", new { area = "" })
+			: teacherSession.IsDeactivated ? this.RedirectToAction("Index", "Home", new { area = "" }) : this.View(new InputViewModel());
+	}
 
 	[HttpPost]
-	public async Task<IActionResult> Create([FromForm] CreateViewModel model) {
+	public async Task<IActionResult> Create([FromForm] InputViewModel model) {
+		var teacherSession = await this._userManager.GetUserAsync(this.User);
+		if (teacherSession is null) {
+			return this.RedirectToAction("Index", "Home", new { area = "" });
+		}
+		if (teacherSession.IsDeactivated) {
+			return this.RedirectToAction("Index", "Home", new { area = "" });
+		}
 		try {
 			var errorMessages = new List<string>();
 			var warningMessages = new List<string>();
 			var successMessages = new List<string>();
 			using var reader = new StreamReader(model.CsvFile!.OpenReadStream());
 			using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
-			var records = csv.GetRecords<CreateModel>();
+			var records = csv.GetRecords<CreateViewModel>();
 			foreach (var record in records) {
 				var user = new ApplicationUser {
 					FirstName = record.FirstName,
 					LastName = record.LastName,
-					UserName = record.Email,
-					Email = record.Email,
+					StudentUniversityId = record.UniversityId,
 					Rut = record.Rut,
+					CreatedAt = DateTimeOffset.Now,
+					UpdatedAt = DateTimeOffset.Now
 				};
-				await this._userStore.SetUserNameAsync(user, user.Email, CancellationToken.None);
-				await this._emailStore.SetEmailAsync(user, user.Email, CancellationToken.None);
+				await this._userStore.SetUserNameAsync(user, record.Email, CancellationToken.None);
+				await this._emailStore.SetEmailAsync(user, record.Email, CancellationToken.None);
 				var result = await this._userManager.CreateAsync(user, record!.Password!);
-				if (result.Succeeded) {
-					var roleResult = await this._userManager.AddToRoleAsync(user, Roles.Student.ToString());
-					if (roleResult.Succeeded) {
-						var studentProfile = new StudentProfile {
-							UniversityId = record.UniversityId,
-							ApplicationUser = user
-						};
-						_ = this._dbContext.StudentProfiles.Add(studentProfile);
-						successMessages.Add($"Estudiante {user.Email} creado correctamente.");
-					} else {
-						warningMessages.Add($"Estudiante {user.Email} creado, pero no se le pudo asignar el rol.");
-					}
-				} else {
-					errorMessages.Add($"Error al crear al estudiante {user.Email}");
+				if (!result.Succeeded) {
+					errorMessages.Add($"Estudiante {record.Email} ya existe");
+					continue;
 				}
+				_ = await this._userManager.AddToRoleAsync(user, Roles.Student.ToString());
+				successMessages.Add($"Estudiante {record.Email} creado correctamente.");
 			}
-			_ = await this._dbContext.SaveChangesAsync();
 			if (errorMessages.Any()) {
-				this.ViewBag.ErrorMessages = errorMessages;
-			}
-			if (warningMessages.Any()) {
-				this.ViewBag.WarningMessages = warningMessages;
+				this.TempData["ErrorMessages"] = errorMessages;
 			}
 			if (successMessages.Any()) {
-				this.ViewBag.SuccessMessages = successMessages;
+				this.TempData["SuccessMessages"] = successMessages;
 			}
-			return this.View();
+			return this.RedirectToAction("Index", "Student", new { area = "DirectorTeacher" });
 		} catch {
-			this.ViewBag.ErrorMessage = "Error al importar el archivo CSV.";
-			return this.View();
+			this.TempData["ErrorMessage"] = "Error al importar el archivo CSV.";
+			return this.RedirectToAction("Index", "Student", new { area = "DirectorTeacher" });
 		}
-	} 
+	}
 
-	public IActionResult Edit(string id) {
-		var applicationUser = this._userManager.Users.Include(a => a.StudentProfile).FirstOrDefault(a => a.Id == id);
-		if (applicationUser is null) {
+	public async Task<IActionResult> Edit(string id) {
+		var teacherSession = await this._userManager.GetUserAsync(this.User);
+		if (teacherSession is null) {
+			return this.RedirectToAction("Index", "Home", new { area = "" });
+		}
+		if (teacherSession.IsDeactivated) {
+			return this.RedirectToAction("Index", "Home", new { area = "" });
+		}
+		var student = await this._userManager.FindByIdAsync(id);
+		if (student is null) {
 			this.ViewBag.ErrorMessage = "Error al obtener al estudiante.";
 			return this.View();
 		}
+		if (student.IsDeactivated) {
+			this.TempData["ErrorMessage"] = "El estudiante está desactivado.";
+			return this.RedirectToAction("Index", "Student", new { area = "DirectorTeacher" });
+		}
 		var editViewModel = new EditViewModel {
-			FirstName = applicationUser.FirstName,
-			LastName = applicationUser.LastName,
-			UniversityId = applicationUser!.StudentProfile!.UniversityId,
-			Rut = applicationUser.Rut,
-			Email = applicationUser.Email
+			Id = id,
+			FirstName = student.FirstName,
+			LastName = student.LastName,
+			UniversityId = student.StudentUniversityId,
+			Rut = student.Rut,
+			Email = student.Email,
+			CreatedAt = student.CreatedAt,
+			UpdatedAt = student.UpdatedAt
 		};
 		return this.View(editViewModel);
 	}
 
 	[HttpPost, ValidateAntiForgeryToken]
-	public async Task<IActionResult> Edit(string id, [FromForm] EditViewModel model) {
-		var applicationUser = this._userManager.Users.Include(a => a.StudentProfile).FirstOrDefault(a => a.Id == id);
-		if (applicationUser is null) {
-			this.ViewBag.ErrorMessage = "Error al obtener al estudiante.";
-			return this.View();
+	public async Task<IActionResult> Edit([FromForm] EditViewModel model) {
+		var teacherSession = await this._userManager.GetUserAsync(this.User);
+		if (teacherSession is null) {
+			return this.RedirectToAction("Index", "Home", new { area = "" });
 		}
-		await this._userStore.SetUserNameAsync(applicationUser, userName: model.Email, CancellationToken.None);
-		await this._emailStore.SetEmailAsync(applicationUser, model.Email, CancellationToken.None);
-		applicationUser.FirstName = !model.FirstName.IsNullOrEmpty() ? model.FirstName : applicationUser.FirstName;
-		applicationUser.LastName = !model.LastName.IsNullOrEmpty() ? model.LastName : applicationUser.LastName;
-		applicationUser.Rut = !model.Rut.IsNullOrEmpty() ? model.Rut : applicationUser.Rut;
-		var updateResult = await this._userManager.UpdateAsync(applicationUser);
-		if (updateResult.Succeeded) {
-			applicationUser.StudentProfile!.UniversityId = model.UniversityId;
-			_ = await this._dbContext.SaveChangesAsync();
-			this.ViewBag.SuccessMessage = "Estudiante actualizado con éxito.";
-			return this.View();
+		if (teacherSession.IsDeactivated) {
+			return this.RedirectToAction("Index", "Home", new { area = "" });
 		}
-		if (updateResult.Errors.Any()) {
-			this.ViewBag.ErrorMessages = updateResult.Errors.Select(e => e.Description).ToList();
+		var student = await this._userManager.FindByIdAsync(model.Id!.ToString()!);
+		if (student is null) {
+			this.TempData["ErrorMessage"] = "Error al obtener al estudiante.";
+			return this.RedirectToAction("Index", "Student", new { area = "DirectorTeacher" });
 		}
-		this.ViewBag.ErrorMessage = "Error al actualizar al estudiante.";
-		return this.View();
+		if (student.IsDeactivated) {
+			this.TempData["ErrorMessage"] = "El estudiante está desactivado.";
+			return this.RedirectToAction("Index", "Student", new { area = "DirectorTeacher" });
+		}
+		await this._userStore.SetUserNameAsync(student, model.Email, CancellationToken.None);
+		await this._emailStore.SetEmailAsync(student, model.Email, CancellationToken.None);
+		student.FirstName = model.FirstName;
+		student.LastName = model.LastName;
+		student.StudentUniversityId = model.UniversityId;
+		student.Rut = model.Rut;
+		student.UpdatedAt = DateTimeOffset.Now;
+		_ = await this._userManager.UpdateAsync(student);
+		var editViewModel = new EditViewModel {
+			Id = student.Id,
+			FirstName = student.FirstName,
+			LastName = student.LastName,
+			UniversityId = student.StudentUniversityId,
+			Rut = student.Rut,
+			Email = student.Email,
+			CreatedAt = student.CreatedAt,
+			UpdatedAt = student.UpdatedAt
+		};
+		this.ViewBag.SuccessMessage = "Estudiante actualizado correctamente.";
+		return this.View(editViewModel);
 	}
 
-	public IActionResult Delete(string id) {
-		var applicationUser = this._userManager.Users.FirstOrDefault(a => a.Id == id);
-		if (applicationUser is null) {
-			this.ViewBag.ErrorMessage = "Error al obtener al estudiante.";
-			return this.View();
+	public async Task<IActionResult> ToggleActivation(string id) {
+		var teacherSession = await this._userManager.GetUserAsync(this.User);
+		if (teacherSession is null) {
+			return this.RedirectToAction("Index", "Home", new { area = "" });
 		}
-		var deleteViewModel = new DeleteViewModel {
-			Id = applicationUser.Id,
-			Email = applicationUser.Email
+		if (teacherSession.IsDeactivated) {
+			return this.RedirectToAction("Index", "Home", new { area = "" });
+		}
+		var student = await this._userManager.FindByIdAsync(id);
+		if (student is null) {
+			this.TempData["ErrorMessage"] = "Error al obtener al estudiante.";
+			return this.RedirectToAction("Index", "Student", new { area = "DirectorTeacher" });
+		}
+		var toggleActivationModel = new ToggleActivationViewModel {
+			Id = student.Id,
+			Email = student.Email,
+			IsDeactivated = student.IsDeactivated
 		};
-		return this.View(deleteViewModel);
+		return this.View(toggleActivationModel);
 	}
 
 	[HttpPost, ValidateAntiForgeryToken]
-	public async Task<IActionResult> Delete(string id, [FromForm] DeleteViewModel model) {
-		var applicationUser = this._userManager.Users.Include(a => a.StudentProfile).FirstOrDefault(a => a.Id == id);
-		if (applicationUser is null) {
-			this.ViewBag.ErrorMessage = "Error al obtener al estudiante.";
-			return this.View();
+	public async Task<IActionResult> ToggleActivation([FromForm] ToggleActivationViewModel model) {
+		var teacherSession = await this._userManager.GetUserAsync(this.User);
+		if (teacherSession is null) {
+			return this.RedirectToAction("Index", "Home", new { area = "" });
 		}
-		if (applicationUser!.Id == this._userManager.GetUserId(this.User)) {
-			this.ViewBag.ErrorMessage = "No te puedes eliminar a tí mismo.";
-			return this.View();
+		if (teacherSession.IsDeactivated) {
+			return this.RedirectToAction("Index", "Home", new { area = "" });
 		}
-		_ = this._dbContext.StudentProfiles.Remove(applicationUser.StudentProfile!);
-		_ = await this._dbContext.SaveChangesAsync();
-		var result = await this._userManager.DeleteAsync(applicationUser);
-		if (result.Succeeded) {
-			this.ViewBag.SuccessMessage = "Estudiante eliminado con éxito.";
-			return this.View();
+		var student = await this._userManager.FindByIdAsync(model.Id!.ToString()!);
+		if (student is null) {
+			this.TempData["ErrorMessage"] = "Error al obtener al estudiante.";
+			return this.RedirectToAction("Index", "Student", new { area = "DirectorTeacher" });
 		}
-		this.ViewBag.ErrorMessage = "Error al eliminar al estudiante.";
-		this.ViewBag.ErrorMessages = result.Errors.Select(e => e.Description).ToList();
-		return this.View();
+		if (student!.Id == this._userManager.GetUserId(this.User)) {
+			this.TempData["ErrorMessage"] = !model.IsDeactivated ? "No te puedes desactivar a tí mismo." : "¡No deberías haber llegado a este punto!";
+			return this.RedirectToAction("Index", "Student", new { area = "DirectorTeacher" });
+		}
+		student.IsDeactivated = !model.IsDeactivated;
+		student.UpdatedAt = DateTimeOffset.Now;
+		_ = await this._userManager.UpdateAsync(student);
+		this.TempData["SuccessMessage"] = !model.IsDeactivated ? "Estudiante desactivado correctamente." : "Estudiante activado correctamente.";
+		return this.RedirectToAction("Index", "Student", new { area = "DirectorTeacher" });
 	}
 }

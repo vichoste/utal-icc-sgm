@@ -1,7 +1,24 @@
-﻿@{
+﻿@using Microsoft.AspNetCore.Identity
+
+@using Utal.Icc.Sgm.Models
+
+@inject UserManager<ApplicationUser> UserManager
+
+@{
 	this.ViewData["Title"] = "Inicio";
+	var userSession = await this.UserManager.GetUserAsync(this.User);
 }
 
-<div class="text-center">
-	<h1 class="display-4">¡Hola Mundo!</h1>
+<div class="container">
+	<partial name="_Alerts" />
+	<div class="text-center">
+		@if (!this.User.Identity!.IsAuthenticated || userSession is null) {
+			<h1 class="display-4">¡Bienvenido!</h1>
+			<h3 class="display-6">Por favor, inicia sesión para ingresar a la plataforma.</h3>
+		} else if (userSession is not null && userSession.IsDeactivated) {
+			<h1 class="display-4">Tu cuenta está desactivada.</h1>
+		} else if (userSession is not null) {
+			<h1 class="display-4">¡Bienvenido @(userSession?.FirstName)!</h1>
+		}
+	</div>
 </div>

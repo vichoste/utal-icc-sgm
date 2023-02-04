@@ -13,4 +13,8 @@ public class IndexViewModel {
 	public string? UniversityId { get; set; }
 	[DataType(DataType.EmailAddress), Display(Name = "E-mail"), EmailAddress]
 	public string? Email { get; set; }
+	[Display(Name = "Creado")]
+	public DateTimeOffset? CreatedAt { get; set; }
+	[Display(Name = "Actualizado")]
+	public DateTimeOffset? UpdatedAt { get; set; }
 }

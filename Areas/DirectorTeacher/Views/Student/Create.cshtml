@@ -2,65 +2,18 @@
 
 @using Utal.Icc.Sgm.Areas.DirectorTeacher.Views.Student
 
-@model CreateViewModel
+@model InputViewModel
 
 @{
 	this.ViewData["Title"] = "Importar estudiantes desde CSV";
 }
 
 <div class="container">
-	@if (this.ViewBag.SuccessMessage is not null) {
-		<div class="row justify-content-center">
-			<div class="alert alert-success" role="alert">
-				@this.ViewBag.SuccessMessage
-			</div>
-		</div>
-	}
-	@if (this.ViewBag.SuccessMessages is not null) {
-		@foreach (var success in this.ViewBag.SuccessMessages) {
-			<div class="row justify-content-center">
-				<div class="alert alert-success" role="alert">
-					@success
-				</div>
-			</div>
-		}
-	}
-	@if (this.ViewBag.WarningMessage is not null) {
-		<div class="row justify-content-center">
-			<div class="alert alert-warning" role="alert">
-				@this.ViewBag.WarningMessage
-			</div>
-		</div>
-	}
-	@if (this.ViewBag.WarningMessages is not null) {
-		@foreach (var warning in this.ViewBag.WarningMessages) {
-			<div class="row justify-content-center">
-				<div class="alert alert-warning" role="alert">
-					@warning
-				</div>
-			</div>
-		}
-	}
-	@if (this.ViewBag.ErrorMessage is not null) {
-		<div class="row justify-content-center">
-			<div class="alert alert-danger" role="alert">
-				@this.ViewBag.ErrorMessage
-			</div>
-		</div>
-	}
-	@if (this.ViewBag.ErrorMessages is not null) {
-		@foreach (var error in this.ViewBag.ErrorMessages) {
-			<div class="row justify-content-center">
-				<div class="alert alert-danger" role="alert">
-					@error
-				</div>
-			</div>
-		}
-	}
+	<partial name="_Alerts" />
 	<div class="row justify-content-center">
 		<div class="col-10">
 			<div class="card">
-				<div class="card-header text-center">Importar estudiantes desde CSV</div>
+				<div class="card-header text-center">@this.ViewData["Title"]</div>
 				<div class="card-body">
 					@using (this.Html.BeginForm("Create", "Student", new { area = "DirectorTeacher" }, FormMethod.Post, true, new { @enctype = "multipart/form-data" })) {
 						<div class="row was-validated">
@@ -76,7 +29,7 @@
 							<div class="col">
 								<div class="btn-group">
 									@this.Html.ActionLink("Cancelar", "Index", "Student", new { area = "DirectorTeacher" }, new { @class = "btn btn-secondary" })
-									<button type="submit" class="btn btn-primary">Importar</button>
+									<button type="submit" class="btn btn-success">Importar</button>
 								</div>
 							</div>
 						</div>

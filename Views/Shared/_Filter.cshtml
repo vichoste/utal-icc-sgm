@@ -1,0 +1,12 @@
+﻿@using Utal.Icc.Sgm.Views.Shared
+
+@model FilterPartialViewModel
+
+@using (this.Html.BeginForm(this.Model.Action, this.Model.Controller, new { area = this.Model.Area })) {
+	<div class="form-group">
+		@this.Html.LabelFor(m => m.SearchString, new { @class = "form-label mb-3" })
+		@this.Html.TextBoxFor(m => m.SearchString, new { @class = "form-control mb-3" })
+	</div>
+	<button type="submit" class="btn btn-primary">Filtrar</button>
+	@this.Html.ActionLink("Volver a la lista principal", this.Model.Action, this.Model.Controller, new { area = this.Model.Area }, new { @class = "btn btn-link" })
+}

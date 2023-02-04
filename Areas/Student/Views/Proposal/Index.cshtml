@@ -1,0 +1,113 @@
+﻿@using Utal.Icc.Sgm
+@using Utal.Icc.Sgm.Models
+@using Utal.Icc.Sgm.Areas.Student.Views.Proposal
+@using Utal.Icc.Sgm.Views.Shared
+
+@model PaginatedList<IndexViewModel>
+
+@{
+	this.ViewData["Title"] = "Mis propuestas";
+}
+
+<div class="container">
+	<partial name="_Alerts" />
+	<div class="row justify-content-center">
+		<div class="col-12 col-md-10 mb-3">
+			<h2>@this.ViewData["Title"]</h2>
+		</div>
+		<div class="col-12 col-md-2 mb-3">
+			@this.Html.ActionLink("Crear propuesta", "Create", "Proposal", new { area = "Student" }, new { @class = "btn btn-success"})
+		</div>
+		<div class="col-12 mb-3">
+			<partial name="_Filter" , model=@(new FilterPartialViewModel("Index", "Proposal", "Student")) />
+		</div>
+	</div>
+	<div class="row justify-content-center">
+		<div class="col-12">
+			<div class="table-responsive">
+				@this.Html.HiddenFor(m => m.ApplicationUserId)
+				<table class="table table-bordered">
+					<thead class="table-dark">
+						<tr>
+							<th>
+								<a asp-action="Index" asp-route-sortOrder="@this.ViewData["TitleSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+									Título
+								</a>
+							</th>
+							<th>
+								<a asp-action="Index" asp-route-sortOrder="@this.ViewData["GuideTeacherLastNameSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+									Profesor guía
+								</a>
+							</th>
+							<th>Estado</th>
+							<th>Acciones</th>
+						</tr>
+					</thead>
+					<tbody>
+						@foreach (var item in this.Model) {
+							<tr>
+								<td>@item.Title</td>
+								<td>@item.GuideTeacher</td>
+								<td>
+									@switch (item.ProposalStatus) {
+										case "Draft":
+											<span class="badge bg-secondary">Borrador</span>
+											break;
+										case "Sent":
+											<span class="badge bg-primary">Enviado</span>
+											break;
+										case "Approved":
+											<span class="badge bg-success">Aceptado</span>
+											break;
+										case "Confirmed":
+											<span class="badge bg-success">Confirmado</span>
+											break;
+										case "Rejected":
+											<span class="badge bg-danger">Rechazado</span>
+											break;
+									}
+								</td>
+								<td>
+									@if (item.ProposalStatus == StudentProposal.Status.Draft.ToString()) {
+										@this.Html.ActionLink("Editar", "Edit", "Proposal", new { area = "Student", id = item.Id }, new { @class = "btn btn-yellow mb-3"})
+										@this.Html.ActionLink("Eliminar", "Delete", "Proposal", new { area = "Student", id = item.Id }, new { @class = "btn btn-danger mb-3"})
+										@this.Html.ActionLink("Enviar", "Send", "Proposal", new { area = "Student", id = item.Id }, new { @class = "btn btn-primary mb-3"})
+									} else if (item.ProposalStatus == StudentProposal.Status.Sent.ToString()) {
+										<p class="text-muted">Debes esperar a que el profesor guía apruebe o rechace esta propuesta.</p>
+									} else if (item.ProposalStatus == StudentProposal.Status.Approved.ToString()) {
+										@this.Html.ActionLink("Confirmar", "Confirm", "Proposal", new { area = "Student", id = item.Id }, new { @class = "btn btn-success mb-3"})
+									} else if (item.ProposalStatus == StudentProposal.Status.Rejected.ToString()) {
+										@this.Html.ActionLink("Ver razón", "ViewRejectionReason", "Proposal", new { area = "Student", id = item.Id }, new { @class = "btn btn-danger mb-3"})
+									}
+								</td>
+							</tr>
+						}
+					</tbody>
+				</table>
+				@{
+					var prevDisabled = !this.Model.HasPreviousPage ? "disabled" : "";
+					var nextDisabled = !this.Model.HasNextPage ? "disabled" : "";
+				}
+				<ul class="pagination mb-0">
+					<li class="page-item @prevDisabled">
+						<a asp-action="Index" asp-route-sortOrder="@this.ViewData["CurrentSort"]" asp-route-pageNumber="@(this.Model.PageIndex - 1)" asp-route-currentFilter="@this.ViewData["CurrentFilter"]" class="page-link">
+							Anterior página
+						</a>
+					</li>
+					@for (var i = 0; i < this.Model.TotalPages; i++) {
+						<li class="page-item @(i + 1 == this.Model.PageIndex ? " active" : "")">
+							<a asp-action="Index" asp-route-sortOrder="@this.ViewData["CurrentSort"]" asp-route-pageNumber="@(i + 1)" asp-route-currentFilter="@this.ViewData["CurrentFilter"]" class="page-link">
+								@(i + 1)
+							</a>
+						</li>
+					}
+					<li class="page-item @nextDisabled">
+						<a asp-action="Index" asp-route-sortOrder="@this.ViewData["CurrentSort"]" asp-route-pageNumber="@(this.Model.PageIndex + 1)" asp-route-currentFilter="@this.ViewData["CurrentFilter"]" class="page-link">
+							Siguiente página
+						</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+</div>

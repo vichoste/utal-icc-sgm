@@ -13,6 +13,8 @@ public class IndexViewModel {
 	public string? UniversityId { get; set; }
 	[Display(Name = "RUT")]
 	public string? Rut { get; set; }
-	[Display(Name = "E-mail")]
+	[DataType(DataType.EmailAddress), Display(Name = "E-mail"), EmailAddress]
 	public string? Email { get; set; }
+	[Display(Name = "Deshabilitado")]
+	public bool IsDeactivated { get; set; }
 }

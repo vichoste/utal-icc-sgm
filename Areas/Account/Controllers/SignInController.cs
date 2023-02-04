@@ -20,13 +20,13 @@ public class SignInController : Controller {
 			return this.RedirectToAction("Index", "Home", new { area = "" });
 		}
 		if (!this.ModelState.IsValid) {
-			this.ViewBag.ErrorMessage = "Revisa que los campos estén correctos.";
-			return this.View();
+			this.ViewBag.WarningMessage = "Revisa que los campos estén correctos.";
+			return this.View(new IndexViewModel());
 		}
 		var result = await this._signInManager.PasswordSignInAsync(model.Email!, model.Password!, model.RememberMe, false);
 		if (!result.Succeeded) {
-			this.ViewBag.ErrorMessage = "Error al iniciar sesión.";
-			return this.View();
+			this.ViewBag.ErrorMessage = "Credenciales incorrectas.";
+			return this.View(new IndexViewModel());
 		}
 		return this.RedirectToAction("Index", "Home", new { area = "" });
 	}

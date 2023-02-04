@@ -6,7 +6,7 @@
 	this.ViewData["Title"] = "Error";
 }
 
-<h1 class="text-danger">Error.</h1>
+<h1 class="text-danger">@this.ViewData["Title"]</h1>
 <h2 class="text-danger">Ocurrió un error mientras se procesaba la petición.</h2>
 
 @if (this.Model.ShowRequestId) {

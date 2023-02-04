@@ -1,36 +1,38 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 
 using Utal.Icc.Sgm.Areas.DirectorTeacher.Views.Teacher;
 using Utal.Icc.Sgm.Data;
 using Utal.Icc.Sgm.Models;
 
+using static Utal.Icc.Sgm.Models.ApplicationUser;
+
 namespace Utal.Icc.Sgm.Areas.DirectorTeacher.Controllers;
 
 [Area("DirectorTeacher"), Authorize(Roles = "DirectorTeacher")]
 public class TeacherController : Controller {
-	private readonly SignInManager<ApplicationUser> _signInManager;
 	private readonly UserManager<ApplicationUser> _userManager;
 	private readonly IUserStore<ApplicationUser> _userStore;
 	private readonly IUserEmailStore<ApplicationUser> _emailStore;
-	private readonly RoleManager<IdentityRole> _roleManager;
-	private readonly ApplicationDbContext _dbContext;
 
-	public TeacherController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, RoleManager<IdentityRole> roleManager, ApplicationDbContext dbContext) {
-		this._signInManager = signInManager;
+	public TeacherController(UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore) {
 		this._userManager = userManager;
 		this._userStore = userStore;
 		this._emailStore = (IUserEmailStore<ApplicationUser>)this._userStore;
-		this._roleManager = roleManager;
-		this._dbContext = dbContext;
 	}
 
 	public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
+		var teacherSession = await this._userManager.GetUserAsync(this.User);
+		if (teacherSession is null) {
+			return this.RedirectToAction("Index", "Home", new { area = "" });
+		}
+		if (teacherSession.IsDeactivated) {
+			return this.RedirectToAction("Index", "Home", new { area = "" });
+		}
 		this.ViewData["FirstNameSortParam"] = sortOrder == "FirstName" ? "FirstNameDesc" : "FirstName";
 		this.ViewData["LastNameSortParam"] = sortOrder == "LastName" ? "LastNameDesc" : "LastName";
+		this.ViewData["UniversityIdSortParam"] = sortOrder == "StudentUniversityId" ? "UniversityIdDesc" : "StudentUniversityId";
 		this.ViewData["RutSortParam"] = sortOrder == "Rut" ? "RutDesc" : "Rut";
 		this.ViewData["EmailSortParam"] = sortOrder == "Email" ? "EmailDesc" : "Email";
 		this.ViewData["CurrentSort"] = sortOrder;
@@ -40,105 +42,117 @@ public class TeacherController : Controller {
 			searchString = currentFilter;
 		}
 		this.ViewData["CurrentFilter"] = searchString;
-		var teachers = new List<ApplicationUser>();
-		foreach (var applicationUser in this._userManager.Users.Include(a => a.TeacherProfile).ToList()) {
-			if (await this._userManager.IsInRoleAsync(applicationUser, Roles.Teacher.ToString())) {
-				teachers.Add(applicationUser);
-			}
-		}
-		teachers = sortOrder switch {
-			"FirstName" => teachers.OrderBy(a => a.FirstName).ToList(),
-			"FirstNameDesc" => teachers.OrderByDescending(a => a.FirstName).ToList(),
-			"Rut" => teachers.OrderBy(a => a.Rut).ToList(),
-			"RutDesc" => teachers.OrderByDescending(a => a.Rut).ToList(),
-			"Email" => teachers.OrderBy(a => a.Email).ToList(),
-			"EmailDesc" => teachers.OrderByDescending(a => a.Email).ToList(),
-			"LastName" => teachers.OrderBy(a => a.LastName).ToList(),
-			"LastNameDesc" => teachers.OrderByDescending(a => a.LastName).ToList(),
-			_ => teachers.OrderBy(a => a.LastName).ToList()
+		var teachers = await this._userManager.GetUsersInRoleAsync(Roles.Teacher.ToString());
+		var orderedTeachers = sortOrder switch {
+			"FirstName" => teachers.OrderBy(t => t.FirstName),
+			"FirstNameDesc" => teachers.OrderByDescending(t => t.FirstName),
+			"Rut" => teachers.OrderBy(t => t.Rut),
+			"RutDesc" => teachers.OrderByDescending(t => t.Rut),
+			"Email" => teachers.OrderBy(t => t.Email),
+			"EmailDesc" => teachers.OrderByDescending(t => t.Email),
+			"LastName" => teachers.OrderBy(t => t.LastName),
+			"LastNameDesc" => teachers.OrderByDescending(t => t.LastName),
+			_ => teachers.OrderBy(t => t.LastName)
 		};
+		var filteredAndOrderedTeachers = orderedTeachers.ToList();
 		if (!string.IsNullOrEmpty(searchString)) {
-			teachers = teachers.Where(s => s.FirstName!.ToUpper().Contains(searchString.ToUpper()) || s.LastName!.ToUpper().Contains(searchString.ToUpper()) || s.Rut!.ToUpper().Contains(searchString.ToUpper()) || s.Email == searchString).ToList();
+			filteredAndOrderedTeachers = orderedTeachers
+				.Where(
+					t => t.FirstName!.ToUpper().Contains(searchString.ToUpper())
+					|| t.LastName!.ToUpper().Contains(searchString.ToUpper())
+					|| t.Rut!.ToUpper().Contains(searchString.ToUpper())
+					|| t.Email == searchString)
+				.ToList();
 		}
-		var indexViewModels = teachers.Select(async a => new IndexViewModel {
-			Id = a.Id,
-			FirstName = a.FirstName,
-			LastName = a.LastName,
-			Rut = a.Rut,
-			Email = a.Email,
-			IsDirectorTeacher = await this._userManager.IsInRoleAsync(a, Roles.DirectorTeacher.ToString()),
+		var indexViewModels = filteredAndOrderedTeachers.Select(async t => new IndexViewModel {
+			Id = t.Id,
+			FirstName = t.FirstName,
+			LastName = t.LastName,
+			Rut = t.Rut,
+			Email = t.Email,
+			IsDirectorTeacher = await this._userManager.IsInRoleAsync(t, Roles.DirectorTeacher.ToString()),
+			IsDeactivated = t.IsDeactivated
 		}).Select(t => t.Result);
 		var pageSize = 6;
-		return this.View(PaginatedList<IndexViewModel>.Create(indexViewModels.AsQueryable(), pageNumber ?? 1, pageSize));
+		return this.View(PaginatedList<IndexViewModel>.Create((await this._userManager.GetUserAsync(this.User))!.Id, indexViewModels.AsQueryable(), pageNumber ?? 1, pageSize));
 	}
 
-	public IActionResult Create() => this.View();
+	public async Task<IActionResult> Create() {
+		var teacherSession = await this._userManager.GetUserAsync(this.User);
+		return teacherSession is null
+			? this.RedirectToAction("Index", "Home", new { area = "" })
+			: teacherSession.IsDeactivated ? this.RedirectToAction("Index", "Home", new { area = "" }) : this.View(new CreateViewModel());
+	}
 
 	[HttpPost, ValidateAntiForgeryToken]
 	public async Task<IActionResult> Create([FromForm] CreateViewModel model) {
-		if (!this.ModelState.IsValid) {
-			this.ViewBag.ErrorMessage = "Revisa que los campos estén correctos.";
-			return this.View();
+		var teacherSession = await this._userManager.GetUserAsync(this.User);
+		if (teacherSession is null) {
+			return this.RedirectToAction("Index", "Home", new { area = "" });
 		}
-		var applicationUser = new ApplicationUser {
+		if (teacherSession.IsDeactivated) {
+			return this.RedirectToAction("Index", "Home", new { area = "" });
+		}
+		if (!this.ModelState.IsValid) {
+			this.ViewBag.WarningMessage = "Revisa que los campos estén correctos.";
+			return this.View(model);
+		}
+		var teacher = new ApplicationUser {
 			FirstName = model.FirstName,
 			LastName = model.LastName,
 			Rut = model.Rut,
+			CreatedAt = DateTimeOffset.Now,
+			UpdatedAt = DateTimeOffset.Now
 		};
-		await this._userStore.SetUserNameAsync(applicationUser, model.Email, CancellationToken.None);
-		await this._emailStore.SetEmailAsync(applicationUser, model.Email, CancellationToken.None);
-		var createResult = await this._userManager.CreateAsync(applicationUser, model.Password!);
-		if (createResult.Succeeded) {
-			var rolesResult = await this._userManager.AddToRoleAsync(applicationUser, "Teacher");
-			var rankRoles = new List<string>();
-			if (model.IsGuideTeacher) {
-				rankRoles.Add(Roles.GuideTeacher.ToString());
-			}
-			if (model.IsAssistantTeacher) {
-				rankRoles.Add(Roles.AssistantTeacher.ToString());
-			}
-			if (model.IsCourseTeacher) {
-				rankRoles.Add(Roles.CourseTeacher.ToString());
-			}
-			if (model.IsCommitteeTeacher) {
-				rankRoles.Add(Roles.CommitteeTeacher.ToString());
-			}
-			var rankRolesResult = await this._userManager.AddToRolesAsync(applicationUser, rankRoles);
-			if (rolesResult.Succeeded && rankRolesResult.Succeeded) {
-				var teacherProfile = new TeacherProfile {
-					ApplicationUser = applicationUser
-				};
-				_ = this._dbContext.TeacherProfiles.Add(teacherProfile);
-				_ = await this._dbContext.SaveChangesAsync();
-				this.ViewBag.SuccessMessage = "Profesor creado con éxito.";
-				this.ModelState.Clear();
-				return this.View();
-			}
-			this.ViewBag.WarningMessage = "Profesor creado, pero no se le pudo asignar el rol.";
-			this.ViewBag.WarningMessages = rolesResult.Errors.Select(w => w.Description).ToList();
-			this.ModelState.Clear();
-			return this.View();
+		await this._userStore.SetUserNameAsync(teacher, model.Email, CancellationToken.None);
+		await this._emailStore.SetEmailAsync(teacher, model.Email, CancellationToken.None);
+		_ = await this._userManager.CreateAsync(teacher, model.Password!);
+		_ = await this._userManager.AddToRoleAsync(teacher, Roles.Teacher.ToString());
+		var rankRoles = new List<string>();
+		if (model.IsGuideTeacher) {
+			rankRoles.Add(Roles.GuideTeacher.ToString());
 		}
-		if (createResult.Errors.Any()) {
-			this.ViewBag.ErrorMessages = createResult.Errors.Select(e => e.Description).ToList();
+		if (model.IsAssistantTeacher) {
+			rankRoles.Add(Roles.AssistantTeacher.ToString());
 		}
-		this.ViewBag.ErrorMessage = "Error al crear el profesor.";
-		return this.View();
+		if (model.IsCourseTeacher) {
+			rankRoles.Add(Roles.CourseTeacher.ToString());
+		}
+		if (model.IsCommitteeTeacher) {
+			rankRoles.Add(Roles.CommitteeTeacher.ToString());
+		}
+		_ = await this._userManager.AddToRolesAsync(teacher, rankRoles);
+		this.TempData["SuccessMessage"] = "Profesor creado correctamente.";
+		return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
 	}
 
 	public async Task<IActionResult> Edit(string id) {
-		var applicationUser = this._userManager.Users.Include(a => a.TeacherProfile).FirstOrDefault(a => a.Id == id);
-		if (applicationUser is null) {
-			this.ViewBag.ErrorMessage = "Error al obtener al profesor.";
-			return this.View();
+		var teacherSession = await this._userManager.GetUserAsync(this.User);
+		if (teacherSession is null) {
+			return this.RedirectToAction("Index", "Home", new { area = "" });
+		}
+		if (teacherSession.IsDeactivated) {
+			return this.RedirectToAction("Index", "Home", new { area = "" });
+		}
+		var teacher = await this._userManager.FindByIdAsync(id);
+		if (teacher is null) {
+			this.TempData["ErrorMessage"] = "Error al obtener al profesor.";
+			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
+		}
+		if (teacher.IsDeactivated) {
+			this.TempData["ErrorMessage"] = "El profesor está desactivado.";
+			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
 		}
 		var editViewModel = new EditViewModel {
-			FirstName = applicationUser.FirstName,
-			LastName = applicationUser.LastName,
-			Rut = applicationUser.Rut,
-			Email = applicationUser.Email
+			Id = id,
+			FirstName = teacher.FirstName,
+			LastName = teacher.LastName,
+			Rut = teacher.Rut,
+			Email = teacher.Email,
+			CreatedAt = teacher.CreatedAt,
+			UpdatedAt = teacher.UpdatedAt
 		};
-		var roles = (await this._userManager.GetRolesAsync(applicationUser)).ToList();
+		var roles = (await this._userManager.GetRolesAsync(teacher)).ToList();
 		editViewModel.IsGuideTeacher = roles.Contains(Roles.GuideTeacher.ToString());
 		editViewModel.IsAssistantTeacher = roles.Contains(Roles.AssistantTeacher.ToString());
 		editViewModel.IsCourseTeacher = roles.Contains(Roles.CourseTeacher.ToString());
@@ -147,144 +161,216 @@ public class TeacherController : Controller {
 	}
 
 	[HttpPost, ValidateAntiForgeryToken]
-	public async Task<IActionResult> Edit(string id, [FromForm] EditViewModel model) {
-		var applicationUser = this._userManager.Users.Include(a => a.TeacherProfile).FirstOrDefault(a => a.Id == id);
-		if (applicationUser is null) {
-			this.ViewBag.ErrorMessage = "Error al obtener al profesor.";
-			return this.View();
+	public async Task<IActionResult> Edit([FromForm] EditViewModel model) {
+		var teacherSession = await this._userManager.GetUserAsync(this.User);
+		if (teacherSession is null) {
+			return this.RedirectToAction("Index", "Home", new { area = "" });
 		}
-		await this._userStore.SetUserNameAsync(applicationUser, userName: model.Email, CancellationToken.None);
-		await this._emailStore.SetEmailAsync(applicationUser, model.Email, CancellationToken.None);
-		applicationUser.FirstName = !model.FirstName.IsNullOrEmpty() ? model.FirstName : applicationUser.FirstName;
-		applicationUser.LastName = !model.LastName.IsNullOrEmpty() ? model.LastName : applicationUser.LastName;
-		applicationUser.Rut = !model.Rut.IsNullOrEmpty() ? model.Rut : applicationUser.Rut;
-		var updateResult = await this._userManager.UpdateAsync(applicationUser);
-		if (updateResult.Succeeded) {
-			var roles = (await this._userManager.GetRolesAsync(applicationUser)).ToList();
-			if (roles.Contains(Roles.Teacher.ToString())) {
-				_ = roles.Remove(Roles.Teacher.ToString());
-			}
-			if (roles.Contains(Roles.DirectorTeacher.ToString())) {
-				_ = roles.Remove(Roles.DirectorTeacher.ToString());
-			}
-			var removeRankRolesResult = await this._userManager.RemoveFromRolesAsync(applicationUser, roles);
-			var rankRoles = new List<string>();
-			if (model.IsGuideTeacher) {
-				rankRoles.Add(Roles.GuideTeacher.ToString());
-			}
-			if (model.IsAssistantTeacher) {
-				rankRoles.Add(Roles.AssistantTeacher.ToString());
-			}
-			if (model.IsCourseTeacher) {
-				rankRoles.Add(Roles.CourseTeacher.ToString());
-			}
-			if (model.IsCommitteeTeacher) {
-				rankRoles.Add(Roles.CommitteeTeacher.ToString());
-			}
-			var rankRolesResult = await this._userManager.AddToRolesAsync(applicationUser, rankRoles);
-			if (removeRankRolesResult.Succeeded && rankRolesResult.Succeeded) {
-				this.ViewBag.SuccessMessage = "Profesor actualizado con éxito.";
-				this.ModelState.Clear();
-				return this.View();
-			}
-			this.ViewBag.WarningMessage = "Profesor actualizado, pero no se le pudo asignar el(los) rol(es).";
-			this.ViewBag.WarningMessages = removeRankRolesResult.Errors.Select(w => w.Description).ToList();
-			this.ViewBag.WarningMessages2 = rankRolesResult.Errors.Select(w => w.Description).ToList();
-			this.ModelState.Clear();
-			return this.View();
+		if (teacherSession.IsDeactivated) {
+			return this.RedirectToAction("Index", "Home", new { area = "" });
 		}
-		if (updateResult.Errors.Any()) {
-			this.ViewBag.ErrorMessages = updateResult.Errors.Select(e => e.Description).ToList();
+		var teacher = await this._userManager.FindByIdAsync(model.Id!.ToString()!);
+		if (teacher is null) {
+			this.TempData["ErrorMessage"] = "Error al obtener al profesor.";
+			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
 		}
-		this.ViewBag.ErrorMessage = "Error al actualizar al profesor.";
-		return this.View();
+		if (teacher.IsDeactivated) {
+			this.TempData["ErrorMessage"] = "El profesor está desactivado.";
+			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
+		}
+		var roles = (await this._userManager.GetRolesAsync(teacher)).ToList();
+		await this._userStore.SetUserNameAsync(teacher, userName: model.Email, CancellationToken.None);
+		await this._emailStore.SetEmailAsync(teacher, model.Email, CancellationToken.None);
+		teacher.FirstName = model.FirstName;
+		teacher.LastName = model.LastName;
+		teacher.Rut = model.Rut;
+		teacher.UpdatedAt = DateTimeOffset.Now;
+		_ = await this._userManager.UpdateAsync(teacher);
+		if (roles.Contains(Roles.Teacher.ToString())) {
+			_ = roles.Remove(Roles.Teacher.ToString());
+		}
+		if (roles.Contains(Roles.DirectorTeacher.ToString())) {
+			_ = roles.Remove(Roles.DirectorTeacher.ToString());
+		}
+		var removeRankRolesResult = await this._userManager.RemoveFromRolesAsync(teacher, roles);
+		var rankRoles = new List<string>();
+		if (model.IsGuideTeacher) {
+			rankRoles.Add(Roles.GuideTeacher.ToString());
+		}
+		if (model.IsAssistantTeacher) {
+			rankRoles.Add(Roles.AssistantTeacher.ToString());
+		}
+		if (model.IsCourseTeacher) {
+			rankRoles.Add(Roles.CourseTeacher.ToString());
+		}
+		if (model.IsCommitteeTeacher) {
+			rankRoles.Add(Roles.CommitteeTeacher.ToString());
+		}
+		var rankRolesResult = await this._userManager.AddToRolesAsync(teacher, rankRoles);
+		if (removeRankRolesResult.Succeeded && rankRolesResult.Succeeded) {
+			var editViewModel1 = new EditViewModel {
+				FirstName = teacher.FirstName,
+				LastName = teacher.LastName,
+				Rut = teacher.Rut,
+				Email = teacher.Email,
+				CreatedAt = teacher.CreatedAt,
+				UpdatedAt = teacher.UpdatedAt
+			};
+			roles = (await this._userManager.GetRolesAsync(teacher)).ToList();
+			editViewModel1.IsGuideTeacher = roles.Contains(Roles.GuideTeacher.ToString());
+			editViewModel1.IsAssistantTeacher = roles.Contains(Roles.AssistantTeacher.ToString());
+			editViewModel1.IsCourseTeacher = roles.Contains(Roles.CourseTeacher.ToString());
+			editViewModel1.IsCommitteeTeacher = roles.Contains(Roles.CommitteeTeacher.ToString());
+			this.ViewBag.SuccessMessage = "Profesor actualizado correctamente.";
+			return this.View(editViewModel1);
+		}
+		var editViewModel = new EditViewModel {
+			Id = teacher.Id,
+			FirstName = teacher.FirstName,
+			LastName = teacher.LastName,
+			Rut = teacher.Rut,
+			Email = teacher.Email,
+			CreatedAt = teacher.CreatedAt,
+			UpdatedAt = teacher.UpdatedAt
+		};
+		roles = (await this._userManager.GetRolesAsync(teacher)).ToList();
+		editViewModel.IsGuideTeacher = roles.Contains(Roles.GuideTeacher.ToString());
+		editViewModel.IsAssistantTeacher = roles.Contains(Roles.AssistantTeacher.ToString());
+		editViewModel.IsCourseTeacher = roles.Contains(Roles.CourseTeacher.ToString());
+		editViewModel.IsCommitteeTeacher = roles.Contains(Roles.CommitteeTeacher.ToString());
+		this.TempData["WarningMessage"] = "Profesor actualizado, pero no se le pudo asignar el(los) rol(es).";
+		this.TempData["WarningMessages1"] = removeRankRolesResult.Errors.Select(w => w.Description).ToList();
+		this.TempData["WarningMessages2"] = rankRolesResult.Errors.Select(w => w.Description).ToList();
+		return this.View(editViewModel);
 	}
 
-	public IActionResult Delete(string id) {
-		var applicationUser = this._userManager.Users.FirstOrDefault(a => a.Id == id);
-		if (applicationUser is null) {
-			this.ViewBag.ErrorMessage = "Error al obtener al profesor.";
-			return this.View();
+	public async Task<IActionResult> ToggleActivation(string id) {
+		var teacherSession = await this._userManager.GetUserAsync(this.User);
+		if (teacherSession is null) {
+			return this.RedirectToAction("Index", "Home", new { area = "" });
 		}
-		var deleteViewModel = new DeleteViewModel {
-			Id = applicationUser.Id,
-			Email = applicationUser.Email
+		if (teacherSession.IsDeactivated) {
+			return this.RedirectToAction("Index", "Home", new { area = "" });
+		}
+		var teacher = await this._userManager.FindByIdAsync(id);
+		if (teacher is null) {
+			this.TempData["ErrorMessage"] = "Error al obtener al profesor.";
+			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
+		}
+		var toggleActivationModel = new ToggleActivationViewModel {
+			Id = teacher.Id,
+			Email = teacher.Email,
+			IsDeactivated = teacher.IsDeactivated
 		};
-		return this.View(deleteViewModel);
+		return this.View(toggleActivationModel);
 	}
 
 	[HttpPost, ValidateAntiForgeryToken]
-	public async Task<IActionResult> Delete(string id, [FromForm] DeleteViewModel model) {
-		var applicationUser = this._userManager.Users.Include(a => a.TeacherProfile).FirstOrDefault(a => a.Id == id);
-		if (applicationUser is null) {
-			this.ViewBag.ErrorMessage = "Error al obtener al profesor.";
-			return this.View();
+	public async Task<IActionResult> ToggleActivation([FromForm] ToggleActivationViewModel model) {
+		var teacherSession = await this._userManager.GetUserAsync(this.User);
+		if (teacherSession is null) {
+			return this.RedirectToAction("Index", "Home", new { area = "" });
 		}
-		if (applicationUser!.Id == this._userManager.GetUserId(this.User)) {
-			this.ViewBag.ErrorMessage = "No te puedes eliminar a tí mismo.";
-			return this.View();
+		if (teacherSession.IsDeactivated) {
+			return this.RedirectToAction("Index", "Home", new { area = "" });
 		}
-		var roles = (await this._userManager.GetRolesAsync(applicationUser)).ToList();
+		var teacher = await this._userManager.FindByIdAsync(model.Id!.ToString()!);
+		if (teacher is null) {
+			this.TempData["ErrorMessage"] = "Error al obtener al profesor.";
+			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
+		}
+		if (teacher!.Id == this._userManager.GetUserId(this.User)) {
+			this.TempData["ErrorMessage"] = !model.IsDeactivated ? "No te puedes desactivar a tí mismo." : "¡No deberías haber llegado a este punto!";
+			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
+		}
+		var roles = (await this._userManager.GetRolesAsync(teacher)).ToList();
 		if (roles.Contains(Roles.DirectorTeacher.ToString())) {
-			this.ViewBag.ErrorMessage = "No puedes eliminar al director de carrera actual.";
-			return this.View();
+			this.TempData["ErrorMessage"] = !model.IsDeactivated ? "No puedes desactivar al director de carrera actual." : "¡No deberías haber llegado a este punto!";
+			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
 		}
-		_ = this._dbContext.TeacherProfiles.Remove(applicationUser.TeacherProfile!);
-		_ = await this._dbContext.SaveChangesAsync();
-		var result = await this._userManager.DeleteAsync(applicationUser);
-		if (result.Succeeded) {
-			this.ViewBag.SuccessMessage = "Profesor eliminado con éxito.";
-			return this.View();
-		}
-		this.ViewBag.ErrorMessage = "Error al eliminar al profesor.";
-		this.ViewBag.ErrorMessages = result.Errors.Select(e => e.Description).ToList();
-		return this.View();
+		teacher.IsDeactivated = !model.IsDeactivated;
+		teacher.UpdatedAt = DateTimeOffset.Now;
+		_ = await this._userManager.UpdateAsync(teacher);
+		this.TempData["SuccessMessage"] = !model.IsDeactivated ? "Profesor desactivado correctamente." : "Profesor activado correctamente.";
+		return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
 	}
 
-	public IActionResult Transfer(string id) {
-		var applicationUser = this._userManager.Users.FirstOrDefault(a => a.Id == id);
-		if (applicationUser is null) {
-			this.ViewBag.ErrorMessage = "Error al obtener al profesor.";
-			return this.View();
+	public async Task<IActionResult> Transfer(string currentDirectorTeacherId, string newDirectorTeacherId) {
+		var teacherSession = await this._userManager.GetUserAsync(this.User);
+		if (teacherSession is null) {
+			return this.RedirectToAction("Index", "Home", new { area = "" });
+		}
+		if (teacherSession.IsDeactivated) {
+			return this.RedirectToAction("Index", "Home", new { area = "" });
+		}
+		var currentDirectorTeacher = await this._userManager.FindByIdAsync(currentDirectorTeacherId);
+		var newDirectorTeacher = await this._userManager.FindByIdAsync(newDirectorTeacherId);
+		if (currentDirectorTeacher is null) {
+			this.TempData["ErrorMessage"] = "Error al obtener al profesor fuente.";
+			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
+		}
+		if (currentDirectorTeacher.IsDeactivated) {
+			this.TempData["ErrorMessage"] = "El profesor fuente está desactivado.";
+			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
+		}
+		if (newDirectorTeacher is null) {
+			this.TempData["ErrorMessage"] = "Error al obtener al profesor objetivo.";
+			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
+		}
+		if (newDirectorTeacher.IsDeactivated) {
+			this.TempData["ErrorMessage"] = "El profesor objetivo está desactivado.";
+			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
 		}
 		var transferViewModel = new TransferViewModel {
-			Id = applicationUser.Id,
-			Email = applicationUser.Email
+			CurrentDirectorTeacherId = currentDirectorTeacher.Id,
+			NewDirectorTeacherId = newDirectorTeacher!.Id,
+			NewDirectorTeacherName = $"{newDirectorTeacher.FirstName} {newDirectorTeacher.LastName}"
 		};
 		return this.View(transferViewModel);
 	}
 
 	[HttpPost, ValidateAntiForgeryToken]
-	public async Task<IActionResult> Transfer(string id, [FromForm] TransferViewModel model) {
-		var applicationUser = this._userManager.Users.FirstOrDefault(a => a.Id == id);
-		if (applicationUser is null) {
-			this.ViewBag.ErrorMessage = "Error al obtener al profesor.";
-			return this.View();
+	public async Task<IActionResult> Transfer([FromForm] TransferViewModel model) {
+		var teacherSession = await this._userManager.GetUserAsync(this.User);
+		if (teacherSession is null) {
+			return this.RedirectToAction("Index", "Home", new { area = "" });
 		}
-		var directorTeacher = this._userManager.Users.FirstOrDefault(a => a.Id == this._userManager.GetUserId(this.User));
-		if (applicationUser == directorTeacher) {
-			this.ViewBag.ErrorMessage = "No puedes transferirte a tí mismo.";
-			return this.View();
+		if (teacherSession.IsDeactivated) {
+			return this.RedirectToAction("Index", "Home", new { area = "" });
 		}
-		if (directorTeacher is null) {
-			this.ViewBag.ErrorMessage = "Error al obtener al director de carrera actual.";
-			return this.View();
+		var currentDirectorTeacher = await this._userManager.FindByIdAsync(model.CurrentDirectorTeacherId!);
+		if (currentDirectorTeacher is null) {
+			this.TempData["ErrorMessage"] = "Error al obtener al director de carrera actual.";
+			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
 		}
-		var directorTeacherRoles = (await this._userManager.GetRolesAsync(directorTeacher)).ToList();
-		if (!directorTeacherRoles.Contains(Roles.DirectorTeacher.ToString())) {
-			this.ViewBag.ErrorMessage = "El director de carrera actual no es director de carrera.";
-			return this.View();
+		if (currentDirectorTeacher.IsDeactivated) {
+			this.TempData["ErrorMessage"] = "El director de carrera actual está desactivado, lo cual esto no debería haber pasado.";
+			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
 		}
-		var removeDirectorTeacherRoleResult = await this._userManager.RemoveFromRoleAsync(directorTeacher, Roles.DirectorTeacher.ToString());
-		var addDirectorTeacherRoleResult = await this._userManager.AddToRoleAsync(applicationUser, Roles.DirectorTeacher.ToString());
-		if (removeDirectorTeacherRoleResult.Succeeded && addDirectorTeacherRoleResult.Succeeded) {
-			this.ViewBag.SuccessMessage = "Director de carrera transferido con éxito.";
-			this.ModelState.Clear();
-			return this.View();
+		var currentDirectorTeacherRoles = (await this._userManager.GetRolesAsync(currentDirectorTeacher)).ToList();
+		if (!currentDirectorTeacherRoles.Contains(Roles.DirectorTeacher.ToString())) {
+			this.TempData["ErrorMessage"] = "El profesor fuente no es director de carrera.";
+			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
 		}
-		this.ViewBag.ErrorMessage = "Error al transferir el director de carrera.";
-		this.ViewBag.ErrorMessages = removeDirectorTeacherRoleResult.Errors.Select(e => e.Description).ToList();
-		this.ViewBag.ErrorMessages2 = addDirectorTeacherRoleResult.Errors.Select(e => e.Description).ToList();
-		return this.View();
+		var newDirectorTeacher = await this._userManager.FindByIdAsync(model.NewDirectorTeacherId!);
+		if (newDirectorTeacher is null) {
+			this.TempData["ErrorMessage"] = "Error al obtener al nuevo director de carrera actual.";
+			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
+		}
+		if (newDirectorTeacher.IsDeactivated) {
+			this.TempData["ErrorMessage"] = "El profesor objetivo está desactivado.";
+			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
+		}
+		if (currentDirectorTeacher == newDirectorTeacher) {
+			this.TempData["ErrorMessage"] = "Ambos profesores involucrados en la transferencia son el mismo.";
+			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
+		}
+		_ = await this._userManager.RemoveFromRoleAsync(currentDirectorTeacher, Roles.DirectorTeacher.ToString());
+		_ = await this._userManager.AddToRoleAsync(newDirectorTeacher, Roles.DirectorTeacher.ToString());
+		currentDirectorTeacher.UpdatedAt = DateTimeOffset.Now;
+		newDirectorTeacher.UpdatedAt = DateTimeOffset.Now;
+		_ = await this._userManager.UpdateAsync(currentDirectorTeacher);
+		this.TempData["SuccessMessage"] = "Director de carrera transferido correctamente.";
+		return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
 	}
 }

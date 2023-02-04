@@ -4,12 +4,12 @@ using CsvHelper.Configuration.Attributes;
 
 namespace Utal.Icc.Sgm.Areas.DirectorTeacher.Views.Student;
 
-public class CreateViewModel {
+public class InputViewModel {
 	[Display(Name = "Archivo CSV")]
 	public IFormFile? CsvFile { get; set; }
 }
 
-public class CreateModel {
+public class CreateViewModel {
 	[Index(0), Display(Name = "Nombre")]
 	public string? FirstName { get; set; }
 	[Index(1), Display(Name = "Apellido")]

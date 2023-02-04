@@ -1,0 +1,41 @@
+﻿@using Utal.Icc.Sgm.Areas.GuideTeacher.Views.Proposal
+
+@model RejectViewModel
+
+@{
+	this.ViewData["Title"] = "Rechazar propuesta";
+}
+
+<div class="container">
+	<partial name="_Alerts" />
+	<div class="row justify-content-center">
+		<div class="col-10">
+			<div class="card">
+				<div class="card-header text-center">@this.ViewData["Title"]</div>
+				<div class="card-body text-center">
+					@using (this.Html.BeginForm("Reject", "Proposal", new { area = "GuideTeacher" })) {
+						@this.Html.AntiForgeryToken()
+						@this.Html.HiddenFor(m => m.Id)
+						@this.Html.HiddenFor(m => m.Title)
+						@this.Html.HiddenFor(m => m.Student)
+						<h5 class="card-title">¿Deseas <b class="text-danger">rechazar</b> la propuesta del estudiante <b>@this.Html.DisplayFor(m => m.Student)</b>?</h5>
+						<h6 class="card-subtitle mb-3 text-muted">@this.Html.DisplayFor(m => m.Title)</h6>
+						<div class="row was-validated text-center">
+							<div class="col">
+								<div class="form-group mb-3">
+									@this.Html.LabelFor(m => m.Reason, new { @class = "form-label" })
+									@this.Html.TextBoxFor(m => m.Reason, new { @class = "form-control" })
+									@this.Html.ValidationMessageFor(m => m.Reason, "Justifique su rechazo", new { @class = "invalid-feedback" })
+								</div>
+								<div class="btn-group">
+									@this.Html.ActionLink("No", "View", "Proposal", new { area = "GuideTeacher", id = this.Model.Id }, new { @class = "btn btn-secondary" })
+									<button type="submit" class="btn btn-danger">Sí</button>
+								</div>
+							</div>
+						</div>
+					}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

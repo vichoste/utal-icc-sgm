@@ -3,8 +3,10 @@
 namespace Utal.Icc.Sgm.Areas.DirectorTeacher.Views.Teacher;
 
 public class TransferViewModel {
-	[Display(Name = "ID"), Required]
-	public string? Id { get; set; }
-	[DataType(DataType.EmailAddress), Display(Name = "E-mail"), EmailAddress]
-	public string? Email { get; set; }
+	[Display(Name = "ID del director de carrera actual"), Required]
+	public string? CurrentDirectorTeacherId { get; set; }
+	[Display(Name = "ID del nuevo director de carrera"), Required]
+	public string? NewDirectorTeacherId { get; set; }
+	[Display(Name = "Nombre del nuevo director de carrera"), Required]
+	public string? NewDirectorTeacherName { get; set; }
 }

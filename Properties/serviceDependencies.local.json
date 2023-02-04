@@ -1,6 +1,6 @@
 {
 	"dependencies": {
-		"mssql2": {
+		"mssql1": {
 			"connectionId": "ConnectionStrings:DefaultConnection",
 			"resourceId": null,
 			"secretStore": "LocalSecretsFile",

@@ -3,6 +3,8 @@
 namespace Utal.Icc.Sgm.Areas.DirectorTeacher.Views.Teacher;
 
 public class EditViewModel {
+	[Display(Name = "ID"), Required]
+	public string? Id { get; set; }
 	[Display(Name = "Nombre")]
 	public string? FirstName { get; set; }
 	[Display(Name = "Apellido")]
@@ -19,4 +21,8 @@ public class EditViewModel {
 	public bool IsCourseTeacher { get; set; }
 	[Display(Name = "Profesor de comité")]
 	public bool IsCommitteeTeacher { get; set; }
+	[Display(Name = "Creado"), Required]
+	public DateTimeOffset? CreatedAt { get; set; }
+	[Display(Name = "Actualizado"), Required]
+	public DateTimeOffset? UpdatedAt { get; set; }
 }

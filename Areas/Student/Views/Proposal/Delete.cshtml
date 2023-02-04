@@ -1,0 +1,27 @@
+﻿@using Utal.Icc.Sgm.Areas.Student.Views.Proposal
+
+@model DeleteViewModel
+
+@{
+	this.ViewData["Title"] = "Eliminar propuesta";
+}
+
+<div class="container">
+	<partial name="_Alerts" />
+	<div class="card">
+		<div class="card-header text-center">@this.ViewData["Title"]</div>
+		<div class="card-body text-center">
+			@using (this.Html.BeginForm("Delete", "Proposal", new { area = "Student" })) {
+				<h5 class="card-title">¿Estás seguro que quieres eliminar esta propuesta?</h5>
+				@this.Html.AntiForgeryToken()
+				@this.Html.HiddenFor(m => m.Id)
+				@this.Html.HiddenFor(m => m.Title)
+				<h6 class="card-subtitle mb-3 text-muted">@this.Html.DisplayFor(m => m.Title)</h6>
+				<div>
+					@this.Html.ActionLink("Cancelar", "Index", "Proposal", new { area = "Student" }, new { @class = "btn btn-secondary" })
+					<button type="submit" class="btn btn-danger">Eliminar</button>
+				</div>
+			}
+		</div>
+	</div>
+</div>

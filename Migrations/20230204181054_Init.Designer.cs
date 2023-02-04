@@ -12,8 +12,8 @@ using Utal.Icc.Sgm.Data;
 namespace Utal.Icc.Sgm.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230123174622_NewInit")]
-    partial class NewInit
+    [Migration("20230204181054_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -170,6 +170,9 @@ namespace Utal.Icc.Sgm.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -179,6 +182,9 @@ namespace Utal.Icc.Sgm.Migrations
 
                     b.Property<string>("FirstName")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeactivated")
+                        .HasColumnType("bit");
 
                     b.Property<string>("LastName")
                         .HasColumnType("nvarchar(max)");
@@ -212,8 +218,32 @@ namespace Utal.Icc.Sgm.Migrations
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("StudentIsDoingThePractice")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("StudentIsWorking")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("StudentRemainingCourses")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("StudentUniversityId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TeacherOffice")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TeacherSchedule")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TeacherSpecialization")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
@@ -232,61 +262,65 @@ namespace Utal.Icc.Sgm.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("Utal.Icc.Sgm.Models.StudentProfile", b =>
+            modelBuilder.Entity("Utal.Icc.Sgm.Models.StudentProposal", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("IsDoingThePractice")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsWorking")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("RemainingCourses")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("StudentProfile")
+                    b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("UniversityId")
+                    b.Property<string>("AssistantTeacher1OfTheStudentProposalId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("AssistantTeacher2OfTheStudentProposalId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("AssistantTeacher3OfTheStudentProposalId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<bool>("ConfirmedByStudent")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset?>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("GuideTeacherOfTheStudentProposalId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int?>("ProposalStatus")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RejectionReason")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<string>("StudentOwnerOfTheStudentProposalId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("StudentProfile")
-                        .IsUnique()
-                        .HasFilter("[StudentProfile] IS NOT NULL");
+                    b.HasIndex("AssistantTeacher1OfTheStudentProposalId");
 
-                    b.ToTable("StudentProfiles");
-                });
+                    b.HasIndex("AssistantTeacher2OfTheStudentProposalId");
 
-            modelBuilder.Entity("Utal.Icc.Sgm.Models.TeacherProfile", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                    b.HasIndex("AssistantTeacher3OfTheStudentProposalId");
 
-                    b.Property<string>("Office")
-                        .HasColumnType("nvarchar(max)");
+                    b.HasIndex("GuideTeacherOfTheStudentProposalId");
 
-                    b.Property<string>("Schedule")
-                        .HasColumnType("nvarchar(max)");
+                    b.HasIndex("StudentOwnerOfTheStudentProposalId");
 
-                    b.Property<string>("Specialization")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TeacherProfile")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TeacherProfile")
-                        .IsUnique()
-                        .HasFilter("[TeacherProfile] IS NOT NULL");
-
-                    b.ToTable("TeacherProfiles");
+                    b.ToTable("StudentProposals");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -340,29 +374,50 @@ namespace Utal.Icc.Sgm.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Utal.Icc.Sgm.Models.StudentProfile", b =>
+            modelBuilder.Entity("Utal.Icc.Sgm.Models.StudentProposal", b =>
                 {
-                    b.HasOne("Utal.Icc.Sgm.Models.ApplicationUser", "ApplicationUser")
-                        .WithOne("StudentProfile")
-                        .HasForeignKey("Utal.Icc.Sgm.Models.StudentProfile", "StudentProfile");
+                    b.HasOne("Utal.Icc.Sgm.Models.ApplicationUser", "AssistantTeacher1OfTheStudentProposal")
+                        .WithMany("ImAssistantTeacher1OfTheStudentProposals")
+                        .HasForeignKey("AssistantTeacher1OfTheStudentProposalId");
 
-                    b.Navigation("ApplicationUser");
-                });
+                    b.HasOne("Utal.Icc.Sgm.Models.ApplicationUser", "AssistantTeacher2OfTheStudentProposal")
+                        .WithMany("ImAssistantTeacher2OfTheStudentProposals")
+                        .HasForeignKey("AssistantTeacher2OfTheStudentProposalId");
 
-            modelBuilder.Entity("Utal.Icc.Sgm.Models.TeacherProfile", b =>
-                {
-                    b.HasOne("Utal.Icc.Sgm.Models.ApplicationUser", "ApplicationUser")
-                        .WithOne("TeacherProfile")
-                        .HasForeignKey("Utal.Icc.Sgm.Models.TeacherProfile", "TeacherProfile");
+                    b.HasOne("Utal.Icc.Sgm.Models.ApplicationUser", "AssistantTeacher3OfTheStudentProposal")
+                        .WithMany("ImAssistantTeacher3OfTheStudentProposals")
+                        .HasForeignKey("AssistantTeacher3OfTheStudentProposalId");
 
-                    b.Navigation("ApplicationUser");
+                    b.HasOne("Utal.Icc.Sgm.Models.ApplicationUser", "GuideTeacherOfTheStudentProposal")
+                        .WithMany("ImGuideTeacherOfTheStudentProposals")
+                        .HasForeignKey("GuideTeacherOfTheStudentProposalId");
+
+                    b.HasOne("Utal.Icc.Sgm.Models.ApplicationUser", "StudentOwnerOfTheStudentProposal")
+                        .WithMany("StudentProposalsWhichIOwn")
+                        .HasForeignKey("StudentOwnerOfTheStudentProposalId");
+
+                    b.Navigation("AssistantTeacher1OfTheStudentProposal");
+
+                    b.Navigation("AssistantTeacher2OfTheStudentProposal");
+
+                    b.Navigation("AssistantTeacher3OfTheStudentProposal");
+
+                    b.Navigation("GuideTeacherOfTheStudentProposal");
+
+                    b.Navigation("StudentOwnerOfTheStudentProposal");
                 });
 
             modelBuilder.Entity("Utal.Icc.Sgm.Models.ApplicationUser", b =>
                 {
-                    b.Navigation("StudentProfile");
+                    b.Navigation("ImAssistantTeacher1OfTheStudentProposals");
 
-                    b.Navigation("TeacherProfile");
+                    b.Navigation("ImAssistantTeacher2OfTheStudentProposals");
+
+                    b.Navigation("ImAssistantTeacher3OfTheStudentProposals");
+
+                    b.Navigation("ImGuideTeacherOfTheStudentProposals");
+
+                    b.Navigation("StudentProposalsWhichIOwn");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,66 +1,30 @@
 ﻿@using Utal.Icc.Sgm
 @using Utal.Icc.Sgm.Areas.DirectorTeacher.Views.Student
+@using Utal.Icc.Sgm.Views.Shared
 
 @model PaginatedList<IndexViewModel>
 
 @{
-	this.ViewData["Title"] = "Gestionar estudiantes";
+	this.ViewData["Title"] = "Estudiantes";
 }
 
 <div class="container">
-	@if (this.ViewBag.SuccessMessage is not null) {
-		<div class="row justify-content-center">
-			<div class="alert alert-success" role="alert">
-				@this.ViewBag.SuccessMessage
-			</div>
-		</div>
-	}
-	@if (this.ViewBag.WarningMessage is not null) {
-		<div class="row justify-content-center">
-			<div class="alert alert-warning" role="alert">
-				@this.ViewBag.WarningMessage
-			</div>
-		</div>
-	}
-	@if (this.ViewBag.WarningMessages is not null) {
-		@foreach (var warning in this.ViewBag.WarningMessages) {
-			<div class="row justify-content-center">
-				<div class="alert alert-warning" role="alert">
-					@warning
-				</div>
-			</div>
-		}
-	}
-	@if (this.ViewBag.ErrorMessage is not null) {
-		<div class="row justify-content-center">
-			<div class="alert alert-danger" role="alert">
-				@this.ViewBag.ErrorMessage
-			</div>
-		</div>
-	}
-	@if (this.ViewBag.ErrorMessages is not null) {
-		@foreach (var error in this.ViewBag.ErrorMessages) {
-			<div class="row justify-content-center">
-				<div class="alert alert-danger" role="alert">
-					@error
-				</div>
-			</div>
-		}
-	}
+	<partial name="_Alerts" />
 	<div class="row justify-content-center">
 		<div class="col-12 col-md-10 mb-3">
-			<h2>Gestionar estudiantes</h2>
+			<h2>@this.ViewData["Title"]</h2>
 		</div>
 		<div class="col-12 col-md-2 mb-3">
 			@this.Html.ActionLink("Importar estudiantes desde CSV", "Create", "Student", new { area = "DirectorTeacher" }, new { @class = "btn btn-success"})
 		</div>
 		<div class="col-12 mb-3">
-			<partial name="_Filter" , model="@new FilterPartialViewModel()" />
+			<partial name="_Filter" , model=@(new FilterPartialViewModel("Index", "Student", "DirectorTeacher")) />
 		</div>
 	</div>
 	<div class="row justify-content-center">
 		<div class="col-12">
 			<div class="table-responsive">
+				@this.Html.HiddenFor(m => m.ApplicationUserId)
 				<table class="table table-bordered">
 					<thead class="table-dark">
 						<tr>
@@ -95,15 +59,26 @@
 					<tbody>
 						@foreach (var item in this.Model) {
 							<tr>
-								<td>@item.FirstName</td>
-								<td>@item.LastName</td>
-								<td>@item.UniversityId</td>
-								<td>@item.Rut</td>
-								<td>@item.Email</td>
-								<td>
-									@this.Html.ActionLink("Editar", "Edit", "Student", new { area = "DirectorTeacher", id = item.Id }, new { @class = "btn btn-yellow mb-3"})
-									@this.Html.ActionLink("Eliminar", "Delete", "Student", new { area = "DirectorTeacher", id = item.Id }, new { @class = "btn btn-danger mb-3"})
-								</td>
+								@if (item.IsDeactivated) {
+									<td class="text-muted">@item.FirstName</td>
+									<td class="text-muted">@item.LastName</td>
+									<td class="text-muted">@item.UniversityId</td>
+									<td class="text-muted">@item.Rut</td>
+									<td class="text-muted">@item.Email</td>
+									<td>
+										@this.Html.ActionLink("Activar", "ToggleActivation", "Student", new { area = "DirectorTeacher", id = item.Id }, new { @class = "btn btn-success mb-3" })
+									</td>
+								} else {
+									<td>@item.FirstName</td>
+									<td>@item.LastName</td>
+									<td>@item.UniversityId</td>
+									<td>@item.Rut</td>
+									<td>@item.Email</td>
+									<td>
+										@this.Html.ActionLink("Editar", "Edit", "Student", new { area = "DirectorTeacher", id = item.Id }, new { @class = "btn btn-yellow mb-3" })
+										@this.Html.ActionLink("Desactivar", "ToggleActivation", "Student", new { area = "DirectorTeacher", id = item.Id }, new { @class = "btn btn-danger mb-3" })
+									</td>
+								}
 							</tr>
 						}
 					</tbody>

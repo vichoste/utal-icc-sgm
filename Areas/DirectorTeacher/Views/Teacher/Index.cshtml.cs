@@ -11,8 +11,10 @@ public class IndexViewModel {
 	public string? LastName { get; set; }
 	[Display(Name = "RUT")]
 	public string? Rut { get; set; }
-	[Display(Name = "E-mail")]
+	[DataType(DataType.EmailAddress), Display(Name = "E-mail"), EmailAddress]
 	public string? Email { get; set; }
 	[Display(Name = "¿Es director de carrera?")]
 	public bool IsDirectorTeacher { get; set; }
+	[Display(Name = "Deshabilitado")]
+	public bool IsDeactivated { get; set; }
 }
