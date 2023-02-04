@@ -691,7 +691,7 @@ public class ProposalController : Controller {
 		if (student.IsDeactivated) {
 			return this.RedirectToAction("Index", "Home", new { area = "" });
 		}
-		var studentProposal = await this._dbContext.StudentProposals.AsNoTracking()
+		var studentProposal = await this._dbContext.StudentProposals
 			.Where(sp => sp.StudentOwnerOfTheStudentProposal == student && sp.ProposalStatus == StudentProposal.Status.Draft)
 			.FirstOrDefaultAsync(sp => sp.Id == model.Id);
 		if (studentProposal is null) {
@@ -737,7 +737,7 @@ public class ProposalController : Controller {
 		if (student.IsDeactivated) {
 			return this.RedirectToAction("Index", "Home", new { area = "" });
 		}
-		var studentProposal = await this._dbContext.StudentProposals.AsNoTracking()
+		var studentProposal = await this._dbContext.StudentProposals
 			.Where(sp => sp.StudentOwnerOfTheStudentProposal == student && sp.ProposalStatus == StudentProposal.Status.Draft)
 			.Include(sp => sp.GuideTeacherOfTheStudentProposal)
 			.Include(sp => sp.AssistantTeacher1OfTheStudentProposal)

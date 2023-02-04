@@ -17,9 +17,10 @@
 						@this.Html.AntiForgeryToken()
 						@this.Html.HiddenFor(m => m.Id)
 						@this.Html.HiddenFor(m => m.Title)
-						<h5 class="card-title">¿Deseas <b class="text-danger">rechazar</b> esta propuesta?</h5>
+						@this.Html.HiddenFor(m => m.StudentName)
+						<h5 class="card-title">¿Deseas <b class="text-danger">rechazar</b> esta propuesta del estudiante <b>@this.Html.DisplayFor(m => m.StudentName)</b>?</h5>
 						<h6 class="card-subtitle mb-3 text-muted">@this.Html.DisplayFor(m => m.Title)</h6>
-						<div class="row text-center">
+						<div class="row was-validated text-center">
 							<div class="col">
 								<div class="form-group mb-3">
 									@this.Html.LabelFor(m => m.Reason, new { @class = "form-label" })

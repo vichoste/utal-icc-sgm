@@ -114,7 +114,8 @@ public class ProposalController : Controller {
 			return this.RedirectToAction("Index", "Home", new { area = "" });
 		}
 		var studentProposal = await this._dbContext.StudentProposals.AsNoTracking()
-			.Where(sp => sp.GuideTeacherOfTheStudentProposal == teacher && sp.ProposalStatus == StudentProposal.Status.Sent)
+			.Where(sp => sp.GuideTeacherOfTheStudentProposal == teacher && sp.ProposalStatus == StudentProposal.Status.Sent).AsNoTracking()
+			.Include(sp => sp.StudentOwnerOfTheStudentProposal).AsNoTracking()
 			.FirstOrDefaultAsync(sp => sp.Id == id);
 		if (studentProposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
@@ -123,6 +124,7 @@ public class ProposalController : Controller {
 		var rejectViewModel = new RejectViewModel {
 			Id = id,
 			Title = studentProposal.Title,
+			StudentName = $"{studentProposal.StudentOwnerOfTheStudentProposal!.FirstName} {studentProposal.StudentOwnerOfTheStudentProposal.LastName}"
 		};
 		return this.View(rejectViewModel);
 	}
@@ -141,6 +143,7 @@ public class ProposalController : Controller {
 			return this.View(new RejectViewModel {
 				Id = model.Id,
 				Title = model.Title,
+				StudentName = model.StudentName,
 			});
 		}
 		var studentProposal = await this._dbContext.StudentProposals.AsNoTracking()
