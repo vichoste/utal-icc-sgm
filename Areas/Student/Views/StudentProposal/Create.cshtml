@@ -1,6 +1,6 @@
 ﻿@using Microsoft.AspNetCore.Identity
 
-@using Utal.Icc.Sgm.Areas.Student.Views.Proposal
+@using Utal.Icc.Sgm.Areas.Student.Views.StudentProposal
 
 @model CreateViewModel
 
@@ -15,7 +15,7 @@
 			<div class="card">
 				<div class="card-header text-center">@this.ViewData["Title"]</div>
 				<div class="card-body">
-					@using (this.Html.BeginForm("Create", "Proposal", new { area = "Student" })) {
+					@using (this.Html.BeginForm("Create", "StudentProposal", new { area = "Student" })) {
 						@this.Html.AntiForgeryToken()
 						<div class="row was-validated">
 							<div class="col">
@@ -51,7 +51,7 @@
 						<div class="row text-center">
 							<div class="col">
 								<div class="btn-group">
-									@this.Html.ActionLink("Cancelar", "Index", "Proposal", new { area = "Student" }, new { @class = "btn btn-secondary" })
+									@this.Html.ActionLink("Cancelar", "Index", "StudentProposal", new { area = "Student" }, new { @class = "btn btn-secondary" })
 									<button type="submit" class="btn btn-primary">Crear</button>
 								</div>
 							</div>

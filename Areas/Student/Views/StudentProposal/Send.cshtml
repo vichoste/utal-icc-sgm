@@ -1,9 +1,9 @@
-﻿@using Utal.Icc.Sgm.Areas.GuideTeacher.Views.Proposal
+﻿@using Utal.Icc.Sgm.Areas.Student.Views.StudentProposal
 
-@model ApproveViewModel
+@model SendViewModel
 
 @{
-	this.ViewData["Title"] = "Aprobar propuesta";
+	this.ViewData["Title"] = "Enviar propuesta";
 }
 
 <div class="container">
@@ -13,18 +13,18 @@
 			<div class="card">
 				<div class="card-header text-center">@this.ViewData["Title"]</div>
 				<div class="card-body text-center">
-					@using (this.Html.BeginForm("Approve", "Proposal", new { area = "GuideTeacher" })) {
+					@using (this.Html.BeginForm("Send", "StudentProposal", new { area = "Student" })) {
 						@this.Html.AntiForgeryToken()
 						@this.Html.HiddenFor(m => m.Id)
 						@this.Html.HiddenFor(m => m.Title)
-						@this.Html.HiddenFor(m => m.Student)
-						<h5 class="card-title">¿Deseas <b class="text-success">aprobar</b> la propuesta del estudiante <b>@this.Html.DisplayFor(m => m.Student)</b>?</h5>
+						@this.Html.HiddenFor(m => m.GuideTeacherName)
+						<h5 class="card-title">¿Deseas <b class="text-primary">enviar</b> esta propuesta al profesor guía <b>@this.Html.DisplayFor(m => m.GuideTeacherName)</b>?</h5>
 						<h6 class="card-subtitle mb-3 text-muted">@this.Html.DisplayFor(m => m.Title)</h6>
 						<div class="row text-center">
 							<div class="col">
 								<div class="btn-group">
-									@this.Html.ActionLink("No", "View", "Proposal", new { area = "GuideTeacher", id = this.Model.Id }, new { @class = "btn btn-secondary" })
-									<button type="submit" class="btn btn-success">Sí</button>
+									@this.Html.ActionLink("No", "Index", "StudentProposal", new { area = "Student" }, new { @class = "btn btn-secondary" })
+									<button type="submit" class="btn btn-primary">Sí</button>
 								</div>
 							</div>
 						</div>

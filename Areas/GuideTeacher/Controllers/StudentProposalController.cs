@@ -11,11 +11,11 @@ using Utal.Icc.Sgm.Models;
 namespace Utal.Icc.Sgm.Areas.GuideTeacher.Controllers;
 
 [Area("GuideTeacher"), Authorize(Roles = "GuideTeacher")]
-public class ProposalController : Controller {
+public class StudentProposalController : Controller {
 	private readonly ApplicationDbContext _dbContext;
 	private readonly UserManager<ApplicationUser> _userManager;
 
-	public ProposalController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager) {
+	public StudentProposalController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager) {
 		this._dbContext = dbContext;
 		this._userManager = userManager;
 	}
@@ -38,9 +38,8 @@ public class ProposalController : Controller {
 		this.ViewData["CurrentFilter"] = searchString;
 		var studentProposals = this._dbContext.StudentProposals.AsNoTracking()
 			.Where(sp => sp.GuideTeacherOfTheStudentProposal == teacher && (
-				sp.ProposalStatus == StudentProposal.Status.Sent
-				|| sp.ProposalStatus == StudentProposal.Status.Approved
-				|| sp.ProposalStatus == StudentProposal.Status.Confirmed))
+				sp.ProposalStatus == StudentProposal.Status.SentToGuideTeacher
+				|| sp.ProposalStatus == StudentProposal.Status.ApprovedByGuideTeacher))
 			.Include(sp => sp.StudentOwnerOfTheStudentProposal).AsNoTracking();
 		var orderedProposals = sortOrder switch {
 			"Title" => studentProposals.OrderBy(sp => sp.Title),
@@ -77,7 +76,7 @@ public class ProposalController : Controller {
 			return this.RedirectToAction("Index", "Home", new { area = "" });
 		}
 		var studentProposal = await this._dbContext.StudentProposals.AsNoTracking()
-			.Where(sp => sp.GuideTeacherOfTheStudentProposal == teacher && sp.ProposalStatus == StudentProposal.Status.Sent)
+			.Where(sp => sp.GuideTeacherOfTheStudentProposal == teacher && sp.ProposalStatus == StudentProposal.Status.SentToGuideTeacher)
 			.Include(sp => sp.StudentOwnerOfTheStudentProposal).AsNoTracking()
 			.Include(sp => sp.AssistantTeacher1OfTheStudentProposal).AsNoTracking()
 			.Include(sp => sp.AssistantTeacher2OfTheStudentProposal).AsNoTracking()
@@ -85,7 +84,7 @@ public class ProposalController : Controller {
 			.FirstOrDefaultAsync(sp => sp.Id == id);
 		if (studentProposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
-			return this.RedirectToAction("Index", "Proposal", new { area = "GuideTeacher" });
+			return this.RedirectToAction("Index", "StudentProposal", new { area = "GuideTeacher" });
 		}
 		var viewModel = new ViewModel {
 			Id = id,
@@ -114,12 +113,12 @@ public class ProposalController : Controller {
 			return this.RedirectToAction("Index", "Home", new { area = "" });
 		}
 		var studentProposal = await this._dbContext.StudentProposals.AsNoTracking()
-			.Where(sp => sp.GuideTeacherOfTheStudentProposal == teacher && sp.ProposalStatus == StudentProposal.Status.Sent).AsNoTracking()
+			.Where(sp => sp.GuideTeacherOfTheStudentProposal == teacher && sp.ProposalStatus == StudentProposal.Status.SentToGuideTeacher).AsNoTracking()
 			.Include(sp => sp.StudentOwnerOfTheStudentProposal).AsNoTracking()
 			.FirstOrDefaultAsync(sp => sp.Id == id);
 		if (studentProposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
-			return this.RedirectToAction("Index", "Proposal", new { area = "GuideTeacher" });
+			return this.RedirectToAction("Index", "StudentProposal", new { area = "GuideTeacher" });
 		}
 		var rejectViewModel = new RejectViewModel {
 			Id = id,
@@ -147,19 +146,19 @@ public class ProposalController : Controller {
 			});
 		}
 		var studentProposal = await this._dbContext.StudentProposals
-			.Where(sp => sp.GuideTeacherOfTheStudentProposal == teacher && sp.ProposalStatus == StudentProposal.Status.Sent)
+			.Where(sp => sp.GuideTeacherOfTheStudentProposal == teacher && sp.ProposalStatus == StudentProposal.Status.SentToGuideTeacher)
 			.FirstOrDefaultAsync(sp => sp.Id == model.Id);
 		if (studentProposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
-			return this.RedirectToAction("Index", "Proposal", new { area = "GuideTeacher" });
+			return this.RedirectToAction("Index", "StudentProposal", new { area = "GuideTeacher" });
 		}
-		studentProposal.ProposalStatus = StudentProposal.Status.Rejected;
+		studentProposal.ProposalStatus = StudentProposal.Status.RejectedByGuideTeacher;
 		studentProposal.RejectionReason = model.Reason;
 		studentProposal.UpdatedAt = DateTimeOffset.Now;
 		_ = this._dbContext.StudentProposals.Update(studentProposal);
 		_ = await this._dbContext.SaveChangesAsync();
 		this.TempData["SuccessMessage"] = "La propuesta ha sido rechazada correctamente.";
-		return this.RedirectToAction("Index", "Proposal", new { area = "GuideTeacher" });
+		return this.RedirectToAction("Index", "StudentProposal", new { area = "GuideTeacher" });
 	}
 
 	public async Task<IActionResult> Approve(string id) {
@@ -171,12 +170,12 @@ public class ProposalController : Controller {
 			return this.RedirectToAction("Index", "Home", new { area = "" });
 		}
 		var studentProposal = await this._dbContext.StudentProposals.AsNoTracking()
-			.Where(sp => sp.GuideTeacherOfTheStudentProposal == teacher && sp.ProposalStatus == StudentProposal.Status.Sent).AsNoTracking()
+			.Where(sp => sp.GuideTeacherOfTheStudentProposal == teacher && sp.ProposalStatus == StudentProposal.Status.SentToGuideTeacher).AsNoTracking()
 			.Include(sp => sp.StudentOwnerOfTheStudentProposal).AsNoTracking()
 			.FirstOrDefaultAsync(sp => sp.Id == id);
 		if (studentProposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
-			return this.RedirectToAction("Index", "Proposal", new { area = "GuideTeacher" });
+			return this.RedirectToAction("Index", "StudentProposal", new { area = "GuideTeacher" });
 		}
 		var approveViewModel = new ApproveViewModel {
 			Id = id,
@@ -196,17 +195,17 @@ public class ProposalController : Controller {
 			return this.RedirectToAction("Index", "Home", new { area = "" });
 		}
 		var studentProposal = await this._dbContext.StudentProposals
-			.Where(sp => sp.GuideTeacherOfTheStudentProposal == teacher && sp.ProposalStatus == StudentProposal.Status.Sent)
+			.Where(sp => sp.GuideTeacherOfTheStudentProposal == teacher && sp.ProposalStatus == StudentProposal.Status.SentToGuideTeacher)
 			.FirstOrDefaultAsync(sp => sp.Id == model.Id);
 		if (studentProposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
-			return this.RedirectToAction("Index", "Proposal", new { area = "GuideTeacher" });
+			return this.RedirectToAction("Index", "StudentProposal", new { area = "GuideTeacher" });
 		}
-		studentProposal.ProposalStatus = StudentProposal.Status.Approved;
+		studentProposal.ProposalStatus = StudentProposal.Status.ApprovedByGuideTeacher;
 		studentProposal.UpdatedAt = DateTimeOffset.Now;
 		_ = this._dbContext.StudentProposals.Update(studentProposal);
 		_ = await this._dbContext.SaveChangesAsync();
 		this.TempData["SuccessMessage"] = "La propuesta ha sido aceptada correctamente.";
-		return this.RedirectToAction("Index", "Proposal", new { area = "GuideTeacher" });
+		return this.RedirectToAction("Index", "StudentProposal", new { area = "GuideTeacher" });
 	}
 }

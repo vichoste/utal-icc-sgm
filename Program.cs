@@ -5,6 +5,8 @@ using Utal.Icc.Sgm.Data;
 using Utal.Icc.Sgm.Models;
 using Utal.Icc.Sgm.Seeders;
 
+using static Utal.Icc.Sgm.Models.ApplicationUser;
+
 var builder = WebApplication.CreateBuilder(args);
 var defaultConnection = builder.Environment.IsDevelopment() ? builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("No se encuentra el string de conexión hacia la base de datos.") : Environment.GetEnvironmentVariable("DEFAULT_CONNECTION");
 var directorTeacherEmail = builder.Environment.IsDevelopment() ? builder.Configuration["DirectorTeacherEmail"] ?? throw new InvalidOperationException("No se encuentra el string del email del director de carrera.") : Environment.GetEnvironmentVariable("DIRECTOR_TEACHER_EMAIL");
@@ -43,19 +45,19 @@ _ = app.MapAreaControllerRoute(
 	pattern: "Account/{controller=SignIn}/{action=Index}/{id?}"
 );
 _ = app.MapAreaControllerRoute(
-	name: "DirectorTeacher",
-	areaName: "DirectorTeacher",
-	pattern: "DirectorTeacher/{controller=Student}/{action=Index}/{id?}"
+	name: nameof(Roles.DirectorTeacher),
+	areaName: nameof(Roles.DirectorTeacher),
+	pattern: $"{nameof(Roles.DirectorTeacher)}/{{controller={nameof(Roles.Student)}}}/{{action=Index}}/{{id?}}"
 );
 _ = app.MapAreaControllerRoute(
-	name: "GuideTeacher",
-	areaName: "GuideTeacher",
-	pattern: "GuideTeacher/{controller=Proposal}/{action=Index}/{id?}"
+	name: nameof(Roles.GuideTeacher),
+	areaName: nameof(Roles.GuideTeacher),
+	pattern: $"{nameof(Roles.GuideTeacher)}/{{controller={nameof(StudentProposal)}}}/{{action=Index}}/{{id?}}"
 );
 _ = app.MapAreaControllerRoute(
-	name: "Student",
-	areaName: "Student",
-	pattern: "Student/{controller=Proposal}/{action=Index}/{id?}"
+	name: nameof(Roles.Student),
+	areaName: nameof(Roles.Student),
+	pattern: $"{nameof(Roles.Student)}/{{controller={nameof(StudentProposal)}}}/{{action=Index}}/{{id?}}"
 );
 _ = app.MapControllerRoute(
 	name: "default",

@@ -87,9 +87,9 @@
 						<div class="row text-center">
 							<div class="col">
 								<div class="btn-group">
-									@this.Html.ActionLink("Cancelar", "Index", "Proposal", new { area = "GuideTeacher" }, new { @class = "btn btn-secondary" })
-									@this.Html.ActionLink("Rechazar", "Reject", "Proposal", new { area = "GuideTeacher", id = this.Model.Id }, new { @class = "btn btn-danger" })
-									@this.Html.ActionLink("Aceptar", "Approve", "Proposal", new { area = "GuideTeacher", id = this.Model.Id }, new { @class = "btn btn-success" })
+									@this.Html.ActionLink("Cancelar", "Index", "StudentProposal", new { area = "GuideTeacher" }, new { @class = "btn btn-secondary" })
+									@this.Html.ActionLink("Rechazar", "Reject", "StudentProposal", new { area = "GuideTeacher", id = this.Model.Id }, new { @class = "btn btn-danger" })
+									@this.Html.ActionLink("Aceptar", "Approve", "StudentProposal", new { area = "GuideTeacher", id = this.Model.Id }, new { @class = "btn btn-success" })
 								</div>
 							</div>
 						</div>
