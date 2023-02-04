@@ -53,7 +53,7 @@
 										case "Sent":
 											<span class="badge bg-yellow">Pendiente de revisión</span>
 											break;
-										case "Accepted":
+										case "Approved":
 											<span class="badge bg-success">Aceptado</span>
 											break;
 										case "Confirmed":
@@ -67,7 +67,7 @@
 								<td>
 									@if (item.ProposalStatus == StudentProposal.Status.Sent.ToString()) {
 										@this.Html.ActionLink("Ver", "View", "Proposal", new { area = "GuideTeacher", id = item.Id }, new { @class = "btn btn-yellow mb-3"})
-									} else if (item.ProposalStatus == StudentProposal.Status.Accepted.ToString()) {
+									} else if (item.ProposalStatus == StudentProposal.Status.Approved.ToString()) {
 										@this.Html.ActionLink("Confirmar", "Confirm", "Proposal", new { area = "GuideTeacher", id = item.Id }, new { @class = "btn btn-success mb-3"})
 									}
 								</td>

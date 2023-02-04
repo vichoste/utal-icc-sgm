@@ -38,7 +38,7 @@ public class ProposalController : Controller {
 		}
 		this.ViewData["CurrentFilter"] = searchString;
 		var studentProposals = this._dbContext.StudentProposals.AsNoTracking()
-			.Where(sp => sp.GuideTeacherOfTheStudentProposal == teacher && sp.ProposalStatus == StudentProposal.Status.Sent)
+			.Where(sp => sp.GuideTeacherOfTheStudentProposal == teacher && sp.ProposalStatus == StudentProposal.Status.Sent || sp.ProposalStatus == StudentProposal.Status.Approved)
 			.Include(sp => sp.GuideTeacherOfTheStudentProposal).AsNoTracking()
 			.Include(sp => sp.StudentOwnerOfTheStudentProposal).AsNoTracking();
 		var orderedProposals = sortOrder switch {
@@ -105,6 +105,7 @@ public class ProposalController : Controller {
 		};
 		return this.View(viewModel);
 	}
+	
 	public async Task<IActionResult> Reject(string id) {
 		var teacher = await this._userManager.GetUserAsync(this.User);
 		if (teacher is null) {
@@ -146,7 +147,7 @@ public class ProposalController : Controller {
 				StudentName = model.StudentName,
 			});
 		}
-		var studentProposal = await this._dbContext.StudentProposals.AsNoTracking()
+		var studentProposal = await this._dbContext.StudentProposals
 			.Where(sp => sp.GuideTeacherOfTheStudentProposal == teacher && sp.ProposalStatus == StudentProposal.Status.Sent)
 			.FirstOrDefaultAsync(sp => sp.Id == model.Id);
 		if (studentProposal is null) {
@@ -159,6 +160,54 @@ public class ProposalController : Controller {
 		_ = this._dbContext.StudentProposals.Update(studentProposal);
 		_ = await this._dbContext.SaveChangesAsync();
 		this.TempData["SuccessMessage"] = "La propuesta ha sido rechazada correctamente.";
+		return this.RedirectToAction("Index", "Proposal", new { area = "GuideTeacher" });
+	}
+
+	public async Task<IActionResult> Approve(string id) {
+		var teacher = await this._userManager.GetUserAsync(this.User);
+		if (teacher is null) {
+			return this.RedirectToAction("Index", "Home", new { area = "" });
+		}
+		if (teacher.IsDeactivated) {
+			return this.RedirectToAction("Index", "Home", new { area = "" });
+		}
+		var studentProposal = await this._dbContext.StudentProposals.AsNoTracking()
+			.Where(sp => sp.GuideTeacherOfTheStudentProposal == teacher && sp.ProposalStatus == StudentProposal.Status.Sent).AsNoTracking()
+			.Include(sp => sp.StudentOwnerOfTheStudentProposal).AsNoTracking()
+			.FirstOrDefaultAsync(sp => sp.Id == id);
+		if (studentProposal is null) {
+			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
+			return this.RedirectToAction("Index", "Proposal", new { area = "GuideTeacher" });
+		}
+		var approveViewModel = new ApproveViewModel {
+			Id = id,
+			Title = studentProposal.Title,
+			StudentName = $"{studentProposal.StudentOwnerOfTheStudentProposal!.FirstName} {studentProposal.StudentOwnerOfTheStudentProposal.LastName}"
+		};
+		return this.View(approveViewModel);
+	}
+
+	[HttpPost, ValidateAntiForgeryToken]
+	public async Task<IActionResult> Approve([FromForm] ApproveViewModel model) {
+		var teacher = await this._userManager.GetUserAsync(this.User);
+		if (teacher is null) {
+			return this.RedirectToAction("Index", "Home", new { area = "" });
+		}
+		if (teacher.IsDeactivated) {
+			return this.RedirectToAction("Index", "Home", new { area = "" });
+		}
+		var studentProposal = await this._dbContext.StudentProposals
+			.Where(sp => sp.GuideTeacherOfTheStudentProposal == teacher && sp.ProposalStatus == StudentProposal.Status.Sent)
+			.FirstOrDefaultAsync(sp => sp.Id == model.Id);
+		if (studentProposal is null) {
+			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
+			return this.RedirectToAction("Index", "Proposal", new { area = "GuideTeacher" });
+		}
+		studentProposal.ProposalStatus = StudentProposal.Status.Approved;
+		studentProposal.UpdatedAt = DateTimeOffset.Now;
+		_ = this._dbContext.StudentProposals.Update(studentProposal);
+		_ = await this._dbContext.SaveChangesAsync();
+		this.TempData["SuccessMessage"] = "La propuesta ha sido aceptada correctamente.";
 		return this.RedirectToAction("Index", "Proposal", new { area = "GuideTeacher" });
 	}
 }

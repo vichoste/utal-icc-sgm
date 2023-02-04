@@ -6,7 +6,7 @@ public class StudentProposal {
 	public enum Status {
 		Draft,
 		Sent,
-		Accepted,
+		Approved,
 		Confirmed,
 		Rejected
 	}
