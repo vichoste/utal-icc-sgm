@@ -13,16 +13,18 @@
 			<div class="card">
 				<div class="card-header text-center">@this.ViewData["Title"]</div>
 				<div class="card-body text-center">
-					<p>¿Deseas <b class="text-danger">rechazar</b> esta propuesta llamada <b>"@this.Html.DisplayFor(m => m.Title)"</b>?</p>
 					@using (this.Html.BeginForm("Reject", "Proposal", new { area = "GuideTeacher" })) {
 						@this.Html.AntiForgeryToken()
 						@this.Html.HiddenFor(m => m.Id)
 						@this.Html.HiddenFor(m => m.Title)
+						<h5 class="card-title">¿Deseas <b class="text-danger">rechazar</b> esta propuesta?</h5>
+						<h6 class="card-subtitle mb-3 text-muted">@this.Html.DisplayFor(m => m.Title)</h6>
 						<div class="row text-center">
 							<div class="col">
 								<div class="form-group mb-3">
 									@this.Html.LabelFor(m => m.Reason, new { @class = "form-label" })
 									@this.Html.TextBoxFor(m => m.Reason, new { @class = "form-control" })
+									@this.Html.ValidationMessageFor(m => m.Reason, "Justifique su rechazo", new { @class = "invalid-feedback" })
 								</div>
 								<div class="btn-group">
 									@this.Html.ActionLink("No", "Index", "Proposal", new { area = "GuideTeacher" }, new { @class = "btn btn-secondary" })

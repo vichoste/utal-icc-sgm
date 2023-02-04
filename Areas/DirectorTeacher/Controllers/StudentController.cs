@@ -89,13 +89,9 @@ public class StudentController : Controller {
 
 	public async Task<IActionResult> Create() {
 		var teacherSession = await this._userManager.GetUserAsync(this.User);
-		if (teacherSession is null) {
-			return this.RedirectToAction("Index", "Home", new { area = "" });
-		}
-		if (teacherSession.IsDeactivated) {
-			return this.RedirectToAction("Index", "Home", new { area = "" });
-		}
-		return this.View(new InputViewModel());
+		return teacherSession is null
+			? this.RedirectToAction("Index", "Home", new { area = "" })
+			: teacherSession.IsDeactivated ? this.RedirectToAction("Index", "Home", new { area = "" }) : this.View(new InputViewModel());
 	}
 
 	[HttpPost]

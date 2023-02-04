@@ -136,6 +136,13 @@ public class ProposalController : Controller {
 		if (teacher.IsDeactivated) {
 			return this.RedirectToAction("Index", "Home", new { area = "" });
 		}
+		if (!this.ModelState.IsValid) {
+			this.ViewBag.WarningMessage = "Revisa que los campos estén correctos.";
+			return this.View(new RejectViewModel {
+				Id = model.Id,
+				Title = model.Title,
+			});
+		}
 		var studentProposal = await this._dbContext.StudentProposals.AsNoTracking()
 			.Where(sp => sp.GuideTeacherOfTheStudentProposal == teacher && sp.ProposalStatus == StudentProposal.Status.Sent)
 			.FirstOrDefaultAsync(sp => sp.Id == model.Id);

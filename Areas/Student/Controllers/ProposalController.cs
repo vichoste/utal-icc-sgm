@@ -447,6 +447,7 @@ public class ProposalController : Controller {
 		if (guideTeacher is null) {
 			this.ViewBag.ErrorMessage = "Error al obtener al profesor guía.";
 			return this.View(new EditViewModel {
+				Id = model.Id,
 				Title = model.Title,
 				Description = model.Description,
 				CreatedAt = studentProposal.CreatedAt,
@@ -456,6 +457,7 @@ public class ProposalController : Controller {
 		if (guideTeacher.IsDeactivated) {
 			this.ViewBag.ErrorMessage = $"El profesor guía candidato está desactivado.";
 			return this.View(new EditViewModel {
+				Id = model.Id,
 				Title = model.Title,
 				Description = model.Description,
 				CreatedAt = studentProposal.CreatedAt,
@@ -465,6 +467,7 @@ public class ProposalController : Controller {
 		if (studentProposal.ProposalStatus != StudentProposal.Status.Draft) {
 			this.ViewBag.ErrorMessage = "La propuesta no puede ser editada ya que no es un borrador.";
 			return this.View(new EditViewModel {
+				Id = model.Id,
 				Title = model.Title,
 				Description = model.Description,
 				CreatedAt = studentProposal.CreatedAt,
@@ -479,6 +482,7 @@ public class ProposalController : Controller {
 			if (assistantTeacher1 is null) {
 				this.ViewBag.ErrorMessage = "Error al obtener al primer profesor co-guía.";
 				return this.View(new EditViewModel {
+					Id = model.Id,
 					Title = model.Title,
 					Description = model.Description,
 					CreatedAt = studentProposal.CreatedAt,
@@ -488,6 +492,7 @@ public class ProposalController : Controller {
 			if (assistantTeacher1.IsDeactivated) {
 				this.ViewBag.ErrorMessage = $"El primer profesor co-guía candidato está desactivado.";
 				return this.View(new EditViewModel {
+					Id = model.Id,
 					Title = model.Title,
 					Description = model.Description,
 					CreatedAt = studentProposal.CreatedAt,
@@ -500,6 +505,7 @@ public class ProposalController : Controller {
 			if (assistantTeacher2 is null) {
 				this.ViewBag.ErrorMessage = "Error al obtener al segundo profesor co-guía.";
 				return this.View(new EditViewModel {
+					Id = model.Id,
 					Title = model.Title,
 					Description = model.Description,
 					CreatedAt = studentProposal.CreatedAt,
@@ -509,6 +515,7 @@ public class ProposalController : Controller {
 			if (assistantTeacher2.IsDeactivated) {
 				this.ViewBag.ErrorMessage = $"El segundo profesor co-guía candidato está desactivado.";
 				return this.View(new EditViewModel {
+					Id = model.Id,
 					Title = model.Title,
 					Description = model.Description,
 					CreatedAt = studentProposal.CreatedAt,
@@ -521,6 +528,7 @@ public class ProposalController : Controller {
 			if (assistantTeacher3 is null) {
 				this.ViewBag.ErrorMessage = "Error al obtener al tercer profesor co-guía.";
 				return this.View(new EditViewModel {
+					Id = model.Id,
 					Title = model.Title,
 					Description = model.Description,
 					CreatedAt = studentProposal.CreatedAt,
@@ -530,6 +538,7 @@ public class ProposalController : Controller {
 			if (assistantTeacher3.IsDeactivated) {
 				this.ViewBag.ErrorMessage = $"El tercer profesor co-guía candidato está desactivado.";
 				return this.View(new EditViewModel {
+					Id = model.Id,
 					Title = model.Title,
 					Description = model.Description,
 					CreatedAt = studentProposal.CreatedAt,
@@ -540,6 +549,7 @@ public class ProposalController : Controller {
 		if (assistantTeacher1 is not null && guideTeacher == assistantTeacher1) {
 			this.ViewBag.WarningMessage = "El profesor guía no puede ser un profesor co-guía a la vez.";
 			return this.View(new EditViewModel {
+				Id = model.Id,
 				Title = model.Title,
 				Description = model.Description,
 				CreatedAt = studentProposal.CreatedAt,
@@ -549,6 +559,7 @@ public class ProposalController : Controller {
 		if (assistantTeacher1 is not null && assistantTeacher2 is not null && assistantTeacher1 == assistantTeacher2) {
 			this.ViewBag.WarningMessage = "El profesor co-guía no puede repetirse más de una vez.";
 			return this.View(new EditViewModel {
+				Id = model.Id,
 				Title = model.Title,
 				Description = model.Description,
 				CreatedAt = studentProposal.CreatedAt,
@@ -558,6 +569,7 @@ public class ProposalController : Controller {
 		if (assistantTeacher1 is not null && assistantTeacher3 is not null && assistantTeacher1 == assistantTeacher3) {
 			this.ViewBag.WarningMessage = "El profesor co-guía no puede repetirse más de una vez.";
 			return this.View(new EditViewModel {
+				Id = model.Id,
 				Title = model.Title,
 				Description = model.Description,
 				CreatedAt = studentProposal.CreatedAt,
@@ -567,6 +579,7 @@ public class ProposalController : Controller {
 		if (assistantTeacher2 is not null && guideTeacher == assistantTeacher2) {
 			this.ViewBag.WarningMessage = "El profesor guía no puede ser un profesor co-guía a la vez.";
 			return this.View(new EditViewModel {
+				Id = model.Id,
 				Title = model.Title,
 				Description = model.Description,
 				CreatedAt = studentProposal.CreatedAt,
@@ -576,6 +589,7 @@ public class ProposalController : Controller {
 		if (assistantTeacher2 is not null && assistantTeacher1 is not null && assistantTeacher2 == assistantTeacher1) {
 			this.ViewBag.WarningMessage = "El profesor co-guía no puede repetirse más de una vez.";
 			return this.View(new EditViewModel {
+				Id = model.Id,
 				Title = model.Title,
 				Description = model.Description,
 				CreatedAt = studentProposal.CreatedAt,
@@ -585,6 +599,7 @@ public class ProposalController : Controller {
 		if (assistantTeacher2 is not null && assistantTeacher3 is not null && assistantTeacher2 == assistantTeacher3) {
 			this.ViewBag.WarningMessage = "El profesor co-guía no puede repetirse más de una vez.";
 			return this.View(new EditViewModel {
+				Id = model.Id,
 				Title = model.Title,
 				Description = model.Description,
 				CreatedAt = studentProposal.CreatedAt,
@@ -594,6 +609,7 @@ public class ProposalController : Controller {
 		if (assistantTeacher3 is not null && guideTeacher == assistantTeacher3) {
 			this.ViewBag.WarningMessage = "El profesor guía no puede ser un profesor co-guía a la vez.";
 			return this.View(new EditViewModel {
+				Id = model.Id,
 				Title = model.Title,
 				Description = model.Description,
 				CreatedAt = studentProposal.CreatedAt,
@@ -603,6 +619,7 @@ public class ProposalController : Controller {
 		if (assistantTeacher3 is not null && assistantTeacher1 is not null && assistantTeacher3 == assistantTeacher1) {
 			this.ViewBag.WarningMessage = "El profesor co-guía no puede repetirse más de una vez.";
 			return this.View(new EditViewModel {
+				Id = model.Id,
 				Title = model.Title,
 				Description = model.Description,
 				CreatedAt = studentProposal.CreatedAt,
@@ -612,6 +629,7 @@ public class ProposalController : Controller {
 		if (assistantTeacher3 is not null && assistantTeacher2 is not null && assistantTeacher3 == assistantTeacher2) {
 			this.ViewBag.WarningMessage = "El profesor co-guía no puede repetirse más de una vez.";
 			return this.View(new EditViewModel {
+				Id = model.Id,
 				Title = model.Title,
 				Description = model.Description,
 				CreatedAt = studentProposal.CreatedAt,
@@ -696,6 +714,7 @@ public class ProposalController : Controller {
 		}
 		var studentProposal = await this._dbContext.StudentProposals.AsNoTracking()
 			.Where(sp => sp.StudentOwnerOfTheStudentProposal == student && sp.ProposalStatus == StudentProposal.Status.Draft)
+			.Include(sp => sp.GuideTeacherOfTheStudentProposal)
 			.FirstOrDefaultAsync(sp => sp.Id == id);
 		if (studentProposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
@@ -703,7 +722,8 @@ public class ProposalController : Controller {
 		}
 		var sendViewModel = new SendViewModel {
 			Id = id,
-			Title = studentProposal.Title
+			Title = studentProposal.Title,
+			GuideTeacherName = $"{studentProposal.GuideTeacherOfTheStudentProposal!.FirstName} {studentProposal.GuideTeacherOfTheStudentProposal!.LastName}"
 		};
 		return this.View(sendViewModel);
 	}

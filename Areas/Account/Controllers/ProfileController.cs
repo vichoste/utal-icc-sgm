@@ -94,10 +94,10 @@ public class ProfileController : Controller {
 		student.UpdatedAt = DateTimeOffset.Now;
 		_ = await this._userManager.UpdateAsync(student);
 		var editViewModel = new StudentViewModel {
-			UniversityId = model.UniversityId,
-			RemainingCourses = model.RemainingCourses,
-			IsDoingThePractice = model.IsDoingThePractice,
-			IsWorking = model.IsWorking
+			UniversityId = student.StudentUniversityId,
+			RemainingCourses = student.StudentRemainingCourses,
+			IsDoingThePractice = student.StudentIsDoingThePractice,
+			IsWorking = student.StudentIsWorking
 		};
 		this.ViewBag.SuccessMessage = "Has actualizado tu perfil correctamente.";
 		return this.View(editViewModel);
@@ -115,7 +115,7 @@ public class ProfileController : Controller {
 		var teacherViewModel = new TeacherViewModel {
 			Office = teacher.TeacherOffice,
 			Schedule = teacher.TeacherSchedule,
-			Specialization = teacher.TeacherSpecialization,
+			Specialization = teacher.TeacherSpecialization
 		};
 		return this.View(teacherViewModel);
 	}
@@ -137,7 +137,7 @@ public class ProfileController : Controller {
 		var teacherViewModel = new TeacherViewModel {
 			Office = model.Office,
 			Schedule = model.Schedule,
-			Specialization = model.Specialization,
+			Specialization = model.Specialization
 		};
 		this.ViewBag.SuccessMessage = "Has actualizado tu perfil correctamente.";
 		return this.View(teacherViewModel);

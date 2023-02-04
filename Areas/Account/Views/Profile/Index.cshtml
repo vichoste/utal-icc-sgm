@@ -16,27 +16,33 @@
 					@using (this.Html.BeginForm()) {
 						<div class="form-group mb-3">
 							@this.Html.LabelFor(m => m.FirstName, new { @class = "form-label" }):
+							@this.Html.HiddenFor(m => m.FirstName)
 							@this.Html.DisplayFor(m => m.FirstName, new { @class = "form-control" })
 						</div>
 						<div class="form-group mb-3">
 							@this.Html.LabelFor(m => m.LastName, new { @class = "form-label" }):
+							@this.Html.HiddenFor(m => m.LastName)
 							@this.Html.DisplayFor(m => m.LastName, new { @class = "form-control" })
 						</div>
 						<div class="form-group mb-3">
 							@this.Html.LabelFor(m => m.Rut, new { @class = "form-label" }):
+							@this.Html.HiddenFor(m => m.Rut)
 							@this.Html.DisplayFor(m => m.Rut, new { @class = "form-control" })
 						</div>
 						<div class="form-group mb-3">
 							@this.Html.LabelFor(m => m.Email, new { @class = "form-label" }):
+							@this.Html.HiddenFor(m => m.Email)
 							@this.Html.DisplayFor(m => m.Email, new { @class = "form-control" })
 						</div>
 						<hr />
 						<div class="form-group mb-3 text-muted">
 							@this.Html.LabelFor(m => m.CreatedAt, new { @class = "form-label" }):
+							@this.Html.HiddenFor(m => m.CreatedAt)
 							@this.Html.DisplayFor(m => m.CreatedAt, new { @class = "form-control" })
 							</div>
 						<div class="form-group mb-3 text-muted">
 							@this.Html.LabelFor(m => m.UpdatedAt, new { @class = "form-label" }):
+							@this.Html.HiddenFor(m => m.UpdatedAt)
 							@this.Html.DisplayFor(m => m.UpdatedAt, new { @class = "form-control" })
 						</div>
 					}

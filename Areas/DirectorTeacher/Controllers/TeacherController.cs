@@ -79,13 +79,9 @@ public class TeacherController : Controller {
 
 	public async Task<IActionResult> Create() {
 		var teacherSession = await this._userManager.GetUserAsync(this.User);
-		if (teacherSession is null) {
-			return this.RedirectToAction("Index", "Home", new { area = "" });
-		}
-		if (teacherSession.IsDeactivated) {
-			return this.RedirectToAction("Index", "Home", new { area = "" });
-		}
-		return this.View(new CreateViewModel());
+		return teacherSession is null
+			? this.RedirectToAction("Index", "Home", new { area = "" })
+			: teacherSession.IsDeactivated ? this.RedirectToAction("Index", "Home", new { area = "" }) : this.View(new CreateViewModel());
 	}
 
 	[HttpPost, ValidateAntiForgeryToken]
@@ -229,6 +225,7 @@ public class TeacherController : Controller {
 			return this.View(editViewModel1);
 		}
 		var editViewModel = new EditViewModel {
+			Id = teacher.Id,
 			FirstName = teacher.FirstName,
 			LastName = teacher.LastName,
 			Rut = teacher.Rut,
