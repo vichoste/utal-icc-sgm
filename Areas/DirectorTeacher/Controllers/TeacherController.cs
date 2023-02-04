@@ -74,7 +74,7 @@ public class TeacherController : Controller {
 		if (await this.CheckTeacherSession() is null) {
 			return this.RedirectToAction("Index", "Home", new { area = "" });
 		}
-		var parameters = new[] { "FirstNameSortParam", "LastNameSortParam", "UniversityIdSortParam", "RutSortParam", "EmailSortParam" };
+		var parameters = new[] { "FirstName", "LastName", "Rut", "Email" };
 		this.SetSortParameters(sortOrder, parameters);
 		if (searchString is not null) {
 			pageNumber = 1;
@@ -83,7 +83,7 @@ public class TeacherController : Controller {
 		}
 		this.ViewData["CurrentFilter"] = searchString;
 		var teachers = await this._userManager.GetUsersInRoleAsync(Roles.Teacher.ToString());
-		var orderedTeachers = this.OrderApplicationUsers(sortOrder, teachers, "FirstName", "LastName", "Rut", "Email");
+		var orderedTeachers = this.OrderApplicationUsers(sortOrder, teachers, parameters);
 		var indexViewModels = this.FilterApplicationUsers(searchString, orderedTeachers, parameters);
 		return this.View(PaginatedList<IndexViewModel>.Create((await this._userManager.GetUserAsync(this.User))!.Id, indexViewModels.AsQueryable(), pageNumber ?? 1, 6));
 	}
