@@ -34,6 +34,11 @@
 									Título
 								</a>
 							</th>
+							<th>
+								<a asp-action="Index" asp-route-sortOrder="@this.ViewData["GuideTeacherLastNameSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+									Profesor guía
+								</a>
+							</th>
 							<th>Estado</th>
 							<th>Acciones</th>
 						</tr>
@@ -42,6 +47,7 @@
 						@foreach (var item in this.Model) {
 							<tr>
 								<td>@item.Title</td>
+								<td>@item.GuideTeacher</td>
 								<td>
 									@switch (item.ProposalStatus) {
 										case "Draft":

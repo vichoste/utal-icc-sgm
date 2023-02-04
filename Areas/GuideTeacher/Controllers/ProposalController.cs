@@ -29,7 +29,6 @@ public class ProposalController : Controller {
 			return this.RedirectToAction("Index", "Home", new { area = "" });
 		}
 		this.ViewData["TitleSortParam"] = sortOrder == "Title" ? "TitleDesc" : "Title";
-		this.ViewData["StudentFirstNameSortParam"] = sortOrder == "StudentFirstName" ? "StudentFirstNameDesc" : "StudentFirstName";
 		this.ViewData["StudentLastNameSortParam"] = sortOrder == "StudentLastName" ? "StudentLastNameDesc" : "StudentLastName";
 		if (searchString is not null) {
 			pageNumber = 1;
@@ -38,14 +37,14 @@ public class ProposalController : Controller {
 		}
 		this.ViewData["CurrentFilter"] = searchString;
 		var studentProposals = this._dbContext.StudentProposals.AsNoTracking()
-			.Where(sp => sp.GuideTeacherOfTheStudentProposal == teacher && sp.ProposalStatus == StudentProposal.Status.Sent || sp.ProposalStatus == StudentProposal.Status.Approved)
-			.Include(sp => sp.GuideTeacherOfTheStudentProposal).AsNoTracking()
+			.Where(sp => sp.GuideTeacherOfTheStudentProposal == teacher && (
+				sp.ProposalStatus == StudentProposal.Status.Sent
+				|| sp.ProposalStatus == StudentProposal.Status.Approved
+				|| sp.ProposalStatus == StudentProposal.Status.Confirmed))
 			.Include(sp => sp.StudentOwnerOfTheStudentProposal).AsNoTracking();
 		var orderedProposals = sortOrder switch {
 			"Title" => studentProposals.OrderBy(sp => sp.Title),
 			"TitleDesc" => studentProposals.OrderByDescending(sp => sp.Title),
-			"StudentFirstName" => studentProposals.OrderBy(sp => sp.StudentOwnerOfTheStudentProposal!.FirstName),
-			"StudentFirstNameDesc" => studentProposals.OrderByDescending(sp => sp.StudentOwnerOfTheStudentProposal!.FirstName),
 			"StudentLastName" => studentProposals.OrderBy(sp => sp.StudentOwnerOfTheStudentProposal!.LastName),
 			"StudentLastNameDesc" => studentProposals.OrderByDescending(sp => sp.StudentOwnerOfTheStudentProposal!.LastName),
 			_ => studentProposals.OrderBy(sp => sp.Title)
@@ -125,7 +124,7 @@ public class ProposalController : Controller {
 		var rejectViewModel = new RejectViewModel {
 			Id = id,
 			Title = studentProposal.Title,
-			StudentName = $"{studentProposal.StudentOwnerOfTheStudentProposal!.FirstName} {studentProposal.StudentOwnerOfTheStudentProposal.LastName}"
+			Student = $"{studentProposal.StudentOwnerOfTheStudentProposal!.FirstName} {studentProposal.StudentOwnerOfTheStudentProposal.LastName}"
 		};
 		return this.View(rejectViewModel);
 	}
@@ -144,7 +143,7 @@ public class ProposalController : Controller {
 			return this.View(new RejectViewModel {
 				Id = model.Id,
 				Title = model.Title,
-				StudentName = model.StudentName,
+				Student = model.Student,
 			});
 		}
 		var studentProposal = await this._dbContext.StudentProposals
@@ -182,7 +181,7 @@ public class ProposalController : Controller {
 		var approveViewModel = new ApproveViewModel {
 			Id = id,
 			Title = studentProposal.Title,
-			StudentName = $"{studentProposal.StudentOwnerOfTheStudentProposal!.FirstName} {studentProposal.StudentOwnerOfTheStudentProposal.LastName}"
+			Student = $"{studentProposal.StudentOwnerOfTheStudentProposal!.FirstName} {studentProposal.StudentOwnerOfTheStudentProposal.LastName}"
 		};
 		return this.View(approveViewModel);
 	}

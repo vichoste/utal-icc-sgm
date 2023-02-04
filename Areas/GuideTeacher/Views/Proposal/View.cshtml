@@ -13,7 +13,7 @@
 			<div class="card">
 				<div class="card-header text-center">@this.ViewData["Title"]</div>
 				<div class="card-body">
-					@using (this.Html.BeginForm("Approve", "Proposal", new { area = "GuideTeacher" })) {
+					@using (this.Html.BeginForm()) {
 						@this.Html.AntiForgeryToken()
 						@this.Html.HiddenFor(m => m.Id)
 						<div class="row">
@@ -89,7 +89,7 @@
 								<div class="btn-group">
 									@this.Html.ActionLink("Cancelar", "Index", "Proposal", new { area = "GuideTeacher" }, new { @class = "btn btn-secondary" })
 									@this.Html.ActionLink("Rechazar", "Reject", "Proposal", new { area = "GuideTeacher", id = this.Model.Id }, new { @class = "btn btn-danger" })
-									<button type="submit" class="btn btn-success">Aprobar</button>
+									@this.Html.ActionLink("Aceptar", "Approve", "Proposal", new { area = "GuideTeacher", id = this.Model.Id }, new { @class = "btn btn-success" })
 								</div>
 							</div>
 						</div>

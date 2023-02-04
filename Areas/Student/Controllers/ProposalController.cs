@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
+using NuGet.DependencyResolver;
+
 using Utal.Icc.Sgm.Areas.Student.Views.Proposal;
 using Utal.Icc.Sgm.Data;
 using Utal.Icc.Sgm.Models;
@@ -24,9 +26,7 @@ public class ProposalController : Controller {
 	}
 
 	public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
-		var student = this._dbContext.Users.AsNoTracking()
-			.Include(s => s.StudentProposalsWhichIOwn).AsNoTracking()
-			.FirstOrDefault(s => s.Id == this._userManager.GetUserId(this.User));
+		var student = await this._userManager.GetUserAsync(this.User);
 		if (student is null) {
 			return this.RedirectToAction("Index", "Home", new { area = "" });
 		}
@@ -34,16 +34,26 @@ public class ProposalController : Controller {
 			return this.RedirectToAction("Index", "Home", new { area = "" });
 		}
 		this.ViewData["TitleSortParam"] = sortOrder == "Title" ? "TitleDesc" : "Title";
+		this.ViewData["GuideTeacherLastNameSortParam"] = sortOrder == "GuideTeacherLastName" ? "GuideTeacherLastNameDesc" : "GuideTeacherLastName";
 		if (searchString is not null) {
 			pageNumber = 1;
 		} else {
 			searchString = currentFilter;
 		}
 		this.ViewData["CurrentFilter"] = searchString;
+		var studentProposals = this._dbContext.StudentProposals.AsNoTracking()
+			.Where(sp => sp.StudentOwnerOfTheStudentProposal == student && (
+				sp.ProposalStatus == StudentProposal.Status.Draft
+				|| sp.ProposalStatus == StudentProposal.Status.Sent
+				|| sp.ProposalStatus == StudentProposal.Status.Approved
+				|| sp.ProposalStatus == StudentProposal.Status.Confirmed))
+			.Include(sp => sp.GuideTeacherOfTheStudentProposal).AsNoTracking();
 		var orderedProposals = sortOrder switch {
-			"Title" => student.StudentProposalsWhichIOwn!.OrderBy(sp => sp.Title),
-			"TitleDesc" => student.StudentProposalsWhichIOwn!.OrderByDescending(sp => sp.Title),
-			_ => student.StudentProposalsWhichIOwn!.OrderBy(sp => sp.Title)
+			"Title" => studentProposals.OrderBy(sp => sp.Title),
+			"TitleDesc" => studentProposals.OrderByDescending(sp => sp.Title),
+			"GuideTeacherLastName" => studentProposals.OrderBy(sp => sp.GuideTeacherOfTheStudentProposal!.LastName),
+			"GuideTeacherLastNameDesc" => studentProposals.OrderByDescending(sp => sp.GuideTeacherOfTheStudentProposal!.LastName),
+			_ => studentProposals.OrderBy(sp => sp.Title)
 		};
 		var filteredAndOrderedProposals = orderedProposals.ToList();
 		if (!string.IsNullOrEmpty(searchString)) {
@@ -54,6 +64,7 @@ public class ProposalController : Controller {
 		var indexViewModels = filteredAndOrderedProposals.Select(sp => new IndexViewModel {
 			Id = sp.Id,
 			Title = sp.Title,
+			GuideTeacher = $"{sp.GuideTeacherOfTheStudentProposal!.FirstName} {sp.GuideTeacherOfTheStudentProposal!.LastName}",
 			ProposalStatus = sp.ProposalStatus.ToString(),
 		});
 		var pageSize = 6;
