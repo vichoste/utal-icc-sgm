@@ -52,7 +52,7 @@ public class ProposalController : Controller {
 				.ToList();
 		}
 		var indexViewModels = filteredAndOrderedProposals.Select(sp => new IndexViewModel {
-			Id = sp.Id.ToString(),
+			Id = sp.Id,
 			Title = sp.Title,
 			ProposalStatus = sp.ProposalStatus.ToString(),
 		});
@@ -90,19 +90,19 @@ public class ProposalController : Controller {
 			.ToList();
 		this.ViewData["GuideTeachers"] = guideTeachers.Select(gt => new SelectListItem {
 			Text = $"{gt.FirstName} {gt.LastName}",
-			Value = gt.Id.ToString()
+			Value = gt.Id
 		});
 		this.ViewData["AssistantTeachers1"] = assistantTeachers1.Select(gt => new SelectListItem {
 			Text = $"{gt.FirstName} {gt.LastName}",
-			Value = gt.Id.ToString()
+			Value = gt.Id
 		});
 		this.ViewData["AssistantTeachers2"] = assistantTeachers2.Select(gt => new SelectListItem {
 			Text = $"{gt.FirstName} {gt.LastName}",
-			Value = gt.Id.ToString()
+			Value = gt.Id
 		});
 		this.ViewData["AssistantTeachers3"] = assistantTeachers3.Select(gt => new SelectListItem {
 			Text = $"{gt.FirstName} {gt.LastName}",
-			Value = gt.Id.ToString()
+			Value = gt.Id
 		});
 		return this.View(new CreateViewModel());
 	}
@@ -145,19 +145,19 @@ public class ProposalController : Controller {
 			.ToList();
 		this.ViewData["GuideTeachers"] = guideTeachers.Select(gt => new SelectListItem {
 			Text = $"{gt.FirstName} {gt.LastName}",
-			Value = gt.Id.ToString()
+			Value = gt.Id
 		});
 		this.ViewData["AssistantTeachers1"] = assistantTeachers1.Select(gt => new SelectListItem {
 			Text = $"{gt.FirstName} {gt.LastName}",
-			Value = gt.Id.ToString()
+			Value = gt.Id
 		});
 		this.ViewData["AssistantTeachers2"] = assistantTeachers2.Select(gt => new SelectListItem {
 			Text = $"{gt.FirstName} {gt.LastName}",
-			Value = gt.Id.ToString()
+			Value = gt.Id
 		});
 		this.ViewData["AssistantTeachers3"] = assistantTeachers3.Select(gt => new SelectListItem {
 			Text = $"{gt.FirstName} {gt.LastName}",
-			Value = gt.Id.ToString()
+			Value = gt.Id
 		});
 		var guideTeacher = await this._userManager.FindByIdAsync(model.GuideTeacher!.ToString());
 		if (guideTeacher is null) {
@@ -339,19 +339,19 @@ public class ProposalController : Controller {
 			.ToList();
 		this.ViewData["GuideTeachers"] = guideTeachers.Select(gt => new SelectListItem {
 			Text = $"{gt.FirstName} {gt.LastName}",
-			Value = gt.Id.ToString()
+			Value = gt.Id
 		});
 		this.ViewData["AssistantTeachers1"] = assistantTeachers1.Select(gt => new SelectListItem {
 			Text = $"{gt.FirstName} {gt.LastName}",
-			Value = gt.Id.ToString()
+			Value = gt.Id
 		});
 		this.ViewData["AssistantTeachers2"] = assistantTeachers2.Select(gt => new SelectListItem {
 			Text = $"{gt.FirstName} {gt.LastName}",
-			Value = gt.Id.ToString()
+			Value = gt.Id
 		});
 		this.ViewData["AssistantTeachers3"] = assistantTeachers3.Select(gt => new SelectListItem {
 			Text = $"{gt.FirstName} {gt.LastName}",
-			Value = gt.Id.ToString()
+			Value = gt.Id
 		});
 		var studentProposal = await this._dbContext.StudentProposals.AsNoTracking()
 			.Include(sp => sp.StudentOwnerOfTheStudentProposal).AsNoTracking()
@@ -360,7 +360,7 @@ public class ProposalController : Controller {
 			.Include(sp => sp.AssistantTeacher1OfTheStudentProposal).AsNoTracking()
 			.Include(sp => sp.AssistantTeacher2OfTheStudentProposal).AsNoTracking()
 			.Include(sp => sp.AssistantTeacher3OfTheStudentProposal).AsNoTracking()
-			.FirstOrDefaultAsync(sp => sp.Id.ToString() == id);
+			.FirstOrDefaultAsync(sp => sp.Id == id);
 		if (studentProposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
 			return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
@@ -410,19 +410,19 @@ public class ProposalController : Controller {
 			.ToList();
 		this.ViewData["GuideTeachers"] = guideTeachers.Select(gt => new SelectListItem {
 			Text = $"{gt.FirstName} {gt.LastName}",
-			Value = gt.Id.ToString()
+			Value = gt.Id
 		});
 		this.ViewData["AssistantTeachers1"] = assistantTeachers1.Select(gt => new SelectListItem {
 			Text = $"{gt.FirstName} {gt.LastName}",
-			Value = gt.Id.ToString()
+			Value = gt.Id
 		});
 		this.ViewData["AssistantTeachers2"] = assistantTeachers2.Select(gt => new SelectListItem {
 			Text = $"{gt.FirstName} {gt.LastName}",
-			Value = gt.Id.ToString()
+			Value = gt.Id
 		});
 		this.ViewData["AssistantTeachers3"] = assistantTeachers3.Select(gt => new SelectListItem {
 			Text = $"{gt.FirstName} {gt.LastName}",
-			Value = gt.Id.ToString()
+			Value = gt.Id
 		});
 		if (!this.ModelState.IsValid) {
 			this.ViewBag.WarningMessage = "Revisa que los campos estén correctos.";
@@ -437,7 +437,7 @@ public class ProposalController : Controller {
 			.Include(sp => sp.AssistantTeacher1OfTheStudentProposal)
 			.Include(sp => sp.AssistantTeacher2OfTheStudentProposal)
 			.Include(sp => sp.AssistantTeacher3OfTheStudentProposal)
-			.FirstOrDefaultAsync(sp => sp.Id.ToString() == model.Id);
+			.FirstOrDefaultAsync(sp => sp.Id == model.Id);
 		if (studentProposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
 			return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
@@ -628,7 +628,7 @@ public class ProposalController : Controller {
 		_ = await this._dbContext.SaveChangesAsync();
 		this.ViewBag.SuccessMessage = "Tu propuesta ha sido actualizada correctamente.";
 		var editViewModel = new EditViewModel {
-			Id = studentProposal.Id.ToString(),
+			Id = studentProposal.Id,
 			Title = studentProposal!.Title,
 			Description = studentProposal.Description,
 			GuideTeacher = studentProposal.GuideTeacherOfTheStudentProposal!.Id,
@@ -651,7 +651,7 @@ public class ProposalController : Controller {
 		}
 		var studentProposal = await this._dbContext.StudentProposals.AsNoTracking()
 			.Where(sp => sp.StudentOwnerOfTheStudentProposal == student && sp.ProposalStatus == StudentProposal.Status.Draft)
-			.FirstOrDefaultAsync(sp => sp.Id.ToString() == id);
+			.FirstOrDefaultAsync(sp => sp.Id == id);
 		if (studentProposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
 			return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
@@ -674,7 +674,7 @@ public class ProposalController : Controller {
 		}
 		var studentProposal = await this._dbContext.StudentProposals.AsNoTracking()
 			.Where(sp => sp.StudentOwnerOfTheStudentProposal == student && sp.ProposalStatus == StudentProposal.Status.Draft)
-			.FirstOrDefaultAsync(sp => sp.Id.ToString() == model.Id);
+			.FirstOrDefaultAsync(sp => sp.Id == model.Id);
 		if (studentProposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
 			return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
@@ -695,7 +695,7 @@ public class ProposalController : Controller {
 		}
 		var studentProposal = await this._dbContext.StudentProposals.AsNoTracking()
 			.Where(sp => sp.StudentOwnerOfTheStudentProposal == student && sp.ProposalStatus == StudentProposal.Status.Draft)
-			.FirstOrDefaultAsync(sp => sp.Id.ToString() == id);
+			.FirstOrDefaultAsync(sp => sp.Id == id);
 		if (studentProposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
 			return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
@@ -722,7 +722,7 @@ public class ProposalController : Controller {
 			.Include(sp => sp.AssistantTeacher1OfTheStudentProposal)
 			.Include(sp => sp.AssistantTeacher2OfTheStudentProposal)
 			.Include(sp => sp.AssistantTeacher3OfTheStudentProposal)
-			.FirstOrDefaultAsync(sp => sp.Id.ToString() == model.Id);
+			.FirstOrDefaultAsync(sp => sp.Id == model.Id);
 		if (studentProposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
 			return this.RedirectToAction("Index", "Proposal", new { area = "Student" });
@@ -761,7 +761,7 @@ public class ProposalController : Controller {
 		}
 		var studentProposal = await this._dbContext.StudentProposals.AsNoTracking()
 			.Where(sp => sp.StudentOwnerOfTheStudentProposal == student && sp.ProposalStatus == StudentProposal.Status.Rejected)
-			.FirstOrDefaultAsync(sp => sp.Id.ToString() == id);
+			.FirstOrDefaultAsync(sp => sp.Id == id);
 		if (studentProposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
 			return this.RedirectToAction("Index", "Proposal", new { area = "Student" });

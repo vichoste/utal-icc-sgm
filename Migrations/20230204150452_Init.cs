@@ -173,7 +173,7 @@ namespace Utal.Icc.Sgm.Migrations
                 name: "StudentProposals",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ProposalStatus = table.Column<int>(type: "int", nullable: true),
@@ -185,6 +185,8 @@ namespace Utal.Icc.Sgm.Migrations
                     AssistantTeacher2OfTheStudentProposalId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     AssistantTeacher3OfTheStudentProposalId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     RejectionReason = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ConfirmedByStudent = table.Column<bool>(type: "bit", nullable: false),
+                    ConfirmedByGuideTeacher = table.Column<bool>(type: "bit", nullable: false),
                     RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: true)
                 },
                 constraints: table =>

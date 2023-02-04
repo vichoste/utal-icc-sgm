@@ -121,8 +121,7 @@ public class StudentController : Controller {
 					StudentUniversityId = record.UniversityId,
 					Rut = record.Rut,
 					CreatedAt = DateTimeOffset.Now,
-					UpdatedAt = DateTimeOffset.Now,
-					IsDeactivated = false
+					UpdatedAt = DateTimeOffset.Now
 				};
 				await this._userStore.SetUserNameAsync(user, record.Email, CancellationToken.None);
 				await this._emailStore.SetEmailAsync(user, record.Email, CancellationToken.None);

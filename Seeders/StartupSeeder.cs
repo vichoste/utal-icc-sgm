@@ -47,8 +47,7 @@ public static class StartupSeeder {
 			LastName = lastName,
 			Rut = rut,
 			CreatedAt = DateTimeOffset.Now,
-			UpdatedAt = DateTimeOffset.Now,
-			IsDeactivated = false
+			UpdatedAt = DateTimeOffset.Now
 		};
 		var directorTeacherCheck = await userManager.FindByIdAsync(email);
 		if (directorTeacherCheck is null) {

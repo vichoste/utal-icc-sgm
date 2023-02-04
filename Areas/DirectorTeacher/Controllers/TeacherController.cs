@@ -106,8 +106,7 @@ public class TeacherController : Controller {
 			LastName = model.LastName,
 			Rut = model.Rut,
 			CreatedAt = DateTimeOffset.Now,
-			UpdatedAt = DateTimeOffset.Now,
-			IsDeactivated = false
+			UpdatedAt = DateTimeOffset.Now
 		};
 		await this._userStore.SetUserNameAsync(teacher, model.Email, CancellationToken.None);
 		await this._emailStore.SetEmailAsync(teacher, model.Email, CancellationToken.None);
@@ -326,8 +325,8 @@ public class TeacherController : Controller {
 			return this.RedirectToAction("Index", "Teacher", new { area = "DirectorTeacher" });
 		}
 		var transferViewModel = new TransferViewModel {
-			CurrentDirectorTeacherId = currentDirectorTeacher.Id.ToString(),
-			NewDirectorTeacherId = newDirectorTeacher!.Id.ToString(),
+			CurrentDirectorTeacherId = currentDirectorTeacher.Id,
+			NewDirectorTeacherId = newDirectorTeacher!.Id,
 			NewDirectorTeacherName = $"{newDirectorTeacher.FirstName} {newDirectorTeacher.LastName}"
 		};
 		return this.View(transferViewModel);

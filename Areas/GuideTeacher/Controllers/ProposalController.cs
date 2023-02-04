@@ -60,7 +60,7 @@ public class ProposalController : Controller {
 				.ToList();
 		}
 		var indexViewModels = filteredAndOrderedProposals.Select(sp => new IndexViewModel {
-			Id = sp.Id.ToString(),
+			Id = sp.Id,
 			Title = sp.Title,
 			Student = $"{sp.StudentOwnerOfTheStudentProposal!.FirstName} {sp.StudentOwnerOfTheStudentProposal!.LastName}",
 			ProposalStatus = sp.ProposalStatus.ToString(),
@@ -83,7 +83,7 @@ public class ProposalController : Controller {
 			.Include(sp => sp.AssistantTeacher1OfTheStudentProposal).AsNoTracking()
 			.Include(sp => sp.AssistantTeacher2OfTheStudentProposal).AsNoTracking()
 			.Include(sp => sp.AssistantTeacher3OfTheStudentProposal).AsNoTracking()
-			.FirstOrDefaultAsync(sp => sp.Id.ToString() == id);
+			.FirstOrDefaultAsync(sp => sp.Id == id);
 		if (studentProposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
 			return this.RedirectToAction("Index", "Proposal", new { area = "GuideTeacher" });
@@ -115,7 +115,7 @@ public class ProposalController : Controller {
 		}
 		var studentProposal = await this._dbContext.StudentProposals.AsNoTracking()
 			.Where(sp => sp.GuideTeacherOfTheStudentProposal == teacher && sp.ProposalStatus == StudentProposal.Status.Sent)
-			.FirstOrDefaultAsync(sp => sp.Id.ToString() == id);
+			.FirstOrDefaultAsync(sp => sp.Id == id);
 		if (studentProposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
 			return this.RedirectToAction("Index", "Proposal", new { area = "GuideTeacher" });
@@ -138,7 +138,7 @@ public class ProposalController : Controller {
 		}
 		var studentProposal = await this._dbContext.StudentProposals.AsNoTracking()
 			.Where(sp => sp.GuideTeacherOfTheStudentProposal == teacher && sp.ProposalStatus == StudentProposal.Status.Sent)
-			.FirstOrDefaultAsync(sp => sp.Id.ToString() == model.Id);
+			.FirstOrDefaultAsync(sp => sp.Id == model.Id);
 		if (studentProposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
 			return this.RedirectToAction("Index", "Proposal", new { area = "GuideTeacher" });

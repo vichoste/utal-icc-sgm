@@ -12,7 +12,7 @@ using Utal.Icc.Sgm.Data;
 namespace Utal.Icc.Sgm.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230203124006_Init")]
+    [Migration("20230204150452_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -264,9 +264,8 @@ namespace Utal.Icc.Sgm.Migrations
 
             modelBuilder.Entity("Utal.Icc.Sgm.Models.StudentProposal", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("AssistantTeacher1OfTheStudentProposalId")
                         .HasColumnType("nvarchar(450)");
@@ -276,6 +275,12 @@ namespace Utal.Icc.Sgm.Migrations
 
                     b.Property<string>("AssistantTeacher3OfTheStudentProposalId")
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<bool>("ConfirmedByGuideTeacher")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ConfirmedByStudent")
+                        .HasColumnType("bit");
 
                     b.Property<DateTimeOffset?>("CreatedAt")
                         .HasColumnType("datetimeoffset");

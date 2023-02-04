@@ -261,9 +261,8 @@ namespace Utal.Icc.Sgm.Migrations
 
             modelBuilder.Entity("Utal.Icc.Sgm.Models.StudentProposal", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("AssistantTeacher1OfTheStudentProposalId")
                         .HasColumnType("nvarchar(450)");
@@ -273,6 +272,12 @@ namespace Utal.Icc.Sgm.Migrations
 
                     b.Property<string>("AssistantTeacher3OfTheStudentProposalId")
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<bool>("ConfirmedByGuideTeacher")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ConfirmedByStudent")
+                        .HasColumnType("bit");
 
                     b.Property<DateTimeOffset?>("CreatedAt")
                         .HasColumnType("datetimeoffset");
