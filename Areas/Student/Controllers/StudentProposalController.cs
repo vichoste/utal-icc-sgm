@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 using Utal.Icc.Sgm.Areas.Student.Views.StudentProposal;
+using Utal.Icc.Sgm.Controllers;
 using Utal.Icc.Sgm.Data;
 using Utal.Icc.Sgm.Models;
 
@@ -13,7 +14,7 @@ using static Utal.Icc.Sgm.Models.ApplicationUser;
 
 namespace Utal.Icc.Sgm.Areas.Student.Controllers;
 
-[Area(nameof(Roles.Student)), Authorize(Roles = nameof(Roles.Student))]
+[Area(nameof(Student)), Authorize(Roles = nameof(Roles.Student))]
 public class StudentProposalController : Controller {
 	private readonly ApplicationDbContext _dbContext;
 	private readonly UserManager<ApplicationUser> _userManager;
@@ -106,7 +107,7 @@ public class StudentProposalController : Controller {
 
 	public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
 		if (await this.CheckStudentSession() is not ApplicationUser student) {
-			return this.RedirectToAction("Index", "Home", new { area = string.Empty });
+			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
 		var parameters = new[] { nameof(StudentProposal.Title), nameof(Roles.GuideTeacher) };
 		this.SetSortParameters(sortOrder, parameters);
@@ -134,7 +135,7 @@ public class StudentProposalController : Controller {
 
 	public async Task<IActionResult> Create() {
 		if (await this.CheckStudentSession() is null) {
-			return this.RedirectToAction("Index", "Home", new { area = string.Empty });
+			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
 		await this.PopulateTeachers();
 		return this.View(new CreateViewModel());
@@ -150,7 +151,7 @@ public class StudentProposalController : Controller {
 			});
 		}
 		if (await this.CheckStudentSession() is not ApplicationUser student) {
-			return this.RedirectToAction("Index", "Home", new { area = string.Empty });
+			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
 		await this.PopulateTeachers();
 		if (await this.CheckApplicationUser(model.GuideTeacher!) is not ApplicationUser guideTeacher) {
@@ -193,12 +194,12 @@ public class StudentProposalController : Controller {
 		_ = await this._dbContext.StudentProposals.AddAsync(studentProposal);
 		_ = await this._dbContext.SaveChangesAsync();
 		this.TempData["SuccessMessage"] = "Tu propuesta ha sido registrada correctamente.";
-		return this.RedirectToAction("Index", nameof(StudentProposal), new { area = nameof(Roles.Student) });
+		return this.RedirectToAction(nameof(StudentProposalController.Index), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Student) });
 	}
 
 	public async Task<IActionResult> Edit(string id) {
 		if (await this.CheckStudentSession() is not ApplicationUser student) {
-			return this.RedirectToAction("Index", "Home", new { area = string.Empty });
+			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
 		await this.PopulateTeachers();
 		var studentProposal = await this._dbContext.StudentProposals.AsNoTracking()
@@ -211,7 +212,7 @@ public class StudentProposalController : Controller {
 			.FirstOrDefaultAsync(sp => sp.Id == id);
 		if (studentProposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
-			return this.RedirectToAction("Index", nameof(StudentProposal), new { area = nameof(Roles.Student) });
+			return this.RedirectToAction(nameof(StudentProposalController.Index), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Student) });
 		}
 		var editViewModel = new EditViewModel {
 			Id = id,
@@ -237,7 +238,7 @@ public class StudentProposalController : Controller {
 			});
 		}
 		if (await this.CheckStudentSession() is not ApplicationUser student) {
-			return this.RedirectToAction("Index", "Home", new { area = string.Empty });
+			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
 		await this.PopulateTeachers();
 		var studentProposal = await this._dbContext.StudentProposals
@@ -249,7 +250,7 @@ public class StudentProposalController : Controller {
 			.FirstOrDefaultAsync(sp => sp.Id == model.Id);
 		if (studentProposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
-			return this.RedirectToAction("Index", nameof(StudentProposal), new { area = nameof(Roles.Student) });
+			return this.RedirectToAction(nameof(StudentProposalController.Index), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Student) });
 		}
 		if (await this.CheckApplicationUser(model.GuideTeacher!) is not ApplicationUser guideTeacher) {
 			this.ViewBag.WarningMessage = "Revisa tu selección del profesor guía.";
@@ -314,14 +315,14 @@ public class StudentProposalController : Controller {
 
 	public async Task<IActionResult> Delete(string id) {
 		if (await this.CheckStudentSession() is not ApplicationUser student) {
-			return this.RedirectToAction("Index", "Home", new { area = string.Empty });
+			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
 		var studentProposal = await this._dbContext.StudentProposals.AsNoTracking()
 			.Where(sp => sp.StudentOwnerOfTheStudentProposal == student && sp.ProposalStatus == StudentProposal.Status.Draft)
 			.FirstOrDefaultAsync(sp => sp.Id == id);
 		if (studentProposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
-			return this.RedirectToAction("Index", nameof(StudentProposal), new { area = nameof(Roles.Student) });
+			return this.RedirectToAction(nameof(StudentProposalController.Index), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Student) });
 		}
 		var deleteViewModel = new DeleteViewModel {
 			Id = id,
@@ -333,24 +334,24 @@ public class StudentProposalController : Controller {
 	[HttpPost, ValidateAntiForgeryToken]
 	public async Task<IActionResult> Delete([FromForm] DeleteViewModel model) {
 		if (await this.CheckStudentSession() is not ApplicationUser student) {
-			return this.RedirectToAction("Index", "Home", new { area = string.Empty });
+			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
 		var studentProposal = await this._dbContext.StudentProposals
 			.Where(sp => sp.StudentOwnerOfTheStudentProposal == student && sp.ProposalStatus == StudentProposal.Status.Draft)
 			.FirstOrDefaultAsync(sp => sp.Id == model.Id);
 		if (studentProposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
-			return this.RedirectToAction("Index", nameof(StudentProposal), new { area = nameof(Roles.Student) });
+			return this.RedirectToAction(nameof(StudentProposalController.Index), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Student) });
 		}
 		_ = this._dbContext.StudentProposals.Remove(studentProposal);
 		_ = this._dbContext.SaveChangesAsync();
 		this.TempData["SuccessMessage"] = "Tu propuesta ha sido eliminada correctamente.";
-		return this.RedirectToAction("Index", nameof(StudentProposal), new { area = nameof(Roles.Student) });
+		return this.RedirectToAction(nameof(StudentProposalController.Index), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Student) });
 	}
 
 	public async Task<IActionResult> Send(string id) {
 		if (await this.CheckStudentSession() is not ApplicationUser student) {
-			return this.RedirectToAction("Index", "Home", new { area = string.Empty });
+			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
 		var studentProposal = await this._dbContext.StudentProposals.AsNoTracking()
 			.Where(sp => sp.StudentOwnerOfTheStudentProposal == student && sp.ProposalStatus == StudentProposal.Status.Draft)
@@ -358,7 +359,7 @@ public class StudentProposalController : Controller {
 			.FirstOrDefaultAsync(sp => sp.Id == id);
 		if (studentProposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
-			return this.RedirectToAction("Index", nameof(StudentProposal), new { area = nameof(Roles.Student) });
+			return this.RedirectToAction(nameof(StudentProposalController.Index), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Student) });
 		}
 		var sendViewModel = new SendViewModel {
 			Id = id,
@@ -371,7 +372,7 @@ public class StudentProposalController : Controller {
 	[HttpPost, ValidateAntiForgeryToken]
 	public async Task<IActionResult> Send([FromForm] SendViewModel model) {
 		if (await this.CheckStudentSession() is not ApplicationUser student) {
-			return this.RedirectToAction("Index", "Home", new { area = string.Empty });
+			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
 		var studentProposal = await this._dbContext.StudentProposals
 			.Where(sp => sp.StudentOwnerOfTheStudentProposal == student && sp.ProposalStatus == StudentProposal.Status.Draft)
@@ -382,7 +383,7 @@ public class StudentProposalController : Controller {
 			.FirstOrDefaultAsync(sp => sp.Id == model.Id);
 		if (studentProposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
-			return this.RedirectToAction("Index", nameof(StudentProposal), new { area = nameof(Roles.Student) });
+			return this.RedirectToAction(nameof(StudentProposalController.Index), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Student) });
 		}
 		var teacherCheck = (studentProposal.GuideTeacherOfTheStudentProposal, studentProposal.AssistantTeacher1OfTheStudentProposal, studentProposal.AssistantTeacher2OfTheStudentProposal, studentProposal.AssistantTeacher3OfTheStudentProposal) switch {
 			(ApplicationUser teacher, _, _, _) when teacher.IsDeactivated => "El profesor guía está desactivado.",
@@ -393,19 +394,19 @@ public class StudentProposalController : Controller {
 		};
 		if (teacherCheck is not null) {
 			this.TempData["ErrorMessage"] = teacherCheck;
-			return this.RedirectToAction("Index", nameof(StudentProposal), new { area = nameof(Roles.Student) });
+			return this.RedirectToAction(nameof(StudentProposalController.Index), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Student) });
 		}
 		studentProposal.ProposalStatus = StudentProposal.Status.SentToGuideTeacher;
 		studentProposal.UpdatedAt = DateTimeOffset.Now;
 		_ = this._dbContext.StudentProposals.Update(studentProposal);
 		_ = await this._dbContext.SaveChangesAsync();
 		this.TempData["SuccessMessage"] = "Tu propuesta ha sido enviada correctamente.";
-		return this.RedirectToAction("Index", nameof(StudentProposal), new { area = nameof(Roles.Student) });
+		return this.RedirectToAction(nameof(StudentProposalController.Index), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Student) });
 	}
 
 	public async Task<IActionResult> ViewRejectionReason(string id) {
 		if (await this.CheckStudentSession() is not ApplicationUser student) {
-			return this.RedirectToAction("Index", "Home", new { area = string.Empty });
+			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
 		var studentProposal = await this._dbContext.StudentProposals.AsNoTracking()
 			.Where(sp => sp.StudentOwnerOfTheStudentProposal == student && sp.ProposalStatus == StudentProposal.Status.RejectedByGuideTeacher)
@@ -413,7 +414,7 @@ public class StudentProposalController : Controller {
 			.FirstOrDefaultAsync(sp => sp.Id == id);
 		if (studentProposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
-			return this.RedirectToAction("Index", nameof(StudentProposal), new { area = nameof(Roles.Student) });
+			return this.RedirectToAction(nameof(StudentProposalController.Index), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Student) });
 		}
 		var viewRejectionReasonViewModel = new ViewRejectionReasonViewModel {
 			Id = id,
@@ -429,7 +430,7 @@ public class StudentProposalController : Controller {
 
 	public async Task<IActionResult> Convert(string id) {
 		if (await this.CheckStudentSession() is not ApplicationUser student) {
-			return this.RedirectToAction("Index", "Home", new { area = string.Empty });
+			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
 		var studentProposal = await this._dbContext.StudentProposals.AsNoTracking()
 			.Where(sp => sp.StudentOwnerOfTheStudentProposal == student && sp.ProposalStatus == StudentProposal.Status.ApprovedByGuideTeacher)
@@ -440,7 +441,7 @@ public class StudentProposalController : Controller {
 			.FirstOrDefaultAsync(sp => sp.Id == id);
 		if (studentProposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
-			return this.RedirectToAction("Index", nameof(StudentProposal), new { area = nameof(Roles.Student) });
+			return this.RedirectToAction(nameof(StudentProposalController.Index), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Student) });
 		}
 		var convertViewModel = new ConvertViewModel {
 			Id = id,
