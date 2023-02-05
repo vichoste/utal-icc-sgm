@@ -4,9 +4,9 @@ namespace Utal.Icc.Sgm.Areas.Account.Views.Profile;
 
 public class TeacherViewModel {
 	[Display(Name = "Oficina")]
-	public string? Office { get; set; }
+	public string? TeacherOffice { get; set; }
 	[Display(Name = "Horarios")]
-	public string? Schedule { get; set; }
+	public string? TeacherSchedule { get; set; }
 	[Display(Name = "Especialización")]
-	public string? Specialization { get; set; }
+	public string? TeacherSpecialization { get; set; }
 }

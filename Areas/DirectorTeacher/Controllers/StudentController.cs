@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 using NuGet.DependencyResolver;
 
@@ -33,10 +34,11 @@ public class StudentController : Controller {
 		var teacher = await this._userManager.GetUserAsync(this.User);
 		return teacher is null || teacher.IsDeactivated ? null! : teacher;
 	}
-
-	protected async Task<ApplicationUser> CheckApplicationUser(string applicationUserId) {
+	protected async Task<ApplicationUser?> CheckApplicationUser(string applicationUserId) => await this._userManager.FindByIdAsync(applicationUserId);
+	
+	protected async Task<ApplicationUser?> CheckApplicationUserStatus(string applicationUserId) {
 		var applicationUser = await this._userManager.FindByIdAsync(applicationUserId);
-		return applicationUser is null || applicationUser.IsDeactivated ? null! : applicationUser;
+		return applicationUser is null || applicationUser.IsDeactivated ? null : applicationUser;
 	}
 
 	protected void SetSortParameters(string sortOrder, params string[] parameters) {
@@ -49,9 +51,9 @@ public class StudentController : Controller {
 	protected IOrderedEnumerable<ApplicationUser> OrderApplicationUsers(string sortOrder, IEnumerable<ApplicationUser> applicationUsers, params string[] parameters) {
 		foreach (var parameter in parameters) {
 			if (parameter == sortOrder) {
-				return applicationUsers.OrderBy(s => s.GetType().GetProperty(parameter));
+				return applicationUsers.OrderBy(s => s.GetType().GetProperty(parameter)!.GetValue(s, null));
 			} else if ($"{parameter}Desc" == sortOrder) {
-				return applicationUsers.OrderByDescending(s => s.GetType().GetProperty(parameter));
+				return applicationUsers.OrderByDescending(s => s.GetType().GetProperty(parameter)!.GetValue(s, null));
 			}
 		}
 		return applicationUsers.OrderBy(s => s.GetType().GetProperty(parameters[0]));
@@ -61,7 +63,7 @@ public class StudentController : Controller {
 		var result = new List<IndexViewModel>();
 		foreach (var parameter in parameters) {
 			var partials = applicationUsers
-					.Where(s => (s.GetType().GetProperty(parameter)!.GetValue(s, null) as string)!.Contains(searchString))
+					.Where(s => (s.GetType().GetProperty(parameter)!.GetValue(s) as string)!.Contains(searchString))
 					.Select(s => new IndexViewModel {
 						Id = s.Id,
 						FirstName = s.FirstName,
@@ -71,7 +73,11 @@ public class StudentController : Controller {
 						Email = s.Email,
 						IsDeactivated = s.IsDeactivated
 					});
-			result.AddRange(partials);
+			foreach (var partial in partials) {
+				if (!result.Contains(partial)) {
+					result.Add(partial);
+				}
+			}
 		}
 		return result;
 	}
@@ -80,7 +86,8 @@ public class StudentController : Controller {
 		if (await this.CheckTeacherSession() is null) {
 			return this.RedirectToAction("Index", "Home", new { area = "" });
 		}
-		var parameters = new[] { "FirstName", "LastName", "UniversityId", "RutSort", "Email" };
+		var parameters = new[] { "FirstName", "LastName", "StudentUniversityId", "Rut", "Email" };
+		this.SetSortParameters(sortOrder, parameters);
 		if (searchString is not null) {
 			pageNumber = 1;
 		} else {
@@ -89,7 +96,15 @@ public class StudentController : Controller {
 		this.ViewData["CurrentFilter"] = searchString;
 		var students = await this._userManager.GetUsersInRoleAsync(Roles.Student.ToString());
 		var orderedStudents = this.OrderApplicationUsers(sortOrder, students, parameters);
-		var indexViewModels = this.FilterApplicationUsers(searchString, orderedStudents, parameters);
+		var indexViewModels = !searchString.IsNullOrEmpty() ? this.FilterApplicationUsers(searchString, orderedStudents, parameters) : orderedStudents.Select(s => new IndexViewModel {
+			Id = s.Id,
+			FirstName = s.FirstName,
+			LastName = s.LastName,
+			UniversityId = s.StudentUniversityId,
+			Rut = s.Rut,
+			Email = s.Email,
+			IsDeactivated = s.IsDeactivated
+		}).ToList();
 		return this.View(PaginatedList<IndexViewModel>.Create((await this._userManager.GetUserAsync(this.User))!.Id, indexViewModels.AsQueryable(), pageNumber ?? 1, 6));
 	}
 
@@ -197,9 +212,14 @@ public class StudentController : Controller {
 		if (await this.CheckTeacherSession() is null) {
 			return this.RedirectToAction("Index", "Home", new { area = "" });
 		}
-		if (await this.CheckApplicationUser(id) is not ApplicationUser student) {
+		var student = await this._userManager.FindByIdAsync(id);
+		if (student is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener al estudiante.";
-			return this.RedirectToAction("Index", nameof(Roles.Student), new { area = nameof(Roles.DirectorTeacher) });
+			return this.RedirectToAction("Index", "Student", new { area = "DirectorTeacher" });
+		}
+		if (student!.Id == this._userManager.GetUserId(this.User)) {
+			this.TempData["ErrorMessage"] = !student.IsDeactivated ? "No te puedes desactivar a tí mismo." : "¡No deberías haber llegado a este punto!";
+			return this.RedirectToAction("Index", "Student", new { area = "DirectorTeacher" });
 		}
 		var toggleActivationModel = new ToggleActivationViewModel {
 			Id = student.Id,
@@ -214,9 +234,10 @@ public class StudentController : Controller {
 		if (await this.CheckTeacherSession() is null) {
 			return this.RedirectToAction("Index", "Home", new { area = "" });
 		}
-		if (await this.CheckApplicationUser(model.Id!) is not ApplicationUser student) {
+		var student = await this._userManager.FindByIdAsync(model.Id!);
+		if (student is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener al estudiante.";
-			return this.RedirectToAction("Index", nameof(Roles.Student), new { area = nameof(Roles.DirectorTeacher) });
+			return this.RedirectToAction("Index", "Student", new { area = "DirectorTeacher" });
 		}
 		student.IsDeactivated = !model.IsDeactivated;
 		student.UpdatedAt = DateTimeOffset.Now;

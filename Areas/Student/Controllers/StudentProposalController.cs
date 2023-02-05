@@ -45,9 +45,9 @@ public class StudentProposalController : Controller {
 	protected IOrderedQueryable<StudentProposal> OrderProposals(string sortOrder, IQueryable<StudentProposal> studentProposals, params string[] parameters) {
 		foreach (var parameter in parameters) {
 			if (parameter == sortOrder) {
-				return studentProposals.OrderBy(sp => sp.GetType().GetProperty(parameter));
+				return studentProposals.OrderBy(sp => sp.GetType().GetProperty(parameter)!.GetValue(sp, null));
 			} else if ($"{parameter}Desc" == sortOrder) {
-				return studentProposals.OrderByDescending(sp => sp.GetType().GetProperty(parameter));
+				return studentProposals.OrderByDescending(sp => sp.GetType().GetProperty(parameter)!.GetValue(sp, null));
 			}
 		}
 		return studentProposals.OrderBy(sp => sp.GetType().GetProperty(parameters[0]));
@@ -57,15 +57,19 @@ public class StudentProposalController : Controller {
 		var result = new List<IndexViewModel>();
 		foreach (var parameter in parameters) {
 			var partials = studentProposals
-					.Where(sp => (sp.GetType().GetProperty(parameter)!.GetValue(sp, null) as string)!.Contains(searchString))
-					.Include(sp => sp.GetType().GetProperty(includeProperty))
+					.Where(sp => (sp.GetType().GetProperty(parameter)!.GetValue(sp) as string)!.Contains(searchString))
+					.Include(sp => sp.GetType().GetProperty(includeProperty)!.GetValue(sp, null))
 					.Select(sp => new IndexViewModel {
 						Id = sp.Id,
 						Title = sp.Title,
-						GuideTeacher = $"{(sp.GetType().GetProperty(includeProperty)!.GetValue(sp, null) as ApplicationUser)!.FirstName} {(sp.GetType().GetProperty(includeProperty)!.GetValue(sp, null) as ApplicationUser)!.LastName}",
+						GuideTeacher = $"{(sp.GetType().GetProperty(includeProperty)!.GetValue(sp) as ApplicationUser)!.FirstName} {(sp.GetType().GetProperty(includeProperty)!.GetValue(sp, null) as ApplicationUser)!.LastName}",
 						ProposalStatus = sp.ProposalStatus.ToString(),
 					});
-			result.AddRange(partials);
+			foreach (var partial in partials) {
+				if (!result.Contains(partial)) {
+					result.Add(partial);
+				}
+			}
 		}
 		return result;
 	}
@@ -129,7 +133,12 @@ public class StudentProposalController : Controller {
 			.Include(sp => sp.GuideTeacherOfTheStudentProposal).AsNoTracking();
 
 		var orderedProposals = this.OrderProposals(sortOrder, studentProposals, parameters);
-		var indexViewModels = this.FilterProposals(searchString, nameof(StudentProposal.GuideTeacherOfTheStudentProposal), orderedProposals);
+		var indexViewModels = !searchString.IsNullOrEmpty() ? this.FilterProposals(searchString, nameof(StudentProposal.GuideTeacherOfTheStudentProposal), orderedProposals) : orderedProposals.Select(sp => new IndexViewModel {
+			Id = sp.Id,
+			Title = sp.Title,
+			GuideTeacher = $"{sp.GuideTeacherOfTheStudentProposal!.FirstName} {sp.GuideTeacherOfTheStudentProposal!.LastName}",
+			ProposalStatus = sp.ProposalStatus.ToString(),
+		}).ToList();
 		return this.View(PaginatedList<IndexViewModel>.Create((await this._userManager.GetUserAsync(this.User))!.Id, indexViewModels.AsQueryable(), pageNumber ?? 1, 6));
 	}
 

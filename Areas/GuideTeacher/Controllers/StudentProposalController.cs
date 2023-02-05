@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 using Utal.Icc.Sgm.Areas.GuideTeacher.Views.Proposal;
 using Utal.Icc.Sgm.Data;
@@ -32,7 +33,7 @@ public class StudentProposalController : Controller {
 		return applicationUser is null || applicationUser.IsDeactivated ? null! : applicationUser;
 	}
 
-	protected void SetSortProperties(string sortOrder, params string[] parameters) {
+	protected void SetSortParameters(string sortOrder, params string[] parameters) {
 		foreach (var parameter in parameters) {
 			this.ViewData[$"{parameter}SortParam"] = sortOrder == parameter ? $"{parameter}Desc" : parameter;
 		}
@@ -54,15 +55,19 @@ public class StudentProposalController : Controller {
 		var result = new List<IndexViewModel>();
 		foreach (var parameter in parameters) {
 			var partials = studentProposals
-					.Where(sp => (sp.GetType().GetProperty(parameter)!.GetValue(sp, null) as string)!.Contains(searchString))
-					.Include(sp => sp.GetType().GetProperty(includeProperty))
+					.Where(sp => (sp.GetType().GetProperty(parameter)!.GetValue(sp) as string)!.Contains(searchString))
+					.Include(sp => sp.GetType().GetProperty(includeProperty)!.GetValue(sp, null))
 					.Select(sp => new IndexViewModel {
 				Id = sp.Id,
 				Title = sp.Title,
-				Student = $"{(sp.GetType().GetProperty(includeProperty)!.GetValue(sp, null) as ApplicationUser)!.FirstName} {(sp.GetType().GetProperty(includeProperty)!.GetValue(sp, null) as ApplicationUser)!.LastName}",
+				Student = $"{(sp.GetType().GetProperty(includeProperty)!.GetValue(sp) as ApplicationUser)!.FirstName} {(sp.GetType().GetProperty(includeProperty)!.GetValue(sp, null) as ApplicationUser)!.LastName}",
 				ProposalStatus = sp.ProposalStatus.ToString(),
 			});
-			result.AddRange(partials);
+			foreach (var partial in partials) {
+				if (!result.Contains(partial)) {
+					result.Add(partial);
+				}
+			}
 		}
 		return result;
 	}
@@ -71,8 +76,8 @@ public class StudentProposalController : Controller {
 		if (await this.CheckTeacherSession() is not ApplicationUser teacher) {
 			return this.RedirectToAction("Index", "Home", new { area = "" });
 		}
-		var properties = new[] { "Title", "StudentLastName" };
-		this.SetSortProperties(sortOrder, properties);
+		var parameters = new[] { "Title", "StudentLastName" };
+		this.SetSortParameters(sortOrder, parameters);
 		if (searchString is not null) {
 			pageNumber = 1;
 		} else {
@@ -84,10 +89,14 @@ public class StudentProposalController : Controller {
 				sp.ProposalStatus == StudentProposal.Status.SentToGuideTeacher
 				|| sp.ProposalStatus == StudentProposal.Status.ApprovedByGuideTeacher))
 			.Include(sp => sp.StudentOwnerOfTheStudentProposal).AsNoTracking();
-		var orderedProposals = this.OrderProposals(sortOrder, studentProposals, properties);
-		var indexViewModels = this.FilterProposals(searchString, nameof(StudentProposal.StudentOwnerOfTheStudentProposal), orderedProposals, properties);
-		var pageSize = 6;
-		return this.View(PaginatedList<IndexViewModel>.Create((await this._userManager.GetUserAsync(this.User))!.Id, indexViewModels.AsQueryable(), pageNumber ?? 1, pageSize));
+		var orderedProposals = this.OrderProposals(sortOrder, studentProposals, parameters);
+		var indexViewModels = !searchString.IsNullOrEmpty() ? this.FilterProposals(searchString, nameof(StudentProposal.StudentOwnerOfTheStudentProposal), orderedProposals, parameters) : orderedProposals.Select(sp => new IndexViewModel {
+			Id = sp.Id,
+			Title = sp.Title,
+			Student = $"{sp.StudentOwnerOfTheStudentProposal!.FirstName} {sp.StudentOwnerOfTheStudentProposal!.LastName}",
+			ProposalStatus = sp.ProposalStatus.ToString(),
+		}).ToList();
+		return this.View(PaginatedList<IndexViewModel>.Create((await this._userManager.GetUserAsync(this.User))!.Id, indexViewModels.AsQueryable(), pageNumber ?? 1, 6));
 	}
 
 	public new async Task<IActionResult> View(string id) {
