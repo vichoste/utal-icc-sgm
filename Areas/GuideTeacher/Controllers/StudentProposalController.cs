@@ -40,21 +40,21 @@ public class StudentProposalController : Controller {
 		this.ViewData["CurrentSort"] = sortOrder;
 	}
 
-	protected IOrderedEnumerable<IndexViewModel> OrderProposals(string sortOrder, IEnumerable<IndexViewModel> studentProposals, params string[] parameters) {
+	protected IOrderedEnumerable<IndexViewModel> OrderProposals(string sortOrder, IEnumerable<IndexViewModel> indexViewModels, params string[] parameters) {
 		foreach (var parameter in parameters) {
 			if (parameter == sortOrder) {
-				return studentProposals.OrderBy(sp => sp.GetType().GetProperty(parameter)!.GetValue(sp, null));
+				return indexViewModels.OrderBy(sp => sp.GetType().GetProperty(parameter)!.GetValue(sp, null));
 			} else if ($"{parameter}Desc" == sortOrder) {
-				return studentProposals.OrderByDescending(sp => sp.GetType().GetProperty(parameter)!.GetValue(sp, null));
+				return indexViewModels.OrderByDescending(sp => sp.GetType().GetProperty(parameter)!.GetValue(sp, null));
 			}
 		}
-		return studentProposals.OrderBy(sp => sp.GetType().GetProperty(parameters[0]));
+		return indexViewModels.OrderBy(sp => sp.GetType().GetProperty(parameters[0]));
 	}
 
-	protected IEnumerable<IndexViewModel> FilterProposals(string searchString, IEnumerable<IndexViewModel> studentProposals, params string[] parameters) {
+	protected IEnumerable<IndexViewModel> FilterProposals(string searchString, IEnumerable<IndexViewModel> indexViewModels, params string[] parameters) {
 		var result = new List<IndexViewModel>();
 		foreach (var parameter in parameters) {
-			var partials = studentProposals
+			var partials = indexViewModels
 					.Where(sp => (sp.GetType().GetProperty(parameter)!.GetValue(sp) as string)!.Contains(searchString));
 			foreach (var partial in partials) {
 				if (!result.Any(ivm => ivm.Id == partial.Id)) {
@@ -92,7 +92,7 @@ public class StudentProposalController : Controller {
 		var filteredAndOrderedProposals = !searchString.IsNullOrEmpty() ?
 			this.FilterProposals(searchString, orderedProposals, parameters)
 			: orderedProposals;
-		return this.View(PaginatedList<IndexViewModel>.Create((await this._userManager.GetUserAsync(this.User))!.Id, orderedProposals.AsQueryable(), pageNumber ?? 1, 6));
+		return this.View(PaginatedList<IndexViewModel>.Create((await this._userManager.GetUserAsync(this.User))!.Id, filteredAndOrderedProposals.AsQueryable(), pageNumber ?? 1, 6));
 	}
 
 	public new async Task<IActionResult> View(string id) {
