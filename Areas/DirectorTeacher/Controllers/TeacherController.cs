@@ -52,22 +52,23 @@ public class TeacherController : Controller {
 		return applicationUsers.OrderBy(s => s.GetType().GetProperty(parameters[0]));
 	}
 
+
 	protected List<IndexViewModel> FilterApplicationUsers(string searchString, IOrderedEnumerable<ApplicationUser> applicationUsers, params string[] parameters) {
 		var result = new List<IndexViewModel>();
 		foreach (var parameter in parameters) {
 			var partials = applicationUsers
-					.Where(t =>  (t.GetType().GetProperty(parameter)!.GetValue(t) as string)!.Contains(searchString))
-					.Select(async t =>  new IndexViewModel {
-						Id = t.Id,
-						FirstName = t.FirstName,
-						LastName = t.LastName,
-						Rut = t.Rut,
-						Email = t.Email,
-						IsDirectorTeacher = await this._userManager.IsInRoleAsync(t, Roles.DirectorTeacher.ToString()),
-						IsDeactivated = t.IsDeactivated
+					.Where(s => (s.GetType().GetProperty(parameter)!.GetValue(s) as string)!.Contains(searchString))
+					.Select(async s => new IndexViewModel {
+						Id = s.Id,
+						FirstName = s.FirstName,
+						LastName = s.LastName,
+						Rut = s.Rut,
+						Email = s.Email,
+						IsDeactivated = s.IsDeactivated,
+						IsDirectorTeacher = await this._userManager.IsInRoleAsync(s, Roles.DirectorTeacher.ToString()),
 					}).Select(t => t.Result);
 			foreach (var partial in partials) {
-				if (!result.Contains(partial)) {
+				if (!result.Any(ivm => ivm.Id == partial.Id)) {
 					result.Add(partial);
 				}
 			}

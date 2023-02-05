@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System.Collections.Immutable;
+using System.Globalization;
 
 using CsvHelper;
 
@@ -58,7 +59,7 @@ public class StudentController : Controller {
 		}
 		return applicationUsers.OrderBy(s => s.GetType().GetProperty(parameters[0]));
 	}
-
+	
 	protected List<IndexViewModel> FilterApplicationUsers(string searchString, IOrderedEnumerable<ApplicationUser> applicationUsers, params string[] parameters) {
 		var result = new List<IndexViewModel>();
 		foreach (var parameter in parameters) {
@@ -74,7 +75,7 @@ public class StudentController : Controller {
 						IsDeactivated = s.IsDeactivated
 					});
 			foreach (var partial in partials) {
-				if (!result.Contains(partial)) {
+				if (!result.Any(ivm => ivm.Id == partial.Id)) {
 					result.Add(partial);
 				}
 			}

@@ -66,7 +66,7 @@ public class StudentProposalController : Controller {
 						ProposalStatus = sp.ProposalStatus.ToString(),
 					});
 			foreach (var partial in partials) {
-				if (!result.Contains(partial)) {
+				if (!result.Any(ivm => ivm.Id == partial.Id)) {
 					result.Add(partial);
 				}
 			}
