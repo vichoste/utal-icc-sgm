@@ -53,7 +53,7 @@ public class StudentProposalController : Controller {
 		return studentProposals.OrderBy(sp => sp.GetType().GetProperty(parameters[0]));
 	}
 
-	protected List<IndexViewModel> FilterProposals(string searchString, string includeProperty, IQueryable<StudentProposal> studentProposals, params string[] parameters) {
+	protected IEnumerable<IndexViewModel> FilterProposals(string searchString, string includeProperty, IQueryable<StudentProposal> studentProposals, params string[] parameters) {
 		var result = new List<IndexViewModel>();
 		foreach (var parameter in parameters) {
 			var partials = studentProposals
@@ -131,7 +131,6 @@ public class StudentProposalController : Controller {
 				|| sp.ProposalStatus == StudentProposal.Status.SentToGuideTeacher
 				|| sp.ProposalStatus == StudentProposal.Status.ApprovedByGuideTeacher))
 			.Include(sp => sp.GuideTeacherOfTheStudentProposal).AsNoTracking();
-
 		var orderedProposals = this.OrderProposals(sortOrder, studentProposals, parameters);
 		var indexViewModels = !searchString.IsNullOrEmpty() ? this.FilterProposals(searchString, nameof(StudentProposal.GuideTeacherOfTheStudentProposal), orderedProposals) : orderedProposals.Select(sp => new IndexViewModel {
 			Id = sp.Id,

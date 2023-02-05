@@ -52,8 +52,7 @@ public class TeacherController : Controller {
 		return applicationUsers.OrderBy(s => s.GetType().GetProperty(parameters[0]));
 	}
 
-
-	protected List<IndexViewModel> FilterApplicationUsers(string searchString, IOrderedEnumerable<ApplicationUser> applicationUsers, params string[] parameters) {
+	protected IEnumerable<IndexViewModel> FilterApplicationUsers(string searchString, IOrderedEnumerable<ApplicationUser> applicationUsers, params string[] parameters) {
 		var result = new List<IndexViewModel>();
 		foreach (var parameter in parameters) {
 			var partials = applicationUsers
@@ -73,7 +72,7 @@ public class TeacherController : Controller {
 				}
 			}
 		}
-		return result;
+		return result.AsEnumerable();
 	}
 
 	public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? pageNumber) {

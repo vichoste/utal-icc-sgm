@@ -43,33 +43,33 @@ public class StudentProposalController : Controller {
 	protected IOrderedQueryable<StudentProposal> OrderProposals(string sortOrder, IQueryable<StudentProposal> studentProposals, params string[] parameters) {
 		foreach (var parameter in parameters) {
 			if (parameter == sortOrder) {
-				return studentProposals.OrderBy(sp => sp.GetType().GetProperty(parameter));
+				return studentProposals.OrderBy(sp => sp.GetType().GetProperty(parameter)!.GetValue(sp, null));
 			} else if ($"{parameter}Desc" == sortOrder) {
-				return studentProposals.OrderByDescending(sp => sp.GetType().GetProperty(parameter));
+				return studentProposals.OrderByDescending(sp => sp.GetType().GetProperty(parameter)!.GetValue(sp, null));
 			}
 		}
 		return studentProposals.OrderBy(sp => sp.GetType().GetProperty(parameters[0]));
 	}
 
-	protected List<IndexViewModel> FilterProposals(string searchString, string includeProperty, IQueryable<StudentProposal> studentProposals, params string[] parameters) {
+	protected IQueryable<IndexViewModel> FilterProposals(string searchString, string includeProperty, IQueryable<StudentProposal> studentProposals, params string[] parameters) {
 		var result = new List<IndexViewModel>();
 		foreach (var parameter in parameters) {
 			var partials = studentProposals
 					.Where(sp => (sp.GetType().GetProperty(parameter)!.GetValue(sp) as string)!.Contains(searchString))
 					.Include(sp => sp.GetType().GetProperty(includeProperty)!.GetValue(sp, null))
 					.Select(sp => new IndexViewModel {
-				Id = sp.Id,
-				Title = sp.Title,
-				Student = $"{(sp.GetType().GetProperty(includeProperty)!.GetValue(sp) as ApplicationUser)!.FirstName} {(sp.GetType().GetProperty(includeProperty)!.GetValue(sp, null) as ApplicationUser)!.LastName}",
-				ProposalStatus = sp.ProposalStatus.ToString(),
-			});
+						Id = sp.Id,
+						Title = sp.Title,
+						Student = $"{(sp.GetType().GetProperty(includeProperty)!.GetValue(sp) as ApplicationUser)!.FirstName} {(sp.GetType().GetProperty(includeProperty)!.GetValue(sp, null) as ApplicationUser)!.LastName}",
+						ProposalStatus = sp.ProposalStatus.ToString(),
+					});
 			foreach (var partial in partials) {
 				if (!result.Any(ivm => ivm.Id == partial.Id)) {
 					result.Add(partial);
 				}
 			}
 		}
-		return result;
+		return result.AsQueryable();
 	}
 
 	public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
@@ -90,13 +90,15 @@ public class StudentProposalController : Controller {
 				|| sp.ProposalStatus == StudentProposal.Status.ApprovedByGuideTeacher))
 			.Include(sp => sp.StudentOwnerOfTheStudentProposal).AsNoTracking();
 		var orderedProposals = this.OrderProposals(sortOrder, studentProposals, parameters);
-		var indexViewModels = !searchString.IsNullOrEmpty() ? this.FilterProposals(searchString, nameof(StudentProposal.StudentOwnerOfTheStudentProposal), orderedProposals, parameters) : orderedProposals.Select(sp => new IndexViewModel {
-			Id = sp.Id,
-			Title = sp.Title,
-			Student = $"{sp.StudentOwnerOfTheStudentProposal!.FirstName} {sp.StudentOwnerOfTheStudentProposal!.LastName}",
-			ProposalStatus = sp.ProposalStatus.ToString(),
-		}).ToList();
-		return this.View(PaginatedList<IndexViewModel>.Create((await this._userManager.GetUserAsync(this.User))!.Id, indexViewModels.AsQueryable(), pageNumber ?? 1, 6));
+		var indexViewModels = !searchString.IsNullOrEmpty()
+				? this.FilterProposals(searchString, nameof(StudentProposal.StudentOwnerOfTheStudentProposal), orderedProposals, parameters)
+				: orderedProposals.Select(sp => new IndexViewModel {
+					Id = sp.Id,
+					Title = sp.Title,
+					Student = $"{sp.StudentOwnerOfTheStudentProposal!.FirstName} {sp.StudentOwnerOfTheStudentProposal!.LastName}",
+					ProposalStatus = sp.ProposalStatus.ToString(),
+				});
+		return this.View(PaginatedList<IndexViewModel>.Create((await this._userManager.GetUserAsync(this.User))!.Id, indexViewModels, pageNumber ?? 1, 6));
 	}
 
 	public new async Task<IActionResult> View(string id) {
@@ -131,7 +133,7 @@ public class StudentProposalController : Controller {
 		};
 		return this.View(viewModel);
 	}
-	
+
 	public async Task<IActionResult> Reject(string id) {
 		if (await this.CheckTeacherSession() is not ApplicationUser teacher) {
 			return this.RedirectToAction("Index", "Home", new { area = "" });

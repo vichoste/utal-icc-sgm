@@ -60,7 +60,7 @@ public class StudentController : Controller {
 		return applicationUsers.OrderBy(s => s.GetType().GetProperty(parameters[0]));
 	}
 	
-	protected List<IndexViewModel> FilterApplicationUsers(string searchString, IOrderedEnumerable<ApplicationUser> applicationUsers, params string[] parameters) {
+	protected IEnumerable<IndexViewModel> FilterApplicationUsers(string searchString, IOrderedEnumerable<ApplicationUser> applicationUsers, params string[] parameters) {
 		var result = new List<IndexViewModel>();
 		foreach (var parameter in parameters) {
 			var partials = applicationUsers
@@ -80,7 +80,7 @@ public class StudentController : Controller {
 				}
 			}
 		}
-		return result;
+		return result.AsEnumerable();
 	}
 
 	public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
@@ -119,8 +119,7 @@ public class StudentController : Controller {
 			return this.RedirectToAction("Index", "Home", new { area = "" });
 		}
 		try {
-			var errorMessages = new List<string>();
-			var warningMessages = new List<string>();
+			var errorMessages = new List<string>();;
 			var successMessages = new List<string>();
 			using var reader = new StreamReader(model.CsvFile!.OpenReadStream());
 			using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
@@ -145,10 +144,10 @@ public class StudentController : Controller {
 				successMessages.Add($"Estudiante {record.Email} creado correctamente.");
 			}
 			if (errorMessages.Any()) {
-				this.TempData["ErrorMessages"] = errorMessages;
+				this.TempData["ErrorMessages"] = errorMessages.AsEnumerable();
 			}
 			if (successMessages.Any()) {
-				this.TempData["SuccessMessages"] = successMessages;
+				this.TempData["SuccessMessages"] = successMessages.AsEnumerable();
 			}
 			return this.RedirectToAction("Index", nameof(Roles.Student), new { area = nameof(Roles.DirectorTeacher) });
 		} catch {
