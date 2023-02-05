@@ -184,8 +184,8 @@ public class TeacherController : Controller {
 		teacher.Rut = model.Rut;
 		teacher.UpdatedAt = DateTimeOffset.Now;
 		_ = await this._userManager.UpdateAsync(teacher);
-		if (roles.Contains(nameof(Roles.DirectorTeacher))) {
-			_ = roles.Remove(nameof(Roles.DirectorTeacher));
+		if (roles.Contains(nameof(Roles.Teacher))) {
+			_ = roles.Remove(nameof(Roles.Teacher));
 		}
 		if (roles.Contains(nameof(Roles.DirectorTeacher))) {
 			_ = roles.Remove(nameof(Roles.DirectorTeacher));
