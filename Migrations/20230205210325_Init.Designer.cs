@@ -12,7 +12,7 @@ using Utal.Icc.Sgm.Data;
 namespace Utal.Icc.Sgm.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230204230558_Init")]
+    [Migration("20230205210325_Init")]
     partial class Init
     {
         /// <inheritdoc />
