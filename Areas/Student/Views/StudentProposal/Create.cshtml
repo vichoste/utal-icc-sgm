@@ -18,7 +18,7 @@
 			<div class="card">
 				<div class="card-header text-center">@this.ViewData["Title"]</div>
 				<div class="card-body">
-					@using (this.Html.BeginForm(nameof(StudentProposalController.Create), nameof(StudentProposal), new { area = nameof(Roles.Student) })) {
+					@using (this.Html.BeginForm(nameof(StudentProposalController.Create), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.Student) })) {
 						@this.Html.AntiForgeryToken()
 						<div class="row was-validated">
 							<div class="col">
@@ -54,7 +54,7 @@
 						<div class="row text-center">
 							<div class="col">
 								<div class="btn-group">
-									@this.Html.ActionLink("Cancelar", nameof(StudentProposalController.Index), nameof(StudentProposal), new { area = nameof(Roles.Student) }, new { @class = "btn btn-secondary" })
+									@this.Html.ActionLink("Cancelar", nameof(StudentProposalController.Index), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.Student) }, new { @class = "btn btn-secondary" })
 									<button type="submit" class="btn btn-primary">Crear</button>
 								</div>
 							</div>

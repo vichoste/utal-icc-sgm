@@ -18,10 +18,10 @@
 			<h2>@this.ViewData["Title"]</h2>
 		</div>
 		<div class="col-12 col-md-2 mb-3">
-			@this.Html.ActionLink("Crear propuesta", "Create", nameof(StudentProposal), new { area = nameof(Roles.Student) }, new { @class = "btn btn-success"})
+			@this.Html.ActionLink("Crear propuesta", "Create", nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.Student) }, new { @class = "btn btn-success"})
 		</div>
 		<div class="col-12 mb-3">
-			<partial name="_Filter" , model=@(new FilterPartialViewModel(nameof(StudentProposalController.Index), nameof(StudentProposal), nameof(Roles.Student))) />
+			<partial name="_Filter" , model=@(new FilterPartialViewModel(nameof(StudentProposalController.Index), nameof(StudentProposalController).Replace("Controller", string.Empty), nameof(Utal.Icc.Sgm.Areas.Student))) />
 		</div>
 	</div>
 	<div class="row justify-content-center">
@@ -68,15 +68,15 @@
 								</td>
 								<td>
 									@if (item.ProposalStatus == nameof(StudentProposal.Status.Draft)) {
-										@this.Html.ActionLink("Editar", nameof(StudentProposalController.Edit), nameof(StudentProposal), new { area = nameof(Roles.Student), id = item.Id }, new { @class = "btn btn-yellow mb-3"})
-										@this.Html.ActionLink("Eliminar", nameof(StudentProposalController.Delete), nameof(StudentProposal), new { area = nameof(Roles.Student), id = item.Id }, new { @class = "btn btn-danger mb-3"})
-										@this.Html.ActionLink("Enviar", nameof(StudentProposalController.Send), nameof(StudentProposal), new { area = nameof(Roles.Student), id = item.Id }, new { @class = "btn btn-primary mb-3"})
+										@this.Html.ActionLink("Editar", nameof(StudentProposalController.Edit), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.Student), id = item.Id }, new { @class = "btn btn-yellow mb-3"})
+										@this.Html.ActionLink("Eliminar", nameof(StudentProposalController.Delete), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.Student), id = item.Id }, new { @class = "btn btn-danger mb-3"})
+										@this.Html.ActionLink("Enviar", nameof(StudentProposalController.Send), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.Student), id = item.Id }, new { @class = "btn btn-primary mb-3"})
 									} else if (item.ProposalStatus == nameof(StudentProposal.Status.SentToGuideTeacher)) {
 										<p class="text-muted">Debes esperar a que el profesor guía apruebe o rechace esta propuesta.</p>
 									} else if (item.ProposalStatus == nameof(StudentProposal.Status.ApprovedByGuideTeacher)) {
-										@this.Html.ActionLink("Enviar", nameof(StudentProposalController.Convert), nameof(StudentProposal), new { area = nameof(Roles.Student), id = item.Id }, new { @class = "btn btn-info mb-3"})
+										@this.Html.ActionLink("Enviar", nameof(StudentProposalController.Convert), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.Student), id = item.Id }, new { @class = "btn btn-info mb-3"})
 									} else if (item.ProposalStatus == nameof(StudentProposal.Status.RejectedByGuideTeacher)) {
-										@this.Html.ActionLink("Ver razón", nameof(StudentProposalController.ViewRejectionReason), nameof(StudentProposal), new { area = nameof(Roles.Student), id = item.Id }, new { @class = "btn btn-danger mb-3"})
+										@this.Html.ActionLink("Ver razón", nameof(StudentProposalController.ViewRejectionReason), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.Student), id = item.Id }, new { @class = "btn btn-danger mb-3"})
 									}
 								</td>
 							</tr>

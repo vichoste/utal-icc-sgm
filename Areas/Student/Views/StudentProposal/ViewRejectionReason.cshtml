@@ -53,7 +53,7 @@
 								<div class="row text-center">
 									<div class="col">
 										<div class="btn-group">
-											@this.Html.ActionLink("Volver", nameof(StudentProposalController.Index), nameof(StudentProposal), new { area = nameof(Roles.Student) }, new { @class = "btn btn-secondary" })
+											@this.Html.ActionLink("Volver", nameof(StudentProposalController.Index), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.Student) }, new { @class = "btn btn-secondary" })
 										</div>
 									</div>
 								</div>

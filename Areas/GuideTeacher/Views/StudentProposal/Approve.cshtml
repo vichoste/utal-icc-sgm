@@ -16,7 +16,7 @@
 			<div class="card">
 				<div class="card-header text-center">@this.ViewData["Title"]</div>
 				<div class="card-body text-center">
-					@using (this.Html.BeginForm(nameof(StudentProposalController.Approve), nameof(StudentProposal), new { area = nameof(Roles.GuideTeacher) })) {
+					@using (this.Html.BeginForm(nameof(StudentProposalController.Approve), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.GuideTeacher) })) {
 						@this.Html.AntiForgeryToken()
 						@this.Html.HiddenFor(m => m.Id)
 						@this.Html.HiddenFor(m => m.Title)
@@ -26,7 +26,7 @@
 						<div class="row text-center">
 							<div class="col">
 								<div class="btn-group">
-									@this.Html.ActionLink("No", nameof(StudentProposalController.View), nameof(StudentProposal), new { area = nameof(Roles.GuideTeacher), id = this.Model.Id }, new { @class = "btn btn-secondary" })
+									@this.Html.ActionLink("No", nameof(StudentProposalController.View), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.GuideTeacher), id = this.Model.Id }, new { @class = "btn btn-secondary" })
 									<button type="submit" class="btn btn-success">Sí</button>
 								</div>
 							</div>

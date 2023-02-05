@@ -18,7 +18,7 @@
 			<h2>@this.ViewData["Title"]</h2>
 		</div>
 		<div class="col-12 mb-3">
-			<partial name="_Filter" , model=@(new FilterPartialViewModel(nameof(StudentProposalController.Index), nameof(StudentProposal), nameof(Roles.GuideTeacher))) />
+			<partial name="_Filter" , model=@(new FilterPartialViewModel(nameof(StudentProposalController.Index), nameof(StudentProposalController).Replace("Controller", string.Empty), nameof(Utal.Icc.Sgm.Areas.GuideTeacher))) />
 		</div>
 	</div>
 	<div class="row justify-content-center">
@@ -49,9 +49,6 @@
 								<td>@item.Student</td>
 								<td>
 									@switch (item.ProposalStatus) {
-										case nameof(StudentProposal.Status.Draft):
-											<span class="badge bg-secondary">Esto no debería verse</span>
-											break;
 										case nameof(StudentProposal.Status.SentToGuideTeacher):
 											<span class="badge bg-yellow">Pendiente de revisión</span>
 											break;
@@ -62,7 +59,7 @@
 								</td>
 								<td>
 									@if (item.ProposalStatus == nameof(StudentProposal.Status.SentToGuideTeacher)) {
-										@this.Html.ActionLink("Ver", nameof(StudentProposalController.View), nameof(StudentProposal), new { area = nameof(Roles.GuideTeacher), id = item.Id }, new { @class = "btn btn-yellow mb-3"})
+										@this.Html.ActionLink("Ver", nameof(StudentProposalController.View), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.GuideTeacher), id = item.Id }, new { @class = "btn btn-yellow mb-3"})
 									} else if (item.ProposalStatus == nameof(StudentProposal.Status.ApprovedByGuideTeacher)) {
 										<p class="text-muted">El estudiante debe enviar esta propuesta al comité.</p>
 									}
