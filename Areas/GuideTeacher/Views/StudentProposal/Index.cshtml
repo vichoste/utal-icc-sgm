@@ -33,7 +33,7 @@
 								</a>
 							</th>
 							<th>
-								<a asp-action="Index" asp-route-sortOrder="@this.ViewData["StudentLastNameSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+								<a asp-action="Index" asp-route-sortOrder="@this.ViewData["StudentSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
 									Estudiante
 								</a>
 							</th>
@@ -69,7 +69,7 @@
 									@if (item.ProposalStatus == StudentProposal.Status.SentToGuideTeacher.ToString()) {
 										@this.Html.ActionLink("Ver", "View", nameof(StudentProposal), new { area = nameof(Roles.GuideTeacher), id = item.Id }, new { @class = "btn btn-yellow mb-3"})
 									} else if (item.ProposalStatus == StudentProposal.Status.ApprovedByGuideTeacher.ToString()) {
-										<p class="text-muted">Debes esperar a que el estudiante confirme esta propuesta.</p>
+										<p class="text-muted">El estudiante debe enviar esta propuesta al comité.</p>
 									}
 								</td>
 							</tr>

@@ -2,7 +2,7 @@
 
 namespace Utal.Icc.Sgm.Areas.Student.Views.StudentProposal;
 
-public class ConfirmViewModel {
+public class ConvertViewModel {
 	[Display(Name = "ID"), Required]
 	public string? Id { get; set; }
 	[Display(Name = "Título")]
