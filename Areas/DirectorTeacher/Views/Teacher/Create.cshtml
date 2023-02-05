@@ -2,6 +2,7 @@
 
 @using Utal.Icc.Sgm.Areas.DirectorTeacher.Views.Teacher
 @using static Utal.Icc.Sgm.Models.ApplicationUser
+@using Utal.Icc.Sgm.Areas.DirectorTeacher.Controllers
 
 @model CreateViewModel
 
@@ -16,7 +17,7 @@
 			<div class="card">
 				<div class="card-header text-center">@this.ViewData["Title"]</div>
 				<div class="card-body">
-					@using (this.Html.BeginForm("Create", nameof(Roles.Teacher), new { area = nameof(Roles.DirectorTeacher) })) {
+					@using (this.Html.BeginForm(nameof(TeacherController.Create), nameof(Roles.Teacher), new { area = nameof(Roles.DirectorTeacher) })) {
 						@this.Html.AntiForgeryToken()
 						<div class="row was-validated">
 							<div class="col">
@@ -73,7 +74,7 @@
 						<div class="row text-center">
 							<div class="col">
 								<div class="btn-group">
-									@this.Html.ActionLink("Cancelar", "Index", nameof(Roles.Teacher), new { area = nameof(Roles.DirectorTeacher) }, new { @class = "btn btn-secondary" })
+									@this.Html.ActionLink("Cancelar", nameof(TeacherController.Index), nameof(Roles.Teacher), new { area = nameof(Roles.DirectorTeacher) }, new { @class = "btn btn-secondary" })
 									<button type="submit" class="btn btn-success">Crear</button>
 								</div>	
 							</div>

@@ -3,6 +3,7 @@
 @using Utal.Icc.Sgm.Areas.GuideTeacher.Views.Proposal
 @using Utal.Icc.Sgm.Views.Shared
 @using static Utal.Icc.Sgm.Models.ApplicationUser
+@using Utal.Icc.Sgm.Areas.GuideTeacher.Controllers
 
 @model PaginatedList<IndexViewModel>
 
@@ -17,7 +18,7 @@
 			<h2>@this.ViewData["Title"]</h2>
 		</div>
 		<div class="col-12 mb-3">
-			<partial name="_Filter" , model=@(new FilterPartialViewModel("Index", nameof(StudentProposal), nameof(Roles.GuideTeacher))) />
+			<partial name="_Filter" , model=@(new FilterPartialViewModel(nameof(StudentProposalController.Index), nameof(StudentProposal), nameof(Roles.GuideTeacher))) />
 		</div>
 	</div>
 	<div class="row justify-content-center">
@@ -28,12 +29,12 @@
 					<thead class="table-dark">
 						<tr>
 							<th>
-								<a asp-action="Index" asp-route-sortOrder="@this.ViewData["TitleSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+								<a asp-action="@nameof(StudentProposalController.Index)" asp-route-sortOrder="@this.ViewData["TitleSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
 									Título
 								</a>
 							</th>
 							<th>
-								<a asp-action="Index" asp-route-sortOrder="@this.ViewData["StudentSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+								<a asp-action="@nameof(StudentProposalController.Index)" asp-route-sortOrder="@this.ViewData["StudentSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
 									Estudiante
 								</a>
 							</th>
@@ -48,27 +49,21 @@
 								<td>@item.Student</td>
 								<td>
 									@switch (item.ProposalStatus) {
-										case "Draft":
+										case nameof(StudentProposal.Status.Draft):
 											<span class="badge bg-secondary">Esto no debería verse</span>
 											break;
-										case "SentToGuideTeacher":
+										case nameof(StudentProposal.Status.SentToGuideTeacher):
 											<span class="badge bg-yellow">Pendiente de revisión</span>
 											break;
-										case "ApprovedByGuideTeacher":
+										case nameof(StudentProposal.Status.ApprovedByGuideTeacher):
 											<span class="badge bg-success">Aceptada</span>
-											break;
-										case "Confirmed":
-											<span class="badge bg-success">Confirmado</span>
-											break;
-										case "RejectedByGuideTeacher":
-											<span class="badge bg-danger">Esto no debería verse</span>
 											break;
 									}
 								</td>
 								<td>
-									@if (item.ProposalStatus == StudentProposal.Status.SentToGuideTeacher.ToString()) {
-										@this.Html.ActionLink("Ver", "View", nameof(StudentProposal), new { area = nameof(Roles.GuideTeacher), id = item.Id }, new { @class = "btn btn-yellow mb-3"})
-									} else if (item.ProposalStatus == StudentProposal.Status.ApprovedByGuideTeacher.ToString()) {
+									@if (item.ProposalStatus == nameof(StudentProposal.Status.SentToGuideTeacher)) {
+										@this.Html.ActionLink("Ver", nameof(StudentProposalController.View), nameof(StudentProposal), new { area = nameof(Roles.GuideTeacher), id = item.Id }, new { @class = "btn btn-yellow mb-3"})
+									} else if (item.ProposalStatus == nameof(StudentProposal.Status.ApprovedByGuideTeacher)) {
 										<p class="text-muted">El estudiante debe enviar esta propuesta al comité.</p>
 									}
 								</td>
@@ -82,19 +77,19 @@
 				}
 				<ul class="pagination mb-0">
 					<li class="page-item @prevDisabled">
-						<a asp-action="Index" asp-route-sortOrder="@this.ViewData["CurrentSort"]" asp-route-pageNumber="@(this.Model.PageIndex - 1)" asp-route-currentFilter="@this.ViewData["CurrentFilter"]" class="page-link">
+						<a asp-action="@nameof(StudentProposalController.Index)" asp-route-sortOrder="@this.ViewData["CurrentSort"]" asp-route-pageNumber="@(this.Model.PageIndex - 1)" asp-route-currentFilter="@this.ViewData["CurrentFilter"]" class="page-link">
 							Anterior página
 						</a>
 					</li>
 					@for (var i = 0; i < this.Model.TotalPages; i++) {
 						<li class="page-item @(i + 1 == this.Model.PageIndex ? " active" : "")">
-							<a asp-action="Index" asp-route-sortOrder="@this.ViewData["CurrentSort"]" asp-route-pageNumber="@(i + 1)" asp-route-currentFilter="@this.ViewData["CurrentFilter"]" class="page-link">
+							<a asp-action="@nameof(StudentProposalController.Index)" asp-route-sortOrder="@this.ViewData["CurrentSort"]" asp-route-pageNumber="@(i + 1)" asp-route-currentFilter="@this.ViewData["CurrentFilter"]" class="page-link">
 								@(i + 1)
 							</a>
 						</li>
 					}
 					<li class="page-item @nextDisabled">
-						<a asp-action="Index" asp-route-sortOrder="@this.ViewData["CurrentSort"]" asp-route-pageNumber="@(this.Model.PageIndex + 1)" asp-route-currentFilter="@this.ViewData["CurrentFilter"]" class="page-link">
+						<a asp-action="@nameof(StudentProposalController.Index)" asp-route-sortOrder="@this.ViewData["CurrentSort"]" asp-route-pageNumber="@(this.Model.PageIndex + 1)" asp-route-currentFilter="@this.ViewData["CurrentFilter"]" class="page-link">
 							Siguiente página
 						</a>
 					</li>

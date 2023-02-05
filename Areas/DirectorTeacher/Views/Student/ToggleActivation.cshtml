@@ -1,5 +1,6 @@
 ﻿@using Utal.Icc.Sgm.Areas.DirectorTeacher.Views.Student
 @using static Utal.Icc.Sgm.Models.ApplicationUser
+@using Utal.Icc.Sgm.Areas.DirectorTeacher.Controllers
 
 @model ToggleActivationViewModel
 
@@ -12,7 +13,7 @@
 	<div class="card">
 		<div class="card-header text-center">@this.ViewData["Title"]</div>
 		<div class="card-body text-center">
-			@using (this.Html.BeginForm("ToggleActivation", nameof(Roles.Student), new { area = nameof(Roles.DirectorTeacher) })) {
+			@using (this.Html.BeginForm(nameof(StudentController.ToggleActivation), nameof(Roles.Student), new { area = nameof(Roles.DirectorTeacher) })) {
 				@this.Html.AntiForgeryToken()
 				@this.Html.HiddenFor(m => m.Id)
 				@this.Html.HiddenFor(m => m.Email)
@@ -24,7 +25,7 @@
 				}
 				<h6 class="card-subtitle mb-3 text-muted">@this.Html.DisplayFor(m => m.Email)</h6>
 				<div>
-					@this.Html.ActionLink("Cancelar", "Index", nameof(Roles.Student), new { area = nameof(Roles.DirectorTeacher) }, new { @class = "btn btn-secondary" })
+					@this.Html.ActionLink("Cancelar", nameof(StudentController.Index), nameof(Roles.Student), new { area = nameof(Roles.DirectorTeacher) }, new { @class = "btn btn-secondary" })
 					@if (!this.Model.IsDeactivated) {
 						<button type="submit" class="btn btn-danger">Desactivar</button>
 					} else {

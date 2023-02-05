@@ -24,7 +24,7 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment()) {
 	_ = app.UseMigrationsEndPoint();
 } else {
-	_ = app.UseExceptionHandler("/Home/Error");
+	_ = app.UseExceptionHandler($"/{nameof(Utal.Icc.Sgm.Controllers.HomeController).Replace("Controller", string.Empty)}/{nameof(Utal.Icc.Sgm.Controllers.HomeController.Error)}");
 	_ = app.UseHsts();
 }
 using var scope = app.Services.CreateScope();
@@ -40,28 +40,28 @@ _ = app.UseRouting();
 _ = app.UseAuthentication();
 _ = app.UseAuthorization();
 _ = app.MapAreaControllerRoute(
-	name: "Account",
-	areaName: "Account",
-	pattern: "Account/{controller=SignIn}/{action=Index}/{id?}"
+	name: nameof(Utal.Icc.Sgm.Areas.Account),
+	areaName: nameof(Utal.Icc.Sgm.Areas.Account),
+	pattern: $"{nameof(Utal.Icc.Sgm.Areas.Account)}/{{controller={nameof(Utal.Icc.Sgm.Areas.Account.Controllers.SignInController).Replace("Controller", string.Empty)}}}/{{action={nameof(Utal.Icc.Sgm.Areas.Account.Controllers.SignInController.Index)}}}/{{id?}}"
 );
 _ = app.MapAreaControllerRoute(
 	name: nameof(Roles.DirectorTeacher),
 	areaName: nameof(Roles.DirectorTeacher),
-	pattern: $"{nameof(Roles.DirectorTeacher)}/{{controller={nameof(Roles.Student)}}}/{{action=Index}}/{{id?}}"
+	pattern: $"{nameof(Roles.DirectorTeacher)}/{{controller={nameof(Roles.Student)}}}/{{action={nameof(Utal.Icc.Sgm.Areas.DirectorTeacher.Controllers.StudentController.Index)}}}/{{id?}}"
 );
 _ = app.MapAreaControllerRoute(
 	name: nameof(Roles.GuideTeacher),
 	areaName: nameof(Roles.GuideTeacher),
-	pattern: $"{nameof(Roles.GuideTeacher)}/{{controller={nameof(StudentProposal)}}}/{{action=Index}}/{{id?}}"
+	pattern: $"{nameof(Roles.GuideTeacher)}/{{controller={nameof(StudentProposal)}}}/{{action={nameof(Utal.Icc.Sgm.Areas.GuideTeacher.Controllers.StudentProposalController.Index)}}}/{{id?}}"
 );
 _ = app.MapAreaControllerRoute(
 	name: nameof(Roles.Student),
 	areaName: nameof(Roles.Student),
-	pattern: $"{nameof(Roles.Student)}/{{controller={nameof(StudentProposal)}}}/{{action=Index}}/{{id?}}"
+	pattern: $"{nameof(Roles.Student)}/{{controller={nameof(StudentProposal)}}}/{{action={nameof(Utal.Icc.Sgm.Areas.Student.Controllers.StudentProposalController.Index)}}}/{{id?}}"
 );
 _ = app.MapControllerRoute(
 	name: "default",
-	pattern: "{controller=Home}/{action=Index}/{id?}"
+	pattern: $"{{controller={nameof(Utal.Icc.Sgm.Controllers.HomeController).Replace("Controller", string.Empty)}}}/{{action={nameof(Utal.Icc.Sgm.Controllers.HomeController.Index)}}}/{{id?}}"
 );
 _ = app.MapRazorPages();
 app.Run();

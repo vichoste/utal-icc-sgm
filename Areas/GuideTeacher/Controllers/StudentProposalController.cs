@@ -67,9 +67,9 @@ public class StudentProposalController : Controller {
 
 	public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
 		if (await this.CheckTeacherSession() is not ApplicationUser teacher) {
-			return this.RedirectToAction("Index", "Home", new { area = "" });
+			return this.RedirectToAction("Index", "Home", new { area = string.Empty });
 		}
-		var parameters = new[] { "Title", "Student" };
+		var parameters = new[] { "Title", nameof(Roles.Student) };
 		this.SetSortParameters(sortOrder, parameters);
 		if (searchString is not null) {
 			pageNumber = 1;
@@ -97,7 +97,7 @@ public class StudentProposalController : Controller {
 
 	public new async Task<IActionResult> View(string id) {
 		if (await this.CheckTeacherSession() is not ApplicationUser teacher) {
-			return this.RedirectToAction("Index", "Home", new { area = "" });
+			return this.RedirectToAction("Index", "Home", new { area = string.Empty });
 		}
 		var studentProposal = await this._dbContext.StudentProposals.AsNoTracking()
 			.Where(sp => sp.GuideTeacherOfTheStudentProposal == teacher && sp.ProposalStatus == StudentProposal.Status.SentToGuideTeacher)
@@ -130,7 +130,7 @@ public class StudentProposalController : Controller {
 
 	public async Task<IActionResult> Reject(string id) {
 		if (await this.CheckTeacherSession() is not ApplicationUser teacher) {
-			return this.RedirectToAction("Index", "Home", new { area = "" });
+			return this.RedirectToAction("Index", "Home", new { area = string.Empty });
 		}
 		var studentProposal = await this._dbContext.StudentProposals.AsNoTracking()
 			.Where(sp => sp.GuideTeacherOfTheStudentProposal == teacher && sp.ProposalStatus == StudentProposal.Status.SentToGuideTeacher).AsNoTracking()
@@ -151,7 +151,7 @@ public class StudentProposalController : Controller {
 	[HttpPost, ValidateAntiForgeryToken]
 	public async Task<IActionResult> Reject([FromForm] RejectViewModel model) {
 		if (await this.CheckTeacherSession() is not ApplicationUser teacher) {
-			return this.RedirectToAction("Index", "Home", new { area = "" });
+			return this.RedirectToAction("Index", "Home", new { area = string.Empty });
 		}
 		var studentProposal = await this._dbContext.StudentProposals
 			.Where(sp => sp.GuideTeacherOfTheStudentProposal == teacher && sp.ProposalStatus == StudentProposal.Status.SentToGuideTeacher)
@@ -171,7 +171,7 @@ public class StudentProposalController : Controller {
 
 	public async Task<IActionResult> Approve(string id) {
 		if (await this.CheckTeacherSession() is not ApplicationUser teacher) {
-			return this.RedirectToAction("Index", "Home", new { area = "" });
+			return this.RedirectToAction("Index", "Home", new { area = string.Empty });
 		}
 		var studentProposal = await this._dbContext.StudentProposals.AsNoTracking()
 			.Where(sp => sp.GuideTeacherOfTheStudentProposal == teacher && sp.ProposalStatus == StudentProposal.Status.SentToGuideTeacher).AsNoTracking()
@@ -192,7 +192,7 @@ public class StudentProposalController : Controller {
 	[HttpPost, ValidateAntiForgeryToken]
 	public async Task<IActionResult> Approve([FromForm] ApproveViewModel model) {
 		if (await this.CheckTeacherSession() is not ApplicationUser teacher) {
-			return this.RedirectToAction("Index", "Home", new { area = "" });
+			return this.RedirectToAction("Index", "Home", new { area = string.Empty });
 		}
 		var studentProposal = await this._dbContext.StudentProposals
 			.Where(sp => sp.GuideTeacherOfTheStudentProposal == teacher && sp.ProposalStatus == StudentProposal.Status.SentToGuideTeacher)

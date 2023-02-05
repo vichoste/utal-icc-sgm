@@ -1,6 +1,7 @@
 ﻿@using Utal.Icc.Sgm.Areas.GuideTeacher.Views.Proposal
 @using Utal.Icc.Sgm.Models
 @using static Utal.Icc.Sgm.Models.ApplicationUser
+@using Utal.Icc.Sgm.Areas.GuideTeacher.Controllers
 
 @model ViewModel
 
@@ -89,9 +90,9 @@
 						<div class="row text-center">
 							<div class="col">
 								<div class="btn-group">
-									@this.Html.ActionLink("Cancelar", "Index", nameof(StudentProposal), new { area = nameof(Roles.GuideTeacher) }, new { @class = "btn btn-secondary" })
-									@this.Html.ActionLink("Rechazar", "Reject", nameof(StudentProposal), new { area = nameof(Roles.GuideTeacher), id = this.Model.Id }, new { @class = "btn btn-danger" })
-									@this.Html.ActionLink("Aceptar", "Approve", nameof(StudentProposal), new { area = nameof(Roles.GuideTeacher), id = this.Model.Id }, new { @class = "btn btn-success" })
+									@this.Html.ActionLink("Cancelar", nameof(StudentProposalController.Index), nameof(StudentProposal), new { area = nameof(Roles.GuideTeacher) }, new { @class = "btn btn-secondary" })
+									@this.Html.ActionLink("Rechazar", nameof(StudentProposalController.Reject), nameof(StudentProposal), new { area = nameof(Roles.GuideTeacher), id = this.Model.Id }, new { @class = "btn btn-danger" })
+									@this.Html.ActionLink("Aceptar", nameof(StudentProposalController.Approve), nameof(StudentProposal), new { area = nameof(Roles.GuideTeacher), id = this.Model.Id }, new { @class = "btn btn-success" })
 								</div>
 							</div>
 						</div>
