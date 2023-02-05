@@ -5,10 +5,9 @@ namespace Utal.Icc.Sgm.Models;
 public class StudentProposal {
 	public enum Status {
 		Draft,
-		Sent,
-		Approved,
-		Confirmed,
-		Rejected
+		SentToGuideTeacher,
+		ApprovedByGuideTeacher,
+		RejectedByGuideTeacher
 	}
 	#region Common
 	[Key]
@@ -28,9 +27,6 @@ public class StudentProposal {
 	#endregion
 	#region Rejected
 	public string? RejectionReason { get; set; }
-	#endregion
-	#region Accepted
-	public bool ConfirmedByStudent { get; set; }
 	#endregion
 	[Timestamp]
 	public byte[]? RowVersion { get; set; }

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Utal.Icc.Sgm.Areas.Student.Views.Proposal;
+namespace Utal.Icc.Sgm.Areas.Student.Views.StudentProposal;
 
 public class CreateViewModel {
 	[Display(Name = "Título"), Required]

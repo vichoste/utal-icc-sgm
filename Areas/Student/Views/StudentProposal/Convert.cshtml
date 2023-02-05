@@ -1,9 +1,11 @@
-﻿@using Utal.Icc.Sgm.Areas.Student.Views.Proposal
+﻿@using Utal.Icc.Sgm.Areas.Student.Views.StudentProposal
+@using Utal.Icc.Sgm.Models
+@using static Utal.Icc.Sgm.Models.ApplicationUser
 
-@model ConfirmViewModel
+@model ConvertViewModel
 
 @{
-	this.ViewData["Title"] = "Confirmar propuesta";
+	this.ViewData["Title"] = "Enviar propuesta a comité";
 }
 
 <div class="container">
@@ -13,9 +15,8 @@
 			<div class="card">
 				<div class="card-header text-center">@this.ViewData["Title"]</div>
 				<div class="card-body">
-					<h5 class="card-title text-center"><b class="text-success">Confirmar</b> propuesta</h5>
-					<h6 class="card-subtitle text-center mb-3 text-muted">Estás a punto de confirmar tu propuesta. Revisa la información y una vez listo, presiona el botón de <b class="text-success">"Confirmar"</b>.</h6>
-					@using (this.Html.BeginForm("Confirm", "Proposal", new { area = "Student" })) {
+					<h5 class="card-title text-center">Estás a punto de <b class="text-info">enviar</b> tu propuesta al <b>comité</b>, convirtiendola en una <b>solicitud</b>. Revisa la información y una vez listo, presiona el botón de <b class="text-info">"Enviar"</b>.</h5>
+					@using (this.Html.BeginForm("Convert", nameof(StudentProposal), new { area = nameof(Roles.Student) })) {
 						@this.Html.AntiForgeryToken()
 						@this.Html.HiddenFor(m => m.Id)
 						<div class="row">
@@ -81,8 +82,8 @@
 						<div class="row text-center">
 							<div class="col">
 								<div class="btn-group">
-									@this.Html.ActionLink("Cancelar", "Index", "Proposal", new { area = "Student" }, new { @class = "btn btn-secondary" })
-									<button type="submit" class="btn btn-success">Confirmar</button>
+									@this.Html.ActionLink("Cancelar", "Index", nameof(StudentProposal), new { area = nameof(Roles.Student) }, new { @class = "btn btn-secondary" })
+									<button type="submit" class="btn btn-info">Enviar</button>
 								</div>
 							</div>
 						</div>

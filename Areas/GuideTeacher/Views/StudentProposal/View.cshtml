@@ -1,4 +1,6 @@
 ﻿@using Utal.Icc.Sgm.Areas.GuideTeacher.Views.Proposal
+@using Utal.Icc.Sgm.Models
+@using static Utal.Icc.Sgm.Models.ApplicationUser
 
 @model ViewModel
 
@@ -87,9 +89,9 @@
 						<div class="row text-center">
 							<div class="col">
 								<div class="btn-group">
-									@this.Html.ActionLink("Cancelar", "Index", "Proposal", new { area = "GuideTeacher" }, new { @class = "btn btn-secondary" })
-									@this.Html.ActionLink("Rechazar", "Reject", "Proposal", new { area = "GuideTeacher", id = this.Model.Id }, new { @class = "btn btn-danger" })
-									@this.Html.ActionLink("Aceptar", "Approve", "Proposal", new { area = "GuideTeacher", id = this.Model.Id }, new { @class = "btn btn-success" })
+									@this.Html.ActionLink("Cancelar", "Index", nameof(StudentProposal), new { area = nameof(Roles.GuideTeacher) }, new { @class = "btn btn-secondary" })
+									@this.Html.ActionLink("Rechazar", "Reject", nameof(StudentProposal), new { area = nameof(Roles.GuideTeacher), id = this.Model.Id }, new { @class = "btn btn-danger" })
+									@this.Html.ActionLink("Aceptar", "Approve", nameof(StudentProposal), new { area = nameof(Roles.GuideTeacher), id = this.Model.Id }, new { @class = "btn btn-success" })
 								</div>
 							</div>
 						</div>

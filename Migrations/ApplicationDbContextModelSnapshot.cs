@@ -273,9 +273,6 @@ namespace Utal.Icc.Sgm.Migrations
                     b.Property<string>("AssistantTeacher3OfTheStudentProposalId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<bool>("ConfirmedByStudent")
-                        .HasColumnType("bit");
-
                     b.Property<DateTimeOffset?>("CreatedAt")
                         .HasColumnType("datetimeoffset");
 

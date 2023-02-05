@@ -1,4 +1,6 @@
 ﻿@using Utal.Icc.Sgm.Areas.GuideTeacher.Views.Proposal
+@using Utal.Icc.Sgm.Models
+@using static Utal.Icc.Sgm.Models.ApplicationUser
 
 @model ApproveViewModel
 
@@ -13,7 +15,7 @@
 			<div class="card">
 				<div class="card-header text-center">@this.ViewData["Title"]</div>
 				<div class="card-body text-center">
-					@using (this.Html.BeginForm("Approve", "Proposal", new { area = "GuideTeacher" })) {
+					@using (this.Html.BeginForm("Approve", nameof(StudentProposal), new { area = nameof(Roles.GuideTeacher) })) {
 						@this.Html.AntiForgeryToken()
 						@this.Html.HiddenFor(m => m.Id)
 						@this.Html.HiddenFor(m => m.Title)
@@ -23,7 +25,7 @@
 						<div class="row text-center">
 							<div class="col">
 								<div class="btn-group">
-									@this.Html.ActionLink("No", "View", "Proposal", new { area = "GuideTeacher", id = this.Model.Id }, new { @class = "btn btn-secondary" })
+									@this.Html.ActionLink("No", "View", nameof(StudentProposal), new { area = nameof(Roles.GuideTeacher), id = this.Model.Id }, new { @class = "btn btn-secondary" })
 									<button type="submit" class="btn btn-success">Sí</button>
 								</div>
 							</div>

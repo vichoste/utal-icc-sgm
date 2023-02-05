@@ -1,9 +1,13 @@
-﻿@using Utal.Icc.Sgm.Areas.Student.Views.Proposal
+﻿@using Microsoft.AspNetCore.Identity
 
-@model EditViewModel
+@using Utal.Icc.Sgm.Areas.Student.Views.StudentProposal
+@using Utal.Icc.Sgm.Models
+@using static Utal.Icc.Sgm.Models.ApplicationUser
+
+@model CreateViewModel
 
 @{
-	this.ViewData["Title"] = "Editar propuesta";
+	this.ViewData["Title"] = "Crear propuesta";
 }
 
 <div class="container">
@@ -13,22 +17,23 @@
 			<div class="card">
 				<div class="card-header text-center">@this.ViewData["Title"]</div>
 				<div class="card-body">
-					@using (this.Html.BeginForm("Edit", "Proposal", new { area = "Student" })) {
+					@using (this.Html.BeginForm("Create", nameof(StudentProposal), new { area = nameof(Roles.Student) })) {
 						@this.Html.AntiForgeryToken()
-						@this.Html.HiddenFor(m => m.Id)
 						<div class="row was-validated">
 							<div class="col">
 								<div class="form-group mb-3">
 									@this.Html.LabelFor(m => m.Title, new { @class = "form-label" })
-									@this.Html.TextBoxFor(m => m.Title, new { @class = "form-control" })
+									@this.Html.TextBoxFor(m => m.Title, new { @class = "form-control", @required = "required" })
+									@this.Html.ValidationMessageFor(m => m.Title, "Título requerido", new { @class = "invalid-feedback" })
 								</div>
 								<div class="form-group mb-3">
 									@this.Html.LabelFor(m => m.Description, new { @class = "form-label" })
-									@this.Html.TextBoxFor(m => m.Description, new { @class = "form-control" })
+									@this.Html.TextBoxFor(m => m.Description, new { @class = "form-control", @required = "required" })
+									@this.Html.ValidationMessageFor(m => m.Description, "Descripción requerida", new { @class = "invalid-feedback" })
 								</div>
 								<div class="form-group mb-3">
-									@this.Html.LabelFor(m => m.GuideTeacher, new { @class = "form-label" , @required = "required" })
-									@this.Html.DropDownListFor(m => m.GuideTeacher, (IEnumerable<SelectListItem>)this.ViewData["GuideTeachers"]!, "Seleccionar profesor guía", new { @class = "form-select" })
+									@this.Html.LabelFor(m => m.GuideTeacher, new { @class = "form-label" })
+									@this.Html.DropDownListFor(m => m.GuideTeacher, (IEnumerable<SelectListItem>)this.ViewData["GuideTeachers"]!, "Seleccionar profesor guía", new { @class = "form-select", @required = "required" })
 									@this.Html.ValidationMessageFor(m => m.GuideTeacher, "Profesor guía requerido", new { @class = "invalid-feedback" })
 								</div>
 								<div class="form-group mb-3">
@@ -43,24 +48,13 @@
 									@this.Html.LabelFor(m => m.AssistantTeacher3, new { @class = "form-label" })
 									@this.Html.DropDownListFor(m => m.AssistantTeacher3, (IEnumerable<SelectListItem>)this.ViewData["AssistantTeachers3"]!, "Seleccionar tercer profesor co-guía", new { @class = "form-select" })
 								</div>
-								<hr />
-								<div class="form-group mb-3 text-muted">
-									@this.Html.HiddenFor(m => m.CreatedAt)
-									@this.Html.LabelFor(m => m.CreatedAt, new { @class = "form-label" }):
-									@this.Html.DisplayFor(m => m.CreatedAt, new { @class = "form-control" })
-								</div>
-								<div class="form-group mb-3 text-muted">
-									@this.Html.HiddenFor(m => m.UpdatedAt)
-									@this.Html.LabelFor(m => m.UpdatedAt, new { @class = "form-label" }):
-									@this.Html.DisplayFor(m => m.UpdatedAt, new { @class = "form-control" })
-								</div>
 							</div>
 						</div>
 						<div class="row text-center">
 							<div class="col">
 								<div class="btn-group">
-									@this.Html.ActionLink("Cancelar", "Index", "Proposal", new { area = "Student" }, new { @class = "btn btn-secondary" })
-									<button type="submit" class="btn btn-primary">Editar</button>
+									@this.Html.ActionLink("Cancelar", "Index", nameof(StudentProposal), new { area = nameof(Roles.Student) }, new { @class = "btn btn-secondary" })
+									<button type="submit" class="btn btn-primary">Crear</button>
 								</div>
 							</div>
 						</div>

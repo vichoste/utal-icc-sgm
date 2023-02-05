@@ -185,7 +185,6 @@ namespace Utal.Icc.Sgm.Migrations
                     AssistantTeacher2OfTheStudentProposalId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     AssistantTeacher3OfTheStudentProposalId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     RejectionReason = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ConfirmedByStudent = table.Column<bool>(type: "bit", nullable: false),
                     RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: true)
                 },
                 constraints: table =>

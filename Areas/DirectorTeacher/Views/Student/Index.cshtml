@@ -1,6 +1,7 @@
 ﻿@using Utal.Icc.Sgm
 @using Utal.Icc.Sgm.Areas.DirectorTeacher.Views.Student
 @using Utal.Icc.Sgm.Views.Shared
+@using static Utal.Icc.Sgm.Models.ApplicationUser
 
 @model PaginatedList<IndexViewModel>
 
@@ -15,10 +16,10 @@
 			<h2>@this.ViewData["Title"]</h2>
 		</div>
 		<div class="col-12 col-md-2 mb-3">
-			@this.Html.ActionLink("Importar estudiantes desde CSV", "Create", "Student", new { area = "DirectorTeacher" }, new { @class = "btn btn-success"})
+			@this.Html.ActionLink("Importar estudiantes desde CSV", "Create", nameof(Roles.Student), new { area = nameof(Roles.DirectorTeacher) }, new { @class = "btn btn-success"})
 		</div>
 		<div class="col-12 mb-3">
-			<partial name="_Filter" , model=@(new FilterPartialViewModel("Index", "Student", "DirectorTeacher")) />
+			<partial name="_Filter" , model=@(new FilterPartialViewModel("Index", nameof(Roles.Student), nameof(Roles.DirectorTeacher))) />
 		</div>
 	</div>
 	<div class="row justify-content-center">
@@ -39,7 +40,7 @@
 								</a>
 							</th>
 							<th>
-								<a asp-action="Index" asp-route-sortOrder="@this.ViewData["UniversityIdSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+								<a asp-action="Index" asp-route-sortOrder="@this.ViewData["StudentUniversityIdSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
 									Número de matrícula
 								</a>
 							</th>
@@ -66,7 +67,7 @@
 									<td class="text-muted">@item.Rut</td>
 									<td class="text-muted">@item.Email</td>
 									<td>
-										@this.Html.ActionLink("Activar", "ToggleActivation", "Student", new { area = "DirectorTeacher", id = item.Id }, new { @class = "btn btn-success mb-3" })
+										@this.Html.ActionLink("Activar", "ToggleActivation", nameof(Roles.Student), new { area = nameof(Roles.DirectorTeacher), id = item.Id }, new { @class = "btn btn-success mb-3" })
 									</td>
 								} else {
 									<td>@item.FirstName</td>
@@ -75,8 +76,8 @@
 									<td>@item.Rut</td>
 									<td>@item.Email</td>
 									<td>
-										@this.Html.ActionLink("Editar", "Edit", "Student", new { area = "DirectorTeacher", id = item.Id }, new { @class = "btn btn-yellow mb-3" })
-										@this.Html.ActionLink("Desactivar", "ToggleActivation", "Student", new { area = "DirectorTeacher", id = item.Id }, new { @class = "btn btn-danger mb-3" })
+										@this.Html.ActionLink("Editar", "Edit", nameof(Roles.Student), new { area = nameof(Roles.DirectorTeacher), id = item.Id }, new { @class = "btn btn-yellow mb-3" })
+										@this.Html.ActionLink("Desactivar", "ToggleActivation", nameof(Roles.Student), new { area = nameof(Roles.DirectorTeacher), id = item.Id }, new { @class = "btn btn-danger mb-3" })
 									</td>
 								}
 							</tr>

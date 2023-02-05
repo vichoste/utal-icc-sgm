@@ -54,7 +54,7 @@ public static class StartupSeeder {
 			await userStore.SetUserNameAsync(directorTeacher, email, CancellationToken.None);
 			await emailStore.SetEmailAsync(directorTeacher, email, CancellationToken.None);
 			_ = await userManager.CreateAsync(directorTeacher, password);
-			_ = await userManager.AddToRolesAsync(directorTeacher, new List<string> { Roles.Teacher.ToString(), Roles.DirectorTeacher.ToString() });
+			_ = await userManager.AddToRolesAsync(directorTeacher, new List<string> { Roles.Teacher.ToString(), Roles.DirectorTeacher.ToString() }.AsEnumerable());
 		}
 	}
 }

@@ -1,25 +1,23 @@
 ﻿@using Utal.Icc.Sgm
 @using Utal.Icc.Sgm.Models
-@using Utal.Icc.Sgm.Areas.Student.Views.Proposal
+@using Utal.Icc.Sgm.Areas.GuideTeacher.Views.Proposal
 @using Utal.Icc.Sgm.Views.Shared
+@using static Utal.Icc.Sgm.Models.ApplicationUser
 
 @model PaginatedList<IndexViewModel>
 
 @{
-	this.ViewData["Title"] = "Mis propuestas";
+	this.ViewData["Title"] = "Propuestas de estudiantes";
 }
 
 <div class="container">
 	<partial name="_Alerts" />
 	<div class="row justify-content-center">
-		<div class="col-12 col-md-10 mb-3">
+		<div class="col-12 mb-3">
 			<h2>@this.ViewData["Title"]</h2>
 		</div>
-		<div class="col-12 col-md-2 mb-3">
-			@this.Html.ActionLink("Crear propuesta", "Create", "Proposal", new { area = "Student" }, new { @class = "btn btn-success"})
-		</div>
 		<div class="col-12 mb-3">
-			<partial name="_Filter" , model=@(new FilterPartialViewModel("Index", "Proposal", "Student")) />
+			<partial name="_Filter" , model=@(new FilterPartialViewModel("Index", nameof(StudentProposal), nameof(Roles.GuideTeacher))) />
 		</div>
 	</div>
 	<div class="row justify-content-center">
@@ -35,8 +33,8 @@
 								</a>
 							</th>
 							<th>
-								<a asp-action="Index" asp-route-sortOrder="@this.ViewData["GuideTeacherLastNameSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
-									Profesor guía
+								<a asp-action="Index" asp-route-sortOrder="@this.ViewData["StudentSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+									Estudiante
 								</a>
 							</th>
 							<th>Estado</th>
@@ -47,37 +45,31 @@
 						@foreach (var item in this.Model) {
 							<tr>
 								<td>@item.Title</td>
-								<td>@item.GuideTeacher</td>
+								<td>@item.Student</td>
 								<td>
 									@switch (item.ProposalStatus) {
 										case "Draft":
-											<span class="badge bg-secondary">Borrador</span>
+											<span class="badge bg-secondary">Esto no debería verse</span>
 											break;
-										case "Sent":
-											<span class="badge bg-primary">Enviado</span>
+										case "SentToGuideTeacher":
+											<span class="badge bg-yellow">Pendiente de revisión</span>
 											break;
-										case "Approved":
-											<span class="badge bg-success">Aceptado</span>
+										case "ApprovedByGuideTeacher":
+											<span class="badge bg-success">Aceptada</span>
 											break;
 										case "Confirmed":
 											<span class="badge bg-success">Confirmado</span>
 											break;
-										case "Rejected":
-											<span class="badge bg-danger">Rechazado</span>
+										case "RejectedByGuideTeacher":
+											<span class="badge bg-danger">Esto no debería verse</span>
 											break;
 									}
 								</td>
 								<td>
-									@if (item.ProposalStatus == StudentProposal.Status.Draft.ToString()) {
-										@this.Html.ActionLink("Editar", "Edit", "Proposal", new { area = "Student", id = item.Id }, new { @class = "btn btn-yellow mb-3"})
-										@this.Html.ActionLink("Eliminar", "Delete", "Proposal", new { area = "Student", id = item.Id }, new { @class = "btn btn-danger mb-3"})
-										@this.Html.ActionLink("Enviar", "Send", "Proposal", new { area = "Student", id = item.Id }, new { @class = "btn btn-primary mb-3"})
-									} else if (item.ProposalStatus == StudentProposal.Status.Sent.ToString()) {
-										<p class="text-muted">Debes esperar a que el profesor guía apruebe o rechace esta propuesta.</p>
-									} else if (item.ProposalStatus == StudentProposal.Status.Approved.ToString()) {
-										@this.Html.ActionLink("Confirmar", "Confirm", "Proposal", new { area = "Student", id = item.Id }, new { @class = "btn btn-success mb-3"})
-									} else if (item.ProposalStatus == StudentProposal.Status.Rejected.ToString()) {
-										@this.Html.ActionLink("Ver razón", "ViewRejectionReason", "Proposal", new { area = "Student", id = item.Id }, new { @class = "btn btn-danger mb-3"})
+									@if (item.ProposalStatus == StudentProposal.Status.SentToGuideTeacher.ToString()) {
+										@this.Html.ActionLink("Ver", "View", nameof(StudentProposal), new { area = nameof(Roles.GuideTeacher), id = item.Id }, new { @class = "btn btn-yellow mb-3"})
+									} else if (item.ProposalStatus == StudentProposal.Status.ApprovedByGuideTeacher.ToString()) {
+										<p class="text-muted">El estudiante debe enviar esta propuesta al comité.</p>
 									}
 								</td>
 							</tr>

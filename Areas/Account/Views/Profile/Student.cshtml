@@ -1,4 +1,5 @@
 ﻿@using Utal.Icc.Sgm.Areas.Account.Views.Profile
+@using static Utal.Icc.Sgm.Models.ApplicationUser
 
 @model StudentViewModel
 
@@ -13,26 +14,26 @@
 			<div class="card">
 				<div class="card-header text-center">@this.ViewData["Title"]</div>
 				<div class="card-body">
-					@using (this.Html.BeginForm("Student", "Profile", new { area = "Account" })) {
+					@using (this.Html.BeginForm(nameof(Roles.Student), "Profile", new { area = "Account" })) {
 						@this.Html.AntiForgeryToken()
 						<div class="row">
 							<div class="col">
 								<div class="form-group mb-3">
-									@this.Html.LabelFor(m => m.UniversityId, new { @class = "form-label" })
-									@this.Html.HiddenFor(m => m.UniversityId)
-									@this.Html.DisplayFor(m => m.UniversityId, new { @class = "form-control" })
+									@this.Html.LabelFor(m => m.StudentUniversityId, new { @class = "form-label" })
+									@this.Html.HiddenFor(m => m.StudentUniversityId)
+									@this.Html.DisplayFor(m => m.StudentUniversityId, new { @class = "form-control" })
 								</div>
 								<div class="form-group mb-3">
-									@this.Html.LabelFor(m => m.RemainingCourses, new { @class = "form-label" })
-									@this.Html.TextBoxFor(m => m.RemainingCourses, new { @class = "form-control" })
+									@this.Html.LabelFor(m => m.StudentRemainingCourses, new { @class = "form-label" })
+									@this.Html.TextBoxFor(m => m.StudentRemainingCourses, new { @class = "form-control" })
 								</div>
 								<div class="form-check mb-3">
-									@this.Html.LabelFor(m => m.IsDoingThePractice, new { @class = "form-check-label" })
-									@this.Html.CheckBoxFor(m => m.IsDoingThePractice, new { @class = "form-check-input" })
+									@this.Html.LabelFor(m => m.StudentIsDoingThePractice, new { @class = "form-check-label" })
+									@this.Html.CheckBoxFor(m => m.StudentIsDoingThePractice, new { @class = "form-check-input" })
 								</div>
 								<div class="form-check mb-3">
-									@this.Html.LabelFor(m => m.IsWorking, new { @class = "form-check-label" })
-									@this.Html.CheckBoxFor(m => m.IsWorking, new { @class = "form-check-input" })
+									@this.Html.LabelFor(m => m.StudentIsWorking, new { @class = "form-check-label" })
+									@this.Html.CheckBoxFor(m => m.StudentIsWorking, new { @class = "form-check-input" })
 								</div>
 							</div>
 						</div>

@@ -1,6 +1,7 @@
 ﻿@using Microsoft.AspNetCore.Identity
 
 @using Utal.Icc.Sgm.Areas.DirectorTeacher.Views.Student
+@using static Utal.Icc.Sgm.Models.ApplicationUser
 
 @model InputViewModel
 
@@ -15,7 +16,7 @@
 			<div class="card">
 				<div class="card-header text-center">@this.ViewData["Title"]</div>
 				<div class="card-body">
-					@using (this.Html.BeginForm("Create", "Student", new { area = "DirectorTeacher" }, FormMethod.Post, true, new { @enctype = "multipart/form-data" })) {
+					@using (this.Html.BeginForm("Create", nameof(Roles.Student), new { area = nameof(Roles.DirectorTeacher) }, FormMethod.Post, true, new { @enctype = "multipart/form-data" })) {
 						<div class="row was-validated">
 							<div class="col">
 								<div class="mb-3">
@@ -28,7 +29,7 @@
 						<div class="row text-center">
 							<div class="col">
 								<div class="btn-group">
-									@this.Html.ActionLink("Cancelar", "Index", "Student", new { area = "DirectorTeacher" }, new { @class = "btn btn-secondary" })
+									@this.Html.ActionLink("Cancelar", "Index", nameof(Roles.Student), new { area = nameof(Roles.DirectorTeacher) }, new { @class = "btn btn-secondary" })
 									<button type="submit" class="btn btn-success">Importar</button>
 								</div>
 							</div>

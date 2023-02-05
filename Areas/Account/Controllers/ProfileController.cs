@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 using Utal.Icc.Sgm.Areas.Account.Views.Profile;
 using Utal.Icc.Sgm.Models;
 
+using static Utal.Icc.Sgm.Models.ApplicationUser;
+
 namespace Utal.Icc.Sgm.Areas.Account.Controllers;
 
 [Area("Account")]
@@ -61,7 +63,7 @@ public class ProfileController : Controller {
 		return this.RedirectToAction("Index", "Profile", new { area = "Account" });
 	}
 
-	[Authorize(Roles = "Student")]
+	[Authorize(Roles = nameof(Roles.Student))]
 	public async Task<IActionResult> Student() {
 		var student = await this._userManager.GetUserAsync(this.User);
 		if (student is null) {
@@ -71,15 +73,15 @@ public class ProfileController : Controller {
 			return this.RedirectToAction("Index", "Home", new { area = "" });
 		}
 		var studentViewModel = new StudentViewModel {
-			UniversityId = student.StudentUniversityId,
-			RemainingCourses = student.StudentRemainingCourses,
-			IsDoingThePractice = student.StudentIsDoingThePractice,
-			IsWorking = student.StudentIsWorking
+			StudentUniversityId = student.StudentUniversityId,
+			StudentRemainingCourses = student.StudentRemainingCourses,
+			StudentIsDoingThePractice = student.StudentIsDoingThePractice,
+			StudentIsWorking = student.StudentIsWorking
 		};
 		return this.View(studentViewModel);
 	}
 
-	[Authorize(Roles = "Student"), HttpPost, ValidateAntiForgeryToken]
+	[Authorize(Roles = nameof(Roles.Student)), HttpPost, ValidateAntiForgeryToken]
 	public async Task<IActionResult> Student([FromForm] StudentViewModel model) {
 		var student = await this._userManager.GetUserAsync(this.User);
 		if (student is null) {
@@ -88,22 +90,22 @@ public class ProfileController : Controller {
 		if (student.IsDeactivated) {
 			return this.RedirectToAction("Index", "Home", new { area = "" });
 		}
-		student.StudentRemainingCourses = model.RemainingCourses;
-		student.StudentIsDoingThePractice = model.IsDoingThePractice;
-		student.StudentIsWorking = model.IsWorking;
+		student.StudentRemainingCourses = model.StudentRemainingCourses;
+		student.StudentIsDoingThePractice = model.StudentIsDoingThePractice;
+		student.StudentIsWorking = model.StudentIsWorking;
 		student.UpdatedAt = DateTimeOffset.Now;
 		_ = await this._userManager.UpdateAsync(student);
 		var editViewModel = new StudentViewModel {
-			UniversityId = student.StudentUniversityId,
-			RemainingCourses = student.StudentRemainingCourses,
-			IsDoingThePractice = student.StudentIsDoingThePractice,
-			IsWorking = student.StudentIsWorking
+			StudentUniversityId = student.StudentUniversityId,
+			StudentRemainingCourses = student.StudentRemainingCourses,
+			StudentIsDoingThePractice = student.StudentIsDoingThePractice,
+			StudentIsWorking = student.StudentIsWorking
 		};
 		this.ViewBag.SuccessMessage = "Has actualizado tu perfil correctamente.";
 		return this.View(editViewModel);
 	}
 
-	[Authorize(Roles = "Teacher")]
+	[Authorize(Roles = nameof(Roles.Teacher))]
 	public async Task<IActionResult> Teacher() {
 		var teacher = await this._userManager.GetUserAsync(this.User);
 		if (teacher is null) {
@@ -113,14 +115,14 @@ public class ProfileController : Controller {
 			return this.RedirectToAction("Index", "Home", new { area = "" });
 		}
 		var teacherViewModel = new TeacherViewModel {
-			Office = teacher.TeacherOffice,
-			Schedule = teacher.TeacherSchedule,
-			Specialization = teacher.TeacherSpecialization
+			TeacherOffice = teacher.TeacherOffice,
+			TeacherSchedule = teacher.TeacherSchedule,
+			TeacherSpecialization = teacher.TeacherSpecialization
 		};
 		return this.View(teacherViewModel);
 	}
 
-	[Authorize(Roles = "Teacher"), HttpPost, ValidateAntiForgeryToken]
+	[Authorize(Roles = nameof(Roles.Teacher)), HttpPost, ValidateAntiForgeryToken]
 	public async Task<IActionResult> Teacher([FromForm] TeacherViewModel model) {
 		var teacher = await this._userManager.GetUserAsync(this.User);
 		if (teacher is null) {
@@ -129,15 +131,15 @@ public class ProfileController : Controller {
 		if (teacher.IsDeactivated) {
 			return this.RedirectToAction("Index", "Home", new { area = "" });
 		}
-		teacher.TeacherOffice = model.Office;
-		teacher.TeacherSchedule = model.Schedule;
-		teacher.TeacherSpecialization = model.Specialization;
+		teacher.TeacherOffice = model.TeacherOffice;
+		teacher.TeacherSchedule = model.TeacherSchedule;
+		teacher.TeacherSpecialization = model.TeacherSpecialization;
 		teacher.UpdatedAt = DateTimeOffset.Now;
 		_ = await this._userManager.UpdateAsync(teacher);
 		var teacherViewModel = new TeacherViewModel {
-			Office = model.Office,
-			Schedule = model.Schedule,
-			Specialization = model.Specialization
+			TeacherOffice = model.TeacherOffice,
+			TeacherSchedule = model.TeacherSchedule,
+			TeacherSpecialization = model.TeacherSpecialization
 		};
 		this.ViewBag.SuccessMessage = "Has actualizado tu perfil correctamente.";
 		return this.View(teacherViewModel);

@@ -1,6 +1,7 @@
 ﻿@using Utal.Icc.Sgm
 @using Utal.Icc.Sgm.Areas.DirectorTeacher.Views.Teacher
 @using Utal.Icc.Sgm.Views.Shared
+@using static Utal.Icc.Sgm.Models.ApplicationUser
 
 @model PaginatedList<IndexViewModel>
 
@@ -15,10 +16,10 @@
 			<h2>@this.ViewData["Title"]</h2>
 		</div>
 		<div class="col-12 col-md-2 mb-3">
-			@this.Html.ActionLink("Crear profesor", "Create", "Teacher", new { area = "DirectorTeacher" }, new { @class = "btn btn-success"})
+			@this.Html.ActionLink("Crear profesor", "Create", nameof(Roles.Teacher), new { area = nameof(Roles.DirectorTeacher) }, new { @class = "btn btn-success"})
 		</div>
 		<div class="col-12 mb-3">
-			<partial name="_Filter" , model=@(new FilterPartialViewModel("Index", "Teacher", "DirectorTeacher")) />
+			<partial name="_Filter" , model=@(new FilterPartialViewModel("Index", nameof(Roles.Teacher), nameof(Roles.DirectorTeacher))) />
 		</div>
 	</div>
 	<div class="row justify-content-center">
@@ -60,7 +61,7 @@
 									<td class="text-muted">@item.Rut</td>
 									<td class="text-muted">@item.Email</td>
 									<td>
-										@this.Html.ActionLink("Activar", "ToggleActivation", "Teacher", new { area = "DirectorTeacher", id = item.Id }, new { @class = "btn btn-success mb-3"})
+										@this.Html.ActionLink("Activar", "ToggleActivation", nameof(Roles.Teacher), new { area = nameof(Roles.DirectorTeacher), id = item.Id }, new { @class = "btn btn-success mb-3"})
 									</td>
 								} else {
 									<td>@item.FirstName</td>
@@ -68,12 +69,12 @@
 									<td>@item.Rut</td>
 									<td>@item.Email</td>
 									<td>
-										@this.Html.ActionLink("Editar", "Edit", "Teacher", new { area = "DirectorTeacher", id = item.Id }, new { @class = "btn btn-yellow mb-3"})
-										@this.Html.ActionLink("Desactivar", "ToggleActivation", "Teacher", new { area = "DirectorTeacher", id = item.Id }, new { @class = "btn btn-danger mb-3"})
+										@this.Html.ActionLink("Editar", "Edit", nameof(Roles.Teacher), new { area = nameof(Roles.DirectorTeacher), id = item.Id }, new { @class = "btn btn-yellow mb-3"})
+										@this.Html.ActionLink("Desactivar", "ToggleActivation", nameof(Roles.Teacher), new { area = nameof(Roles.DirectorTeacher), id = item.Id }, new { @class = "btn btn-danger mb-3"})
 										@if (item.IsDirectorTeacher) {
 											<a asp-action="Index" asp-route-sortOrder="@this.ViewData["CurrentSort"]" asp-route-pageNumber="@(this.Model.PageIndex)" asp-route-currentFilter="@this.ViewData["CurrentFilter"]" class="btn btn-info mb-3">Es director de carrera</a>
 										} else {
-											@this.Html.ActionLink("No es director de carrera", "Transfer", "Teacher", new { area = "DirectorTeacher", currentDirectorTeacherId = this.Model.ApplicationUserId , newDirectorTeacherId = item.Id }, new { @class = "btn btn-default mb-3" })
+											@this.Html.ActionLink("No es director de carrera", "Transfer", nameof(Roles.Teacher), new { area = nameof(Roles.DirectorTeacher), currentDirectorTeacherId = this.Model.ApplicationUserId , newDirectorTeacherId = item.Id }, new { @class = "btn btn-default mb-3" })
 										}
 									</td>
 								}
