@@ -26,12 +26,12 @@
 					</a>
 					<div class="menu-submenu">
 						<div class="menu-item">
-							<a href="@this.Url.Action(nameof(Utal.Icc.Sgm.Areas.DirectorTeacher.Controllers.StudentController.Index), nameof(Roles.Student), new { area = nameof(Utal.Icc.Sgm.Areas.DirectorTeacher) })" class="menu-link">
+							<a href="@this.Url.Action(nameof(Utal.Icc.Sgm.Areas.DirectorTeacher.Controllers.StudentController.Index), nameof(Utal.Icc.Sgm.Areas.DirectorTeacher.Controllers.StudentController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.DirectorTeacher) })" class="menu-link">
 								<span class="menu-text">Estudiantes</span>
 							</a>
 						</div>
 						<div class="menu-item">
-							<a href="@this.Url.Action(nameof(Utal.Icc.Sgm.Areas.DirectorTeacher.Controllers.TeacherController.Index), nameof(Roles.Teacher), new { area = nameof(Utal.Icc.Sgm.Areas.DirectorTeacher) })" class="menu-link">
+							<a href="@this.Url.Action(nameof(Utal.Icc.Sgm.Areas.DirectorTeacher.Controllers.TeacherController.Index), nameof(Utal.Icc.Sgm.Areas.DirectorTeacher.Controllers.TeacherController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.DirectorTeacher) })" class="menu-link">
 								<span class="menu-text">Profesores</span>
 							</a>
 						</div>

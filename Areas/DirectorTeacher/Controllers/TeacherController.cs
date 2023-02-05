@@ -11,7 +11,7 @@ using static Utal.Icc.Sgm.Models.ApplicationUser;
 
 namespace Utal.Icc.Sgm.Areas.DirectorTeacher.Controllers;
 
-[Area(nameof(Roles.DirectorTeacher)), Authorize(Roles = nameof(Roles.DirectorTeacher))]
+[Area(nameof(DirectorTeacher)), Authorize(Roles = nameof(Roles.DirectorTeacher))]
 public class TeacherController : Controller {
 	private readonly UserManager<ApplicationUser> _userManager;
 	private readonly IUserStore<ApplicationUser> _userStore;
