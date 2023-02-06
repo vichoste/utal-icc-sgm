@@ -117,7 +117,7 @@ public class StudentProposalController : Controller {
 			searchString = currentFilter;
 		}
 		this.ViewData["CurrentFilter"] = searchString;
-		var studentProposals = this._dbContext.StudentProposals.AsNoTracking()
+		var studentProposals = this._dbContext.StudentProposals!.AsNoTracking()
 			.Where(sp => sp.StudentOwnerOfTheStudentProposal == student)
 			.Include(sp => sp.GuideTeacherOfTheStudentProposal).AsNoTracking()
 			.Select(sp => new IndexViewModel {
@@ -191,7 +191,7 @@ public class StudentProposalController : Controller {
 			CreatedAt = DateTimeOffset.Now,
 			UpdatedAt = DateTimeOffset.Now
 		};
-		_ = await this._dbContext.StudentProposals.AddAsync(studentProposal);
+		_ = await this._dbContext.StudentProposals!.AddAsync(studentProposal);
 		_ = await this._dbContext.SaveChangesAsync();
 		this.TempData["SuccessMessage"] = "Tu propuesta ha sido registrada correctamente.";
 		return this.RedirectToAction(nameof(StudentProposalController.Index), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Student) });
@@ -202,7 +202,7 @@ public class StudentProposalController : Controller {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
 		await this.PopulateTeachers();
-		var studentProposal = await this._dbContext.StudentProposals.AsNoTracking()
+		var studentProposal = await this._dbContext.StudentProposals!.AsNoTracking()
 			.Include(sp => sp.StudentOwnerOfTheStudentProposal).AsNoTracking()
 			.Where(sp => sp.StudentOwnerOfTheStudentProposal == student && sp.ProposalStatus == StudentProposal.Status.Draft)
 			.Include(sp => sp.GuideTeacherOfTheStudentProposal).AsNoTracking()
@@ -241,7 +241,7 @@ public class StudentProposalController : Controller {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
 		await this.PopulateTeachers();
-		var studentProposal = await this._dbContext.StudentProposals
+		var studentProposal = await this._dbContext.StudentProposals!
 			.Include(sp => sp.StudentOwnerOfTheStudentProposal)
 			.Include(sp => sp.GuideTeacherOfTheStudentProposal)
 			.Include(sp => sp.AssistantTeacher1OfTheStudentProposal)
@@ -296,7 +296,7 @@ public class StudentProposalController : Controller {
 		studentProposal.AssistantTeacher2OfTheStudentProposal = assistantTeacher2;
 		studentProposal.AssistantTeacher3OfTheStudentProposal = assistantTeacher3;
 		studentProposal.UpdatedAt = DateTimeOffset.Now;
-		_ = this._dbContext.StudentProposals.Update(studentProposal);
+		_ = this._dbContext.StudentProposals!.Update(studentProposal);
 		_ = await this._dbContext.SaveChangesAsync();
 		var editViewModel = new EditViewModel {
 			Id = studentProposal.Id,
@@ -317,7 +317,7 @@ public class StudentProposalController : Controller {
 		if (await this.CheckStudentSession() is not ApplicationUser student) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
-		var studentProposal = await this._dbContext.StudentProposals.AsNoTracking()
+		var studentProposal = await this._dbContext.StudentProposals!.AsNoTracking()
 			.Where(sp => sp.StudentOwnerOfTheStudentProposal == student && sp.ProposalStatus == StudentProposal.Status.Draft)
 			.FirstOrDefaultAsync(sp => sp.Id == id);
 		if (studentProposal is null) {
@@ -336,14 +336,14 @@ public class StudentProposalController : Controller {
 		if (await this.CheckStudentSession() is not ApplicationUser student) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
-		var studentProposal = await this._dbContext.StudentProposals
+		var studentProposal = await this._dbContext.StudentProposals!
 			.Where(sp => sp.StudentOwnerOfTheStudentProposal == student && sp.ProposalStatus == StudentProposal.Status.Draft)
 			.FirstOrDefaultAsync(sp => sp.Id == model.Id);
 		if (studentProposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
 			return this.RedirectToAction(nameof(StudentProposalController.Index), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Student) });
 		}
-		_ = this._dbContext.StudentProposals.Remove(studentProposal);
+		_ = this._dbContext.StudentProposals!.Remove(studentProposal);
 		_ = this._dbContext.SaveChangesAsync();
 		this.TempData["SuccessMessage"] = "Tu propuesta ha sido eliminada correctamente.";
 		return this.RedirectToAction(nameof(StudentProposalController.Index), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Student) });
@@ -353,7 +353,7 @@ public class StudentProposalController : Controller {
 		if (await this.CheckStudentSession() is not ApplicationUser student) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
-		var studentProposal = await this._dbContext.StudentProposals.AsNoTracking()
+		var studentProposal = await this._dbContext.StudentProposals!.AsNoTracking()
 			.Where(sp => sp.StudentOwnerOfTheStudentProposal == student && sp.ProposalStatus == StudentProposal.Status.Draft)
 			.Include(sp => sp.GuideTeacherOfTheStudentProposal)
 			.FirstOrDefaultAsync(sp => sp.Id == id);
@@ -374,7 +374,7 @@ public class StudentProposalController : Controller {
 		if (await this.CheckStudentSession() is not ApplicationUser student) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
-		var studentProposal = await this._dbContext.StudentProposals
+		var studentProposal = await this._dbContext.StudentProposals!
 			.Where(sp => sp.StudentOwnerOfTheStudentProposal == student && sp.ProposalStatus == StudentProposal.Status.Draft)
 			.Include(sp => sp.GuideTeacherOfTheStudentProposal)
 			.Include(sp => sp.AssistantTeacher1OfTheStudentProposal)
@@ -398,7 +398,7 @@ public class StudentProposalController : Controller {
 		}
 		studentProposal.ProposalStatus = StudentProposal.Status.SentToGuideTeacher;
 		studentProposal.UpdatedAt = DateTimeOffset.Now;
-		_ = this._dbContext.StudentProposals.Update(studentProposal);
+		_ = this._dbContext.StudentProposals!.Update(studentProposal);
 		_ = await this._dbContext.SaveChangesAsync();
 		this.TempData["SuccessMessage"] = "Tu propuesta ha sido enviada correctamente.";
 		return this.RedirectToAction(nameof(StudentProposalController.Index), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Student) });
@@ -408,7 +408,7 @@ public class StudentProposalController : Controller {
 		if (await this.CheckStudentSession() is not ApplicationUser student) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
-		var studentProposal = await this._dbContext.StudentProposals.AsNoTracking()
+		var studentProposal = await this._dbContext.StudentProposals!.AsNoTracking()
 			.Where(sp => sp.StudentOwnerOfTheStudentProposal == student && sp.ProposalStatus == StudentProposal.Status.RejectedByGuideTeacher)
 			.Include(sp => sp.GuideTeacherOfTheStudentProposal)
 			.FirstOrDefaultAsync(sp => sp.Id == id);
@@ -432,7 +432,7 @@ public class StudentProposalController : Controller {
 		if (await this.CheckStudentSession() is not ApplicationUser student) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
-		var studentProposal = await this._dbContext.StudentProposals.AsNoTracking()
+		var studentProposal = await this._dbContext.StudentProposals!.AsNoTracking()
 			.Where(sp => sp.StudentOwnerOfTheStudentProposal == student && sp.ProposalStatus == StudentProposal.Status.ApprovedByGuideTeacher)
 			.Include(sp => sp.GuideTeacherOfTheStudentProposal).AsNoTracking()
 			.Include(sp => sp.AssistantTeacher1OfTheStudentProposal).AsNoTracking()

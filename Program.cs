@@ -25,7 +25,6 @@ if (app.Environment.IsDevelopment()) {
 	_ = app.UseMigrationsEndPoint();
 } else {
 	_ = app.UseExceptionHandler($"/{nameof(Utal.Icc.Sgm.Controllers.HomeController).Replace("Controller", string.Empty)}/{nameof(Utal.Icc.Sgm.Controllers.HomeController.Error)}");
-	_ = app.UseHsts();
 }
 using var scope = app.Services.CreateScope();
 var services = scope.ServiceProvider;
@@ -34,7 +33,6 @@ var userStore = services.GetRequiredService<IUserStore<ApplicationUser>>();
 var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
 await StartupSeeder.SeedRolesAsync(roleManager);
 await StartupSeeder.SeedDirectorTeacherAsync(directorTeacherEmail!, directorTeacherPassword!, directorTeacherFirstName!, directorTeacherLastName!, directorTeacherRut!, userManager, userStore);
-_ = app.UseHttpsRedirection();
 _ = app.UseStaticFiles();
 _ = app.UseRouting();
 _ = app.UseAuthentication();

@@ -4,9 +4,9 @@
 		<TargetFramework>net7.0</TargetFramework>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
-		<UserSecretsId>aspnet-Utal.Icc.Sgm-86ccc516-d163-4d65-ba67-c8cfe84eacfb</UserSecretsId>
 		<PlatformTarget>x64</PlatformTarget>
-	</PropertyGroup>
+	  <UserSecretsId>f86aaeff-ee87-4e99-9f72-5660c3c28ae6</UserSecretsId>
+  </PropertyGroup>
 
 	<ItemGroup>
 		<PackageReference Include="CsvHelper" Version="30.0.1" />

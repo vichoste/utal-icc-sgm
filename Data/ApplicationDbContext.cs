@@ -9,5 +9,5 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser> {
 	public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) {
 	}
 
-	public DbSet<StudentProposal> StudentProposals { get; set; }
+	public DbSet<StudentProposal>? StudentProposals { get; set; }
 }

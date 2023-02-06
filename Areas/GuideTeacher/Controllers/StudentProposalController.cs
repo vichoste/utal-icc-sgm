@@ -78,7 +78,7 @@ public class StudentProposalController : Controller {
 			searchString = currentFilter;
 		}
 		this.ViewData["CurrentFilter"] = searchString;
-		var studentProposals = this._dbContext.StudentProposals.AsNoTracking()
+		var studentProposals = this._dbContext.StudentProposals!.AsNoTracking()
 			.Where(sp => sp.GuideTeacherOfTheStudentProposal == teacher && (
 				sp.ProposalStatus == StudentProposal.Status.SentToGuideTeacher
 				|| sp.ProposalStatus == StudentProposal.Status.ApprovedByGuideTeacher))
@@ -100,7 +100,7 @@ public class StudentProposalController : Controller {
 		if (await this.CheckTeacherSession() is not ApplicationUser teacher) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
-		var studentProposal = await this._dbContext.StudentProposals.AsNoTracking()
+		var studentProposal = await this._dbContext.StudentProposals!.AsNoTracking()
 			.Where(sp => sp.GuideTeacherOfTheStudentProposal == teacher && sp.ProposalStatus == StudentProposal.Status.SentToGuideTeacher)
 			.Include(sp => sp.StudentOwnerOfTheStudentProposal).AsNoTracking()
 			.Include(sp => sp.AssistantTeacher1OfTheStudentProposal).AsNoTracking()
@@ -133,7 +133,7 @@ public class StudentProposalController : Controller {
 		if (await this.CheckTeacherSession() is not ApplicationUser teacher) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
-		var studentProposal = await this._dbContext.StudentProposals.AsNoTracking()
+		var studentProposal = await this._dbContext.StudentProposals!.AsNoTracking()
 			.Where(sp => sp.GuideTeacherOfTheStudentProposal == teacher && sp.ProposalStatus == StudentProposal.Status.SentToGuideTeacher).AsNoTracking()
 			.Include(sp => sp.StudentOwnerOfTheStudentProposal).AsNoTracking()
 			.FirstOrDefaultAsync(sp => sp.Id == id);
@@ -154,7 +154,7 @@ public class StudentProposalController : Controller {
 		if (await this.CheckTeacherSession() is not ApplicationUser teacher) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
-		var studentProposal = await this._dbContext.StudentProposals
+		var studentProposal = await this._dbContext.StudentProposals!
 			.Where(sp => sp.GuideTeacherOfTheStudentProposal == teacher && sp.ProposalStatus == StudentProposal.Status.SentToGuideTeacher)
 			.FirstOrDefaultAsync(sp => sp.Id == model.Id);
 		if (studentProposal is null) {
@@ -165,7 +165,7 @@ public class StudentProposalController : Controller {
 		studentProposal.ProposalStatus = StudentProposal.Status.RejectedByGuideTeacher;
 		studentProposal.RejectionReason = model.Reason;
 		studentProposal.UpdatedAt = DateTimeOffset.Now;
-		_ = this._dbContext.StudentProposals.Update(studentProposal);
+		_ = this._dbContext.StudentProposals!.Update(studentProposal);
 		_ = await this._dbContext.SaveChangesAsync();
 		this.TempData["SuccessMessage"] = "La propuesta ha sido rechazada correctamente.";
 		return this.RedirectToAction(nameof(StudentProposalController.Index), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(GuideTeacher) });
@@ -175,7 +175,7 @@ public class StudentProposalController : Controller {
 		if (await this.CheckTeacherSession() is not ApplicationUser teacher) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
-		var studentProposal = await this._dbContext.StudentProposals.AsNoTracking()
+		var studentProposal = await this._dbContext.StudentProposals!.AsNoTracking()
 			.Where(sp => sp.GuideTeacherOfTheStudentProposal == teacher && sp.ProposalStatus == StudentProposal.Status.SentToGuideTeacher).AsNoTracking()
 			.Include(sp => sp.StudentOwnerOfTheStudentProposal).AsNoTracking()
 			.FirstOrDefaultAsync(sp => sp.Id == id);
@@ -197,7 +197,7 @@ public class StudentProposalController : Controller {
 		if (await this.CheckTeacherSession() is not ApplicationUser teacher) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
-		var studentProposal = await this._dbContext.StudentProposals
+		var studentProposal = await this._dbContext.StudentProposals!
 			.Where(sp => sp.GuideTeacherOfTheStudentProposal == teacher && sp.ProposalStatus == StudentProposal.Status.SentToGuideTeacher)
 			.FirstOrDefaultAsync(sp => sp.Id == model.Id);
 		if (studentProposal is null) {
@@ -207,7 +207,7 @@ public class StudentProposalController : Controller {
 		}
 		studentProposal.ProposalStatus = StudentProposal.Status.ApprovedByGuideTeacher;
 		studentProposal.UpdatedAt = DateTimeOffset.Now;
-		_ = this._dbContext.StudentProposals.Update(studentProposal);
+		_ = this._dbContext.StudentProposals!.Update(studentProposal);
 		_ = await this._dbContext.SaveChangesAsync();
 		this.TempData["SuccessMessage"] = "La propuesta ha sido aceptada correctamente.";
 		return this.RedirectToAction(nameof(StudentProposalController.Index), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(GuideTeacher) });
