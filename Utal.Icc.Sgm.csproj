@@ -5,8 +5,8 @@
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<PlatformTarget>x64</PlatformTarget>
-	  <UserSecretsId>f86aaeff-ee87-4e99-9f72-5660c3c28ae6</UserSecretsId>
-  </PropertyGroup>
+		<UserSecretsId>f86aaeff-ee87-4e99-9f72-5660c3c28ae6</UserSecretsId>
+	</PropertyGroup>
 
 	<ItemGroup>
 		<PackageReference Include="CsvHelper" Version="30.0.1" />
