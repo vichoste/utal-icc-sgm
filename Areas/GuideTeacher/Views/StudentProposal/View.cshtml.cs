@@ -13,6 +13,8 @@ public class ViewModel {
 	public string? StudentName { get; set; }
 	[DataType(DataType.EmailAddress), Display(Name = "E-mail del estudiante"), EmailAddress]
 	public string? StudentEmail { get; set; }
+	[Display(Name = "Número de matrícula"), Required]
+	public string? StudentUniversityId { get; set; }
 	[Display(Name = "Cursos restantes del estudiante")]
 	public string? StudentRemainingCourses { get; set; }
 	[Display(Name = "¿El estudiante está haciendo la práctica?")]

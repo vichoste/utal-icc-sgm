@@ -1,10 +1,10 @@
-﻿@using Utal.Icc.Sgm.Areas.GuideTeacher.Views.Proposal
-@using Utal.Icc.Sgm.Areas.GuideTeacher.Controllers
+﻿@using Utal.Icc.Sgm.Areas.Student.Views.GuideTeacherProposal
+@using Utal.Icc.Sgm.Areas.Student.Controllers
 
-@model ViewModel
+@model ConvertViewModel
 
 @{
-	this.ViewData["Title"] = "Ver propuesta";
+	this.ViewData["Title"] = "Enviar propuesta a comité";
 }
 
 <div class="container">
@@ -14,7 +14,8 @@
 			<div class="card">
 				<div class="card-header text-center">@this.ViewData["Title"]</div>
 				<div class="card-body">
-					@using (this.Html.BeginForm()) {
+					<h5 class="card-title text-center">Estás a punto de <b class="text-info">enviar</b> tu propuesta al <b>comité</b>, convirtiendola en una <b>solicitud</b>. Revisa la información y una vez listo, presiona el botón de <b class="text-info">"Enviar"</b>.</h5>
+					@using (this.Html.BeginForm(nameof(GuideTeacherProposalController.Convert), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.Student) })) {
 						@this.Html.AntiForgeryToken()
 						@this.Html.HiddenFor(m => m.Id)
 						<div class="row">
@@ -30,37 +31,24 @@
 									@this.Html.DisplayFor(m => m.Description, new { @class = "form-control" })
 								</div>
 								<div class="form-group mb-3">
-									@this.Html.LabelFor(m => m.StudentName, new { @class = "form-label" }):
-									@this.Html.HiddenFor(m => m.StudentName)
-									@this.Html.DisplayFor(m => m.StudentName, new { @class = "form-control" })
+									@this.Html.LabelFor(m => m.GuideTeacherName, new { @class = "form-label" }):
+									@this.Html.HiddenFor(m => m.GuideTeacherName)
+									@this.Html.DisplayFor(m => m.GuideTeacherName, new { @class = "form-control" })
 								</div>
 								<div class="form-group mb-3">
-									@this.Html.LabelFor(m => m.StudentUniversityId, new { @class = "form-label" }):
-									@this.Html.HiddenFor(m => m.StudentUniversityId)
-									@this.Html.DisplayFor(m => m.StudentUniversityId, new { @class = "form-control" })
+									@this.Html.LabelFor(m => m.GuideTeacherOffice, new { @class = "form-label" }):
+									@this.Html.HiddenFor(m => m.GuideTeacherOffice)
+									@this.Html.DisplayFor(m => m.GuideTeacherOffice, new { @class = "form-control" })
 								</div>
 								<div class="form-group mb-3">
-									@this.Html.LabelFor(m => m.StudentRemainingCourses, new { @class = "form-label" }):
-									@this.Html.HiddenFor(m => m.StudentRemainingCourses)
-									@this.Html.DisplayFor(m => m.StudentRemainingCourses, new { @class = "form-control" })
+									@this.Html.LabelFor(m => m.GuideTeacherSchedule, new { @class = "form-label" }):
+									@this.Html.HiddenFor(m => m.GuideTeacherSchedule)
+									@this.Html.DisplayFor(m => m.GuideTeacherSchedule, new { @class = "form-control" })
 								</div>
 								<div class="form-group mb-3">
-									@this.Html.LabelFor(m => m.StudentIsDoingThePractice, new { @class = "form-label" }):
-									@this.Html.HiddenFor(m => m.StudentIsDoingThePractice)
-									@if (this.Model.StudentIsDoingThePractice) {
-										<b class="text-info">Sí</b>
-									} else {
-										<b>No</b>
-									}
-								</div>
-								<div class="form-group mb-3">
-									@this.Html.LabelFor(m => m.StudentIsWorking, new { @class = "form-label" }):
-									@this.Html.HiddenFor(m => m.StudentIsWorking)
-									@if (this.Model.StudentIsWorking) {
-										<b class="text-info">Sí</b>
-									} else {
-										<b>No</b>
-									}
+									@this.Html.LabelFor(m => m.GuideTeacherSpecialization, new { @class = "form-label" }):
+									@this.Html.HiddenFor(m => m.GuideTeacherSpecialization)
+									@this.Html.DisplayFor(m => m.GuideTeacherSpecialization, new { @class = "form-control" })
 								</div>
 								<div class="form-group mb-3">
 									@this.Html.LabelFor(m => m.AssistantTeacher1, new { @class = "form-label" }):
@@ -93,9 +81,8 @@
 						<div class="row text-center">
 							<div class="col">
 								<div class="btn-group">
-									@this.Html.ActionLink("Cancelar", nameof(StudentProposalController.Index), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.GuideTeacher) }, new { @class = "btn btn-secondary" })
-									@this.Html.ActionLink("Rechazar", nameof(StudentProposalController.Reject), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.GuideTeacher), id = this.Model.Id }, new { @class = "btn btn-danger" })
-									@this.Html.ActionLink("Aceptar", nameof(StudentProposalController.Approve), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.GuideTeacher), id = this.Model.Id }, new { @class = "btn btn-success" })
+									@this.Html.ActionLink("Cancelar", nameof(GuideTeacherProposalController.Index), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.Student) }, new { @class = "btn btn-secondary" })
+									<button type="submit" class="btn btn-info">Enviar</button>
 								</div>
 							</div>
 						</div>

@@ -1,4 +1,4 @@
-﻿@using Utal.Icc.Sgm.Areas.Student.Views.StudentProposal
+﻿@using Utal.Icc.Sgm.Areas.Student.Views.GuideTeacherProposal
 @using Utal.Icc.Sgm.Areas.Student.Controllers
 
 @model SendViewModel
@@ -14,7 +14,7 @@
 			<div class="card">
 				<div class="card-header text-center">@this.ViewData["Title"]</div>
 				<div class="card-body text-center">
-					@using (this.Html.BeginForm(nameof(StudentProposalController.Send), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.Student) })) {
+					@using (this.Html.BeginForm(nameof(GuideTeacherProposalController.Send), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.Student) })) {
 						@this.Html.AntiForgeryToken()
 						@this.Html.HiddenFor(m => m.Id)
 						@this.Html.HiddenFor(m => m.Title)
@@ -24,7 +24,7 @@
 						<div class="row text-center">
 							<div class="col">
 								<div class="btn-group">
-									@this.Html.ActionLink("No", nameof(StudentProposalController.Index), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.Student) }, new { @class = "btn btn-secondary" })
+									@this.Html.ActionLink("No", nameof(GuideTeacherProposalController.Index), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.Student) }, new { @class = "btn btn-secondary" })
 									<button type="submit" class="btn btn-primary">Sí</button>
 								</div>
 							</div>
