@@ -5,7 +5,7 @@ namespace Utal.Icc.Sgm.Areas.Student.Views.StudentProposal;
 public class EditViewModel {
 	[Display(Name = "ID"), Required]
 	public string? Id { get; set; }
-	[Display(Name = "Título")]
+	[Display(Name = "Título"), Required]
 	public string? Title { get; set; }
 	[Display(Name = "Descripción")]
 	public string? Description { get; set; }

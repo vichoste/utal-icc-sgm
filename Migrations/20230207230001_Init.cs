@@ -184,6 +184,7 @@ namespace Utal.Icc.Sgm.Migrations
                     AssistantTeacher1OfTheGuideTeacherProposalId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     AssistantTeacher2OfTheGuideTeacherProposalId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     AssistantTeacher3OfTheGuideTeacherProposalId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    StudentWhichIsAssignedToThisGuideTeacherProposalId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: true)
                 },
                 constraints: table =>
@@ -207,6 +208,11 @@ namespace Utal.Icc.Sgm.Migrations
                     table.ForeignKey(
                         name: "FK_GuideTeacherProposals_AspNetUsers_GuideTeacherOwnerOfTheGuideTeacherProposalId",
                         column: x => x.GuideTeacherOwnerOfTheGuideTeacherProposalId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_GuideTeacherProposals_AspNetUsers_StudentWhichIsAssignedToThisGuideTeacherProposalId",
+                        column: x => x.StudentWhichIsAssignedToThisGuideTeacherProposalId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id");
                 });
@@ -346,6 +352,11 @@ namespace Utal.Icc.Sgm.Migrations
                 name: "IX_GuideTeacherProposals_GuideTeacherOwnerOfTheGuideTeacherProposalId",
                 table: "GuideTeacherProposals",
                 column: "GuideTeacherOwnerOfTheGuideTeacherProposalId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GuideTeacherProposals_StudentWhichIsAssignedToThisGuideTeacherProposalId",
+                table: "GuideTeacherProposals",
+                column: "StudentWhichIsAssignedToThisGuideTeacherProposalId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_StudentProposals_AssistantTeacher1OfTheStudentProposalId",

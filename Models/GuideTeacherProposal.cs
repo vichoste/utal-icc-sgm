@@ -21,6 +21,7 @@ public class GuideTeacherProposal {
 	public virtual ApplicationUser? AssistantTeacher1OfTheGuideTeacherProposal { get; set; }
 	public virtual ApplicationUser? AssistantTeacher2OfTheGuideTeacherProposal { get; set; }
 	public virtual ApplicationUser? AssistantTeacher3OfTheGuideTeacherProposal { get; set; }
+	public virtual ApplicationUser? StudentWhichIsAssignedToThisGuideTeacherProposal { get; set; }
 	[Timestamp]
 	public byte[]? RowVersion { get; set; }
 }

@@ -94,7 +94,7 @@
 							</a>
 						</div>
 						<div class="menu-item">
-							<a href="@this.Url.Action("Index", "GuideTeacherProposal", new { area = nameof(Utal.Icc.Sgm.Areas.DirectorTeacher) })" class="menu-link">
+							<a href="@this.Url.Action(nameof(Utal.Icc.Sgm.Areas.GuideTeacher.Controllers.GuideTeacherProposalController.Index), nameof(Utal.Icc.Sgm.Areas.GuideTeacher.Controllers.StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.GuideTeacher) })" class="menu-link">
 								<span class="menu-text">Mis propuestas</span>
 							</a>
 						</div>

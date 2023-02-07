@@ -308,6 +308,9 @@ namespace Utal.Icc.Sgm.Migrations
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("rowversion");
 
+                    b.Property<string>("StudentWhichIsAssignedToThisGuideTeacherProposalId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)");
 
@@ -323,6 +326,8 @@ namespace Utal.Icc.Sgm.Migrations
                     b.HasIndex("AssistantTeacher3OfTheGuideTeacherProposalId");
 
                     b.HasIndex("GuideTeacherOwnerOfTheGuideTeacherProposalId");
+
+                    b.HasIndex("StudentWhichIsAssignedToThisGuideTeacherProposalId");
 
                     b.ToTable("GuideTeacherProposals");
                 });
@@ -469,6 +474,10 @@ namespace Utal.Icc.Sgm.Migrations
                         .WithMany("GuideTeacherProposalsWhichIOwn")
                         .HasForeignKey("GuideTeacherOwnerOfTheGuideTeacherProposalId");
 
+                    b.HasOne("Utal.Icc.Sgm.Models.ApplicationUser", "StudentWhichIsAssignedToThisGuideTeacherProposal")
+                        .WithMany("GuideTeacherProposalsWhichIHaveBeenAssigned")
+                        .HasForeignKey("StudentWhichIsAssignedToThisGuideTeacherProposalId");
+
                     b.Navigation("AssistantTeacher1OfTheGuideTeacherProposal");
 
                     b.Navigation("AssistantTeacher2OfTheGuideTeacherProposal");
@@ -476,6 +485,8 @@ namespace Utal.Icc.Sgm.Migrations
                     b.Navigation("AssistantTeacher3OfTheGuideTeacherProposal");
 
                     b.Navigation("GuideTeacherOwnerOfTheGuideTeacherProposal");
+
+                    b.Navigation("StudentWhichIsAssignedToThisGuideTeacherProposal");
                 });
 
             modelBuilder.Entity("Utal.Icc.Sgm.Models.StudentProposal", b =>
@@ -513,6 +524,8 @@ namespace Utal.Icc.Sgm.Migrations
 
             modelBuilder.Entity("Utal.Icc.Sgm.Models.ApplicationUser", b =>
                 {
+                    b.Navigation("GuideTeacherProposalsWhichIHaveBeenAssigned");
+
                     b.Navigation("GuideTeacherProposalsWhichIOwn");
 
                     b.Navigation("ImAssistantTeacher1OfTheGuideTeacherProposals");
