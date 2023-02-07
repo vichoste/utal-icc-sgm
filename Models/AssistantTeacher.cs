@@ -11,12 +11,12 @@ public partial class ApplicationUser {
 	[InverseProperty(nameof(StudentProposal.AssistantTeacher3OfTheStudentProposal))]
 	public virtual ICollection<StudentProposal>? ImAssistantTeacher3OfTheStudentProposals { get; set; } = new HashSet<StudentProposal>();
 	#endregion
-	#region TeacherProposal
-	[InverseProperty(nameof(TeacherProposal.AssistantTeacher1OfTheTeacherProposal))]
-	public virtual ICollection<TeacherProposal>? ImAssistantTeacher1OfTheTeacherProposals { get; set; } = new HashSet<TeacherProposal>();
-	[InverseProperty(nameof(TeacherProposal.AssistantTeacher2OfTheTeacherProposal))]
-	public virtual ICollection<TeacherProposal>? ImAssistantTeacher2OfTheTeacherProposals { get; set; } = new HashSet<TeacherProposal>();
-	[InverseProperty(nameof(TeacherProposal.AssistantTeacher3OfTheTeacherProposal))]
-	public virtual ICollection<TeacherProposal>? ImAssistantTeacher3OfTheTeacherProposals { get; set; } = new HashSet<TeacherProposal>();
+	#region GuideTeacherProposal
+	[InverseProperty(nameof(GuideTeacherProposal.AssistantTeacher1OfTheGuideTeacherProposal))]
+	public virtual ICollection<GuideTeacherProposal>? ImAssistantTeacher1OfTheGuideTeacherProposals { get; set; } = new HashSet<GuideTeacherProposal>();
+	[InverseProperty(nameof(GuideTeacherProposal.AssistantTeacher2OfTheGuideTeacherProposal))]
+	public virtual ICollection<GuideTeacherProposal>? ImAssistantTeacher2OfTheGuideTeacherProposals { get; set; } = new HashSet<GuideTeacherProposal>();
+	[InverseProperty(nameof(GuideTeacherProposal.AssistantTeacher3OfTheGuideTeacherProposal))]
+	public virtual ICollection<GuideTeacherProposal>? ImAssistantTeacher3OfTheGuideTeacherProposals { get; set; } = new HashSet<GuideTeacherProposal>();
 	#endregion
 }

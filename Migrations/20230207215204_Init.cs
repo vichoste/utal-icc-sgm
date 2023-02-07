@@ -170,6 +170,48 @@ namespace Utal.Icc.Sgm.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "GuideTeacherProposals",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Requirements = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ProposalStatus = table.Column<int>(type: "int", nullable: true),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    GuideTeacherOwnerOfTheGuideTeacherProposalId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    AssistantTeacher1OfTheGuideTeacherProposalId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    AssistantTeacher2OfTheGuideTeacherProposalId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    AssistantTeacher3OfTheGuideTeacherProposalId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GuideTeacherProposals", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_GuideTeacherProposals_AspNetUsers_AssistantTeacher1OfTheGuideTeacherProposalId",
+                        column: x => x.AssistantTeacher1OfTheGuideTeacherProposalId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_GuideTeacherProposals_AspNetUsers_AssistantTeacher2OfTheGuideTeacherProposalId",
+                        column: x => x.AssistantTeacher2OfTheGuideTeacherProposalId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_GuideTeacherProposals_AspNetUsers_AssistantTeacher3OfTheGuideTeacherProposalId",
+                        column: x => x.AssistantTeacher3OfTheGuideTeacherProposalId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_GuideTeacherProposals_AspNetUsers_GuideTeacherOwnerOfTheGuideTeacherProposalId",
+                        column: x => x.GuideTeacherOwnerOfTheGuideTeacherProposalId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "StudentProposals",
                 columns: table => new
                 {
@@ -218,75 +260,33 @@ namespace Utal.Icc.Sgm.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "TeacherProposals",
+                name: "ApplicationUserGuideTeacherProposal",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Requirements = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ProposalStatus = table.Column<int>(type: "int", nullable: true),
-                    CreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
-                    UpdatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
-                    GuideTeacherOwnerOfTheTeacherProposalId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    AssistantTeacher1OfTheTeacherProposalId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    AssistantTeacher2OfTheTeacherProposalId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    AssistantTeacher3OfTheTeacherProposalId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: true)
+                    GuideTeacherProposalsWhichImInterestedId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    StudentsWhichAreInterestedInThisGuideTeacherProposalId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_TeacherProposals", x => x.Id);
+                    table.PrimaryKey("PK_ApplicationUserGuideTeacherProposal", x => new { x.GuideTeacherProposalsWhichImInterestedId, x.StudentsWhichAreInterestedInThisGuideTeacherProposalId });
                     table.ForeignKey(
-                        name: "FK_TeacherProposals_AspNetUsers_AssistantTeacher1OfTheTeacherProposalId",
-                        column: x => x.AssistantTeacher1OfTheTeacherProposalId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_TeacherProposals_AspNetUsers_AssistantTeacher2OfTheTeacherProposalId",
-                        column: x => x.AssistantTeacher2OfTheTeacherProposalId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_TeacherProposals_AspNetUsers_AssistantTeacher3OfTheTeacherProposalId",
-                        column: x => x.AssistantTeacher3OfTheTeacherProposalId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_TeacherProposals_AspNetUsers_GuideTeacherOwnerOfTheTeacherProposalId",
-                        column: x => x.GuideTeacherOwnerOfTheTeacherProposalId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ApplicationUserTeacherProposal",
-                columns: table => new
-                {
-                    StudentsWhichAreInterestedInThisTeacherProposalId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    TeacherProposalsWhichImInterestedId = table.Column<string>(type: "nvarchar(450)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ApplicationUserTeacherProposal", x => new { x.StudentsWhichAreInterestedInThisTeacherProposalId, x.TeacherProposalsWhichImInterestedId });
-                    table.ForeignKey(
-                        name: "FK_ApplicationUserTeacherProposal_AspNetUsers_StudentsWhichAreInterestedInThisTeacherProposalId",
-                        column: x => x.StudentsWhichAreInterestedInThisTeacherProposalId,
+                        name: "FK_ApplicationUserGuideTeacherProposal_AspNetUsers_StudentsWhichAreInterestedInThisGuideTeacherProposalId",
+                        column: x => x.StudentsWhichAreInterestedInThisGuideTeacherProposalId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ApplicationUserTeacherProposal_TeacherProposals_TeacherProposalsWhichImInterestedId",
-                        column: x => x.TeacherProposalsWhichImInterestedId,
-                        principalTable: "TeacherProposals",
+                        name: "FK_ApplicationUserGuideTeacherProposal_GuideTeacherProposals_GuideTeacherProposalsWhichImInterestedId",
+                        column: x => x.GuideTeacherProposalsWhichImInterestedId,
+                        principalTable: "GuideTeacherProposals",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_ApplicationUserTeacherProposal_TeacherProposalsWhichImInterestedId",
-                table: "ApplicationUserTeacherProposal",
-                column: "TeacherProposalsWhichImInterestedId");
+                name: "IX_ApplicationUserGuideTeacherProposal_StudentsWhichAreInterestedInThisGuideTeacherProposalId",
+                table: "ApplicationUserGuideTeacherProposal",
+                column: "StudentsWhichAreInterestedInThisGuideTeacherProposalId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -328,6 +328,26 @@ namespace Utal.Icc.Sgm.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_GuideTeacherProposals_AssistantTeacher1OfTheGuideTeacherProposalId",
+                table: "GuideTeacherProposals",
+                column: "AssistantTeacher1OfTheGuideTeacherProposalId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GuideTeacherProposals_AssistantTeacher2OfTheGuideTeacherProposalId",
+                table: "GuideTeacherProposals",
+                column: "AssistantTeacher2OfTheGuideTeacherProposalId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GuideTeacherProposals_AssistantTeacher3OfTheGuideTeacherProposalId",
+                table: "GuideTeacherProposals",
+                column: "AssistantTeacher3OfTheGuideTeacherProposalId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GuideTeacherProposals_GuideTeacherOwnerOfTheGuideTeacherProposalId",
+                table: "GuideTeacherProposals",
+                column: "GuideTeacherOwnerOfTheGuideTeacherProposalId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_StudentProposals_AssistantTeacher1OfTheStudentProposalId",
                 table: "StudentProposals",
                 column: "AssistantTeacher1OfTheStudentProposalId");
@@ -351,33 +371,13 @@ namespace Utal.Icc.Sgm.Migrations
                 name: "IX_StudentProposals_StudentOwnerOfTheStudentProposalId",
                 table: "StudentProposals",
                 column: "StudentOwnerOfTheStudentProposalId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_TeacherProposals_AssistantTeacher1OfTheTeacherProposalId",
-                table: "TeacherProposals",
-                column: "AssistantTeacher1OfTheTeacherProposalId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_TeacherProposals_AssistantTeacher2OfTheTeacherProposalId",
-                table: "TeacherProposals",
-                column: "AssistantTeacher2OfTheTeacherProposalId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_TeacherProposals_AssistantTeacher3OfTheTeacherProposalId",
-                table: "TeacherProposals",
-                column: "AssistantTeacher3OfTheTeacherProposalId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_TeacherProposals_GuideTeacherOwnerOfTheTeacherProposalId",
-                table: "TeacherProposals",
-                column: "GuideTeacherOwnerOfTheTeacherProposalId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "ApplicationUserTeacherProposal");
+                name: "ApplicationUserGuideTeacherProposal");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
@@ -398,7 +398,7 @@ namespace Utal.Icc.Sgm.Migrations
                 name: "StudentProposals");
 
             migrationBuilder.DropTable(
-                name: "TeacherProposals");
+                name: "GuideTeacherProposals");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
