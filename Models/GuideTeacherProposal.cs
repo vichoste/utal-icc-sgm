@@ -5,7 +5,8 @@ namespace Utal.Icc.Sgm.Models;
 public class GuideTeacherProposal {
 	public enum Status {
 		Draft,
-		Published
+		Published,
+		Ready
 	}
 	[Key]
 	public string? Id { get; set; }

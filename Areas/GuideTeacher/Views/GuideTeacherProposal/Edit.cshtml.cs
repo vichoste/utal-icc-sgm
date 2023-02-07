@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Utal.Icc.Sgm.Areas.Student.Views.GuideTeacherProposal;
+namespace Utal.Icc.Sgm.Areas.GuideTeacher.Views.GuideTeacherProposal;
 
 public class EditViewModel {
 	[Display(Name = "ID"), Required]
@@ -9,8 +9,8 @@ public class EditViewModel {
 	public string? Title { get; set; }
 	[Display(Name = "Descripción")]
 	public string? Description { get; set; }
-	[Display(Name = "Profesor guía"), Required]
-	public string? GuideTeacher { get; set; }
+	[Display(Name = "Requisitos"), Required]
+	public string? Requirements { get; set; }
 	[Display(Name = "Primer profesor co-guía")]
 	public string? AssistantTeacher1 { get; set; }
 	[Display(Name = "Segundo profesor co-guía")]

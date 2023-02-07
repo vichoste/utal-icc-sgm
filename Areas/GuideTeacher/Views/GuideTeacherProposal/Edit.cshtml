@@ -1,5 +1,5 @@
-﻿@using Utal.Icc.Sgm.Areas.Student.Views.GuideTeacherProposal
-@using Utal.Icc.Sgm.Areas.Student.Controllers
+﻿@using Utal.Icc.Sgm.Areas.GuideTeacher.Views.GuideTeacherProposal
+@using Utal.Icc.Sgm.Areas.GuideTeacher.Controllers
 
 @model EditViewModel
 
@@ -14,7 +14,7 @@
 			<div class="card">
 				<div class="card-header text-center">@this.ViewData["Title"]</div>
 				<div class="card-body">
-					@using (this.Html.BeginForm(nameof(GuideTeacherProposalController.Edit), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.Student) })) {
+					@using (this.Html.BeginForm(nameof(GuideTeacherProposalController.Edit), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.GuideTeacher) })) {
 						@this.Html.AntiForgeryToken()
 						@this.Html.HiddenFor(m => m.Id)
 						<div class="row was-validated">
@@ -28,9 +28,8 @@
 									@this.Html.TextBoxFor(m => m.Description, new { @class = "form-control" })
 								</div>
 								<div class="form-group mb-3">
-									@this.Html.LabelFor(m => m.GuideTeacher, new { @class = "form-label" , @required = "required" })
-									@this.Html.DropDownListFor(m => m.GuideTeacher, (IEnumerable<SelectListItem>)this.ViewData["GuideTeachers"]!, "Seleccionar profesor guía", new { @class = "form-select" })
-									@this.Html.ValidationMessageFor(m => m.GuideTeacher, "Profesor guía requerido", new { @class = "invalid-feedback" })
+									@this.Html.LabelFor(m => m.Requirements, new { @class = "form-label" })
+									@this.Html.TextBoxFor(m => m.Requirements, new { @class = "form-control" })
 								</div>
 								<div class="form-group mb-3">
 									@this.Html.LabelFor(m => m.AssistantTeacher1, new { @class = "form-label" })
@@ -60,7 +59,7 @@
 						<div class="row text-center">
 							<div class="col">
 								<div class="btn-group">
-									@this.Html.ActionLink("Cancelar", nameof(GuideTeacherProposalController.Index), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.Student) }, new { @class = "btn btn-secondary" })
+									@this.Html.ActionLink("Cancelar", nameof(GuideTeacherProposalController.Index), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.GuideTeacher) }, new { @class = "btn btn-secondary" })
 									<button type="submit" class="btn btn-yellow">Editar</button>
 								</div>
 							</div>

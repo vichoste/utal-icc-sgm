@@ -55,13 +55,13 @@
 											<span class="badge bg-secondary">Borrador</span>
 											break;
 										case nameof(StudentProposal.Status.SentToGuideTeacher):
-											<span class="badge bg-primary">Enviado</span>
+											<span class="badge bg-primary">Enviada</span>
 											break;
 										case nameof(StudentProposal.Status.ApprovedByGuideTeacher):
 											<span class="badge bg-success">Aceptada</span>
 											break;
 										case nameof(StudentProposal.Status.RejectedByGuideTeacher):
-											<span class="badge bg-danger">Rechazado</span>
+											<span class="badge bg-danger">Rechazada</span>
 											break;
 									}
 								</td>
@@ -73,7 +73,7 @@
 									} else if (item.ProposalStatus == nameof(StudentProposal.Status.SentToGuideTeacher)) {
 										<p class="text-muted">Debes esperar a que el profesor guía apruebe o rechace esta propuesta.</p>
 									} else if (item.ProposalStatus == nameof(StudentProposal.Status.ApprovedByGuideTeacher)) {
-										@this.Html.ActionLink("Enviar", nameof(StudentProposalController.Convert), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.Student), id = item.Id }, new { @class = "btn btn-info mb-3"})
+										@this.Html.ActionLink("Convertir", nameof(StudentProposalController.Convert), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.Student), id = item.Id }, new { @class = "btn btn-success mb-3"})
 									} else if (item.ProposalStatus == nameof(StudentProposal.Status.RejectedByGuideTeacher)) {
 										@this.Html.ActionLink("Ver razón", nameof(StudentProposalController.ViewRejectionReason), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.Student), id = item.Id }, new { @class = "btn btn-danger mb-3"})
 									}

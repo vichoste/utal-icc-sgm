@@ -5,14 +5,14 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
-using Utal.Icc.Sgm.Areas.Student.Views.GuideTeacherProposal;
+using Utal.Icc.Sgm.Areas.GuideTeacher.Views.GuideTeacherProposal;
 using Utal.Icc.Sgm.Controllers;
 using Utal.Icc.Sgm.Data;
 using Utal.Icc.Sgm.Models;
 
 using static Utal.Icc.Sgm.Models.ApplicationUser;
 
-namespace Utal.Icc.Sgm.Areas.Student.Controllers;
+namespace Utal.Icc.Sgm.Areas.GuideTeacher.Controllers;
 
 [Area(nameof(Student)), Authorize(Roles = nameof(Roles.Student))]
 public class GuideTeacherProposalController : Controller {
@@ -67,11 +67,6 @@ public class GuideTeacherProposalController : Controller {
 	}
 
 	protected async Task PopulateTeachers() {
-		var guideTeachers = (
-			await this._userManager.GetUsersInRoleAsync(nameof(Roles.GuideTeacher)))
-				.Where(gt => !gt.IsDeactivated)
-				.OrderBy(gt => gt.LastName)
-				.ToList();
 		var assistantTeachers1 = (
 			await this._userManager.GetUsersInRoleAsync(nameof(Roles.AssistantTeacher)))
 				.Where(gt => !gt.IsDeactivated)
@@ -87,10 +82,6 @@ public class GuideTeacherProposalController : Controller {
 				.Where(gt => !gt.IsDeactivated)
 				.OrderBy(at => at.LastName)
 			.ToList();
-		this.ViewData[$"{nameof(Roles.GuideTeacher)}s"] = guideTeachers.Select(gt => new SelectListItem {
-			Text = $"{gt.FirstName} {gt.LastName}",
-			Value = gt.Id
-		});
 		this.ViewData[$"{nameof(Roles.AssistantTeacher)}s1"] = assistantTeachers1.Select(at => new SelectListItem {
 			Text = $"{at.FirstName} {at.LastName}",
 			Value = at.Id

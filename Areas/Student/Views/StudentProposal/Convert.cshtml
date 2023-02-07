@@ -4,7 +4,7 @@
 @model ConvertViewModel
 
 @{
-	this.ViewData["Title"] = "Enviar propuesta a comité";
+	this.ViewData["Title"] = "Convertir propuesta a solicitud para el comité";
 }
 
 <div class="container">
@@ -14,7 +14,7 @@
 			<div class="card">
 				<div class="card-header text-center">@this.ViewData["Title"]</div>
 				<div class="card-body">
-					<h5 class="card-title text-center">Estás a punto de <b class="text-info">enviar</b> tu propuesta al <b>comité</b>, convirtiendola en una <b>solicitud</b>. Revisa la información y una vez listo, presiona el botón de <b class="text-info">"Enviar"</b>.</h5>
+					<h5 class="card-title text-center">Estás a punto de <b class="text-success">convertir</b> tu propuesta en una <b>solicitud</b> para el <b>comité</b>. Revisa la información y una vez listo, presiona el botón de <b class="text-success">"Convertir"</b>.</h5>
 					@using (this.Html.BeginForm(nameof(StudentProposalController.Convert), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.Student) })) {
 						@this.Html.AntiForgeryToken()
 						@this.Html.HiddenFor(m => m.Id)
@@ -82,7 +82,7 @@
 							<div class="col">
 								<div class="btn-group">
 									@this.Html.ActionLink("Cancelar", nameof(StudentProposalController.Index), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.Student) }, new { @class = "btn btn-secondary" })
-									<button type="submit" class="btn btn-info">Enviar</button>
+									<button type="submit" class="btn btn-success">Convertir</button>
 								</div>
 							</div>
 						</div>

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Utal.Icc.Sgm.Areas.Student.Views.GuideTeacherProposal;
+namespace Utal.Icc.Sgm.Areas.GuideTeacher.Views.GuideTeacherProposal;
 
 public class ConvertViewModel {
 	[Display(Name = "ID"), Required]

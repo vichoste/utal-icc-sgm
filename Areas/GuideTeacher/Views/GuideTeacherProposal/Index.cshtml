@@ -1,8 +1,8 @@
 ﻿@using Utal.Icc.Sgm
 @using Utal.Icc.Sgm.Models
-@using Utal.Icc.Sgm.Areas.Student.Views.GuideTeacherProposal
 @using Utal.Icc.Sgm.Views.Shared
-@using Utal.Icc.Sgm.Areas.Student.Controllers
+@using Utal.Icc.Sgm.Areas.GuideTeacher.Views.GuideTeacherProposal
+@using Utal.Icc.Sgm.Areas.GuideTeacher.Controllers
 
 @model PaginatedList<IndexViewModel>
 
@@ -17,10 +17,10 @@
 			<h2>@this.ViewData["Title"]</h2>
 		</div>
 		<div class="col-12 col-md-2 mb-3">
-			@this.Html.ActionLink("Crear propuesta", "Create", nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.Student) }, new { @class = "btn btn-success"})
+			@this.Html.ActionLink("Crear propuesta", "Create", nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.GuideTeacher) }, new { @class = "btn btn-success"})
 		</div>
 		<div class="col-12 mb-3">
-			<partial name="_Filter" , model=@(new FilterPartialViewModel(nameof(GuideTeacherProposalController.Index), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), nameof(Utal.Icc.Sgm.Areas.Student))) />
+			<partial name="_Filter" , model=@(new FilterPartialViewModel(nameof(GuideTeacherProposalController.Index), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), nameof(Utal.Icc.Sgm.Areas.GuideTeacher))) />
 		</div>
 	</div>
 	<div class="row justify-content-center">
@@ -35,11 +35,6 @@
 									Título
 								</a>
 							</th>
-							<th>
-								<a asp-action="@nameof(GuideTeacherProposalController.Index)" asp-route-sortOrder="@this.ViewData["GuideTeacherSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
-									Profesor guía
-								</a>
-							</th>
 							<th>Estado</th>
 							<th>Acciones</th>
 						</tr>
@@ -48,34 +43,28 @@
 						@foreach (var item in this.Model) {
 							<tr>
 								<td>@item.Title</td>
-								<td>@item.GuideTeacher</td>
 								<td>
 									@switch (item.ProposalStatus) {
 										case nameof(GuideTeacherProposal.Status.Draft):
 											<span class="badge bg-secondary">Borrador</span>
 											break;
-										case nameof(GuideTeacherProposal.Status.SentToGuideTeacher):
-											<span class="badge bg-primary">Enviado</span>
+										case nameof(GuideTeacherProposal.Status.Published):
+											<span class="badge bg-primary">Publicada</span>
 											break;
-										case nameof(GuideTeacherProposal.Status.ApprovedByGuideTeacher):
-											<span class="badge bg-success">Aceptada</span>
-											break;
-										case nameof(GuideTeacherProposal.Status.RejectedByGuideTeacher):
-											<span class="badge bg-danger">Rechazado</span>
+										case nameof(GuideTeacherProposal.Status.Ready):
+											<span class="badge bg-success">Lista</span>
 											break;
 									}
 								</td>
 								<td>
 									@if (item.ProposalStatus == nameof(GuideTeacherProposal.Status.Draft)) {
-										@this.Html.ActionLink("Editar", nameof(GuideTeacherProposalController.Edit), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.Student), id = item.Id }, new { @class = "btn btn-yellow mb-3"})
-										@this.Html.ActionLink("Eliminar", nameof(GuideTeacherProposalController.Delete), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.Student), id = item.Id }, new { @class = "btn btn-danger mb-3"})
-										@this.Html.ActionLink("Enviar", nameof(GuideTeacherProposalController.Send), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.Student), id = item.Id }, new { @class = "btn btn-primary mb-3"})
-									} else if (item.ProposalStatus == nameof(GuideTeacherProposal.Status.SentToGuideTeacher)) {
-										<p class="text-muted">Debes esperar a que el profesor guía apruebe o rechace esta propuesta.</p>
-									} else if (item.ProposalStatus == nameof(GuideTeacherProposal.Status.ApprovedByGuideTeacher)) {
-										@this.Html.ActionLink("Enviar", nameof(GuideTeacherProposalController.Convert), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.Student), id = item.Id }, new { @class = "btn btn-info mb-3"})
-									} else if (item.ProposalStatus == nameof(GuideTeacherProposal.Status.RejectedByGuideTeacher)) {
-										@this.Html.ActionLink("Ver razón", nameof(GuideTeacherProposalController.ViewRejectionReason), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.Student), id = item.Id }, new { @class = "btn btn-danger mb-3"})
+										@this.Html.ActionLink("Editar", nameof(GuideTeacherProposalController.Edit), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.GuideTeacher), id = item.Id }, new { @class = "btn btn-yellow mb-3"})
+										@this.Html.ActionLink("Eliminar", nameof(GuideTeacherProposalController.Delete), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.GuideTeacher), id = item.Id }, new { @class = "btn btn-danger mb-3"})
+										@this.Html.ActionLink("Publicar", nameof(GuideTeacherProposalController.Publish), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.GuideTeacher), id = item.Id }, new { @class = "btn btn-primary mb-3"})
+									} else if (item.ProposalStatus == nameof(GuideTeacherProposal.Status.Published)) {
+										@this.Html.ActionLink("Ver postulantes", nameof(GuideTeacherProposalController.ViewCandidates), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.GuideTeacher), id = item.Id }, new { @class = "btn btn-yellow mb-3"})
+									} else if (item.ProposalStatus == nameof(GuideTeacherProposal.Status.Ready)) {
+										@this.Html.ActionLink("Enviar", nameof(GuideTeacherProposalController.Convert), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.GuideTeacher), id = item.Id }, new { @class = "btn btn-info mb-3"})
 									}
 								</td>
 							</tr>

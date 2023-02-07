@@ -1,5 +1,5 @@
-﻿@using Utal.Icc.Sgm.Areas.Student.Views.GuideTeacherProposal
-@using Utal.Icc.Sgm.Areas.Student.Controllers
+﻿@using Utal.Icc.Sgm.Areas.GuideTeacher.Views.GuideTeacherProposal
+@using Utal.Icc.Sgm.Areas.GuideTeacher.Controllers
 
 @model CreateViewModel
 
@@ -14,7 +14,7 @@
 			<div class="card">
 				<div class="card-header text-center">@this.ViewData["Title"]</div>
 				<div class="card-body">
-					@using (this.Html.BeginForm(nameof(GuideTeacherProposalController.Create), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.Student) })) {
+					@using (this.Html.BeginForm(nameof(GuideTeacherProposalController.Create), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.GuideTeacher) })) {
 						@this.Html.AntiForgeryToken()
 						<div class="row was-validated">
 							<div class="col">
