@@ -29,27 +29,27 @@
 					<thead class="table-dark">
 						<tr>
 							<th>
-								<a asp-action="@nameof(StudentController.Index)" asp-route-sortOrder="@this.ViewData["FirstNameSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+								<a asp-action="@nameof(StudentController.Index)" asp-route-sortOrder="@this.ViewData[$"{nameof(ApplicationUserViewModel.FirstName)}SortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
 									Nombre
 								</a>
 							</th>
 							<th>
-								<a asp-action="@nameof(StudentController.Index)" asp-route-sortOrder="@this.ViewData["LastNameSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+								<a asp-action="@nameof(StudentController.Index)" asp-route-sortOrder="@this.ViewData[$"{nameof(ApplicationUserViewModel.LastName)}SortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
 									Apellido
 								</a>
 							</th>
 							<th>
-								<a asp-action="@nameof(StudentController.Index)" asp-route-sortOrder="@this.ViewData["StudentUniversityIdSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+								<a asp-action="@nameof(StudentController.Index)" asp-route-sortOrder="@this.ViewData[$"{nameof(ApplicationUserViewModel.StudentUniversityId)}SortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
 									Número de matrícula
 								</a>
 							</th>
 							<th>
-								<a asp-action="@nameof(StudentController.Index)" asp-route-sortOrder="@this.ViewData["RutSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+								<a asp-action="@nameof(StudentController.Index)" asp-route-sortOrder="@this.ViewData[$"{nameof(ApplicationUserViewModel.Rut)}SortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
 									RUT
 								</a>
 							</th>
 							<th>
-								<a asp-action="@nameof(StudentController.Index)" asp-route-sortOrder="@this.ViewData["EmailSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+								<a asp-action="@nameof(StudentController.Index)" asp-route-sortOrder="@this.ViewData[$"{nameof(ApplicationUserViewModel.Email)}SortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
 									E-mail
 								</a>
 							</th>

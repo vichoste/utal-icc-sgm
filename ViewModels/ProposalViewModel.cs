@@ -7,4 +7,6 @@ public abstract class ProposalViewModel : ApplicationViewModel {
 	public virtual string? Title { get; set; }
 	[Display(Name = "Descripción")]
 	public virtual string? Description { get; set; }
+	[Display(Name = "Estado de la propuesta")]
+	public virtual string? ProposalStatus { get; set; }
 }

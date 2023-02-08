@@ -1,10 +1,10 @@
 ﻿@using Utal.Icc.Sgm
 @using Utal.Icc.Sgm.Models
-@using Utal.Icc.Sgm.Areas.Student.Views.StudentProposal
+@using Utal.Icc.Sgm.ViewModels
 @using Utal.Icc.Sgm.Views.Shared
 @using Utal.Icc.Sgm.Areas.Student.Controllers
 
-@model PaginatedList<ProposalViewModel>
+@model PaginatedList<StudentProposalViewModel>
 
 @{
 	this.ViewData["Title"] = "Mis propuestas";
@@ -30,12 +30,12 @@
 					<thead class="table-dark">
 						<tr>
 							<th>
-								<a asp-action="@nameof(StudentProposalController.Index)" asp-route-sortOrder="@this.ViewData["TitleSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+								<a asp-action="@nameof(StudentProposalController.Index)" asp-route-sortOrder="@this.ViewData[$"{nameof(StudentProposalViewModel.Title)}SortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
 									Título
 								</a>
 							</th>
 							<th>
-								<a asp-action="@nameof(StudentProposalController.Index)" asp-route-sortOrder="@this.ViewData["GuideTeacherSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+								<a asp-action="@nameof(StudentProposalController.Index)" asp-route-sortOrder="@this.ViewData[$"nameof(StudentProposalViewModel.GuideTeacherName)SortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
 									Profesor guía
 								</a>
 							</th>

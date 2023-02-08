@@ -1,7 +1,7 @@
-﻿@using Utal.Icc.Sgm.Areas.Student.Views.StudentProposal
+﻿@using Utal.Icc.Sgm.ViewModels
 @using Utal.Icc.Sgm.Areas.Student.Controllers
 
-@model CreateViewModel
+@model StudentProposalViewModel
 
 @{
 	this.ViewData["Title"] = "Crear propuesta";
@@ -21,12 +21,10 @@
 								<div class="form-group mb-3">
 									@this.Html.LabelFor(m => m.Title, new { @class = "form-label" })
 									@this.Html.TextBoxFor(m => m.Title, new { @class = "form-control", @required = "required" })
-									@this.Html.ValidationMessageFor(m => m.Title, "Título requerido", new { @class = "invalid-feedback" })
 								</div>
 								<div class="form-group mb-3">
 									@this.Html.LabelFor(m => m.Description, new { @class = "form-label" })
 									@this.Html.TextBoxFor(m => m.Description, new { @class = "form-control", @required = "required" })
-									@this.Html.ValidationMessageFor(m => m.Description, "Descripción requerida", new { @class = "invalid-feedback" })
 								</div>
 								<div class="form-group mb-3">
 									@this.Html.LabelFor(m => m.GuideTeacherName, new { @class = "form-label" })

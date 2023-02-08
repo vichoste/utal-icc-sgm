@@ -34,22 +34,22 @@
 					<thead class="table-dark">
 						<tr>
 							<th>
-								<a asp-action=@nameof(TeacherController.Index) asp-route-sortOrder="@this.ViewData["FirstNameSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+								<a asp-action="@nameof(TeacherController.Index)" asp-route-sortOrder="@this.ViewData[$"{nameof(IndexTeacherViewModel.FirstName)}SortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
 									Nombre
 								</a>
 							</th>
 							<th>
-								<a asp-action=@nameof(TeacherController.Index) asp-route-sortOrder="@this.ViewData["LastNameSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+								<a asp-action="@nameof(TeacherController.Index)" asp-route-sortOrder="@this.ViewData[$"{nameof(IndexTeacherViewModel.LastName)}SortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
 									Apellido
 								</a>
 							</th>
 							<th>
-								<a asp-action=@nameof(TeacherController.Index) asp-route-sortOrder="@this.ViewData["RutSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+								<a asp-action="@nameof(TeacherController.Index)" asp-route-sortOrder="@this.ViewData[$"{nameof(IndexTeacherViewModel.Rut)}SortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
 									RUT
 								</a>
 							</th>
 							<th>
-								<a asp-action=@nameof(TeacherController.Index) asp-route-sortOrder="@this.ViewData["EmailSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+								<a asp-action="@nameof(TeacherController.Index)" asp-route-sortOrder="@this.ViewData[$"{nameof(IndexTeacherViewModel.Email)}SortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
 									E-mail
 								</a>
 							</th>

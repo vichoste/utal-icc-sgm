@@ -17,4 +17,8 @@ public class StudentProposalViewModel : ProposalViewModel {
 	public virtual string? GuideTeacherSpecialization { get; set; }
 	[Display(Name = "Profesores co-guía")]
 	public virtual ICollection<string>? AssistantTeachers { get; set; } = new HashSet<string>();
+	[Display(Name = "¿Quién rechazó la propuesta?")]
+	public virtual string? WhoRejected { get; set; }
+	[Display(Name = "Justificación")]
+	public string? RejectionReason { get; set; }
 }
