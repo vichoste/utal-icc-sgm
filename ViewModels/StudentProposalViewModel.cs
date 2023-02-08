@@ -7,6 +7,8 @@ public class StudentProposalViewModel : ProposalViewModel {
 	public virtual string? StudentId { get; set; }
 	[Display(Name = "Nombre del estudiante")]
 	public virtual string? StudentName { get; set; }
+	[DataType(DataType.EmailAddress), Display(Name = "E-mail del estudiante"), EmailAddress]
+	public virtual string? StudentEmail { get; set; }
 	[Display(Name = "Número de matrícula")]
 	public virtual string? StudentUniversityId { get; set; }
 	[Display(Name = "Cursos restantes")]
