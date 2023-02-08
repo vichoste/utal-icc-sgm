@@ -8,6 +8,7 @@ public class GuideTeacherProposal : Proposal {
 		Published,
 		Ready
 	}
+	public string? Requirements { get; set; }
 	public Status? ProposalStatus { get; set; }
 	public virtual ApplicationUser? GuideTeacherOwnerOfTheGuideTeacherProposal { get; set; }
 	public virtual ICollection<ApplicationUser?>? AssistantTeachersOfTheGuideTeacherProposal { get; set; } = new HashSet<ApplicationUser?>();

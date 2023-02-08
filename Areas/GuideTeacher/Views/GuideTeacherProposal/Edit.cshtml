@@ -1,0 +1,54 @@
+﻿@using Utal.Icc.Sgm.ViewModels
+@using Utal.Icc.Sgm.Areas.GuideTeacher.Controllers
+@using static Utal.Icc.Sgm.Models.ApplicationUser
+
+@model GuideTeacherProposalViewModel
+
+@{
+	this.ViewData["Title"] = "Editar propuesta";
+}
+
+<div class="container">
+	<partial name="_Alerts" />
+	<div class="row justify-content-center">
+		<div class="col-10">
+			<div class="card">
+				<div class="card-header text-center">@this.ViewData["Title"]</div>
+				<div class="card-body">
+					@using (this.Html.BeginForm(nameof(GuideTeacherProposalController.Edit), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.GuideTeacher) })) {
+						@this.Html.AntiForgeryToken()
+						@this.Html.HiddenFor(m => m.Id)
+						<div class="row">
+							<div class="col">
+								<div class="form-group mb-3">
+									@this.Html.LabelFor(m => m.Title, new { @class = "form-label" })
+									@this.Html.TextBoxFor(m => m.Title, new { @class = "form-control", @required = "required" })
+								</div>
+								<div class="form-group mb-3">
+									@this.Html.LabelFor(m => m.Description, new { @class = "form-label" })
+									@this.Html.TextBoxFor(m => m.Description, new { @class = "form-control", @required = "required" })
+								</div>
+								<div class="form-group mb-3">
+									@this.Html.LabelFor(m => m.Requirements, new { @class = "form-label" })
+									@this.Html.TextBoxFor(m => m.Requirements, new { @class = "form-control", @required = "required" })
+								</div>
+								<div class="form-group mb-3">
+									@this.Html.LabelFor(m => m.AssistantTeachers, new { @class = "form-label" }):
+									@this.Html.ListBoxFor(m => m.AssistantTeachers, new MultiSelectList((IEnumerable<SelectListItem>)this.ViewData[$"{nameof(Roles.AssistantTeacher)}s"]!, "Value", "Text"), new { @class = "form-select", @multiple = "multiple" })
+								</div>
+							</div>
+						</div>
+						<div class="row text-center">
+							<div class="col">
+								<div class="btn-group">
+									@this.Html.ActionLink("Cancelar", nameof(GuideTeacherProposalController.Index), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.GuideTeacher) }, new { @class = "btn btn-secondary" })
+									<button type="submit" class="btn btn-yellow">Editar</button>
+								</div>
+							</div>
+						</div>
+					}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

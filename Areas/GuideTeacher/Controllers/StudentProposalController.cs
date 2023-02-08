@@ -20,7 +20,7 @@ namespace Utal.Icc.Sgm.Areas.GuideTeacher.Controllers;
 public class StudentProposalController : ApplicationController {
 	public StudentProposalController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, SignInManager<ApplicationUser> signInManager) : base(dbContext, userManager, userStore, signInManager) { }
 
-	protected async Task Populate(ApplicationUser guideTeacher) {
+	protected async Task PopulateAssistantTeachers(ApplicationUser guideTeacher) {
 		var assistantTeachers = (
 			await this._userManager.GetUsersInRoleAsync(nameof(Roles.AssistantTeacher)))
 				.Where(at => at != guideTeacher && !at.IsDeactivated)

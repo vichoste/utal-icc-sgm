@@ -18,7 +18,7 @@ namespace Utal.Icc.Sgm.Areas.Student.Controllers;
 public class StudentProposalController : ApplicationController {
 	public StudentProposalController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, SignInManager<ApplicationUser> signInManager) : base(dbContext, userManager, userStore, signInManager) { }
 
-	protected async Task Populate(ApplicationUser guideTeacher) {
+	protected async Task PopulateAssistantTeachers(ApplicationUser guideTeacher) {
 		var assistantTeachers = (
 			await this._userManager.GetUsersInRoleAsync(nameof(Roles.AssistantTeacher)))
 				.Where(at => at != guideTeacher && !at.IsDeactivated)
@@ -145,7 +145,7 @@ public class StudentProposalController : ApplicationController {
 			this.TempData["ErrorMessage"] = "Error al obtener al profesor guía.";
 			return this.RedirectToAction(nameof(StudentProposalController.Index), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Student) });
 		}
-		await this.Populate(guideTeacher);
+		await this.PopulateAssistantTeachers(guideTeacher);
 		var output = new StudentProposalViewModel {
 			GuideTeacherId = guideTeacher.Id,
 			GuideTeacherName = $"{guideTeacher.FirstName} {guideTeacher.LastName}",
@@ -198,7 +198,7 @@ public class StudentProposalController : ApplicationController {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
 			return this.RedirectToAction(nameof(StudentProposalController.Index), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Student) });
 		}
-		await this.Populate(proposal.GuideTeacherOfTheStudentProposal!);
+		await this.PopulateAssistantTeachers(proposal.GuideTeacherOfTheStudentProposal!);
 		var output = new StudentProposalViewModel {
 			Id = id,
 			Title = proposal!.Title,
@@ -218,8 +218,8 @@ public class StudentProposalController : ApplicationController {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
 		var proposal = await this._dbContext.StudentProposals!
-			.Where(p => p.StudentOwnerOfTheStudentProposal == user && p.ProposalStatus == StudentProposal.Status.Draft)
 			.Include(p => p.StudentOwnerOfTheStudentProposal)
+			.Where(p => p.StudentOwnerOfTheStudentProposal == user && p.ProposalStatus == StudentProposal.Status.Draft)
 			.Include(p => p.GuideTeacherOfTheStudentProposal)
 			.Include(p => p.AssistantTeachersOfTheStudentProposal)
 			.FirstOrDefaultAsync(p => p.Id == input.Id);
@@ -227,7 +227,7 @@ public class StudentProposalController : ApplicationController {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
 			return this.RedirectToAction(nameof(StudentProposalController.Index), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Student) });
 		}
-		await this.Populate(proposal.GuideTeacherOfTheStudentProposal!);
+		await this.PopulateAssistantTeachers(proposal.GuideTeacherOfTheStudentProposal!);
 		proposal.Title = input.Title;
 		proposal.Description = input.Description;
 		var assistantTeachers = input.AssistantTeachers!.Select(async at => await this.CheckApplicationUser(at)).Select(at => at.Result).ToList();
