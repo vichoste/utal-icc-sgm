@@ -9,8 +9,8 @@ namespace Utal.Icc.Sgm.Areas.Account.Controllers;
 
 [Area(nameof(Account))]
 public class SignOutController : ApplicationController {
-	public SignOutController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, IUserEmailStore<ApplicationUser> emailStore, SignInManager<ApplicationUser> signInManager) : base(dbContext, userManager, userStore, emailStore, signInManager) { }
-
+	public SignOutController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, SignInManager<ApplicationUser> signInManager) : base(dbContext, userManager, userStore, signInManager) { }
+	
 	public async Task<IActionResult> Index() {
 		if (this.User.Identity!.IsAuthenticated) {
 			await this._signInManager.SignOutAsync();

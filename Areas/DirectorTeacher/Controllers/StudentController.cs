@@ -20,7 +20,7 @@ namespace Utal.Icc.Sgm.Areas.DirectorTeacher.Controllers;
 
 [Area(nameof(DirectorTeacher)), Authorize(Roles = nameof(Roles.DirectorTeacher))]
 public class StudentController : ApplicationController, IApplicationUserViewModelFilterable, IApplicationUserViewModelSortable {
-	public StudentController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, IUserEmailStore<ApplicationUser> emailStore, SignInManager<ApplicationUser> signInManager) : base(dbContext, userManager, userStore, emailStore, signInManager) { }
+	public StudentController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, SignInManager<ApplicationUser> signInManager) : base(dbContext, userManager, userStore, signInManager) { }
 
 	public IEnumerable<ApplicationUserViewModel> Filter(string searchString, IOrderedEnumerable<ApplicationUserViewModel> viewModels, params string[] parameters) {
 		var result = new List<ApplicationUserViewModel>();
@@ -61,6 +61,7 @@ public class StudentController : ApplicationController, IApplicationUserViewMode
 		this.ViewData["CurrentFilter"] = searchString;
 		var users = (await this._userManager.GetUsersInRoleAsync(nameof(Roles.Student))).Select(
 			u => new ApplicationUserViewModel {
+				Id = u.Id,
 				FirstName = u.FirstName,
 				LastName = u.LastName,
 				StudentUniversityId = u.StudentUniversityId,

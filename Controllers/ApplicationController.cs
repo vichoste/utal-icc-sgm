@@ -11,7 +11,7 @@ public abstract class ApplicationController : Controller {
 	protected readonly IUserEmailStore<ApplicationUser> _emailStore;
 	protected readonly SignInManager<ApplicationUser> _signInManager;
 
-	public ApplicationController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, IUserEmailStore<ApplicationUser> emailStore, SignInManager<ApplicationUser> signInManager) {
+	public ApplicationController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, SignInManager<ApplicationUser> signInManager) {
 		this._dbContext = dbContext;
 		this._userManager = userManager;
 		this._userStore = userStore;

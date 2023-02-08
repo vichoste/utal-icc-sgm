@@ -15,7 +15,7 @@ namespace Utal.Icc.Sgm.Areas.DirectorTeacher.Controllers;
 
 [Area(nameof(DirectorTeacher)), Authorize(Roles = nameof(Roles.DirectorTeacher))]
 public class TeacherController : ApplicationController, IApplicationUserViewModelFilterable, IApplicationUserViewModelSortable {
-	public TeacherController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, IUserEmailStore<ApplicationUser> emailStore, SignInManager<ApplicationUser> signInManager) : base(dbContext, userManager, userStore, emailStore, signInManager) { }
+	public TeacherController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, SignInManager<ApplicationUser> signInManager) : base(dbContext, userManager, userStore, signInManager) { }
 
 	public IEnumerable<ApplicationUserViewModel> Filter(string searchString, IOrderedEnumerable<ApplicationUserViewModel> viewModels, params string[] parameters) {
 		var result = new List<ApplicationUserViewModel>();
@@ -56,6 +56,7 @@ public class TeacherController : ApplicationController, IApplicationUserViewMode
 		this.ViewData["CurrentFilter"] = searchString;
 		var users = (await this._userManager.GetUsersInRoleAsync(nameof(Roles.Teacher))).Select(
 			async u => new IndexTeacherViewModel {
+				Id = u.Id,
 				FirstName = u.FirstName,
 				LastName = u.LastName,
 				Rut = u.Rut,
@@ -64,9 +65,9 @@ public class TeacherController : ApplicationController, IApplicationUserViewMode
 				IsDirectorTeacher = await this._userManager.IsInRoleAsync(u, nameof(Roles.DirectorTeacher)),
 			}
 		).Select(u => u.Result).AsEnumerable();
-		var ordered = this.Sort(sortOrder, users, parameters);
-		var output = !searchString.IsNullOrEmpty() ? this.Filter(searchString, ordered, parameters) : ordered;
-		return this.View(PaginatedList<ApplicationUserViewModel>.Create(output.AsQueryable(), pageNumber ?? 1, 6));
+		var ordered = this.Sort(sortOrder, users, parameters) as IOrderedEnumerable<IndexTeacherViewModel>;
+		var output = !searchString.IsNullOrEmpty() ? this.Filter(searchString, ordered!, parameters) as IOrderedEnumerable<IndexTeacherViewModel> : ordered;
+		return this.View(PaginatedList<IndexTeacherViewModel>.Create(output!.AsQueryable(), pageNumber ?? 1, 6));
 	}
 
 	public async Task<IActionResult> Create() => await base.CheckSession() is not ApplicationUser user

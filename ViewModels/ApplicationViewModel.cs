@@ -6,7 +6,7 @@ public abstract class ApplicationViewModel {
 	[Display(Name = "ID")]
 	public string? Id { get; set; }
 	[Display(Name = "Fecha de creación")]
-	public virtual DateTimeOffset? CreatedAt { get; set; }
+	public DateTimeOffset? CreatedAt { get; set; }
 	[Display(Name = "Fecha de actualización")]
-	public virtual DateTimeOffset? UpdatedAt { get; set; }
+	public DateTimeOffset? UpdatedAt { get; set; }
 }
