@@ -3,10 +3,10 @@ using System.ComponentModel.DataAnnotations;
 namespace Utal.Icc.Sgm.ViewModels;
 
 public partial class ApplicationUserViewModel {
-	[Display(Name = "Oficina"), Required]
+	[Display(Name = "Oficina")]
 	public virtual string? TeacherOffice { get; set; }
-	[Display(Name = "Horarios"), Required]
+	[Display(Name = "Horarios")]
 	public virtual string? TeacherSchedule { get; set; }
-	[Display(Name = "Especialización"), Required]
+	[Display(Name = "Especialización")]
 	public virtual bool TeacherSpecialization { get; set; }
 }

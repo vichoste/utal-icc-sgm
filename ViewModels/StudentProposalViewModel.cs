@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 namespace Utal.Icc.Sgm.ViewModels;
 
 public class StudentProposalViewModel : ProposalViewModel {
-	[Display(Name = "ID del profesor guía"), Required]
+	[Display(Name = "ID del profesor guía")]
 	public virtual string? GuideTeacherId { get; set; }
 	[Display(Name = "Nombre del profesor guía")]
 	public virtual string? GuideTeacherName { get; set; }
