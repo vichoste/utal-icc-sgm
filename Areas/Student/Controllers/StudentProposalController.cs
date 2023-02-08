@@ -193,40 +193,32 @@ public class StudentProposalController : Controller {
 
 	[HttpPost, ValidateAntiForgeryToken]
 	public async Task<IActionResult> Create([FromForm] CreateViewModel model) {
+		if (await this.CheckStudentSession() is not ApplicationUser student) {
+			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
+		}
 		if (!this.ModelState.IsValid) {
+			await this.PopulateTeachers();
 			this.ViewBag.WarningMessage = "Revisa que los campos estén correctos.";
 			return this.View(new CreateViewModel {
 				Title = model.Title,
 				Description = model.Description,
+				GuideTeacherId = model.GuideTeacherId,
+				GuideTeacher = model.GuideTeacher,
+				AssistantTeachers = model.AssistantTeachers
 			});
 		}
-		if (await this.CheckStudentSession() is not ApplicationUser student) {
-			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
-		}
-		await this.PopulateTeachers();
 		if (await this.CheckApplicationUser(model.GuideTeacher!) is not ApplicationUser guideTeacher) {
 			this.TempData["ErrorMessage"] = "Revisa tu selección del profesor guía.";
 			return this.RedirectToAction(nameof(StudentProposalController.Index), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Student) });
 		}
-		var assistantTeachers =  model.AssistantTeachers!.Select(at => this._dbContext.Users!.AsNoTracking().FirstOrDefault(u => u.Id == at)).ToList();
-		foreach (var assistantTeacher in assistantTeachers) {
-			if (await this.CheckApplicationUser(assistantTeacher!.Id) is null) {
-				this.ViewBag.WarningMessage = "Revisa tu selección del profesor asistente.";
-				return this.View(new CreateViewModel {
-					GuideTeacherId = model.GuideTeacherId,
-					GuideTeacher = model.GuideTeacher,
-					Title = model.Title,
-					Description = model.Description
-				});
-			}
-		}
+		var assistantTeachers = model.AssistantTeachers!.Select(async at => await this.CheckApplicationUser(at)).Select(at => at.Result).ToList();
 		var studentProposal = new StudentProposal {
 			Id = Guid.NewGuid().ToString(),
 			Title = model.Title,
 			Description = model.Description,
 			StudentOwnerOfTheStudentProposal = student,
 			GuideTeacherOfTheStudentProposal = guideTeacher,
-			AssistantTeachersOfTheStudentProposal = assistantTeachers,
+			AssistantTeachersOfTheStudentProposal = assistantTeachers!,
 			ProposalStatus = StudentProposal.Status.Draft,
 			CreatedAt = DateTimeOffset.Now,
 			UpdatedAt = DateTimeOffset.Now
@@ -257,7 +249,7 @@ public class StudentProposalController : Controller {
 			Title = studentProposal!.Title,
 			Description = studentProposal.Description,
 			GuideTeacher = studentProposal.GuideTeacherOfTheStudentProposal!.Id,
-			AssistantTeachers = 
+			AssistantTeachers = studentProposal.AssistantTeachersOfTheStudentProposal!.Select(at => at!.Id).ToList(),
 			CreatedAt = studentProposal.CreatedAt,
 			UpdatedAt = studentProposal.UpdatedAt
 		};
@@ -267,6 +259,7 @@ public class StudentProposalController : Controller {
 	[HttpPost, ValidateAntiForgeryToken]
 	public async Task<IActionResult> Edit([FromForm] EditViewModel model) {
 		if (!this.ModelState.IsValid) {
+			await this.PopulateTeachers();
 			this.ViewBag.WarningMessage = "Revisa que los campos estén correctos.";
 			return this.View(new EditViewModel {
 				Title = model.Title,
@@ -276,13 +269,10 @@ public class StudentProposalController : Controller {
 		if (await this.CheckStudentSession() is not ApplicationUser student) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
-		await this.PopulateTeachers();
 		var studentProposal = await this._dbContext.StudentProposals!
 			.Include(sp => sp.StudentOwnerOfTheStudentProposal)
 			.Include(sp => sp.GuideTeacherOfTheStudentProposal)
-			.Include(sp => sp.AssistantTeacher1OfTheStudentProposal)
-			.Include(sp => sp.AssistantTeacher2OfTheStudentProposal)
-			.Include(sp => sp.AssistantTeacher3OfTheStudentProposal)
+			.Include(sp => sp.AssistantTeachersOfTheStudentProposal)
 			.FirstOrDefaultAsync(sp => sp.Id == model.Id);
 		if (studentProposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";

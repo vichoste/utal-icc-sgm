@@ -47,7 +47,7 @@
 						@foreach (var item in this.Model) {
 							<tr>
 								<td>@item.Title</td>
-								<td>@item.GuideTeacher</td>
+								<td>@item.GuideTeacherName</td>
 								<td>
 									@switch (item.ProposalStatus) {
 										case nameof(StudentProposal.Status.Draft):

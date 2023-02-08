@@ -5,6 +5,6 @@ namespace Utal.Icc.Sgm.Areas.Student.Views.StudentProposal;
 public class DeleteViewModel {
 	[Display(Name = "ID"), Required]
 	public string? Id { get; set; }
-	[DataType(DataType.EmailAddress), Display(Name = "E-mail"), EmailAddress, Required]
+	[Display(Name = "Título")]
 	public string? Title { get; set; }
 }

@@ -17,8 +17,6 @@
 					@using (this.Html.BeginForm(nameof(StudentProposalController.Send), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.Student) })) {
 						@this.Html.AntiForgeryToken()
 						@this.Html.HiddenFor(m => m.Id)
-						@this.Html.HiddenFor(m => m.Title)
-						@this.Html.HiddenFor(m => m.GuideTeacherName)
 						<h5 class="card-title">¿Deseas <b class="text-primary">enviar</b> esta propuesta al profesor guía <b>@this.Html.DisplayFor(m => m.GuideTeacherName)</b>?</h5>
 						<h6 class="card-subtitle mb-3 text-muted">@this.Html.DisplayFor(m => m.Title)</h6>
 						<div class="row text-center">

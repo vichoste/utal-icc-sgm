@@ -5,9 +5,9 @@ namespace Utal.Icc.Sgm.Areas.Student.Views.StudentProposal;
 public class ViewRejectionReasonViewModel {
 	[Display(Name = "ID"), Required]
 	public string? Id { get; set; }
-	[Display(Name = "Título de la propuesta"), Required]
+	[Display(Name = "Título"), Required]
 	public string? Title { get; set; }
-	[Display(Name = "Descripción de la propuesta"), Required]
+	[Display(Name = "Descripción"), Required]
 	public string? Description { get; set; }
 	[Display(Name = "Rechazado por"), Required]
 	public string? RejectedBy { get; set; }

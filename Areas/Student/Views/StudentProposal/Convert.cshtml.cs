@@ -5,24 +5,24 @@ namespace Utal.Icc.Sgm.Areas.Student.Views.StudentProposal;
 public class ConvertViewModel {
 	[Display(Name = "ID"), Required]
 	public string? Id { get; set; }
-	[Display(Name = "Título"), Required]
+	[Display(Name = "Título")]
 	public string? Title { get; set; }
-	[Display(Name = "Descripción"), Required]
+	[Display(Name = "Descripción")]
 	public string? Description { get; set; }
-	[Display(Name = "Nombre del profesor guía"), Required]
+	[Display(Name = "Profesor guía")]
 	public string? GuideTeacherName { get; set; }
-	[DataType(DataType.EmailAddress), Display(Name = "E-mail del profesor guía"), EmailAddress]
+	[DataType(DataType.EmailAddress), Display(Name = "E-mail"), EmailAddress]
 	public string? GuideTeacherEmail { get; set; }
-	[Display(Name = "Oficina"), Required]
+	[Display(Name = "Oficina")]
 	public string? GuideTeacherOffice { get; set; }
-	[Display(Name = "Horarios"), Required]
+	[Display(Name = "Horarios")]
 	public string? GuideTeacherSchedule { get; set; }
-	[Display(Name = "Especialización"), Required]
+	[Display(Name = "Especialización")]
 	public string? GuideTeacherSpecialization { get; set; }
-	[Display(Name = "Profesores co-guía"), Required]
+	[Display(Name = "Profesores co-guía")]
 	public ICollection<string>? AssistantTeachers { get; set; } = new HashSet<string>();
-	[Display(Name = "Creado"), Required]
+	[Display(Name = "Creado")]
 	public DateTimeOffset? CreatedAt { get; set; }
-	[Display(Name = "Actualizado"), Required]
+	[Display(Name = "Actualizado")]
 	public DateTimeOffset? UpdatedAt { get; set; }
 }

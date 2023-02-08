@@ -8,7 +8,7 @@ public class IndexViewModel {
 	[Display(Name = "Título")]
 	public string? Title { get; set; }
 	[Display(Name = "Profesor guía")]
-	public string? GuideTeacher { get; set; }
+	public string? GuideTeacherName { get; set; }
 	[Display(Name = "Estado")]
 	public string? ProposalStatus { get; set; }
 }
