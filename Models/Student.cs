@@ -11,4 +11,10 @@ public partial class ApplicationUser {
 	[InverseProperty(nameof(StudentProposal.StudentOwnerOfTheStudentProposal))]
 	public virtual ICollection<StudentProposal?>? StudentProposalsWhichIOwn { get; set; } = new HashSet<StudentProposal?>();
 	#endregion
+	#region GuideTeacherProposal
+	[InverseProperty(nameof(GuideTeacherProposal.StudentsWhoAreInterestedInThisGuideTeacherProposal))]
+	public virtual ICollection<GuideTeacherProposal?>? GuideTeacherProposalsWhichImInterested  { get; set; } = new HashSet<GuideTeacherProposal?>();
+	[InverseProperty(nameof(GuideTeacherProposal.StudentWhoIsAssignedToThisGuideTeacherProposal))]
+	public virtual ICollection<GuideTeacherProposal>? GuideTeacherProposalsWhichIHaveBeenAssigned { get; set; } = new HashSet<GuideTeacherProposal>();
+	#endregion
 }
