@@ -5,19 +5,18 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
-using Utal.Icc.Sgm.Areas.Student.Views.StudentProposal;
 using Utal.Icc.Sgm.Controllers;
 using Utal.Icc.Sgm.Data;
 using Utal.Icc.Sgm.Models;
+using Utal.Icc.Sgm.ViewModels;
 
 using static Utal.Icc.Sgm.Models.ApplicationUser;
 
 namespace Utal.Icc.Sgm.Areas.Student.Controllers;
 
 [Area(nameof(Student)), Authorize(Roles = nameof(Roles.Student))]
-public class StudentProposalController : ApplicationController, IAssistantTeacherPopulateable {
-	public StudentProposalController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager) : base(dbContext, userManager) {
-	}
+public class StudentProposalController : ApplicationController, IAssistantTeacherPopulateable, IProposalViewModelFilterable, IProposalViewModelSortableIApplicationUserViewModelFilterable, IApplicationUserViewModelSortable {
+	public StudentProposalController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, IUserEmailStore<ApplicationUser> emailStore, SignInManager<ApplicationUser> signInManager) : base(dbContext, userManager, userStore, emailStore, signInManager) { }
 
 	public async Task Populate(ApplicationUser guideTeacher) {
 		var assistantTeachers = (
@@ -30,12 +29,62 @@ public class StudentProposalController : ApplicationController, IAssistantTeache
 			Value = at.Id
 		});
 	}
+	
+	public IEnumerable<ProposalViewModel> Filter(string searchString, IOrderedEnumerable<ProposalViewModel> viewModels, params string[] parameters) {
+		var result = new List<ProposalViewModel>();
+		foreach (var parameter in parameters) {
+			var partials = viewModels
+					.Where(vm => (vm.GetType().GetProperty(parameter)!.GetValue(vm) as string)!.Contains(searchString));
+			foreach (var partial in partials) {
+				if (!result.Any(vm => vm.Id == partial.Id)) {
+					result.Add(partial);
+				}
+			}
+		}
+		return result.AsEnumerable();
+	}
+
+	public IOrderedEnumerable<ProposalViewModel> Sort(string sortOrder, IEnumerable<ProposalViewModel> viewModels, params string[] parameters) {
+		foreach (var parameter in parameters) {
+			if (parameter == sortOrder) {
+				return viewModels.OrderBy(vm => vm.GetType().GetProperty(parameter)!.GetValue(vm, null));
+			} else if ($"{parameter}Desc" == sortOrder) {
+				return viewModels.OrderByDescending(vm => vm.GetType().GetProperty(parameter)!.GetValue(vm, null));
+			}
+		}
+		return viewModels.OrderBy(vm => vm.GetType().GetProperty(parameters[0]));
+	}
+
+	public IEnumerable<ApplicationUserViewModel> Filter(string searchString, IOrderedEnumerable<ApplicationUserViewModel> viewModels, params string[] parameters) {
+		var result = new List<ApplicationUserViewModel>();
+		foreach (var parameter in parameters) {
+			var partials = viewModels
+					.Where(vm => (vm.GetType().GetProperty(parameter)!.GetValue(vm) as string)!.Contains(searchString));
+			foreach (var partial in partials) {
+				if (!result.Any(vm => vm.Id == partial.Id)) {
+					result.Add(partial);
+				}
+			}
+		}
+		return result.AsEnumerable();
+	}
+
+	public IOrderedEnumerable<ApplicationUserViewModel> Sort(string sortOrder, IEnumerable<ApplicationUserViewModel> viewModels, params string[] parameters) {
+		foreach (var parameter in parameters) {
+			if (parameter == sortOrder) {
+				return viewModels.OrderBy(vm => vm.GetType().GetProperty(parameter)!.GetValue(vm, null));
+			} else if ($"{parameter}Desc" == sortOrder) {
+				return viewModels.OrderByDescending(vm => vm.GetType().GetProperty(parameter)!.GetValue(vm, null));
+			}
+		}
+		return viewModels.OrderBy(vm => vm.GetType().GetProperty(parameters[0]));
+	}
 
 	public async Task<IActionResult> GuideTeacher(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
-		if (await this.CheckSession() is not ApplicationUser student) {
+		if (await base.CheckSession() is null) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
-		var parameters = new[] { nameof(ApplicationUser.FirstName), nameof(ApplicationUser.LastName), nameof(ApplicationUser.Email), nameof(ApplicationUser.TeacherOffice), nameof(ApplicationUser.TeacherSchedule), nameof(ApplicationUser.TeacherSpecialization) };
+		var parameters = new[] { nameof(ApplicationUserViewModel.FirstName), nameof(ApplicationUserViewModel.LastName), nameof(ApplicationUserViewModel.Rut), nameof(ApplicationUserViewModel.Email) };
 		this.SetSortParameters(sortOrder, parameters);
 		if (searchString is not null) {
 			pageNumber = 1;
@@ -43,18 +92,18 @@ public class StudentProposalController : ApplicationController, IAssistantTeache
 			searchString = currentFilter;
 		}
 		this.ViewData["CurrentFilter"] = searchString;
-		var guideTeachers = await this._userManager.GetUsersInRoleAsync(nameof(Roles.GuideTeacher));
-		var orderedGuideTeachers = this.OrderGuideTeachers(sortOrder, guideTeachers, parameters);
-		var guideTeacherViewModels = !searchString.IsNullOrEmpty() ? this.FilterGuideTeachers(searchString, orderedGuideTeachers, parameters) : orderedGuideTeachers.Select(gt => new GuideTeacherViewModel {
-			Id = gt.Id,
-			GuideTeacherFirstName = gt.FirstName,
-			GuideTeacherLastName = gt.LastName,
-			GuideTeacherEmail = gt.Email,
-			GuideTeacherOffice = gt.TeacherOffice,
-			GuideTeacherSchedule = gt.TeacherSchedule,
-			GuideTeacherSpecialization = gt.TeacherSpecialization
-		}).ToList();
-		return this.View(PaginatedList<GuideTeacherViewModel>.Create(guideTeacherViewModels.AsQueryable(), pageNumber ?? 1, 6));
+		var users = (await this._userManager.GetUsersInRoleAsync(nameof(Roles.Teacher))).Select(
+			u => new ApplicationUserViewModel {
+				FirstName = u.FirstName,
+				LastName = u.LastName,
+				Rut = u.Rut,
+				Email = u.Email,
+				IsDeactivated = u.IsDeactivated
+			}
+		);
+		var ordered = this.Sort(sortOrder, users, parameters);
+		var viewModels = !searchString.IsNullOrEmpty() ? this.Filter(searchString, ordered, parameters) : ordered;
+		return this.View(PaginatedList<ApplicationUserViewModel>.Create(viewModels.AsQueryable(), pageNumber ?? 1, 6));
 	}
 
 	public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
