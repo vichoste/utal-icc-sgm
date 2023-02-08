@@ -106,34 +106,16 @@ public class StudentProposalController : Controller {
 				.Where(gt => !gt.IsDeactivated)
 				.OrderBy(gt => gt.LastName)
 				.ToList();
-		var assistantTeachers1 = (
+		var assistantTeachers = (
 			await this._userManager.GetUsersInRoleAsync(nameof(Roles.AssistantTeacher)))
 				.Where(gt => !gt.IsDeactivated)
 				.OrderBy(at => at.LastName)
 				.ToList();
-		var assistantTeachers2 = (
-			await this._userManager.GetUsersInRoleAsync(nameof(Roles.AssistantTeacher)))
-				.Where(gt => !gt.IsDeactivated)
-				.OrderBy(at => at.LastName)
-				.ToList();
-		var assistantTeachers3 = (
-			await this._userManager.GetUsersInRoleAsync(nameof(Roles.AssistantTeacher)))
-				.Where(gt => !gt.IsDeactivated)
-				.OrderBy(at => at.LastName)
-			.ToList();
 		this.ViewData[$"{nameof(Roles.GuideTeacher)}s"] = guideTeachers.Select(gt => new SelectListItem {
 			Text = $"{gt.FirstName} {gt.LastName}",
 			Value = gt.Id
 		});
-		this.ViewData[$"{nameof(Roles.AssistantTeacher)}s1"] = assistantTeachers1.Select(at => new SelectListItem {
-			Text = $"{at.FirstName} {at.LastName}",
-			Value = at.Id
-		});
-		this.ViewData[$"{nameof(Roles.AssistantTeacher)}s2"] = assistantTeachers2.Select(at => new SelectListItem {
-			Text = $"{at.FirstName} {at.LastName}",
-			Value = at.Id
-		});
-		this.ViewData[$"{nameof(Roles.AssistantTeacher)}s3"] = assistantTeachers3.Select(at => new SelectListItem {
+		this.ViewData[$"{nameof(Roles.AssistantTeacher)}s"] = assistantTeachers.Select(at => new SelectListItem {
 			Text = $"{at.FirstName} {at.LastName}",
 			Value = at.Id
 		});
@@ -193,12 +175,20 @@ public class StudentProposalController : Controller {
 		return this.View(PaginatedList<IndexViewModel>.Create(filteredAndOrderedProposals.AsQueryable(), pageNumber ?? 1, 6));
 	}
 
-	public async Task<IActionResult> Create() {
+	public async Task<IActionResult> Create(string id) {
 		if (await this.CheckStudentSession() is null) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
 		await this.PopulateTeachers();
-		return this.View(new CreateViewModel());
+		if (await this.CheckApplicationUser(id) is not ApplicationUser guideTeacher) {
+			this.TempData["ErrorMessage"] = "Error al obtener al profesor guía.";
+			return this.RedirectToAction(nameof(StudentProposalController.Index), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Student) });
+		}
+		var createViewModel = new CreateViewModel {
+			GuideTeacherId = guideTeacher.Id,
+			GuideTeacher = $"{guideTeacher.FirstName} {guideTeacher.LastName}",
+		};
+		return this.View(createViewModel);
 	}
 
 	[HttpPost, ValidateAntiForgeryToken]
@@ -215,19 +205,20 @@ public class StudentProposalController : Controller {
 		}
 		await this.PopulateTeachers();
 		if (await this.CheckApplicationUser(model.GuideTeacher!) is not ApplicationUser guideTeacher) {
-			this.ViewBag.WarningMessage = "Revisa tu selección del profesor guía.";
-			return this.View(new CreateViewModel {
-				Title = model.Title,
-				Description = model.Description,
-			});
+			this.TempData["ErrorMessage"] = "Revisa tu selección del profesor guía.";
+			return this.RedirectToAction(nameof(StudentProposalController.Index), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Student) });
 		}
-
-		if (!teacherCheck) {
-			this.ViewBag.WarningMessage = "Revisa tu selección de profesores.";
-			return this.View(new CreateViewModel {
-				Title = model.Title,
-				Description = model.Description,
-			});
+		var assistantTeachers =  model.AssistantTeachers!.Select(at => this._dbContext.Users!.AsNoTracking().FirstOrDefault(u => u.Id == at)).ToList();
+		foreach (var assistantTeacher in assistantTeachers) {
+			if (await this.CheckApplicationUser(assistantTeacher!.Id) is null) {
+				this.ViewBag.WarningMessage = "Revisa tu selección del profesor asistente.";
+				return this.View(new CreateViewModel {
+					GuideTeacherId = model.GuideTeacherId,
+					GuideTeacher = model.GuideTeacher,
+					Title = model.Title,
+					Description = model.Description
+				});
+			}
 		}
 		var studentProposal = new StudentProposal {
 			Id = Guid.NewGuid().ToString(),
@@ -266,9 +257,7 @@ public class StudentProposalController : Controller {
 			Title = studentProposal!.Title,
 			Description = studentProposal.Description,
 			GuideTeacher = studentProposal.GuideTeacherOfTheStudentProposal!.Id,
-			AssistantTeacher1 = studentProposal.AssistantTeacher1OfTheStudentProposal?.Id,
-			AssistantTeacher2 = studentProposal.AssistantTeacher2OfTheStudentProposal?.Id,
-			AssistantTeacher3 = studentProposal.AssistantTeacher3OfTheStudentProposal?.Id,
+			AssistantTeachers = 
 			CreatedAt = studentProposal.CreatedAt,
 			UpdatedAt = studentProposal.UpdatedAt
 		};

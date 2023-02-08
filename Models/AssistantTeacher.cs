@@ -5,10 +5,10 @@ namespace Utal.Icc.Sgm.Models;
 public partial class ApplicationUser {
 	#region StudentProposal
 	[InverseProperty(nameof(StudentProposal.AssistantTeachersOfTheStudentProposal))]
-	public virtual ICollection<StudentProposal>? ImAssistantTeacherOfTheStudentProposals { get; set; } = new HashSet<StudentProposal>();
+	public virtual ICollection<StudentProposal?>? ImAssistantTeacherOfTheStudentProposals { get; set; } = new HashSet<StudentProposal?>();
 	#endregion
 	#region GuideTeacherProposal
 	[InverseProperty(nameof(GuideTeacherProposal.AssistantTeachersOfTheGuideTeacherProposal))]
-	public virtual ICollection<GuideTeacherProposal>? ImAssistantTeacherOfTheGuideTeacherProposals { get; set; } = new HashSet<GuideTeacherProposal>();
+	public virtual ICollection<GuideTeacherProposal?>? ImAssistantTeacherOfTheGuideTeacherProposals { get; set; } = new HashSet<GuideTeacherProposal?>();
 	#endregion
 }

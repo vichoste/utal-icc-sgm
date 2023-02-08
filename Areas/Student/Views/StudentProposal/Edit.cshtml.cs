@@ -11,7 +11,7 @@ public class EditViewModel {
 	public string? Description { get; set; }
 	[Display(Name = "Profesor guía"), Required]
 	public string? GuideTeacher { get; set; }
-	[Display(Name = "Profesores co-guía"), Required]
+	[Display(Name = "Profesores co-guía")]
 	public ICollection<string>? AssistantTeachers { get; set; } = new HashSet<string>();
 	[Display(Name = "Creado"), Required]
 	public DateTimeOffset? CreatedAt { get; set; }

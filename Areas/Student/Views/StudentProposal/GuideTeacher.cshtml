@@ -13,8 +13,11 @@
 <div class="container">
 	<partial name="_Alerts" />
 	<div class="row justify-content-center">
-		<div class="col-12 mb-3">
+		<div class="col-12 col-md-10 mb-3">
 			<h2>@this.ViewData["Title"]</h2>
+		</div>
+		<div class="col-12 col-md-2 mb-3">
+			@this.Html.ActionLink("Volver", nameof(StudentProposalController.Index), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.Student) }, new { @class = "btn btn-secondary"})
 		</div>
 		<div class="col-12 mb-3">
 			<partial name="_Filter" , model=@(new FilterPartialViewModel(nameof(StudentProposalController.GuideTeacher), nameof(StudentProposalController).Replace("Controller", string.Empty), nameof(Utal.Icc.Sgm.Areas.Student))) />

@@ -30,27 +30,40 @@
 								</div>
 								<div class="form-group mb-3">
 									@this.Html.LabelFor(m => m.GuideTeacher, new { @class = "form-label" })
-									@this.Html.DropDownListFor(m => m.GuideTeacher, (IEnumerable<SelectListItem>)this.ViewData["GuideTeachers"]!, "Seleccionar profesor guía", new { @class = "form-select", @required = "required" })
-									@this.Html.ValidationMessageFor(m => m.GuideTeacher, "Profesor guía requerido", new { @class = "invalid-feedback" })
+									@this.Html.HiddenFor(m => m.GuideTeacherId)
+									@this.Html.HiddenFor(m => m.GuideTeacher)
+									@this.Html.DisplayFor(m => m.GuideTeacher, new { @class = "form-control", @required = "required" })
 								</div>
 								<div class="form-group mb-3">
-									@this.Html.LabelFor(m => m.AssistantTeacher1, new { @class = "form-label" })
-									@this.Html.DropDownListFor(m => m.AssistantTeacher1, (IEnumerable<SelectListItem>)this.ViewData["AssistantTeachers1"]!, "Seleccionar primer profesor co-guía", new { @class = "form-select" })
+									@this.Html.LabelFor(m => m.GuideTeacherEmail, new { @class = "form-label" })
+									@this.Html.HiddenFor(m => m.GuideTeacherEmail)
+									@this.Html.DisplayFor(m => m.GuideTeacherEmail, new { @class = "form-control", @required = "required" })
 								</div>
 								<div class="form-group mb-3">
-									@this.Html.LabelFor(m => m.AssistantTeacher2, new { @class = "form-label" })
-									@this.Html.DropDownListFor(m => m.AssistantTeacher2, (IEnumerable<SelectListItem>)this.ViewData["AssistantTeachers2"]!, "Seleccionar segundo profesor co-guía", new { @class = "form-select" })
+									@this.Html.LabelFor(m => m.GuideTeacherOffice, new { @class = "form-label" })
+									@this.Html.HiddenFor(m => m.GuideTeacherOffice)
+									@this.Html.DisplayFor(m => m.GuideTeacherOffice, new { @class = "form-control", @required = "required" })
 								</div>
 								<div class="form-group mb-3">
-									@this.Html.LabelFor(m => m.AssistantTeacher3, new { @class = "form-label" })
-									@this.Html.DropDownListFor(m => m.AssistantTeacher3, (IEnumerable<SelectListItem>)this.ViewData["AssistantTeachers3"]!, "Seleccionar tercer profesor co-guía", new { @class = "form-select" })
+									@this.Html.LabelFor(m => m.GuideTeacherSchedule, new { @class = "form-label" })
+									@this.Html.HiddenFor(m => m.GuideTeacherSchedule)
+									@this.Html.DisplayFor(m => m.GuideTeacherSchedule, new { @class = "form-control", @required = "required" })
+								</div>
+								<div class="form-group mb-3">
+									@this.Html.LabelFor(m => m.GuideTeacherSpecialization, new { @class = "form-label" })
+									@this.Html.HiddenFor(m => m.GuideTeacherSpecialization)
+									@this.Html.DisplayFor(m => m.GuideTeacherSpecialization, new { @class = "form-control", @required = "required" })
+								</div>
+								<div class="form-group mb-3">
+									@this.Html.LabelFor(m => m.AssistantTeachers, new { @class = "form-label" })
+									@this.Html.ListBoxFor(m => m.AssistantTeachers, new MultiSelectList((IEnumerable<SelectListItem>)this.ViewData["AssistantTeachers"]!), new { @class = "form-select", @multiple = "multiple" })
 								</div>
 							</div>
 						</div>
 						<div class="row text-center">
 							<div class="col">
 								<div class="btn-group">
-									@this.Html.ActionLink("Cancelar", nameof(StudentProposalController.Index), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.Student) }, new { @class = "btn btn-secondary" })
+									@this.Html.ActionLink("Volver", nameof(StudentProposalController.GuideTeacher), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.Student) }, new { @class = "btn btn-secondary" })
 									<button type="submit" class="btn btn-success">Crear</button>
 								</div>
 							</div>
