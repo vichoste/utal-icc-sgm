@@ -17,7 +17,7 @@
 					@using (this.Html.BeginForm(nameof(StudentProposalController.Edit), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.Student) })) {
 						@this.Html.AntiForgeryToken()
 						@this.Html.HiddenFor(m => m.Id)
-						<div class="row was-validated">
+						<div class="row">
 							<div class="col">
 								<div class="form-group mb-3">
 									@this.Html.LabelFor(m => m.Title, new { @class = "form-label" })

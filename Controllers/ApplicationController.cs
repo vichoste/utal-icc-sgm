@@ -9,12 +9,14 @@ public abstract class ApplicationController : Controller {
 	protected readonly UserManager<ApplicationUser> _userManager;
 	protected readonly IUserStore<ApplicationUser> _userStore;
 	protected readonly IUserEmailStore<ApplicationUser> _emailStore;
+	protected readonly SignInManager<ApplicationUser> _signInManager;
 
-	public ApplicationController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, IUserEmailStore<ApplicationUser> emailStore) {
+	public ApplicationController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, IUserEmailStore<ApplicationUser> emailStore, SignInManager<ApplicationUser> signInManager) {
 		this._dbContext = dbContext;
 		this._userManager = userManager;
 		this._userStore = userStore;
 		this._emailStore = (IUserEmailStore<ApplicationUser>)this._userStore;
+		this._signInManager = signInManager;
 	}
 
 	protected async Task<ApplicationUser> CheckSession() {

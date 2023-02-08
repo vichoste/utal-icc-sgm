@@ -2,15 +2,14 @@
 using Microsoft.AspNetCore.Mvc;
 
 using Utal.Icc.Sgm.Controllers;
+using Utal.Icc.Sgm.Data;
 using Utal.Icc.Sgm.Models;
 
 namespace Utal.Icc.Sgm.Areas.Account.Controllers;
 
 [Area(nameof(Account))]
-public class SignOutController : Controller {
-	private readonly SignInManager<ApplicationUser> _signInManager;
-
-	public SignOutController(SignInManager<ApplicationUser> signInManager) => this._signInManager = signInManager;
+public class SignOutController : ApplicationController {
+	public SignOutController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, IUserEmailStore<ApplicationUser> emailStore, SignInManager<ApplicationUser> signInManager) : base(dbContext, userManager, userStore, emailStore, signInManager) { }
 
 	public async Task<IActionResult> Index() {
 		if (this.User.Identity!.IsAuthenticated) {

@@ -1,4 +1,4 @@
-﻿@using Utal.Icc.Sgm.Areas.Account.Views.SignIn
+﻿@using Utal.Icc.Sgm.Areas.Account.ViewModels.SignIn
 @using Utal.Icc.Sgm.Areas.Account.Controllers
 
 @model IndexViewModel
@@ -16,17 +16,15 @@
 				<div class="card-body">
 					@using (this.Html.BeginForm(nameof(SignInController.Index), nameof(SignInController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.Account) })) {
 						@this.Html.AntiForgeryToken()
-						<div class="row was-validated">
+						<div class="row">
 							<div class="col">
 								<div class="form-group mb-3">
 									@this.Html.LabelFor(m => m.Email, new { @class = "form-label" })
 									@this.Html.TextBoxFor(m => m.Email, new { @class = "form-control", @required = "required" })
-									@this.Html.ValidationMessageFor(m => m.Email, "Ingresa tu e-mail", new { @class = "invalid-feedback" })
 								</div>
 								<div class="form-group mb-3">
 									@this.Html.LabelFor(m => m.Password, new { @class = "form-label" })
 									@this.Html.PasswordFor(m => m.Password, new { @class = "form-control", @required = "required" })
-									@this.Html.ValidationMessageFor(m => m.Password, "Ingresa tu contraseña", new { @class = "invalid-feedback" })
 								</div>
 								<div class="form-check">
 									@* TODO: Remove validation for this field *@

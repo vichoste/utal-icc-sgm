@@ -1,7 +1,7 @@
-﻿@using Utal.Icc.Sgm.Areas.Account.Views.Profile
+﻿@using Utal.Icc.Sgm.ViewModels
 @using Utal.Icc.Sgm.Areas.Account.Controllers
 
-@model StudentViewModel
+@model ApplicationUserViewModel
 
 @{
 	this.ViewData["Title"] = "Mi perfil de estudiante";
@@ -20,7 +20,6 @@
 							<div class="col">
 								<div class="form-group mb-3">
 									@this.Html.LabelFor(m => m.StudentUniversityId, new { @class = "form-label" })
-									@this.Html.HiddenFor(m => m.StudentUniversityId)
 									@this.Html.DisplayFor(m => m.StudentUniversityId, new { @class = "form-control" })
 								</div>
 								<div class="form-group mb-3">

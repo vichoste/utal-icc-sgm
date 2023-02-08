@@ -8,5 +8,5 @@ public partial class ApplicationUserViewModel {
 	[Display(Name = "Horarios")]
 	public virtual string? TeacherSchedule { get; set; }
 	[Display(Name = "Especialización")]
-	public virtual bool TeacherSpecialization { get; set; }
+	public virtual string? TeacherSpecialization { get; set; }
 }

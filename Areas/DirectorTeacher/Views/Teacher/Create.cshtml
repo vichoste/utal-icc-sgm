@@ -16,7 +16,7 @@
 				<div class="card-body">
 					@using (this.Html.BeginForm(nameof(TeacherController.Create), nameof(TeacherController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.DirectorTeacher) })) {
 						@this.Html.AntiForgeryToken()
-						<div class="row was-validated">
+						<div class="row">
 							<div class="col">
 								<div class="form-group mb-3">
 									@this.Html.LabelFor(m => m.FirstName, new { @class = "form-label" })

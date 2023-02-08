@@ -15,7 +15,7 @@
 				<div class="card-header text-center">@this.ViewData["Title"]</div>
 				<div class="card-body">
 					@using (this.Html.BeginForm(nameof(StudentController.Create), nameof(StudentController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.DirectorTeacher) }, FormMethod.Post, true, new { @enctype = "multipart/form-data" })) {
-						<div class="row was-validated">
+						<div class="row">
 							<div class="col">
 								<div class="mb-3">
 									@this.Html.LabelFor(m => m.CsvFile, new { @class = "form-label" })
