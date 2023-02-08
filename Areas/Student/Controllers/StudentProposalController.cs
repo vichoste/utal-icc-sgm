@@ -116,7 +116,7 @@ public class StudentProposalController : ApplicationController {
 		if (await base.CheckSession() is not ApplicationUser user) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
-		var parameters = new[] { nameof(StudentProposal.Title), nameof(Roles.GuideTeacher) };
+		var parameters = new[] { nameof(StudentProposalViewModel.Title), nameof(StudentProposalViewModel.GuideTeacherName) };
 		this.SetSortParameters(sortOrder, parameters);
 		if (searchString is not null) {
 			pageNumber = 1;
