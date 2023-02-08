@@ -1,5 +1,3 @@
-using System.Globalization;
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -19,19 +17,8 @@ namespace Utal.Icc.Sgm.Areas.DirectorTeacher.Controllers;
 public class TeacherController : ApplicationController, IApplicationUserViewModelFilterable, IApplicationUserViewModelSortable {
 	public TeacherController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, IUserEmailStore<ApplicationUser> emailStore) : base(dbContext, userManager, userStore, emailStore) { }
 
-	public IOrderedEnumerable<T> Sort<T>(string sortOrder, IEnumerable<T> viewModels, params string[] parameters) where T : ApplicationUserViewModel {
-		foreach (var parameter in parameters) {
-			if (parameter == sortOrder) {
-				return viewModels.OrderBy(vm => vm.GetType().GetProperty(parameter)!.GetValue(vm, null));
-			} else if ($"{parameter}Desc" == sortOrder) {
-				return viewModels.OrderByDescending(vm => vm.GetType().GetProperty(parameter)!.GetValue(vm, null));
-			}
-		}
-		return viewModels.OrderBy(vm => vm.GetType().GetProperty(parameters[0]));
-	}
-
-	public IEnumerable<T> Filter<T>(string searchString, IOrderedEnumerable<T> viewModels, params string[] parameters) where T : ApplicationUserViewModel {
-		var result = new List<T>();
+	public IEnumerable<ApplicationUserViewModel> Filter(string searchString, IOrderedEnumerable<ApplicationUserViewModel> viewModels, params string[] parameters) {
+		var result = new List<ApplicationUserViewModel>();
 		foreach (var parameter in parameters) {
 			var partials = viewModels
 					.Where(vm => (vm.GetType().GetProperty(parameter)!.GetValue(vm) as string)!.Contains(searchString));
@@ -42,6 +29,17 @@ public class TeacherController : ApplicationController, IApplicationUserViewMode
 			}
 		}
 		return result.AsEnumerable();
+	}
+
+	public IOrderedEnumerable<ApplicationUserViewModel> Sort(string sortOrder, IEnumerable<ApplicationUserViewModel> viewModels, params string[] parameters) {
+		foreach (var parameter in parameters) {
+			if (parameter == sortOrder) {
+				return viewModels.OrderBy(vm => vm.GetType().GetProperty(parameter)!.GetValue(vm, null));
+			} else if ($"{parameter}Desc" == sortOrder) {
+				return viewModels.OrderByDescending(vm => vm.GetType().GetProperty(parameter)!.GetValue(vm, null));
+			}
+		}
+		return viewModels.OrderBy(vm => vm.GetType().GetProperty(parameters[0]));
 	}
 
 	public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
@@ -57,14 +55,15 @@ public class TeacherController : ApplicationController, IApplicationUserViewMode
 		}
 		this.ViewData["CurrentFilter"] = searchString;
 		var users = (await this._userManager.GetUsersInRoleAsync(nameof(Roles.Teacher))).Select(
-			vm => new ApplicationUserViewModel {
-				FirstName = vm.FirstName,
-				LastName = vm.LastName,
-				Rut = vm.Rut,
-				Email = vm.Email,
-				IsDeactivated = vm.IsDeactivated
+			async u => new IndexTeacherViewModel {
+				FirstName = u.FirstName,
+				LastName = u.LastName,
+				Rut = u.Rut,
+				Email = u.Email,
+				IsDeactivated = u.IsDeactivated,
+				IsDirectorTeacher = await this._userManager.IsInRoleAsync(u, nameof(Roles.DirectorTeacher)),
 			}
-		);
+		).Select(u => u.Result);
 		var ordered = this.Sort(sortOrder, users, parameters);
 		var viewModels = !searchString.IsNullOrEmpty() ? this.Filter(searchString, ordered, parameters) : ordered;
 		return this.View(PaginatedList<ApplicationUserViewModel>.Create(viewModels.AsQueryable(), pageNumber ?? 1, 6));
@@ -116,14 +115,18 @@ public class TeacherController : ApplicationController, IApplicationUserViewMode
 			this.TempData["ErrorMessage"] = "Error al obtener al profesor.";
 			return this.RedirectToAction(nameof(TeacherController.Index), nameof(TeacherController).Replace("Controller", string.Empty), new { area = nameof(DirectorTeacher) });
 		}
-		var output = new ApplicationUserViewModel {
+		var output = new EditTeacherViewModel {
 			Id = id,
 			FirstName = user.FirstName,
 			LastName = user.LastName,
 			Rut = user.Rut,
 			Email = user.Email,
 			CreatedAt = user.CreatedAt,
-			UpdatedAt = user.UpdatedAt
+			UpdatedAt = user.UpdatedAt,
+			IsAssistantTeacher = await this._userManager.IsInRoleAsync(user, nameof(Roles.AssistantTeacher)),
+			IsCommitteeTeacher = await this._userManager.IsInRoleAsync(user, nameof(Roles.CommitteeTeacher)),
+			IsCourseTeacher = await this._userManager.IsInRoleAsync(user, nameof(Roles.CourseTeacher)),
+			IsGuideTeacher = await this._userManager.IsInRoleAsync(user, nameof(Roles.GuideTeacher)),
 		};
 		return this.View(output);
 	}
@@ -167,7 +170,12 @@ public class TeacherController : ApplicationController, IApplicationUserViewMode
 			return this.RedirectToAction(nameof(TeacherController.Index), nameof(TeacherController).Replace("Controller", string.Empty), new { area = nameof(DirectorTeacher) });
 		}
 		if (user!.Id == this._userManager.GetUserId(this.User)) {
-			this.TempData["ErrorMessage"] = !user.IsDeactivated ? "No te puedes desactivar a tí mismo." : "¡No deberías haber llegado a este punto!";
+			this.TempData["ErrorMessage"] = "No te puedes desactivar a tí mismo.";
+			return this.RedirectToAction(nameof(StudentController.Index), nameof(StudentController).Replace("Controller", string.Empty), new { area = nameof(DirectorTeacher) });
+		}
+		var roles = (await this._userManager.GetRolesAsync(user)).ToList();
+		if (roles.Contains(nameof(Roles.DirectorTeacher))) {
+			this.TempData["ErrorMessage"] = "No puedes desactivar al director de carrera actual.";
 			return this.RedirectToAction(nameof(TeacherController.Index), nameof(TeacherController).Replace("Controller", string.Empty), new { area = nameof(DirectorTeacher) });
 		}
 		var output = new ApplicationUserViewModel {
@@ -188,6 +196,15 @@ public class TeacherController : ApplicationController, IApplicationUserViewMode
 			this.TempData["ErrorMessage"] = "Error al obtener al profesor.";
 			return this.RedirectToAction(nameof(TeacherController.Index), nameof(TeacherController).Replace("Controller", string.Empty), new { area = nameof(DirectorTeacher) });
 		}
+		if (user!.Id == this._userManager.GetUserId(this.User)) {
+			this.TempData["ErrorMessage"] = "No te puedes desactivar a tí mismo.";
+			return this.RedirectToAction(nameof(StudentController.Index), nameof(StudentController).Replace("Controller", string.Empty), new { area = nameof(DirectorTeacher) });
+		}
+		var roles = (await this._userManager.GetRolesAsync(user)).ToList();
+		if (roles.Contains(nameof(Roles.DirectorTeacher))) {
+			this.TempData["ErrorMessage"] = "No puedes desactivar al director de carrera actual.";
+			return this.RedirectToAction(nameof(TeacherController.Index), nameof(TeacherController).Replace("Controller", string.Empty), new { area = nameof(DirectorTeacher) });
+		}
 		user.IsDeactivated = !input.IsDeactivated;
 		user.UpdatedAt = DateTimeOffset.Now;
 		_ = await this._userManager.UpdateAsync(user);
@@ -196,7 +213,7 @@ public class TeacherController : ApplicationController, IApplicationUserViewMode
 	}
 
 	public async Task<IActionResult> Transfer(string currentDirectorTeacherId, string newDirectorTeacherId) {
-		if (await this.CheckTeacherSession() is null) {
+		if (await base.CheckSession() is null) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
 		var currentDirectorTeacher = await this._userManager.FindByIdAsync(currentDirectorTeacherId);

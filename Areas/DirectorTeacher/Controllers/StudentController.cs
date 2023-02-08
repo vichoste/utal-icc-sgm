@@ -22,19 +22,8 @@ namespace Utal.Icc.Sgm.Areas.DirectorTeacher.Controllers;
 public class StudentController : ApplicationController, IApplicationUserViewModelFilterable, IApplicationUserViewModelSortable {
 	public StudentController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, IUserEmailStore<ApplicationUser> emailStore) : base(dbContext, userManager, userStore, emailStore) { }
 
-	public IOrderedEnumerable<T> Sort<T>(string sortOrder, IEnumerable<T> viewModels, params string[] parameters) where T : ApplicationUserViewModel {
-		foreach (var parameter in parameters) {
-			if (parameter == sortOrder) {
-				return viewModels.OrderBy(vm => vm.GetType().GetProperty(parameter)!.GetValue(vm, null));
-			} else if ($"{parameter}Desc" == sortOrder) {
-				return viewModels.OrderByDescending(vm => vm.GetType().GetProperty(parameter)!.GetValue(vm, null));
-			}
-		}
-		return viewModels.OrderBy(vm => vm.GetType().GetProperty(parameters[0]));
-	}
-
-	public IEnumerable<T> Filter<T>(string searchString, IOrderedEnumerable<T> viewModels, params string[] parameters) where T : ApplicationUserViewModel {
-		var result = new List<T>();
+	public IEnumerable<ApplicationUserViewModel> Filter(string searchString, IOrderedEnumerable<ApplicationUserViewModel> viewModels, params string[] parameters) {
+		var result = new List<ApplicationUserViewModel>();
 		foreach (var parameter in parameters) {
 			var partials = viewModels
 					.Where(vm => (vm.GetType().GetProperty(parameter)!.GetValue(vm) as string)!.Contains(searchString));
@@ -45,6 +34,17 @@ public class StudentController : ApplicationController, IApplicationUserViewMode
 			}
 		}
 		return result.AsEnumerable();
+	}
+
+	public IOrderedEnumerable<ApplicationUserViewModel> Sort(string sortOrder, IEnumerable<ApplicationUserViewModel> viewModels, params string[] parameters) {
+		foreach (var parameter in parameters) {
+			if (parameter == sortOrder) {
+				return viewModels.OrderBy(vm => vm.GetType().GetProperty(parameter)!.GetValue(vm, null));
+			} else if ($"{parameter}Desc" == sortOrder) {
+				return viewModels.OrderByDescending(vm => vm.GetType().GetProperty(parameter)!.GetValue(vm, null));
+			}
+		}
+		return viewModels.OrderBy(vm => vm.GetType().GetProperty(parameters[0]));
 	}
 
 	public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
@@ -60,13 +60,13 @@ public class StudentController : ApplicationController, IApplicationUserViewMode
 		}
 		this.ViewData["CurrentFilter"] = searchString;
 		var users = (await this._userManager.GetUsersInRoleAsync(nameof(Roles.Student))).Select(
-			vm => new ApplicationUserViewModel {
-				FirstName = vm .FirstName,
-				LastName = vm .LastName,
-				StudentUniversityId = vm.StudentUniversityId,
-				Rut = vm.Rut,
-				Email = vm.Email,
-				IsDeactivated = vm.IsDeactivated
+			u => new ApplicationUserViewModel {
+				FirstName = u.FirstName,
+				LastName = u.LastName,
+				StudentUniversityId = u.StudentUniversityId,
+				Rut = u.Rut,
+				Email = u.Email,
+				IsDeactivated = u.IsDeactivated
 			}
 		);
 		var ordered = this.Sort(sortOrder, users, parameters);
@@ -183,7 +183,7 @@ public class StudentController : ApplicationController, IApplicationUserViewMode
 			return this.RedirectToAction(nameof(StudentController.Index), nameof(StudentController).Replace("Controller", string.Empty), new { area = nameof(DirectorTeacher) });
 		}
 		if (user!.Id == this._userManager.GetUserId(this.User)) {
-			this.TempData["ErrorMessage"] = !user.IsDeactivated ? "No te puedes desactivar a tí mismo." : "¡No deberías haber llegado a este punto!";
+			this.TempData["ErrorMessage"] = "No te puedes desactivar a tí mismo.";
 			return this.RedirectToAction(nameof(StudentController.Index), nameof(StudentController).Replace("Controller", string.Empty), new { area = nameof(DirectorTeacher) });
 		}
 		var output = new ApplicationUserViewModel {
@@ -202,6 +202,10 @@ public class StudentController : ApplicationController, IApplicationUserViewMode
 		var user = await this._userManager.FindByIdAsync(input.Id!);
 		if (user is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener al estudiante.";
+			return this.RedirectToAction(nameof(StudentController.Index), nameof(StudentController).Replace("Controller", string.Empty), new { area = nameof(DirectorTeacher) });
+		}
+		if (user!.Id == this._userManager.GetUserId(this.User)) {
+			this.TempData["ErrorMessage"] = "No te puedes desactivar a tí mismo.";
 			return this.RedirectToAction(nameof(StudentController.Index), nameof(StudentController).Replace("Controller", string.Empty), new { area = nameof(DirectorTeacher) });
 		}
 		user.IsDeactivated = !input.IsDeactivated;

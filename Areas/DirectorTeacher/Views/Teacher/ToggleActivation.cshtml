@@ -1,7 +1,7 @@
-﻿@using Utal.Icc.Sgm.Areas.DirectorTeacher.Views.Teacher
+﻿@using Utal.Icc.Sgm.ViewModels
 @using Utal.Icc.Sgm.Areas.DirectorTeacher.Controllers
 
-@model ToggleActivationViewModel
+@model ApplicationUserViewModel
 
 @{
 	this.ViewData["Title"] = !this.Model.IsDeactivated ? "Desactivar profesor" : "Activar profesor";
@@ -15,8 +15,6 @@
 			@using (this.Html.BeginForm(nameof(TeacherController.ToggleActivation), nameof(TeacherController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.DirectorTeacher) })) {
 				@this.Html.AntiForgeryToken()
 				@this.Html.HiddenFor(m => m.Id)
-				@this.Html.HiddenFor(m => m.Email)
-				@this.Html.HiddenFor(m => m.IsDeactivated)
 				@if (!this.Model.IsDeactivated) {
 					<h5 class="card-title">¿Estás seguro que quieres <b class="text-danger">desactivar</b> a este profesor?</h5>
 				} else {
