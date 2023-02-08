@@ -34,7 +34,7 @@ public class StudentProposalController : ApplicationController {
 		var result = new List<StudentProposalViewModel>();
 		foreach (var parameter in parameters) {
 			var partials = viewModels
-					.Where(vm => (vm.GetType().GetProperty(parameter)!.GetValue(vm, null) as string)!.Contains(searchString));
+					.Where(vm => !(vm.GetType().GetProperty(parameter)!.GetValue(vm, null) as string)!.IsNullOrEmpty() && (vm.GetType().GetProperty(parameter)!.GetValue(vm, null) as string)!.Contains(searchString));
 			foreach (var partial in partials) {
 				if (!result.Any(vm => vm.Id == partial.Id)) {
 					result.Add(partial);
