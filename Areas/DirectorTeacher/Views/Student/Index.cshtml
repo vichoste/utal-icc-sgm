@@ -1,9 +1,9 @@
 ﻿@using Utal.Icc.Sgm
-@using Utal.Icc.Sgm.Areas.DirectorTeacher.Views.Student
+@using Utal.Icc.Sgm.ViewModels
 @using Utal.Icc.Sgm.Views.Shared
 @using Utal.Icc.Sgm.Areas.DirectorTeacher.Controllers
 
-@model PaginatedList<IndexViewModel>
+@model PaginatedList<ApplicationUserViewModel>
 
 @{
 	this.ViewData["Title"] = "Estudiantes";
@@ -62,7 +62,7 @@
 								@if (item.IsDeactivated) {
 									<td class="text-muted">@item.FirstName</td>
 									<td class="text-muted">@item.LastName</td>
-									<td class="text-muted">@item.UniversityId</td>
+									<td class="text-muted">@item.StudentUniversityId</td>
 									<td class="text-muted">@item.Rut</td>
 									<td class="text-muted">@item.Email</td>
 									<td>
@@ -71,7 +71,7 @@
 								} else {
 									<td>@item.FirstName</td>
 									<td>@item.LastName</td>
-									<td>@item.UniversityId</td>
+									<td>@item.StudentUniversityId</td>
 									<td>@item.Rut</td>
 									<td>@item.Email</td>
 									<td>

@@ -2,7 +2,7 @@
 
 namespace Utal.Icc.Sgm.Areas.Student.Views.StudentProposal;
 
-public class IndexViewModel {
+public class ProposalViewModel {
 	[Display(Name = "ID")]
 	public string? Id { get; set; }
 	[Display(Name = "Título")]

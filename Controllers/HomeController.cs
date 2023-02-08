@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Utal.Icc.Sgm.Views.Shared;
 
 namespace Utal.Icc.Sgm.Controllers;
+
 public class HomeController : Controller {
 	public HomeController() { }
 

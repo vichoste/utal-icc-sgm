@@ -7,69 +7,37 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 
-using Utal.Icc.Sgm.Areas.DirectorTeacher.Views.Student;
+using Utal.Icc.Sgm.Areas.DirectorTeacher.Helpers;
+using Utal.Icc.Sgm.Areas.DirectorTeacher.ViewModels;
 using Utal.Icc.Sgm.Controllers;
+using Utal.Icc.Sgm.Data;
 using Utal.Icc.Sgm.Models;
+using Utal.Icc.Sgm.ViewModels;
 
 using static Utal.Icc.Sgm.Models.ApplicationUser;
 
 namespace Utal.Icc.Sgm.Areas.DirectorTeacher.Controllers;
 
 [Area(nameof(DirectorTeacher)), Authorize(Roles = nameof(Roles.DirectorTeacher))]
-public class StudentController : Controller {
-	private readonly UserManager<ApplicationUser> _userManager;
-	private readonly IUserStore<ApplicationUser> _userStore;
-	private readonly IUserEmailStore<ApplicationUser> _emailStore;
+public class StudentController : ApplicationController, IApplicationUserViewModelFilterable, IApplicationUserViewModelSortable {
+	public StudentController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, IUserEmailStore<ApplicationUser> emailStore) : base(dbContext, userManager, userStore, emailStore) { }
 
-	public StudentController(UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore) {
-		this._userManager = userManager;
-		this._userStore = userStore;
-		this._emailStore = (IUserEmailStore<ApplicationUser>)this._userStore;
-	}
-
-	protected async Task<ApplicationUser> CheckTeacherSession() {
-		var teacher = await this._userManager.GetUserAsync(this.User);
-		return teacher is null || teacher.IsDeactivated ? null! : teacher;
-	}
-	protected async Task<ApplicationUser?> CheckApplicationUser(string applicationUserId) => await this._userManager.FindByIdAsync(applicationUserId);
-
-	protected async Task<ApplicationUser?> CheckApplicationUserStatus(string applicationUserId) {
-		var applicationUser = await this._userManager.FindByIdAsync(applicationUserId);
-		return applicationUser is null || applicationUser.IsDeactivated ? null : applicationUser;
-	}
-
-	protected void SetSortParameters(string sortOrder, params string[] parameters) {
-		foreach (var parameter in parameters) {
-			this.ViewData[$"{parameter}SortParam"] = sortOrder == parameter ? $"{parameter}Desc" : parameter;
-		}
-		this.ViewData["CurrentSort"] = sortOrder;
-	}
-
-	protected IOrderedEnumerable<ApplicationUser> OrderStudents(string sortOrder, IEnumerable<ApplicationUser> students, params string[] parameters) {
+	public IOrderedEnumerable<T> Sort<T>(string sortOrder, IEnumerable<T> applicationUserViewModels, params string[] parameters) where T : ApplicationUserViewModel {
 		foreach (var parameter in parameters) {
 			if (parameter == sortOrder) {
-				return students.OrderBy(s => s.GetType().GetProperty(parameter)!.GetValue(s, null));
+				return applicationUserViewModels.OrderBy(s => s.GetType().GetProperty(parameter)!.GetValue(s, null));
 			} else if ($"{parameter}Desc" == sortOrder) {
-				return students.OrderByDescending(s => s.GetType().GetProperty(parameter)!.GetValue(s, null));
+				return applicationUserViewModels.OrderByDescending(s => s.GetType().GetProperty(parameter)!.GetValue(s, null));
 			}
 		}
-		return students.OrderBy(s => s.GetType().GetProperty(parameters[0]));
+		return applicationUserViewModels.OrderBy(s => s.GetType().GetProperty(parameters[0]));
 	}
 
-	protected IEnumerable<IndexViewModel> FilterStudents(string searchString, IOrderedEnumerable<ApplicationUser> students, params string[] parameters) {
-		var result = new List<IndexViewModel>();
+	public IEnumerable<T> Filter<T>(string searchString, IOrderedEnumerable<T> applicationUserViewModels, params string[] parameters) where T : ApplicationUserViewModel {
+		var result = new List<T>();
 		foreach (var parameter in parameters) {
-			var partials = students
-					.Where(s => (s.GetType().GetProperty(parameter)!.GetValue(s) as string)!.Contains(searchString))
-					.Select(s => new IndexViewModel {
-						Id = s.Id,
-						FirstName = s.FirstName,
-						LastName = s.LastName,
-						UniversityId = s.StudentUniversityId,
-						Rut = s.Rut,
-						Email = s.Email,
-						IsDeactivated = s.IsDeactivated
-					});
+			var partials = applicationUserViewModels
+					.Where(s => (s.GetType().GetProperty(parameter)!.GetValue(s) as string)!.Contains(searchString));
 			foreach (var partial in partials) {
 				if (!result.Any(ivm => ivm.Id == partial.Id)) {
 					result.Add(partial);
@@ -80,10 +48,10 @@ public class StudentController : Controller {
 	}
 
 	public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
-		if (await this.CheckTeacherSession() is null) {
+		if (await base.CheckSession() is null) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
-		var parameters = new[] { nameof(ApplicationUser.FirstName), nameof(ApplicationUser.LastName), nameof(ApplicationUser.StudentUniversityId), nameof(ApplicationUser.Rut), nameof(ApplicationUser.Email) };
+		var parameters = new[] { nameof(ApplicationUserViewModel.FirstName), nameof(ApplicationUserViewModel.LastName), nameof(ApplicationUserViewModel.StudentUniversityId), nameof(ApplicationUserViewModel.Rut), nameof(ApplicationUserViewModel.Email) };
 		this.SetSortParameters(sortOrder, parameters);
 		if (searchString is not null) {
 			pageNumber = 1;
@@ -91,27 +59,28 @@ public class StudentController : Controller {
 			searchString = currentFilter;
 		}
 		this.ViewData["CurrentFilter"] = searchString;
-		var students = await this._userManager.GetUsersInRoleAsync(nameof(Roles.Student));
-		var orderedStudents = this.OrderStudents(sortOrder, students, parameters);
-		var indexViewModels = !searchString.IsNullOrEmpty() ? this.FilterStudents(searchString, orderedStudents, parameters) : orderedStudents.Select(s => new IndexViewModel {
-			Id = s.Id,
-			FirstName = s.FirstName,
-			LastName = s.LastName,
-			UniversityId = s.StudentUniversityId,
-			Rut = s.Rut,
-			Email = s.Email,
-			IsDeactivated = s.IsDeactivated
-		}).ToList();
-		return this.View(PaginatedList<IndexViewModel>.Create(indexViewModels.AsQueryable(), pageNumber ?? 1, 6));
+		var users = (await this._userManager.GetUsersInRoleAsync(nameof(Roles.Student))).Select(
+			s => new ApplicationUserViewModel {
+				FirstName = s.FirstName,
+				LastName = s.LastName,
+				StudentUniversityId = s.StudentUniversityId,
+				Rut = s.Rut,
+				Email = s.Email,
+				IsDeactivated = s.IsDeactivated
+			}
+		);
+		var ordered = this.Sort(sortOrder, users, parameters);
+		var viewModels = !searchString.IsNullOrEmpty() ? this.Filter(searchString, ordered, parameters) : ordered;
+		return this.View(PaginatedList<ApplicationUserViewModel>.Create(viewModels.AsQueryable(), pageNumber ?? 1, 6));
 	}
 
-	public async Task<IActionResult> Create() => await this.CheckTeacherSession() is not ApplicationUser teacher
+	public async Task<IActionResult> Create() => await base.CheckSession() is not ApplicationUser teacher
 			? this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty })
-			: teacher.IsDeactivated ? this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty }) : this.View(new InputViewModel());
+			: teacher.IsDeactivated ? this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty }) : this.View(new CsvFileViewModel());
 
 	[HttpPost]
-	public async Task<IActionResult> Create([FromForm] InputViewModel model) {
-		if (await this.CheckTeacherSession() is null) {
+	public async Task<IActionResult> Create([FromForm] CsvFileViewModel model) {
+		if (await base.CheckSession() is null) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
 		try {
@@ -119,7 +88,7 @@ public class StudentController : Controller {
 			var successMessages = new List<string>();
 			using var reader = new StreamReader(model.CsvFile!.OpenReadStream());
 			using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
-			var records = csv.GetRecords<CreateViewModel>();
+			var records = csv.GetRecords<CsvFileHelper>();
 			foreach (var record in records) {
 				var user = new ApplicationUser {
 					FirstName = record.FirstName,
@@ -153,44 +122,44 @@ public class StudentController : Controller {
 	}
 
 	public async Task<IActionResult> Edit(string id) {
-		if (await this.CheckTeacherSession() is null) {
+		if (await base.CheckSession() is null) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
-		if (await this.CheckApplicationUser(id) is not ApplicationUser student) {
+		if (await this.CheckApplicationUser(id) is not ApplicationUser user) {
 			this.TempData["ErrorMessage"] = "Error al obtener al estudiante.";
 			return this.RedirectToAction(nameof(StudentController.Index), nameof(StudentController).Replace("Controller", string.Empty), new { area = nameof(DirectorTeacher) });
 		}
-		var editViewModel = new EditViewModel {
+		var viewModel = new ApplicationUserViewModel {
 			Id = id,
-			FirstName = student.FirstName,
-			LastName = student.LastName,
-			UniversityId = student.StudentUniversityId,
-			Rut = student.Rut,
-			Email = student.Email,
-			CreatedAt = student.CreatedAt,
-			UpdatedAt = student.UpdatedAt
+			FirstName = user.FirstName,
+			LastName = user.LastName,
+			StudentUniversityId = user.StudentUniversityId,
+			Rut = user.Rut,
+			Email = user.Email,
+			CreatedAt = user.CreatedAt,
+			UpdatedAt = user.UpdatedAt
 		};
-		return this.View(editViewModel);
+		return this.View(viewModel);
 	}
 
 	[HttpPost, ValidateAntiForgeryToken]
-	public async Task<IActionResult> Edit([FromForm] EditViewModel model) {
-		if (await this.CheckTeacherSession() is null) {
+	public async Task<IActionResult> Edit([FromForm] ApplicationUserViewModel viewModel) {
+		if (await base.CheckSession() is null) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
-		if (await this.CheckApplicationUser(model.Id!) is not ApplicationUser student) {
+		if (await this.CheckApplicationUser(viewModel.Id!) is not ApplicationUser user) {
 			this.TempData["ErrorMessage"] = "Error al obtener al estudiante.";
 			return this.RedirectToAction(nameof(StudentController.Index), nameof(StudentController).Replace("Controller", string.Empty), new { area = nameof(DirectorTeacher) });
 		}
-		await this._userStore.SetUserNameAsync(student, model.Email, CancellationToken.None);
-		await this._emailStore.SetEmailAsync(student, model.Email, CancellationToken.None);
-		student.FirstName = model.FirstName;
-		student.LastName = model.LastName;
-		student.StudentUniversityId = model.UniversityId;
-		student.Rut = model.Rut;
-		student.UpdatedAt = DateTimeOffset.Now;
-		_ = await this._userManager.UpdateAsync(student);
-		var editViewModel = new EditViewModel {
+		await this._userStore.SetUserNameAsync(user, viewModel.Email, CancellationToken.None);
+		await this._emailStore.SetEmailAsync(user, viewModel.Email, CancellationToken.None);
+		user.FirstName = model.FirstName;
+		user.LastName = model.LastName;
+		user.StudentUniversityId = model.UniversityId;
+		user.Rut = model.Rut;
+		user.UpdatedAt = DateTimeOffset.Now;
+		_ = await this._userManager.UpdateAsync(user);
+		var viewModel = new EditViewModel {
 			Id = student.Id,
 			FirstName = student.FirstName,
 			LastName = student.LastName,
@@ -201,7 +170,7 @@ public class StudentController : Controller {
 			UpdatedAt = student.UpdatedAt
 		};
 		this.ViewBag.SuccessMessage = "Estudiante actualizado correctamente.";
-		return this.View(editViewModel);
+		return this.View(viewModel);
 	}
 
 	public async Task<IActionResult> ToggleActivation(string id) {
