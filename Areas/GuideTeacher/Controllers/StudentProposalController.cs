@@ -70,7 +70,7 @@ public class StudentProposalController : ApplicationController {
 		}
 		this.ViewData["CurrentFilter"] = searchString;
 		var proposals = this._dbContext.StudentProposals!.AsNoTracking()
-			.Where(p => p.GuideTeacherOfTheStudentProposal == user && (p.ProposalStatus != Status.Draft || p.ProposalStatus != Status.RejectedByGuideTeacher))
+			.Where(p => p.GuideTeacherOfTheStudentProposal == user && (p.ProposalStatus == Status.SentToGuideTeacher || p.ProposalStatus == Status.ApprovedByGuideTeacher))
 			.Include(p => p.GuideTeacherOfTheStudentProposal).AsNoTracking()
 			.Select(p => new StudentProposalViewModel {
 				Id = p.Id,
@@ -89,7 +89,7 @@ public class StudentProposalController : ApplicationController {
 		}
 		var proposal = await this._dbContext.StudentProposals!.AsNoTracking()
 			.Include(p => p.GuideTeacherOfTheStudentProposal).AsNoTracking()
-			.Where(p => p.GuideTeacherOfTheStudentProposal == user && p.ProposalStatus != Status.Draft)
+			.Where(p => p.GuideTeacherOfTheStudentProposal == user && (p.ProposalStatus == Status.SentToGuideTeacher || p.ProposalStatus == Status.ApprovedByGuideTeacher))
 			.Include(p => p.StudentOwnerOfTheStudentProposal).AsNoTracking()
 			.Include(p => p.AssistantTeachersOfTheStudentProposal).AsNoTracking()
 			.FirstOrDefaultAsync(p => p.Id == id);
@@ -101,6 +101,7 @@ public class StudentProposalController : ApplicationController {
 			Id = id,
 			Title = proposal.Title,
 			Description = proposal.Description,
+			StudentUniversityId = proposal.StudentOwnerOfTheStudentProposal!.StudentUniversityId,
 			StudentName = $"{proposal.StudentOwnerOfTheStudentProposal!.FirstName} {proposal.StudentOwnerOfTheStudentProposal!.LastName}",
 			StudentEmail = proposal.StudentOwnerOfTheStudentProposal.Email,
 			StudentRemainingCourses = proposal.StudentOwnerOfTheStudentProposal.StudentRemainingCourses,
@@ -118,9 +119,9 @@ public class StudentProposalController : ApplicationController {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
 		var proposal = await this._dbContext.StudentProposals!.AsNoTracking()
-			.Where(sp => sp.GuideTeacherOfTheStudentProposal == user && sp.ProposalStatus == StudentProposal.Status.SentToGuideTeacher).AsNoTracking()
-			.Include(sp => sp.StudentOwnerOfTheStudentProposal).AsNoTracking()
-			.FirstOrDefaultAsync(sp => sp.Id == id);
+			.Where(p => p.GuideTeacherOfTheStudentProposal == user && p.ProposalStatus == Status.SentToGuideTeacher)
+			.Include(p => p.StudentOwnerOfTheStudentProposal).AsNoTracking()
+			.FirstOrDefaultAsync(p => p.Id == id);
 		if (proposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
 			return this.RedirectToAction(nameof(StudentProposalController.Index), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(GuideTeacher) });
@@ -139,14 +140,15 @@ public class StudentProposalController : ApplicationController {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
 		var proposal = await this._dbContext.StudentProposals!
-			.Where(sp => sp.GuideTeacherOfTheStudentProposal == user && sp.ProposalStatus == StudentProposal.Status.SentToGuideTeacher)
-			.FirstOrDefaultAsync(sp => sp.Id == input.Id);
+			.Where(p => p.GuideTeacherOfTheStudentProposal == user && p.ProposalStatus == Status.SentToGuideTeacher)
+			.FirstOrDefaultAsync(p => p.Id == input.Id);
 		if (proposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
 			return this.RedirectToAction(nameof(StudentProposalController.Index), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(GuideTeacher) });
 
 		}
 		proposal.ProposalStatus = StudentProposal.Status.RejectedByGuideTeacher;
+		proposal.GuideTeacherWhoRejectedThisStudentProposal = user;
 		proposal.RejectionReason = input.RejectionReason;
 		proposal.UpdatedAt = DateTimeOffset.Now;
 		_ = this._dbContext.StudentProposals!.Update(proposal);
@@ -160,9 +162,9 @@ public class StudentProposalController : ApplicationController {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
 		var proposal = await this._dbContext.StudentProposals!.AsNoTracking()
-			.Where(sp => sp.GuideTeacherOfTheStudentProposal == user && sp.ProposalStatus == StudentProposal.Status.SentToGuideTeacher).AsNoTracking()
-			.Include(sp => sp.StudentOwnerOfTheStudentProposal).AsNoTracking()
-			.FirstOrDefaultAsync(sp => sp.Id == id);
+			.Where(p => p.GuideTeacherOfTheStudentProposal == user && p.ProposalStatus == Status.SentToGuideTeacher)
+			.Include(p => p.StudentOwnerOfTheStudentProposal).AsNoTracking()
+			.FirstOrDefaultAsync(p => p.Id == id);
 		if (proposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
 			return this.RedirectToAction(nameof(StudentProposalController.Index), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(GuideTeacher) });
@@ -182,8 +184,8 @@ public class StudentProposalController : ApplicationController {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
 		var proposal = await this._dbContext.StudentProposals!
-			.Where(sp => sp.GuideTeacherOfTheStudentProposal == user && sp.ProposalStatus == StudentProposal.Status.SentToGuideTeacher)
-			.FirstOrDefaultAsync(sp => sp.Id == input.Id);
+			.Where(p => p.GuideTeacherOfTheStudentProposal == user && (p.ProposalStatus != Status.Draft || p.ProposalStatus != Status.RejectedByGuideTeacher))
+			.FirstOrDefaultAsync(p => p.Id == input.Id);
 		if (proposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
 			return this.RedirectToAction(nameof(StudentProposalController.Index), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(GuideTeacher) });

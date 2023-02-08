@@ -232,10 +232,10 @@ public class TeacherController : ApplicationController {
 			this.TempData["ErrorMessage"] = "No puedes desactivar al director de carrera actual.";
 			return this.RedirectToAction(nameof(TeacherController.Index), nameof(TeacherController).Replace("Controller", string.Empty), new { area = nameof(DirectorTeacher) });
 		}
-		user.IsDeactivated = !input.IsDeactivated;
+		user.IsDeactivated = !user.IsDeactivated;
 		user.UpdatedAt = DateTimeOffset.Now;
 		_ = await this._userManager.UpdateAsync(user);
-		this.TempData["SuccessMessage"] = !input.IsDeactivated ? "Profesor desactivado correctamente." : "Profesor activado correctamente.";
+		this.TempData["SuccessMessage"] = user.IsDeactivated ? "Profesor desactivado correctamente." : "Profesor activado correctamente.";
 		return this.RedirectToAction(nameof(TeacherController.Index), nameof(TeacherController).Replace("Controller", string.Empty), new { area = nameof(DirectorTeacher) });
 	}
 

@@ -209,10 +209,10 @@ public class StudentController : ApplicationController {
 			this.TempData["ErrorMessage"] = "No te puedes desactivar a tí mismo.";
 			return this.RedirectToAction(nameof(StudentController.Index), nameof(StudentController).Replace("Controller", string.Empty), new { area = nameof(DirectorTeacher) });
 		}
-		user.IsDeactivated = !input.IsDeactivated;
+		user.IsDeactivated = !user.IsDeactivated;
 		user.UpdatedAt = DateTimeOffset.Now;
 		_ = await this._userManager.UpdateAsync(user);
-		this.TempData["SuccessMessage"] = !input.IsDeactivated ? "Estudiante desactivado correctamente." : "Estudiante activado correctamente.";
+		this.TempData["SuccessMessage"] = user.IsDeactivated ? "Estudiante desactivado correctamente." : "Estudiante activado correctamente.";
 		return this.RedirectToAction(nameof(StudentController.Index), nameof(StudentController).Replace("Controller", string.Empty), new { area = nameof(DirectorTeacher) });
 	}
 }
