@@ -24,7 +24,7 @@
 			@this.Html.ActionLink("Crear profesor", nameof(TeacherController.Create), nameof(TeacherController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.DirectorTeacher) }, new { @class = "btn btn-success"})
 		</div>
 		<div class="col-12 mb-3">
-			<partial name="_Filter" , model=@(new FilterPartialViewModel(nameof(TeacherController.Index), nameof(TeacherController).Replace("Controller", string.Empty), nameof(Utal.Icc.Sgm.Areas.DirectorTeacher))) />
+			<partial name="_Filter", model=@(new FilterPartialViewModel(nameof(TeacherController.Index), nameof(TeacherController).Replace("Controller", string.Empty), nameof(Utal.Icc.Sgm.Areas.DirectorTeacher))) />
 		</div>
 	</div>
 	<div class="row justify-content-center">

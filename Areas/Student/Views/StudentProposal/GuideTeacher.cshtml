@@ -19,7 +19,7 @@
 			@this.Html.ActionLink("Volver", nameof(StudentProposalController.Index), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.Student) }, new { @class = "btn btn-secondary"})
 		</div>
 		<div class="col-12 mb-3">
-			<partial name="_Filter" , model=@(new FilterPartialViewModel(nameof(StudentProposalController.GuideTeacher), nameof(StudentProposalController).Replace("Controller", string.Empty), nameof(Utal.Icc.Sgm.Areas.Student))) />
+			<partial name="_Filter", model=@(new FilterPartialViewModel(nameof(StudentProposalController.GuideTeacher), nameof(StudentProposalController).Replace("Controller", string.Empty), nameof(Utal.Icc.Sgm.Areas.Student))) />
 		</div>
 	</div>
 	<div class="row justify-content-center">
@@ -29,32 +29,32 @@
 					<thead class="table-dark">
 						<tr>
 							<th>
-								<a asp-action="@nameof(StudentProposalController.GuideTeacher)" asp-route-sortOrder="@this.ViewData["FirstNameSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+								<a asp-action="@nameof(StudentProposalController.GuideTeacher)" asp-route-sortOrder="@this.ViewData[$"{nameof(ApplicationUserViewModel.FirstName)}SortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
 									Nombre
 								</a>
 							</th>
 							<th>
-								<a asp-action="@nameof(StudentProposalController.GuideTeacher)" asp-route-sortOrder="@this.ViewData["LastNameSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+								<a asp-action="@nameof(StudentProposalController.GuideTeacher)" asp-route-sortOrder="@this.ViewData[$"{nameof(ApplicationUserViewModel.LastName)}SortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
 									Apellido
 								</a>
 							</th>
 							<th>
-								<a asp-action="@nameof(StudentProposalController.GuideTeacher)" asp-route-sortOrder="@this.ViewData["EmailSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+								<a asp-action="@nameof(StudentProposalController.GuideTeacher)" asp-route-sortOrder="@this.ViewData[$"{nameof(ApplicationUserViewModel.Email)}SortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
 									E-mail
 								</a>
 							</th>
 							<th>
-								<a asp-action="@nameof(StudentProposalController.GuideTeacher)" asp-route-sortOrder="@this.ViewData["TeacherOfficeSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+								<a asp-action="@nameof(StudentProposalController.GuideTeacher)" asp-route-sortOrder="@this.ViewData[$"{nameof(ApplicationUserViewModel.TeacherOffice)}SortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
 									Oficina
 								</a>
 							</th>
 							<th>
-								<a asp-action="@nameof(StudentProposalController.GuideTeacher)" asp-route-sortOrder="@this.ViewData["TeacherScheduleSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+								<a asp-action="@nameof(StudentProposalController.GuideTeacher)" asp-route-sortOrder="@this.ViewData[$"{nameof(ApplicationUserViewModel.TeacherSchedule)}SortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
 									Horarios
 								</a>
 							</th>
 							<th>
-								<a asp-action="@nameof(StudentProposalController.GuideTeacher)" asp-route-sortOrder="@this.ViewData["TeacherSpecializationSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+								<a asp-action="@nameof(StudentProposalController.GuideTeacher)" asp-route-sortOrder="@this.ViewData[$"{nameof(ApplicationUserViewModel.TeacherSpecialization)}SortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
 									Especialización
 								</a>
 							</th>

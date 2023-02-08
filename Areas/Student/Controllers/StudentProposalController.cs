@@ -34,7 +34,7 @@ public class StudentProposalController : ApplicationController {
 		var result = new List<StudentProposalViewModel>();
 		foreach (var parameter in parameters) {
 			var partials = viewModels
-					.Where(vm => (vm.GetType().GetProperty(parameter)!.GetValue(vm) as string)!.Contains(searchString));
+					.Where(vm => (vm.GetType().GetProperty(parameter)!.GetValue(vm, null) as string)!.Contains(searchString));
 			foreach (var partial in partials) {
 				if (!result.Any(vm => vm.Id == partial.Id)) {
 					result.Add(partial);
@@ -59,7 +59,7 @@ public class StudentProposalController : ApplicationController {
 		var result = new List<ApplicationUserViewModel>();
 		foreach (var parameter in parameters) {
 			var partials = viewModels
-					.Where(vm => (vm.GetType().GetProperty(parameter)!.GetValue(vm) as string)!.Contains(searchString));
+					.Where(vm => !(vm.GetType().GetProperty(parameter)!.GetValue(vm, null) as string)!.IsNullOrEmpty() && (vm.GetType().GetProperty(parameter)!.GetValue(vm, null) as string)!.Contains(searchString));
 			foreach (var partial in partials) {
 				if (!result.Any(vm => vm.Id == partial.Id)) {
 					result.Add(partial);
@@ -84,8 +84,8 @@ public class StudentProposalController : ApplicationController {
 		if (await base.CheckSession() is null) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
-		var parameters = new[] { nameof(ApplicationUserViewModel.FirstName), nameof(ApplicationUserViewModel.LastName), nameof(ApplicationUserViewModel.Rut), nameof(ApplicationUserViewModel.Email), nameof(ApplicationUserViewModel.TeacherOffice), nameof(ApplicationUserViewModel.TeacherSchedule), nameof(ApplicationUserViewModel.TeacherSpecialization) };
-		this.SetSortParameters(sortOrder, parameters);
+		var parameters = new[] { nameof(ApplicationUserViewModel.FirstName), nameof(ApplicationUserViewModel.LastName), nameof(ApplicationUserViewModel.Email), nameof(ApplicationUserViewModel.TeacherOffice), nameof(ApplicationUserViewModel.TeacherSchedule), nameof(ApplicationUserViewModel.TeacherSpecialization) };
+		base.SetSortParameters(sortOrder, parameters);
 		if (searchString is not null) {
 			pageNumber = 1;
 		} else {
@@ -101,15 +101,14 @@ public class StudentProposalController : ApplicationController {
 					LastName = u.LastName,
 					Rut = u.Rut,
 					Email = u.Email,
-					IsDeactivated = u.IsDeactivated,
 					TeacherOffice = u.TeacherOffice,
 					TeacherSchedule = u.TeacherSchedule,
 					TeacherSpecialization = u.TeacherSpecialization
 				}
 		).AsEnumerable();
 		var ordered = this.Sort(sortOrder, users, parameters);
-		var viewModels = !searchString.IsNullOrEmpty() ? this.Filter(searchString, ordered, parameters) : ordered;
-		return this.View(PaginatedList<ApplicationUserViewModel>.Create(viewModels.AsQueryable(), pageNumber ?? 1, 6));
+		var output = !searchString.IsNullOrEmpty() ? this.Filter(searchString, ordered, parameters) : ordered;
+		return this.View(PaginatedList<ApplicationUserViewModel>.Create(output.AsQueryable(), pageNumber ?? 1, 6));
 	}
 
 	public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
@@ -117,7 +116,7 @@ public class StudentProposalController : ApplicationController {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
 		var parameters = new[] { nameof(StudentProposalViewModel.Title), nameof(StudentProposalViewModel.GuideTeacherName) };
-		this.SetSortParameters(sortOrder, parameters);
+		base.SetSortParameters(sortOrder, parameters);
 		if (searchString is not null) {
 			pageNumber = 1;
 		} else {

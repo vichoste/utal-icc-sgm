@@ -36,7 +36,7 @@ public class StudentProposalController : ApplicationController {
 		var result = new List<StudentProposalViewModel>();
 		foreach (var parameter in parameters) {
 			var partials = viewModels
-					.Where(vm => (vm.GetType().GetProperty(parameter)!.GetValue(vm) as string)!.Contains(searchString));
+					.Where(vm => (vm.GetType().GetProperty(parameter)!.GetValue(vm, null) as string)!.Contains(searchString));
 			foreach (var partial in partials) {
 				if (!result.Any(vm => vm.Id == partial.Id)) {
 					result.Add(partial);
@@ -62,7 +62,7 @@ public class StudentProposalController : ApplicationController {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
 		var parameters = new[] { nameof(StudentProposalViewModel.Title), nameof(StudentProposalViewModel.StudentName) };
-		this.SetSortParameters(sortOrder, parameters);
+		base.SetSortParameters(sortOrder, parameters);
 		if (searchString is not null) {
 			pageNumber = 1;
 		} else {
