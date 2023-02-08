@@ -57,6 +57,62 @@ public class GuideTeacherProposalController : ApplicationController {
 		return viewModels.OrderBy(vm => vm.GetType().GetProperty(parameters[0]));
 	}
 
+	protected IEnumerable<ApplicationUserViewModel> Filter(string searchString, IOrderedEnumerable<ApplicationUserViewModel> viewModels, params string[] parameters) {
+		var result = new List<ApplicationUserViewModel>();
+		foreach (var parameter in parameters) {
+			var partials = viewModels
+					.Where(vm => !(vm.GetType().GetProperty(parameter)!.GetValue(vm, null) as string)!.IsNullOrEmpty() && (vm.GetType().GetProperty(parameter)!.GetValue(vm, null) as string)!.Contains(searchString));
+			foreach (var partial in partials) {
+				if (!result.Any(vm => vm.Id == partial.Id)) {
+					result.Add(partial);
+				}
+			}
+		}
+		return result.AsEnumerable();
+	}
+
+	protected IOrderedEnumerable<ApplicationUserViewModel> Sort(string sortOrder, IEnumerable<ApplicationUserViewModel> viewModels, params string[] parameters) {
+		foreach (var parameter in parameters) {
+			if (parameter == sortOrder) {
+				return viewModels.OrderBy(vm => vm.GetType().GetProperty(parameter)!.GetValue(vm, null));
+			} else if ($"{parameter}Desc" == sortOrder) {
+				return viewModels.OrderByDescending(vm => vm.GetType().GetProperty(parameter)!.GetValue(vm, null));
+			}
+		}
+		return viewModels.OrderBy(vm => vm.GetType().GetProperty(parameters[0]));
+	}
+
+	public async Task<IActionResult> Students(string id, string sortOrder, string currentFilter, string searchString, int? pageNumber) {
+		if (await base.CheckSession() is not ApplicationUser user) {
+			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
+		}
+		var parameters = new[] { nameof(ApplicationUserViewModel.FirstName), nameof(ApplicationUserViewModel.LastName), nameof(ApplicationUserViewModel.StudentUniversityId), nameof(ApplicationUserViewModel.Rut), nameof(ApplicationUserViewModel.Email) };
+		base.SetSortParameters(sortOrder, parameters);
+		if (searchString is not null) {
+			pageNumber = 1;
+		} else {
+			searchString = currentFilter;
+		}
+		this.ViewData["CurrentFilter"] = searchString;
+		var users = this._dbContext.GuideTeacherProposals!
+			.Where(p => p.GuideTeacherOwnerOfTheGuideTeacherProposal == user)
+			.Include(p => p.StudentsWhoAreInterestedInThisGuideTeacherProposal)
+			.SelectMany(p => p.StudentsWhoAreInterestedInThisGuideTeacherProposal!.Select(
+				u => new ApplicationUserViewModel {
+					Id = u!.Id,
+					FirstName = u.FirstName,
+					LastName = u.LastName,
+					StudentUniversityId = u.StudentUniversityId,
+					Rut = u.Rut,
+					Email = u.Email,
+					IsDeactivated = u.IsDeactivated
+				}
+			)).AsEnumerable();
+		var ordered = this.Sort(sortOrder, users, parameters);
+		var output = !searchString.IsNullOrEmpty() ? this.Filter(searchString, ordered, parameters) : ordered;
+		return this.View(PaginatedList<ApplicationUserViewModel>.Create(output.AsQueryable(), pageNumber ?? 1, 6));
+	}
+
 	public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
 		if (await base.CheckSession() is not ApplicationUser user) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
