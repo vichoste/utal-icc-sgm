@@ -7,8 +7,4 @@ public partial class ApplicationUser {
 	[InverseProperty(nameof(StudentProposal.AssistantTeachersOfTheStudentProposal))]
 	public virtual ICollection<StudentProposal?>? ImAssistantTeacherOfTheStudentProposals { get; set; } = new HashSet<StudentProposal?>();
 	#endregion
-	#region GuideTeacherProposal
-	[InverseProperty(nameof(GuideTeacherProposal.AssistantTeachersOfTheGuideTeacherProposal))]
-	public virtual ICollection<GuideTeacherProposal?>? ImAssistantTeacherOfTheGuideTeacherProposals { get; set; } = new HashSet<GuideTeacherProposal?>();
-	#endregion
 }

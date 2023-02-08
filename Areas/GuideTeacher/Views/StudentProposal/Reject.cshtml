@@ -1,7 +1,7 @@
-﻿@using Utal.Icc.Sgm.Areas.GuideTeacher.Views.Proposal
+﻿@using Utal.Icc.Sgm.ViewModels
 @using Utal.Icc.Sgm.Areas.GuideTeacher.Controllers
 
-@model RejectViewModel
+@model StudentProposalViewModel
 
 @{
 	this.ViewData["Title"] = "Rechazar propuesta";
@@ -17,16 +17,13 @@
 					@using (this.Html.BeginForm(nameof(StudentProposalController.Reject), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.GuideTeacher) })) {
 						@this.Html.AntiForgeryToken()
 						@this.Html.HiddenFor(m => m.Id)
-						@this.Html.HiddenFor(m => m.Title)
-						@this.Html.HiddenFor(m => m.Student)
-						<h5 class="card-title">¿Deseas <b class="text-danger">rechazar</b> la propuesta del estudiante <b>@this.Html.DisplayFor(m => m.Student)</b>?</h5>
+						<h5 class="card-title">¿Deseas <b class="text-danger">rechazar</b> la propuesta del estudiante <b>@this.Html.DisplayFor(m => m.StudentName)</b>?</h5>
 						<h6 class="card-subtitle mb-3 text-muted">@this.Html.DisplayFor(m => m.Title)</h6>
 						<div class="row was-validated text-center">
 							<div class="col">
 								<div class="form-group mb-3">
-									@this.Html.LabelFor(m => m.Reason, new { @class = "form-label" })
-									@this.Html.TextBoxFor(m => m.Reason, new { @class = "form-control" })
-									@this.Html.ValidationMessageFor(m => m.Reason, "Justifique su rechazo", new { @class = "invalid-feedback" })
+									@this.Html.LabelFor(m => m.RejectionReason, new { @class = "form-label" })
+									@this.Html.TextBoxFor(m => m.RejectionReason, new { @class = "form-control" })
 								</div>
 								<div class="btn-group">
 									@this.Html.ActionLink("No", nameof(StudentProposalController.View), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.GuideTeacher), id = this.Model.Id }, new { @class = "btn btn-secondary" })

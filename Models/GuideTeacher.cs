@@ -11,8 +11,4 @@ public partial class ApplicationUser : IdentityUser {
 	[InverseProperty(nameof(StudentProposal.GuideTeacherWhoRejectedThisStudentProposal))]
 	public virtual ICollection<StudentProposal?>? IRejectedTheseStudentProposals { get; set; } = new HashSet<StudentProposal?>();
 	#endregion
-	#region GuideTeacherProposal
-	[InverseProperty(nameof(GuideTeacherProposal.GuideTeacherOwnerOfTheGuideTeacherProposal))]
-	public virtual ICollection<GuideTeacherProposal?>? GuideTeacherProposalsWhichIOwn { get; set; } = new HashSet<GuideTeacherProposal?>();
-	#endregion
 }
