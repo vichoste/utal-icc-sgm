@@ -16,10 +16,10 @@ using static Utal.Icc.Sgm.Models.ApplicationUser;
 namespace Utal.Icc.Sgm.Areas.GuideTeacher.Controllers;
 
 [Area(nameof(GuideTeacher)), Authorize(Roles = nameof(Roles.GuideTeacher))]
-public class StudentProposalController : ApplicationController, IProposalViewModelFilterable, IProposalViewModelSortable {
+public class StudentProposalController : ApplicationController {
 	public StudentProposalController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, SignInManager<ApplicationUser> signInManager) : base(dbContext, userManager, userStore, signInManager) { }
 
-	public async Task Populate(ApplicationUser guideTeacher) {
+	protected async Task Populate(ApplicationUser guideTeacher) {
 		var assistantTeachers = (
 			await this._userManager.GetUsersInRoleAsync(nameof(Roles.AssistantTeacher)))
 				.Where(at => at != guideTeacher && !at.IsDeactivated)
@@ -31,8 +31,8 @@ public class StudentProposalController : ApplicationController, IProposalViewMod
 		});
 	}
 	
-	public IEnumerable<ProposalViewModel> Filter(string searchString, IOrderedEnumerable<ProposalViewModel> viewModels, params string[] parameters) {
-		var result = new List<ProposalViewModel>();
+	protected IEnumerable<StudentProposalViewModel> Filter(string searchString, IOrderedEnumerable<StudentProposalViewModel> viewModels, params string[] parameters) {
+		var result = new List<StudentProposalViewModel>();
 		foreach (var parameter in parameters) {
 			var partials = viewModels
 					.Where(vm => (vm.GetType().GetProperty(parameter)!.GetValue(vm) as string)!.Contains(searchString));
@@ -45,7 +45,7 @@ public class StudentProposalController : ApplicationController, IProposalViewMod
 		return result.AsEnumerable();
 	}
 
-	public IOrderedEnumerable<ProposalViewModel> Sort(string sortOrder, IEnumerable<ProposalViewModel> viewModels, params string[] parameters) {
+	protected IOrderedEnumerable<StudentProposalViewModel> Sort(string sortOrder, IEnumerable<StudentProposalViewModel> viewModels, params string[] parameters) {
 		foreach (var parameter in parameters) {
 			if (parameter == sortOrder) {
 				return viewModels.OrderBy(vm => vm.GetType().GetProperty(parameter)!.GetValue(vm, null));
@@ -77,8 +77,8 @@ public class StudentProposalController : ApplicationController, IProposalViewMod
 				StudentName = $"{p.StudentOwnerOfTheStudentProposal!.FirstName} {p.StudentOwnerOfTheStudentProposal!.LastName}",
 				ProposalStatus = p.ProposalStatus.ToString(),
 			}).AsEnumerable();
-		var ordered = this.Sort(sortOrder, proposals, parameters) as IOrderedEnumerable<StudentProposalViewModel>;
-		var output = !searchString.IsNullOrEmpty() ? this.Filter(searchString, ordered!, parameters) as IOrderedEnumerable<StudentProposalViewModel> : ordered;
+		var ordered = this.Sort(sortOrder, proposals, parameters);
+		var output = !searchString.IsNullOrEmpty() ? this.Filter(searchString, ordered!, parameters) : ordered;
 		return this.View(PaginatedList<StudentProposalViewModel>.Create(output!.AsQueryable(), pageNumber ?? 1, 6));
 	}
 

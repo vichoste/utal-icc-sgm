@@ -14,11 +14,11 @@ using static Utal.Icc.Sgm.Models.ApplicationUser;
 namespace Utal.Icc.Sgm.Areas.DirectorTeacher.Controllers;
 
 [Area(nameof(DirectorTeacher)), Authorize(Roles = nameof(Roles.DirectorTeacher))]
-public class TeacherController : ApplicationController, IApplicationUserViewModelFilterable, IApplicationUserViewModelSortable {
+public class TeacherController : ApplicationController {
 	public TeacherController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, SignInManager<ApplicationUser> signInManager) : base(dbContext, userManager, userStore, signInManager) { }
 
-	public IEnumerable<ApplicationUserViewModel> Filter(string searchString, IOrderedEnumerable<ApplicationUserViewModel> viewModels, params string[] parameters) {
-		var result = new List<ApplicationUserViewModel>();
+	protected IEnumerable<IndexTeacherViewModel> Filter(string searchString, IOrderedEnumerable<IndexTeacherViewModel> viewModels, params string[] parameters) {
+		var result = new List<IndexTeacherViewModel>();
 		foreach (var parameter in parameters) {
 			var partials = viewModels
 					.Where(vm => (vm.GetType().GetProperty(parameter)!.GetValue(vm) as string)!.Contains(searchString));
@@ -31,7 +31,7 @@ public class TeacherController : ApplicationController, IApplicationUserViewMode
 		return result.AsEnumerable();
 	}
 
-	public IOrderedEnumerable<ApplicationUserViewModel> Sort(string sortOrder, IEnumerable<ApplicationUserViewModel> viewModels, params string[] parameters) {
+	protected IOrderedEnumerable<IndexTeacherViewModel> Sort(string sortOrder, IEnumerable<IndexTeacherViewModel> viewModels, params string[] parameters) {
 		foreach (var parameter in parameters) {
 			if (parameter == sortOrder) {
 				return viewModels.OrderBy(vm => vm.GetType().GetProperty(parameter)!.GetValue(vm, null));
@@ -65,14 +65,14 @@ public class TeacherController : ApplicationController, IApplicationUserViewMode
 				IsDirectorTeacher = await this._userManager.IsInRoleAsync(u, nameof(Roles.DirectorTeacher)),
 			}
 		).Select(u => u.Result).AsEnumerable();
-		var ordered = this.Sort(sortOrder, users, parameters) as IOrderedEnumerable<IndexTeacherViewModel>;
-		var output = !searchString.IsNullOrEmpty() ? this.Filter(searchString, ordered!, parameters) as IOrderedEnumerable<IndexTeacherViewModel> : ordered;
+		var ordered = this.Sort(sortOrder, users, parameters);
+		var output = !searchString.IsNullOrEmpty() ? this.Filter(searchString, ordered!, parameters) : ordered;
 		return this.View(PaginatedList<IndexTeacherViewModel>.Create(output!.AsQueryable(), pageNumber ?? 1, 6));
 	}
 
 	public async Task<IActionResult> Create() => await base.CheckSession() is not ApplicationUser user
 			? this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty })
-			: user.IsDeactivated ? this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty }) : this.View(new ApplicationUserViewModel());
+			: user.IsDeactivated ? this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty }) : this.View(new CreateTeacherViewModel());
 
 	[HttpPost]
 	public async Task<IActionResult> Create([FromForm] CreateTeacherViewModel input) {
@@ -133,7 +133,7 @@ public class TeacherController : ApplicationController, IApplicationUserViewMode
 	}
 
 	[HttpPost, ValidateAntiForgeryToken]
-	public async Task<IActionResult> Edit([FromForm] ApplicationUserViewModel input) {
+	public async Task<IActionResult> Edit([FromForm] EditTeacherViewModel input) {
 		if (await base.CheckSession() is null) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
@@ -156,10 +156,10 @@ public class TeacherController : ApplicationController, IApplicationUserViewMode
 			Email = user.Email,
 			CreatedAt = user.CreatedAt,
 			UpdatedAt = user.UpdatedAt,
-			IsAssistantTeacher = await this._userManager.IsInRoleAsync(user, nameof(Roles.AssistantTeacher)),
-			IsCommitteeTeacher = await this._userManager.IsInRoleAsync(user, nameof(Roles.CommitteeTeacher)),
-			IsCourseTeacher = await this._userManager.IsInRoleAsync(user, nameof(Roles.CourseTeacher)),
-			IsGuideTeacher = await this._userManager.IsInRoleAsync(user, nameof(Roles.GuideTeacher)),
+			IsAssistantTeacher = input.IsAssistantTeacher,
+			IsCommitteeTeacher = input.IsCommitteeTeacher,
+			IsCourseTeacher = input.IsCourseTeacher,
+			IsGuideTeacher = input.IsGuideTeacher,
 		};
 		this.ViewBag.SuccessMessage = "Profesor actualizado correctamente.";
 		return this.View(output);
@@ -176,7 +176,7 @@ public class TeacherController : ApplicationController, IApplicationUserViewMode
 		}
 		if (user!.Id == this._userManager.GetUserId(this.User)) {
 			this.TempData["ErrorMessage"] = "No te puedes desactivar a tí mismo.";
-			return this.RedirectToAction(nameof(StudentController.Index), nameof(StudentController).Replace("Controller", string.Empty), new { area = nameof(DirectorTeacher) });
+			return this.RedirectToAction(nameof(TeacherController.Index), nameof(TeacherController).Replace("Controller", string.Empty), new { area = nameof(DirectorTeacher) });
 		}
 		var roles = (await this._userManager.GetRolesAsync(user)).ToList();
 		if (roles.Contains(nameof(Roles.DirectorTeacher))) {
@@ -203,7 +203,7 @@ public class TeacherController : ApplicationController, IApplicationUserViewMode
 		}
 		if (user!.Id == this._userManager.GetUserId(this.User)) {
 			this.TempData["ErrorMessage"] = "No te puedes desactivar a tí mismo.";
-			return this.RedirectToAction(nameof(StudentController.Index), nameof(StudentController).Replace("Controller", string.Empty), new { area = nameof(DirectorTeacher) });
+			return this.RedirectToAction(nameof(TeacherController.Index), nameof(TeacherController).Replace("Controller", string.Empty), new { area = nameof(DirectorTeacher) });
 		}
 		var roles = (await this._userManager.GetRolesAsync(user)).ToList();
 		if (roles.Contains(nameof(Roles.DirectorTeacher))) {

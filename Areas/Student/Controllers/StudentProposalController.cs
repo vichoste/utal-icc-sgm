@@ -15,10 +15,10 @@ using static Utal.Icc.Sgm.Models.ApplicationUser;
 namespace Utal.Icc.Sgm.Areas.Student.Controllers;
 
 [Area(nameof(Student)), Authorize(Roles = nameof(Roles.Student))]
-public class StudentProposalController : ApplicationController, IAssistantTeacherPopulateable, IProposalViewModelFilterable, IProposalViewModelSortable, IApplicationUserViewModelFilterable, IApplicationUserViewModelSortable {
+public class StudentProposalController : ApplicationController {
 	public StudentProposalController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, SignInManager<ApplicationUser> signInManager) : base(dbContext, userManager, userStore, signInManager) { }
 
-	public async Task Populate(ApplicationUser guideTeacher) {
+	protected async Task Populate(ApplicationUser guideTeacher) {
 		var assistantTeachers = (
 			await this._userManager.GetUsersInRoleAsync(nameof(Roles.AssistantTeacher)))
 				.Where(at => at != guideTeacher && !at.IsDeactivated)
@@ -30,8 +30,8 @@ public class StudentProposalController : ApplicationController, IAssistantTeache
 		});
 	}
 	
-	public IEnumerable<ProposalViewModel> Filter(string searchString, IOrderedEnumerable<ProposalViewModel> viewModels, params string[] parameters) {
-		var result = new List<ProposalViewModel>();
+	protected IEnumerable<StudentProposalViewModel> Filter(string searchString, IOrderedEnumerable<StudentProposalViewModel> viewModels, params string[] parameters) {
+		var result = new List<StudentProposalViewModel>();
 		foreach (var parameter in parameters) {
 			var partials = viewModels
 					.Where(vm => (vm.GetType().GetProperty(parameter)!.GetValue(vm) as string)!.Contains(searchString));
@@ -44,7 +44,7 @@ public class StudentProposalController : ApplicationController, IAssistantTeache
 		return result.AsEnumerable();
 	}
 
-	public IOrderedEnumerable<ProposalViewModel> Sort(string sortOrder, IEnumerable<ProposalViewModel> viewModels, params string[] parameters) {
+	protected IOrderedEnumerable<StudentProposalViewModel> Sort(string sortOrder, IEnumerable<StudentProposalViewModel> viewModels, params string[] parameters) {
 		foreach (var parameter in parameters) {
 			if (parameter == sortOrder) {
 				return viewModels.OrderBy(vm => vm.GetType().GetProperty(parameter)!.GetValue(vm, null));
@@ -55,7 +55,7 @@ public class StudentProposalController : ApplicationController, IAssistantTeache
 		return viewModels.OrderBy(vm => vm.GetType().GetProperty(parameters[0]));
 	}
 
-	public IEnumerable<ApplicationUserViewModel> Filter(string searchString, IOrderedEnumerable<ApplicationUserViewModel> viewModels, params string[] parameters) {
+	protected IEnumerable<ApplicationUserViewModel> Filter(string searchString, IOrderedEnumerable<ApplicationUserViewModel> viewModels, params string[] parameters) {
 		var result = new List<ApplicationUserViewModel>();
 		foreach (var parameter in parameters) {
 			var partials = viewModels
@@ -69,7 +69,7 @@ public class StudentProposalController : ApplicationController, IAssistantTeache
 		return result.AsEnumerable();
 	}
 
-	public IOrderedEnumerable<ApplicationUserViewModel> Sort(string sortOrder, IEnumerable<ApplicationUserViewModel> viewModels, params string[] parameters) {
+	protected IOrderedEnumerable<ApplicationUserViewModel> Sort(string sortOrder, IEnumerable<ApplicationUserViewModel> viewModels, params string[] parameters) {
 		foreach (var parameter in parameters) {
 			if (parameter == sortOrder) {
 				return viewModels.OrderBy(vm => vm.GetType().GetProperty(parameter)!.GetValue(vm, null));
@@ -127,8 +127,8 @@ public class StudentProposalController : ApplicationController, IAssistantTeache
 				GuideTeacherName = $"{p.GuideTeacherOfTheStudentProposal!.FirstName} {p.GuideTeacherOfTheStudentProposal!.LastName}",
 				ProposalStatus = p.ProposalStatus.ToString(),
 			}).AsEnumerable();
-		var ordered = this.Sort(sortOrder, proposals, parameters) as IOrderedEnumerable<StudentProposalViewModel>;
-		var output = !searchString.IsNullOrEmpty() ? this.Filter(searchString, ordered!, parameters) as IOrderedEnumerable<StudentProposalViewModel> : ordered;
+		var ordered = this.Sort(sortOrder, proposals, parameters);
+		var output = !searchString.IsNullOrEmpty() ? this.Filter(searchString, ordered!, parameters) : ordered;
 		return this.View(PaginatedList<StudentProposalViewModel>.Create(output!.AsQueryable(), pageNumber ?? 1, 6));
 	}
 
