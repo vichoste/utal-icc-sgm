@@ -1,5 +1,6 @@
 ﻿@using Utal.Icc.Sgm.ViewModels
 @using Utal.Icc.Sgm.Areas.Student.Controllers
+@using static Utal.Icc.Sgm.Models.ApplicationUser
 
 @model StudentProposalViewModel
 
@@ -51,7 +52,7 @@
 								</div>
 								<div class="form-group mb-3">
 									@this.Html.LabelFor(m => m.AssistantTeachers, new { @class = "form-label" })
-									@this.Html.ListBoxFor(m => m.AssistantTeachers, new MultiSelectList((IEnumerable<SelectListItem>)this.ViewData["AssistantTeachers"]!), new { @class = "form-select", @multiple = "multiple" })
+									@this.Html.ListBoxFor(m => m.AssistantTeachers, new MultiSelectList((IEnumerable<SelectListItem>)this.ViewData[$"{nameof(Roles.AssistantTeacher)}s"]!, "Value", "Text"), new { @class = "form-select", @multiple = "multiple" })
 								</div>
 							</div>
 						</div>

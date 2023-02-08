@@ -148,6 +148,28 @@ public class TeacherController : ApplicationController {
 		user.Rut = input.Rut;
 		user.UpdatedAt = DateTimeOffset.Now;
 		_ = await this._userManager.UpdateAsync(user);
+		var roles = (await this._userManager.GetRolesAsync(user)).ToList();
+		if (roles.Contains(nameof(Roles.Teacher))) {
+			_ = roles.Remove(nameof(Roles.Teacher));
+		}
+		if (roles.Contains(nameof(Roles.DirectorTeacher))) {
+			_ = roles.Remove(nameof(Roles.DirectorTeacher));
+		}
+		var removeRankRolesResult = await this._userManager.RemoveFromRolesAsync(user, roles);
+		var rankRoles = new List<string>();
+		if (input.IsGuideTeacher) {
+			rankRoles.Add(nameof(Roles.GuideTeacher));
+		}
+		if (input.IsAssistantTeacher) {
+			rankRoles.Add(nameof(Roles.AssistantTeacher));
+		}
+		if (input.IsCourseTeacher) {
+			rankRoles.Add(nameof(Roles.CourseTeacher));
+		}
+		if (input.IsCommitteeTeacher) {
+			rankRoles.Add(nameof(Roles.CommitteeTeacher));
+		}
+		_ = await this._userManager.AddToRolesAsync(user, rankRoles);
 		var output = new EditTeacherViewModel {
 			Id = user.Id,
 			FirstName = user.FirstName,
@@ -156,10 +178,10 @@ public class TeacherController : ApplicationController {
 			Email = user.Email,
 			CreatedAt = user.CreatedAt,
 			UpdatedAt = user.UpdatedAt,
-			IsAssistantTeacher = input.IsAssistantTeacher,
-			IsCommitteeTeacher = input.IsCommitteeTeacher,
-			IsCourseTeacher = input.IsCourseTeacher,
-			IsGuideTeacher = input.IsGuideTeacher,
+			IsAssistantTeacher = await this._userManager.IsInRoleAsync(user, nameof(Roles.AssistantTeacher)),
+			IsCommitteeTeacher = await this._userManager.IsInRoleAsync(user, nameof(Roles.CommitteeTeacher)),
+			IsCourseTeacher = await this._userManager.IsInRoleAsync(user, nameof(Roles.CourseTeacher)),
+			IsGuideTeacher = await this._userManager.IsInRoleAsync(user, nameof(Roles.GuideTeacher)),
 		};
 		this.ViewBag.SuccessMessage = "Profesor actualizado correctamente.";
 		return this.View(output);

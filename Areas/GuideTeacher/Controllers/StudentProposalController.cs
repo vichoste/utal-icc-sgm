@@ -12,6 +12,7 @@ using Utal.Icc.Sgm.Models;
 using Utal.Icc.Sgm.ViewModels;
 
 using static Utal.Icc.Sgm.Models.ApplicationUser;
+using static Utal.Icc.Sgm.Models.StudentProposal;
 
 namespace Utal.Icc.Sgm.Areas.GuideTeacher.Controllers;
 
@@ -69,7 +70,7 @@ public class StudentProposalController : ApplicationController {
 		}
 		this.ViewData["CurrentFilter"] = searchString;
 		var proposals = this._dbContext.StudentProposals!.AsNoTracking()
-			.Where(p => p.GuideTeacherOfTheStudentProposal == user)
+			.Where(p => p.GuideTeacherOfTheStudentProposal == user && (p.ProposalStatus != Status.Draft || p.ProposalStatus != Status.RejectedByGuideTeacher))
 			.Include(p => p.GuideTeacherOfTheStudentProposal).AsNoTracking()
 			.Select(p => new StudentProposalViewModel {
 				Id = p.Id,
@@ -88,7 +89,7 @@ public class StudentProposalController : ApplicationController {
 		}
 		var proposal = await this._dbContext.StudentProposals!.AsNoTracking()
 			.Include(p => p.GuideTeacherOfTheStudentProposal).AsNoTracking()
-			.Where(p => p.GuideTeacherOfTheStudentProposal == user && p.ProposalStatus == StudentProposal.Status.Draft)
+			.Where(p => p.GuideTeacherOfTheStudentProposal == user && p.ProposalStatus != Status.Draft)
 			.Include(p => p.StudentOwnerOfTheStudentProposal).AsNoTracking()
 			.Include(p => p.AssistantTeachersOfTheStudentProposal).AsNoTracking()
 			.FirstOrDefaultAsync(p => p.Id == id);
@@ -105,7 +106,7 @@ public class StudentProposalController : ApplicationController {
 			StudentRemainingCourses = proposal.StudentOwnerOfTheStudentProposal.StudentRemainingCourses,
 			StudentIsDoingThePractice = proposal.StudentOwnerOfTheStudentProposal.StudentIsDoingThePractice,
 			StudentIsWorking = proposal.StudentOwnerOfTheStudentProposal.StudentIsWorking,
-			AssistantTeachers = proposal.AssistantTeachersOfTheStudentProposal!.Select(at => at!.Id).ToList(),
+			AssistantTeachers = proposal.AssistantTeachersOfTheStudentProposal!.Select(at => $"{at!.FirstName} {at!.LastName}").ToList(),
 			CreatedAt = proposal.CreatedAt,
 			UpdatedAt = proposal.UpdatedAt,
 		};

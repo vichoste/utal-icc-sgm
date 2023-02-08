@@ -84,7 +84,7 @@ public class StudentProposalController : ApplicationController {
 		if (await base.CheckSession() is null) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
-		var parameters = new[] { nameof(ApplicationUserViewModel.FirstName), nameof(ApplicationUserViewModel.LastName), nameof(ApplicationUserViewModel.Rut), nameof(ApplicationUserViewModel.Email) };
+		var parameters = new[] { nameof(ApplicationUserViewModel.FirstName), nameof(ApplicationUserViewModel.LastName), nameof(ApplicationUserViewModel.Rut), nameof(ApplicationUserViewModel.Email), nameof(ApplicationUserViewModel.TeacherOffice), nameof(ApplicationUserViewModel.TeacherSchedule), nameof(ApplicationUserViewModel.TeacherSpecialization) };
 		this.SetSortParameters(sortOrder, parameters);
 		if (searchString is not null) {
 			pageNumber = 1;
@@ -92,14 +92,20 @@ public class StudentProposalController : ApplicationController {
 			searchString = currentFilter;
 		}
 		this.ViewData["CurrentFilter"] = searchString;
-		var users = (await this._userManager.GetUsersInRoleAsync(nameof(Roles.Teacher))).Select(
-			u => new ApplicationUserViewModel {
-				FirstName = u.FirstName,
-				LastName = u.LastName,
-				Rut = u.Rut,
-				Email = u.Email,
-				IsDeactivated = u.IsDeactivated
-			}
+		var users = (await this._userManager.GetUsersInRoleAsync(nameof(Roles.GuideTeacher)))
+			.Where(u => !u.IsDeactivated)
+			.Select(
+				u => new ApplicationUserViewModel {
+					Id = u.Id,
+					FirstName = u.FirstName,
+					LastName = u.LastName,
+					Rut = u.Rut,
+					Email = u.Email,
+					IsDeactivated = u.IsDeactivated,
+					TeacherOffice = u.TeacherOffice,
+					TeacherSchedule = u.TeacherSchedule,
+					TeacherSpecialization = u.TeacherSpecialization
+				}
 		).AsEnumerable();
 		var ordered = this.Sort(sortOrder, users, parameters);
 		var viewModels = !searchString.IsNullOrEmpty() ? this.Filter(searchString, ordered, parameters) : ordered;
@@ -144,6 +150,10 @@ public class StudentProposalController : ApplicationController {
 		var output = new StudentProposalViewModel {
 			GuideTeacherId = guideTeacher.Id,
 			GuideTeacherName = $"{guideTeacher.FirstName} {guideTeacher.LastName}",
+			GuideTeacherEmail = guideTeacher.Email,
+			GuideTeacherOffice = guideTeacher.TeacherOffice,
+			GuideTeacherSchedule = guideTeacher.TeacherSchedule,
+			GuideTeacherSpecialization = guideTeacher.TeacherSpecialization,
 		};
 		return this.View(output);
 	}
@@ -218,6 +228,7 @@ public class StudentProposalController : ApplicationController {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
 			return this.RedirectToAction(nameof(StudentProposalController.Index), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Student) });
 		}
+		await this.Populate(proposal.GuideTeacherOfTheStudentProposal!);
 		proposal.Title = input.Title;
 		proposal.Description = input.Description;
 		var assistantTeachers = input.AssistantTeachers!.Select(async at => await this.CheckApplicationUser(at)).Select(at => at.Result).ToList();
@@ -333,7 +344,7 @@ public class StudentProposalController : ApplicationController {
 		}
 		var proposal = await this._dbContext.StudentProposals!.AsNoTracking()
 			.Where(p => p.StudentOwnerOfTheStudentProposal == user && p.ProposalStatus == StudentProposal.Status.RejectedByGuideTeacher)
-			.Include(p => p.GuideTeacherOfTheStudentProposal)
+			.Include(p => p.GuideTeacherWhoRejectedThisStudentProposal)
 			.FirstOrDefaultAsync(p => p.Id == id);
 		if (proposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
@@ -373,7 +384,7 @@ public class StudentProposalController : ApplicationController {
 			GuideTeacherOffice = proposal.GuideTeacherOfTheStudentProposal!.TeacherOffice,
 			GuideTeacherSchedule = proposal.GuideTeacherOfTheStudentProposal!.TeacherSchedule,
 			GuideTeacherSpecialization = proposal.GuideTeacherOfTheStudentProposal!.TeacherSpecialization,
-			AssistantTeachers = proposal.AssistantTeachersOfTheStudentProposal!.Select(at => at!.Id).ToList(),
+			AssistantTeachers = proposal.AssistantTeachersOfTheStudentProposal!.Select(at => $"{at!.FirstName} {at!.LastName}").ToList(),
 			CreatedAt = proposal.CreatedAt,
 			UpdatedAt = proposal.UpdatedAt
 		};

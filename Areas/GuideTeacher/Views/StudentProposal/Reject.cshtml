@@ -19,7 +19,7 @@
 						@this.Html.HiddenFor(m => m.Id)
 						<h5 class="card-title">¿Deseas <b class="text-danger">rechazar</b> la propuesta del estudiante <b>@this.Html.DisplayFor(m => m.StudentName)</b>?</h5>
 						<h6 class="card-subtitle mb-3 text-muted">@this.Html.DisplayFor(m => m.Title)</h6>
-						<div class="row was-validated text-center">
+						<div class="row text-center">
 							<div class="col">
 								<div class="form-group mb-3">
 									@this.Html.LabelFor(m => m.RejectionReason, new { @class = "form-label" })
