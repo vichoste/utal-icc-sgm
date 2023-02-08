@@ -63,10 +63,10 @@ public class TeacherController : ApplicationController, IApplicationUserViewMode
 				IsDeactivated = u.IsDeactivated,
 				IsDirectorTeacher = await this._userManager.IsInRoleAsync(u, nameof(Roles.DirectorTeacher)),
 			}
-		).Select(u => u.Result);
+		).Select(u => u.Result).AsEnumerable();
 		var ordered = this.Sort(sortOrder, users, parameters);
-		var viewModels = !searchString.IsNullOrEmpty() ? this.Filter(searchString, ordered, parameters) : ordered;
-		return this.View(PaginatedList<ApplicationUserViewModel>.Create(viewModels.AsQueryable(), pageNumber ?? 1, 6));
+		var output = !searchString.IsNullOrEmpty() ? this.Filter(searchString, ordered, parameters) : ordered;
+		return this.View(PaginatedList<ApplicationUserViewModel>.Create(output.AsQueryable(), pageNumber ?? 1, 6));
 	}
 
 	public async Task<IActionResult> Create() => await base.CheckSession() is not ApplicationUser user
@@ -147,14 +147,18 @@ public class TeacherController : ApplicationController, IApplicationUserViewMode
 		user.Rut = input.Rut;
 		user.UpdatedAt = DateTimeOffset.Now;
 		_ = await this._userManager.UpdateAsync(user);
-		var output = new ApplicationUserViewModel {
+		var output = new EditTeacherViewModel {
 			Id = user.Id,
 			FirstName = user.FirstName,
 			LastName = user.LastName,
 			Rut = user.Rut,
 			Email = user.Email,
 			CreatedAt = user.CreatedAt,
-			UpdatedAt = user.UpdatedAt
+			UpdatedAt = user.UpdatedAt,
+			IsAssistantTeacher = await this._userManager.IsInRoleAsync(user, nameof(Roles.AssistantTeacher)),
+			IsCommitteeTeacher = await this._userManager.IsInRoleAsync(user, nameof(Roles.CommitteeTeacher)),
+			IsCourseTeacher = await this._userManager.IsInRoleAsync(user, nameof(Roles.CourseTeacher)),
+			IsGuideTeacher = await this._userManager.IsInRoleAsync(user, nameof(Roles.GuideTeacher)),
 		};
 		this.ViewBag.SuccessMessage = "Profesor actualizado correctamente.";
 		return this.View(output);

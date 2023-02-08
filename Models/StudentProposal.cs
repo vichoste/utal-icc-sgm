@@ -13,6 +13,6 @@ public class StudentProposal : Proposal {
 	public virtual ApplicationUser? StudentOwnerOfTheStudentProposal { get; set; }
 	public virtual ApplicationUser? GuideTeacherOfTheStudentProposal { get; set; }
 	public virtual ICollection<ApplicationUser?>? AssistantTeachersOfTheStudentProposal { get; set; } = new HashSet<ApplicationUser?>();
-	public virtual ApplicationUser? StudentProposalRejectedByGuideTeacher { get; set; }
+	public virtual ApplicationUser? GuideTeacherWhoRejectedThisStudentProposal { get; set; }
 	public string? RejectionReason { get; set; }
 }

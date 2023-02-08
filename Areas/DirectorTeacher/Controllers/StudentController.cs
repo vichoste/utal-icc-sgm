@@ -68,10 +68,10 @@ public class StudentController : ApplicationController, IApplicationUserViewMode
 				Email = u.Email,
 				IsDeactivated = u.IsDeactivated
 			}
-		);
+		).AsEnumerable();
 		var ordered = this.Sort(sortOrder, users, parameters);
-		var viewModels = !searchString.IsNullOrEmpty() ? this.Filter(searchString, ordered, parameters) : ordered;
-		return this.View(PaginatedList<ApplicationUserViewModel>.Create(viewModels.AsQueryable(), pageNumber ?? 1, 6));
+		var output = !searchString.IsNullOrEmpty() ? this.Filter(searchString, ordered, parameters) : ordered;
+		return this.View(PaginatedList<ApplicationUserViewModel>.Create(output.AsQueryable(), pageNumber ?? 1, 6));
 	}
 
 	public async Task<IActionResult> Create() => await base.CheckSession() is not ApplicationUser user
