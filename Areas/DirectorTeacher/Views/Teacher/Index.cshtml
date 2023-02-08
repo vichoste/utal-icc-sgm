@@ -1,10 +1,14 @@
-﻿@using Utal.Icc.Sgm
+﻿@using Microsoft.AspNetCore.Identity
+
+@using Utal.Icc.Sgm
+@using Utal.Icc.Sgm.Models
 @using Utal.Icc.Sgm.Areas.DirectorTeacher.Views.Teacher
 @using Utal.Icc.Sgm.Views.Shared
-@using static Utal.Icc.Sgm.Models.ApplicationUser
 @using Utal.Icc.Sgm.Areas.DirectorTeacher.Controllers
 
 @model PaginatedList<IndexViewModel>
+
+@inject UserManager<ApplicationUser> _userManager
 
 @{
 	this.ViewData["Title"] = "Profesores";
@@ -74,7 +78,7 @@
 										@if (item.IsDirectorTeacher) {
 											<a asp-action=@nameof(TeacherController.Index) asp-route-sortOrder="@this.ViewData["CurrentSort"]" asp-route-pageNumber="@(this.Model.PageIndex)" asp-route-currentFilter="@this.ViewData["CurrentFilter"]" class="btn btn-info mb-3">Es director de carrera</a>
 										} else {
-											@this.Html.ActionLink("No es director de carrera", nameof(TeacherController.Transfer), nameof(TeacherController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.DirectorTeacher), currentDirectorTeacherId = this.Model.ApplicationUserId , newDirectorTeacherId = item.Id }, new { @class = "btn btn-default mb-3" })
+											@this.Html.ActionLink("No es director de carrera", nameof(TeacherController.Transfer), nameof(TeacherController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.DirectorTeacher), currentDirectorTeacherId = this._userManager.GetUserId(this.User), newDirectorTeacherId = item.Id }, new { @class = "btn btn-default mb-3" })
 										}
 									</td>
 								}

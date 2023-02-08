@@ -5,8 +5,8 @@
 @using Utal.Icc.Sgm.Controllers
 @using Utal.Icc.Sgm.Areas.Account.Controllers
 
-@inject SignInManager<ApplicationUser> SignInManager
-@inject UserManager<ApplicationUser> UserManager
+@inject SignInManager<ApplicationUser> _signInManager
+@inject UserManager<ApplicationUser> _userManager
 
 <div id="header" class="app-header">
 	<div class="mobile-toggler">
@@ -27,7 +27,7 @@
 	<div class="menu d-flex justify-content-end">
 		<div class="menu-item dropdown">
 			<a href="#" data-bs-toggle="dropdown" data-bs-display="static" class="menu-link">
-				@if (this.SignInManager.IsSignedIn(this.User)) {
+				@if (this._signInManager.IsSignedIn(this.User)) {
 					<div class="menu-img">
 						@if (this.User.IsInRole(nameof(Roles.Teacher))) {
 							<i class="fa-solid fa-user-tie"></i>
@@ -35,7 +35,7 @@
 							<i class="fa-solid fa fa-user-graduate"></i>
 						}
 					</div>
-					<div class="menu-text">¡Hola @((await this.UserManager.GetUserAsync(this.User))?.FirstName)!</div>
+					<div class="menu-text">¡Hola @((await this._userManager.GetUserAsync(this.User))?.FirstName)!</div>
 				} else {
 					<div class="menu-img">
 						<i class="fa-solid fa-fingerprint"></i>
@@ -44,7 +44,7 @@
 				}
 			</a>
 			<div class="dropdown-menu dropdown-menu-end me-lg-3">
-				@if (this.SignInManager.IsSignedIn(this.User)) {
+				@if (this._signInManager.IsSignedIn(this.User)) {
 					<a class="dropdown-item d-flex align-items-center" href="@this.Url.Action(nameof(ProfileController.Index), nameof(ProfileController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.Account) })">Mi información <i class="fa fa-user-circle fa-fw ms-auto text-gray-400 f-s-16"></i></a>
 					@if (this.User.IsInRole(nameof(Roles.Teacher))) {
 						<a class="dropdown-item d-flex align-items-center" href="@this.Url.Action(nameof(ProfileController.Teacher), nameof(ProfileController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.Account) })">Mi perfil<i class="fa fa-user-tie fa-fw ms-auto text-gray-400 f-s-16"></i></a>
