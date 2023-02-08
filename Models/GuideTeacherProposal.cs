@@ -18,9 +18,7 @@ public class GuideTeacherProposal {
 	public DateTimeOffset? UpdatedAt { get; set; }
 	public virtual ApplicationUser? GuideTeacherOwnerOfTheGuideTeacherProposal { get; set; }
 	public virtual ICollection<ApplicationUser>? StudentsWhichAreInterestedInThisGuideTeacherProposal { get; set; } = new HashSet<ApplicationUser>();
-	public virtual ApplicationUser? AssistantTeacher1OfTheGuideTeacherProposal { get; set; }
-	public virtual ApplicationUser? AssistantTeacher2OfTheGuideTeacherProposal { get; set; }
-	public virtual ApplicationUser? AssistantTeacher3OfTheGuideTeacherProposal { get; set; }
+	public virtual ICollection<ApplicationUser>? AssistantTeachersOfTheGuideTeacherProposal { get; set; } = new HashSet<ApplicationUser>();
 	public virtual ApplicationUser? StudentWhichIsAssignedToThisGuideTeacherProposal { get; set; }
 	[Timestamp]
 	public byte[]? RowVersion { get; set; }

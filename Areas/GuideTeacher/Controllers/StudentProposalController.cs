@@ -93,7 +93,7 @@ public class StudentProposalController : Controller {
 		var filteredAndOrderedProposals = !searchString.IsNullOrEmpty() ?
 			this.FilterProposals(searchString, orderedProposals, parameters)
 			: orderedProposals;
-		return this.View(PaginatedList<IndexViewModel>.Create((await this._userManager.GetUserAsync(this.User))!.Id, filteredAndOrderedProposals.AsQueryable(), pageNumber ?? 1, 6));
+		return this.View(PaginatedList<IndexViewModel>.Create(filteredAndOrderedProposals.AsQueryable(), pageNumber ?? 1, 6));
 	}
 
 	public new async Task<IActionResult> View(string id) {

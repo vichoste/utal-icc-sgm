@@ -19,12 +19,8 @@ public class ConvertViewModel {
 	public string? GuideTeacherSchedule { get; set; }
 	[Display(Name = "Especialización"), Required]
 	public string? GuideTeacherSpecialization { get; set; }
-	[Display(Name = "Primer profesor co-guía"), Required]
-	public string? AssistantTeacher1 { get; set; }
-	[Display(Name = "Segundo profesor co-guía"), Required]
-	public string? AssistantTeacher2 { get; set; }
-	[Display(Name = "Tercer profesor co-guía"), Required]
-	public string? AssistantTeacher3 { get; set; }
+	[Display(Name = "Profesores co-guía"), Required]
+	public ICollection<string>? AssistantTeachers { get; set; } = new HashSet<string>();
 	[Display(Name = "Creado"), Required]
 	public DateTimeOffset? CreatedAt { get; set; }
 	[Display(Name = "Actualizado"), Required]

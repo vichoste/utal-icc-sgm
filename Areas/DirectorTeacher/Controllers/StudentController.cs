@@ -45,21 +45,21 @@ public class StudentController : Controller {
 		this.ViewData["CurrentSort"] = sortOrder;
 	}
 
-	protected IOrderedEnumerable<ApplicationUser> OrderApplicationUsers(string sortOrder, IEnumerable<ApplicationUser> applicationUsers, params string[] parameters) {
+	protected IOrderedEnumerable<ApplicationUser> OrderStudents(string sortOrder, IEnumerable<ApplicationUser> students, params string[] parameters) {
 		foreach (var parameter in parameters) {
 			if (parameter == sortOrder) {
-				return applicationUsers.OrderBy(s => s.GetType().GetProperty(parameter)!.GetValue(s, null));
+				return students.OrderBy(s => s.GetType().GetProperty(parameter)!.GetValue(s, null));
 			} else if ($"{parameter}Desc" == sortOrder) {
-				return applicationUsers.OrderByDescending(s => s.GetType().GetProperty(parameter)!.GetValue(s, null));
+				return students.OrderByDescending(s => s.GetType().GetProperty(parameter)!.GetValue(s, null));
 			}
 		}
-		return applicationUsers.OrderBy(s => s.GetType().GetProperty(parameters[0]));
+		return students.OrderBy(s => s.GetType().GetProperty(parameters[0]));
 	}
 
-	protected IEnumerable<IndexViewModel> FilterApplicationUsers(string searchString, IOrderedEnumerable<ApplicationUser> applicationUsers, params string[] parameters) {
+	protected IEnumerable<IndexViewModel> FilterStudents(string searchString, IOrderedEnumerable<ApplicationUser> students, params string[] parameters) {
 		var result = new List<IndexViewModel>();
 		foreach (var parameter in parameters) {
-			var partials = applicationUsers
+			var partials = students
 					.Where(s => (s.GetType().GetProperty(parameter)!.GetValue(s) as string)!.Contains(searchString))
 					.Select(s => new IndexViewModel {
 						Id = s.Id,
@@ -92,8 +92,8 @@ public class StudentController : Controller {
 		}
 		this.ViewData["CurrentFilter"] = searchString;
 		var students = await this._userManager.GetUsersInRoleAsync(nameof(Roles.Student));
-		var orderedStudents = this.OrderApplicationUsers(sortOrder, students, parameters);
-		var indexViewModels = !searchString.IsNullOrEmpty() ? this.FilterApplicationUsers(searchString, orderedStudents, parameters) : orderedStudents.Select(s => new IndexViewModel {
+		var orderedStudents = this.OrderStudents(sortOrder, students, parameters);
+		var indexViewModels = !searchString.IsNullOrEmpty() ? this.FilterStudents(searchString, orderedStudents, parameters) : orderedStudents.Select(s => new IndexViewModel {
 			Id = s.Id,
 			FirstName = s.FirstName,
 			LastName = s.LastName,
@@ -102,7 +102,7 @@ public class StudentController : Controller {
 			Email = s.Email,
 			IsDeactivated = s.IsDeactivated
 		}).ToList();
-		return this.View(PaginatedList<IndexViewModel>.Create((await this._userManager.GetUserAsync(this.User))!.Id, indexViewModels.AsQueryable(), pageNumber ?? 1, 6));
+		return this.View(PaginatedList<IndexViewModel>.Create(indexViewModels.AsQueryable(), pageNumber ?? 1, 6));
 	}
 
 	public async Task<IActionResult> Create() => await this.CheckTeacherSession() is not ApplicationUser teacher

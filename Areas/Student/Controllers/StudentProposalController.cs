@@ -66,6 +66,40 @@ public class StudentProposalController : Controller {
 		return result.AsEnumerable();
 	}
 
+		protected IOrderedEnumerable<ApplicationUser> OrderGuideTeachers(string sortOrder, IEnumerable<ApplicationUser> guideTeachers, params string[] parameters) {
+		foreach (var parameter in parameters) {
+			if (parameter == sortOrder) {
+				return guideTeachers.OrderBy(s => s.GetType().GetProperty(parameter)!.GetValue(s, null));
+			} else if ($"{parameter}Desc" == sortOrder) {
+				return guideTeachers.OrderByDescending(s => s.GetType().GetProperty(parameter)!.GetValue(s, null));
+			}
+		}
+		return guideTeachers.OrderBy(s => s.GetType().GetProperty(parameters[0]));
+	}
+
+	protected IEnumerable<GuideTeacherViewModel> FilterGuideTeachers(string searchString, IOrderedEnumerable<ApplicationUser> guideTeachers, params string[] parameters) {
+		var result = new List<GuideTeacherViewModel>();
+		foreach (var parameter in parameters) {
+			var partials = guideTeachers
+					.Where(t => (t.GetType().GetProperty(parameter)!.GetValue(t) as string)!.Contains(searchString))
+					.Select(t => new GuideTeacherViewModel {
+						Id = t.Id,
+						FirstName = t.FirstName,
+						LastName = t.LastName,
+						Email = t.Email,
+						TeacherOffice = t.TeacherOffice,
+						TeacherSchedule = t.TeacherSchedule,
+						TeacherSpecialization = t.TeacherSpecialization
+					});
+			foreach (var partial in partials) {
+				if (!result.Any(ivm => ivm.Id == partial.Id)) {
+					result.Add(partial);
+				}
+			}
+		}
+		return result.AsEnumerable();
+	}
+
 	protected async Task PopulateTeachers() {
 		var guideTeachers = (
 			await this._userManager.GetUsersInRoleAsync(nameof(Roles.GuideTeacher)))
@@ -105,6 +139,32 @@ public class StudentProposalController : Controller {
 		});
 	}
 
+	public async Task<IActionResult> GuideTeacher(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
+		if (await this.CheckStudentSession() is not ApplicationUser student) {
+			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
+		}
+		var parameters = new[] { nameof(ApplicationUser.FirstName), nameof(ApplicationUser.LastName), nameof(ApplicationUser.Email), nameof(ApplicationUser.TeacherOffice), nameof(ApplicationUser.TeacherSchedule), nameof(ApplicationUser.TeacherSpecialization) };
+		this.SetSortParameters(sortOrder, parameters);
+		if (searchString is not null) {
+			pageNumber = 1;
+		} else {
+			searchString = currentFilter;
+		}
+		this.ViewData["CurrentFilter"] = searchString;
+		var guideTeachers = await this._userManager.GetUsersInRoleAsync(nameof(Roles.GuideTeacher));
+		var orderedGuideTeachers = this.OrderGuideTeachers(sortOrder, guideTeachers, parameters);
+		var guideTeacherViewModels = !searchString.IsNullOrEmpty() ? this.FilterGuideTeachers(searchString, orderedGuideTeachers, parameters) : orderedGuideTeachers.Select(t => new GuideTeacherViewModel {
+			Id = t.Id,
+			FirstName = t.FirstName,
+			LastName = t.LastName,
+			Email = t.Email,
+			TeacherOffice = t.TeacherOffice,
+			TeacherSchedule = t.TeacherSchedule,
+			TeacherSpecialization = t.TeacherSpecialization
+		}).ToList();
+		return this.View(PaginatedList<GuideTeacherViewModel>.Create(guideTeacherViewModels.AsQueryable(), pageNumber ?? 1, 6));
+	}
+
 	public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
 		if (await this.CheckStudentSession() is not ApplicationUser student) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
@@ -130,7 +190,7 @@ public class StudentProposalController : Controller {
 		var filteredAndOrderedProposals = !searchString.IsNullOrEmpty() ?
 			this.FilterProposals(searchString, orderedProposals, parameters)
 			: orderedProposals;
-		return this.View(PaginatedList<IndexViewModel>.Create((await this._userManager.GetUserAsync(this.User))!.Id, filteredAndOrderedProposals.AsQueryable(), pageNumber ?? 1, 6));
+		return this.View(PaginatedList<IndexViewModel>.Create(filteredAndOrderedProposals.AsQueryable(), pageNumber ?? 1, 6));
 	}
 
 	public async Task<IActionResult> Create() {
@@ -161,16 +221,7 @@ public class StudentProposalController : Controller {
 				Description = model.Description,
 			});
 		}
-		var assistantTeacher1 = !model.AssistantTeacher1.IsNullOrEmpty() ? await this.CheckApplicationUser(model.AssistantTeacher1!) : null;
-		var assistantTeacher2 = !model.AssistantTeacher2.IsNullOrEmpty() ? await this.CheckApplicationUser(model.AssistantTeacher2!) : null;
-		var assistantTeacher3 = !model.AssistantTeacher3.IsNullOrEmpty() ? await this.CheckApplicationUser(model.AssistantTeacher3!) : null;
-		var teacherCheck = (guideTeacher, assistantTeacher1, assistantTeacher2, assistantTeacher3) switch {
-			(ApplicationUser gt, ApplicationUser at1, ApplicationUser at2, ApplicationUser at3) => gt != at1 && gt != at2 && gt != at3 && at1 != at2 && at1 != at3 && at2 != at3,
-			(ApplicationUser gt, ApplicationUser at1, ApplicationUser at2, null) => gt != at1 && gt != at2 && at1 != at2,
-			(ApplicationUser gt, ApplicationUser at1, null, null) => gt != at1,
-			(ApplicationUser, null, null, null) => true,
-			_ => false
-		};
+
 		if (!teacherCheck) {
 			this.ViewBag.WarningMessage = "Revisa tu selección de profesores.";
 			return this.View(new CreateViewModel {
@@ -184,9 +235,7 @@ public class StudentProposalController : Controller {
 			Description = model.Description,
 			StudentOwnerOfTheStudentProposal = student,
 			GuideTeacherOfTheStudentProposal = guideTeacher,
-			AssistantTeacher1OfTheStudentProposal = assistantTeacher1,
-			AssistantTeacher2OfTheStudentProposal = assistantTeacher2,
-			AssistantTeacher3OfTheStudentProposal = assistantTeacher3,
+			AssistantTeachersOfTheStudentProposal = assistantTeachers,
 			ProposalStatus = StudentProposal.Status.Draft,
 			CreatedAt = DateTimeOffset.Now,
 			UpdatedAt = DateTimeOffset.Now
@@ -206,9 +255,7 @@ public class StudentProposalController : Controller {
 			.Include(sp => sp.StudentOwnerOfTheStudentProposal).AsNoTracking()
 			.Where(sp => sp.StudentOwnerOfTheStudentProposal == student && sp.ProposalStatus == StudentProposal.Status.Draft)
 			.Include(sp => sp.GuideTeacherOfTheStudentProposal).AsNoTracking()
-			.Include(sp => sp.AssistantTeacher1OfTheStudentProposal).AsNoTracking()
-			.Include(sp => sp.AssistantTeacher2OfTheStudentProposal).AsNoTracking()
-			.Include(sp => sp.AssistantTeacher3OfTheStudentProposal).AsNoTracking()
+			.Include(sp => sp.AssistantTeachersOfTheStudentProposal).AsNoTracking()
 			.FirstOrDefaultAsync(sp => sp.Id == id);
 		if (studentProposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";

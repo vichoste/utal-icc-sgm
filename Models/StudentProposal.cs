@@ -18,9 +18,7 @@ public class StudentProposal {
 	public DateTimeOffset? UpdatedAt { get; set; }
 	public virtual ApplicationUser? StudentOwnerOfTheStudentProposal { get; set; }
 	public virtual ApplicationUser? GuideTeacherOfTheStudentProposal { get; set; }
-	public virtual ApplicationUser? AssistantTeacher1OfTheStudentProposal { get; set; }
-	public virtual ApplicationUser? AssistantTeacher2OfTheStudentProposal { get; set; }
-	public virtual ApplicationUser? AssistantTeacher3OfTheStudentProposal { get; set; }
+	public virtual ICollection<ApplicationUser>? AssistantTeachersOfTheStudentProposal { get; set; } = new HashSet<ApplicationUser>();
 	public string? RejectionReason { get; set; }
 	[Timestamp]
 	public byte[]? RowVersion { get; set; }
