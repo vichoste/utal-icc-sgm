@@ -12,7 +12,6 @@ using Utal.Icc.Sgm.Models;
 using Utal.Icc.Sgm.ViewModels;
 
 using static Utal.Icc.Sgm.Models.ApplicationUser;
-using static Utal.Icc.Sgm.Models.GuideTeacherProposal;
 
 namespace Utal.Icc.Sgm.Areas.GuideTeacher.Controllers;
 
