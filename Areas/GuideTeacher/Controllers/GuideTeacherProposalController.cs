@@ -184,4 +184,90 @@ public class GuideTeacherProposalController : ApplicationController {
 		this.ViewBag.SuccessMessage = "Tu propuesta ha sido actualizada correctamente.";
 		return this.View(output);
 	}
+
+	public async Task<IActionResult> Delete(string id) {
+		if (await base.CheckSession() is not ApplicationUser user) {
+			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
+		}
+		var proposal = await this._dbContext.GuideTeacherProposals!.AsNoTracking()
+			.Where(p => p.GuideTeacherOwnerOfTheGuideTeacherProposal == user && p.ProposalStatus == GuideTeacherProposal.Status.Draft)
+			.FirstOrDefaultAsync(p => p.Id == id);
+		if (proposal is null) {
+			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
+			return this.RedirectToAction(nameof(GuideTeacherProposalController.Index), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(GuideTeacher) });
+		}
+		var output = new GuideTeacherProposalViewModel {
+			Id = id,
+			Title = proposal.Title
+		};
+		return this.View(output);
+	}
+
+	[HttpPost, ValidateAntiForgeryToken]
+	public async Task<IActionResult> Delete([FromForm] GuideTeacherProposalViewModel input) {
+		if (await base.CheckSession() is not ApplicationUser user) {
+			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
+		}
+		var proposal = await this._dbContext.GuideTeacherProposals!
+			.Where(p => p.GuideTeacherOwnerOfTheGuideTeacherProposal == user && p.ProposalStatus == GuideTeacherProposal.Status.Draft)
+			.FirstOrDefaultAsync(p => p.Id == input.Id);
+		if (proposal is null) {
+			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
+			return this.RedirectToAction(nameof(GuideTeacherProposalController.Index), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(GuideTeacher) });
+		}
+		_ = this._dbContext.GuideTeacherProposals!.Remove(proposal);
+		_ = this._dbContext.SaveChangesAsync();
+		this.TempData["SuccessMessage"] = "Tu propuesta ha sido eliminada correctamente.";
+		return this.RedirectToAction(nameof(GuideTeacherProposalController.Index), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(GuideTeacher) });
+	}
+
+	public async Task<IActionResult> Publish(string id) {
+		if (await base.CheckSession() is not ApplicationUser user) {
+			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
+		}
+		var proposal = await this._dbContext.GuideTeacherProposals!.AsNoTracking()
+			.Where(p => p.GuideTeacherOwnerOfTheGuideTeacherProposal == user && p.ProposalStatus == GuideTeacherProposal.Status.Draft)
+			.FirstOrDefaultAsync(p => p.Id == id);
+		if (proposal is null) {
+			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
+			return this.RedirectToAction(nameof(GuideTeacherProposalController.Index), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(GuideTeacher) });
+		}
+		var output = new GuideTeacherProposalViewModel {
+			Id = id,
+			Title = proposal.Title,
+		};
+		return this.View(output);
+	}
+
+	[HttpPost, ValidateAntiForgeryToken]
+	public async Task<IActionResult> Publish([FromForm] GuideTeacherProposalViewModel input) {
+		if (await base.CheckSession() is not ApplicationUser user) {
+			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
+		}
+		var proposal = await this._dbContext.GuideTeacherProposals!
+			.Where(p => p.GuideTeacherOwnerOfTheGuideTeacherProposal == user && p.ProposalStatus == GuideTeacherProposal.Status.Draft)
+			.Include(p => p.GuideTeacherOwnerOfTheGuideTeacherProposal)
+			.Include(p => p.AssistantTeachersOfTheGuideTeacherProposal)
+			.FirstOrDefaultAsync(p => p.Id == input.Id);
+		if (proposal is null) {
+			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
+			return this.RedirectToAction(nameof(GuideTeacherProposalController.Index), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(GuideTeacher) });
+		}
+		if (await base.CheckApplicationUser(proposal.GuideTeacherOwnerOfTheGuideTeacherProposal!.Id) is null) {
+			this.TempData["ErrorMessage"] = "Error al obtener el profesor guía.";
+			return this.RedirectToAction(nameof(GuideTeacherProposalController.Index), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(GuideTeacher) });
+		}
+		foreach (var assistantTeacher in proposal.AssistantTeachersOfTheGuideTeacherProposal!) {
+			if (await base.CheckApplicationUser(assistantTeacher!.Id) is null) {
+				this.TempData["ErrorMessage"] = "Error al obtener el profesor co-guía.";
+				return this.RedirectToAction(nameof(GuideTeacherProposalController.Index), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(GuideTeacher) });
+			}
+		}
+		proposal.ProposalStatus = GuideTeacherProposal.Status.Published;
+		proposal.UpdatedAt = DateTimeOffset.Now;
+		_ = this._dbContext.GuideTeacherProposals!.Update(proposal);
+		_ = await this._dbContext.SaveChangesAsync();
+		this.TempData["SuccessMessage"] = "Tu propuesta ha sido enviada correctamente.";
+		return this.RedirectToAction(nameof(GuideTeacherProposalController.Index), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(GuideTeacher) });
+	}
 }
