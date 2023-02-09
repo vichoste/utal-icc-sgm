@@ -44,7 +44,7 @@ public class GuideTeacherProposalController : ApplicationController {
 		return viewModels.OrderBy(vm => vm.GetType().GetProperty(parameters[0]));
 	}
 
-	public async Task<IActionResult> GuideTeacherProposal(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
+	public async Task<IActionResult> List(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
 		if (await base.CheckSession() is not ApplicationUser user) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
@@ -173,6 +173,7 @@ public class GuideTeacherProposalController : ApplicationController {
 		var proposal = await this._dbContext.GuideTeacherProposals!.AsNoTracking()
 			.Where(p => (p.StudentsWhoAreInterestedInThisGuideTeacherProposal!.Contains(user) || p.StudentWhoIsAssignedToThisGuideTeacherProposal == user) && (p.ProposalStatus == Status.Published || p.ProposalStatus == Status.Ready))
 			.Include(p => p.GuideTeacherOwnerOfTheGuideTeacherProposal).AsNoTracking()
+			.Include(p => p.StudentWhoIsAssignedToThisGuideTeacherProposal).AsNoTracking()
 			.FirstOrDefaultAsync(p => p.Id == id);
 		if (proposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
@@ -191,7 +192,7 @@ public class GuideTeacherProposalController : ApplicationController {
 			AssistantTeachers = proposal.AssistantTeachersOfTheGuideTeacherProposal!.Select(at => $"{at!.FirstName} {at!.LastName}").ToList(),
 			CreatedAt = proposal.CreatedAt,
 			UpdatedAt = proposal.UpdatedAt,
-			StudentIsAccepted = proposal.StudentWhoIsAssignedToThisGuideTeacherProposal! == user
+			StudentIsAccepted = proposal.StudentWhoIsAssignedToThisGuideTeacherProposal is null ? false : proposal.StudentWhoIsAssignedToThisGuideTeacherProposal == user,
 		};
 		return this.View(output);
 	}

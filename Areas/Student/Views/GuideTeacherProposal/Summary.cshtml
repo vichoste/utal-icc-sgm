@@ -15,7 +15,7 @@
 				<div class="card-header text-center">@this.ViewData["Title"]</div>
 				<div class="card-body">
 					@if (this.Model.StudentIsAccepted) {
-						<h5 class="card-title">Estás <b class="text-success">aceptado</b> en esta propuesta. Deberás esperar a que el profesor guía <b class="text-success">convierta</b> esta propuesta a solicitud para el comité.</h5>
+						<h5 class="card-title mb-3">Estás <b class="text-success">aceptado</b> en esta propuesta. Deberás esperar a que el profesor guía <b class="text-success">convierta</b> esta propuesta a solicitud para el comité.</h5>
 					}
 					@using (this.Html.BeginForm()) {
 						@this.Html.AntiForgeryToken()
@@ -77,7 +77,7 @@
 						<div class="row text-center">
 							<div class="col">
 								<div class="btn-group">
-									@this.Html.ActionLink("Volver", nameof(GuideTeacherProposalController.GuideTeacherProposal), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.Student) }, new { @class = "btn btn-secondary" })
+									@this.Html.ActionLink("Volver", nameof(GuideTeacherProposalController.List), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.Student) }, new { @class = "btn btn-secondary" })
 								</div>
 							</div>
 						</div>

@@ -82,7 +82,7 @@ public class GuideTeacherProposalController : ApplicationController {
 		return viewModels.OrderBy(vm => vm.GetType().GetProperty(parameters[0]));
 	}
 
-	public async Task<IActionResult> Student(string id, string sortOrder, string currentFilter, string searchString, int? pageNumber) {
+	public async Task<IActionResult> Students(string id, string sortOrder, string currentFilter, string searchString, int? pageNumber) {
 		if (await base.CheckSession() is not ApplicationUser user) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
