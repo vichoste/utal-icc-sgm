@@ -14,9 +14,11 @@
 			<div class="card">
 				<div class="card-header text-center">@this.ViewData["Title"]</div>
 				<div class="card-body">
+					@if (this.Model.StudentIsAccepted) {
+						<h5 class="card-title">Estás <b class="text-success">aceptado</b> en esta propuesta. Deberás esperar a que el profesor guía <b class="text-success">convierta</b> esta propuesta a solicitud para el comité.</h5>
+					}
 					@using (this.Html.BeginForm()) {
 						@this.Html.AntiForgeryToken()
-						@this.Html.HiddenFor(m => m.Id)
 						<div class="row">
 							<div class="col">
 								<div class="form-group mb-3">

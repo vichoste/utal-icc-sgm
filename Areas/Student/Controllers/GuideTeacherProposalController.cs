@@ -57,7 +57,7 @@ public class GuideTeacherProposalController : ApplicationController {
 		}
 		this.ViewData["CurrentFilter"] = searchString;
 		var proposals = this._dbContext.GuideTeacherProposals!.AsNoTracking()
-			.Where(p => p.StudentsWhoAreInterestedInThisGuideTeacherProposal!.Contains(user) && (p.ProposalStatus == Status.Published || p.ProposalStatus == Status.Ready))
+			.Where(p => (p.StudentsWhoAreInterestedInThisGuideTeacherProposal!.Contains(user) || p.StudentWhoIsAssignedToThisGuideTeacherProposal == user) && (p.ProposalStatus == Status.Published || p.ProposalStatus == Status.Ready))
 			.Include(p => p.GuideTeacherOwnerOfTheGuideTeacherProposal).AsNoTracking()
 			.Select(p => new GuideTeacherProposalViewModel {
 				Id = p.Id,
@@ -84,7 +84,7 @@ public class GuideTeacherProposalController : ApplicationController {
 		}
 		this.ViewData["CurrentFilter"] = searchString;
 		var proposals = this._dbContext.GuideTeacherProposals!.AsNoTracking()
-			.Where(p => p.ProposalStatus == Status.Published)
+			.Where(p => !p.StudentsWhoAreInterestedInThisGuideTeacherProposal!.Contains(user) && p.ProposalStatus == Status.Published)
 			.Include(p => p.GuideTeacherOwnerOfTheGuideTeacherProposal).AsNoTracking()
 			.Select(p => new GuideTeacherProposalViewModel {
 				Id = p.Id,
@@ -171,7 +171,7 @@ public class GuideTeacherProposalController : ApplicationController {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
 		var proposal = await this._dbContext.GuideTeacherProposals!.AsNoTracking()
-			.Where(p => p.StudentsWhoAreInterestedInThisGuideTeacherProposal!.Contains(user) && (p.ProposalStatus == Status.Published || p.ProposalStatus == Status.Ready))
+			.Where(p => (p.StudentsWhoAreInterestedInThisGuideTeacherProposal!.Contains(user) || p.StudentWhoIsAssignedToThisGuideTeacherProposal == user) && (p.ProposalStatus == Status.Published || p.ProposalStatus == Status.Ready))
 			.Include(p => p.GuideTeacherOwnerOfTheGuideTeacherProposal).AsNoTracking()
 			.FirstOrDefaultAsync(p => p.Id == id);
 		if (proposal is null) {
@@ -191,6 +191,7 @@ public class GuideTeacherProposalController : ApplicationController {
 			AssistantTeachers = proposal.AssistantTeachersOfTheGuideTeacherProposal!.Select(at => $"{at!.FirstName} {at!.LastName}").ToList(),
 			CreatedAt = proposal.CreatedAt,
 			UpdatedAt = proposal.UpdatedAt,
+			StudentIsAccepted = proposal.StudentWhoIsAssignedToThisGuideTeacherProposal! == user
 		};
 		return this.View(output);
 	}

@@ -366,9 +366,9 @@ public class GuideTeacherProposalController : ApplicationController {
 			this.TempData["ErrorMessage"] = "Error al obtener el estudiante.";
 			return this.RedirectToAction(nameof(GuideTeacherProposalController.Index), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(GuideTeacher) });
 		}
-		var proposal = await this._dbContext.GuideTeacherProposals!.AsNoTracking()
+		var proposal = await this._dbContext.GuideTeacherProposals!
 			.Where(p => p.GuideTeacherOwnerOfTheGuideTeacherProposal == user && p.ProposalStatus == GuideTeacherProposal.Status.Published)
-			.Include(p => p.StudentsWhoAreInterestedInThisGuideTeacherProposal).AsNoTracking()
+			.Include(p => p.StudentsWhoAreInterestedInThisGuideTeacherProposal)
 			.Where(p => p.StudentsWhoAreInterestedInThisGuideTeacherProposal!.Any(s => s!.Id == input.StudentId!))
 			.FirstOrDefaultAsync(p => p.Id == input.Id);
 		if (proposal is null) {
