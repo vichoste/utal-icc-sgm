@@ -192,7 +192,7 @@ public class GuideTeacherProposalController : ApplicationController {
 			AssistantTeachers = proposal.AssistantTeachersOfTheGuideTeacherProposal!.Select(at => $"{at!.FirstName} {at!.LastName}").ToList(),
 			CreatedAt = proposal.CreatedAt,
 			UpdatedAt = proposal.UpdatedAt,
-			StudentIsAccepted = proposal.StudentWhoIsAssignedToThisGuideTeacherProposal is null ? false : proposal.StudentWhoIsAssignedToThisGuideTeacherProposal == user,
+			StudentIsAccepted = proposal.StudentWhoIsAssignedToThisGuideTeacherProposal is not null ? proposal.StudentWhoIsAssignedToThisGuideTeacherProposal.Id == user.Id ? true : false : false, // For some reason, IDs must be checked...
 		};
 		return this.View(output);
 	}

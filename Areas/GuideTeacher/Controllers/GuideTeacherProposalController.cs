@@ -407,6 +407,7 @@ public class GuideTeacherProposalController : ApplicationController {
 			Requirements = proposal.Requirements,
 			StudentName = $"{proposal.StudentWhoIsAssignedToThisGuideTeacherProposal!.FirstName} {proposal.StudentWhoIsAssignedToThisGuideTeacherProposal!.LastName}",
 			StudentEmail = proposal.StudentWhoIsAssignedToThisGuideTeacherProposal!.Email,
+			StudentUniversityId = proposal.StudentWhoIsAssignedToThisGuideTeacherProposal!.StudentUniversityId,
 			StudentRemainingCourses = proposal.StudentWhoIsAssignedToThisGuideTeacherProposal!.StudentRemainingCourses,
 			StudentIsDoingThePractice = proposal.StudentWhoIsAssignedToThisGuideTeacherProposal!.StudentIsDoingThePractice,
 			StudentIsWorking = proposal.StudentWhoIsAssignedToThisGuideTeacherProposal!.StudentIsWorking,
