@@ -61,7 +61,8 @@
 										@this.Html.ActionLink("Eliminar", nameof(GuideTeacherProposalController.Delete), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.GuideTeacher), id = item.Id }, new { @class = "btn btn-danger mb-3"})
 										@this.Html.ActionLink("Publicar", nameof(GuideTeacherProposalController.Publish), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.GuideTeacher), id = item.Id }, new { @class = "btn btn-primary mb-3"})
 									} else if (item.ProposalStatus == nameof(GuideTeacherProposal.Status.Published)) {
-										@this.Html.ActionLink("Postulaciones", nameof(GuideTeacherProposalController.Student), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.GuideTeacher), id = item.Id }, new { @class = "btn btn-success mb-3"})
+										@this.Html.ActionLink("Ver", nameof(GuideTeacherProposalController.View), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.GuideTeacher), id = item.Id }, new { @class = "btn btn-yellow mb-3"})
+										@this.Html.ActionLink("Postulaciones", nameof(GuideTeacherProposalController.Student), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.GuideTeacher), id = item.Id }, new { @class = "btn btn-primary mb-3"})
 									} else if (item.ProposalStatus == nameof(GuideTeacherProposal.Status.Ready)) {
 										@this.Html.ActionLink("Convertir", nameof(GuideTeacherProposalController.Convert), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.GuideTeacher), id = item.Id }, new { @class = "btn btn-success mb-3"})
 									}

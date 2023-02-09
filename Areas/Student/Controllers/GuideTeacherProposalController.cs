@@ -90,7 +90,6 @@ public class GuideTeacherProposalController : ApplicationController {
 				Id = p.Id,
 				Title = p.Title,
 				GuideTeacherName = $"{p.GuideTeacherOwnerOfTheGuideTeacherProposal!.FirstName} {p.GuideTeacherOwnerOfTheGuideTeacherProposal!.LastName}",
-				ProposalStatus = p.ProposalStatus.ToString(),
 			}).AsEnumerable();
 		var ordered = this.Sort(sortOrder, proposals, parameters);
 		var output = !searchString.IsNullOrEmpty() ? this.Filter(searchString, ordered!, parameters) : ordered;

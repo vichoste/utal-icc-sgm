@@ -31,26 +31,6 @@
 									@this.Html.LabelFor(m => m.Requirements, new { @class = "form-label" }):
 									@this.Html.DisplayFor(m => m.Requirements, new { @class = "form-control" })
 								</div>
-								<div class="form-group mb-3">
-									@this.Html.LabelFor(m => m.GuideTeacherName, new { @class = "form-label" }):
-									@this.Html.DisplayFor(m => m.GuideTeacherName, new { @class = "form-control" })
-								</div>
-								<div class="form-group mb-3">
-									@this.Html.LabelFor(m => m.GuideTeacherEmail, new { @class = "form-label" }):
-									@this.Html.DisplayFor(m => m.GuideTeacherEmail, new { @class = "form-control" })
-								</div>
-								<div class="form-group mb-3">
-									@this.Html.LabelFor(m => m.GuideTeacherOffice, new { @class = "form-label" }):
-									@this.Html.DisplayFor(m => m.GuideTeacherOffice, new { @class = "form-control" })
-								</div>
-								<div class="form-group mb-3">
-									@this.Html.LabelFor(m => m.GuideTeacherSchedule, new { @class = "form-label" }):
-									@this.Html.DisplayFor(m => m.GuideTeacherSchedule, new { @class = "form-control" })
-								</div>
-								<div class="form-group mb-3">
-									@this.Html.LabelFor(m => m.GuideTeacherSpecialization, new { @class = "form-label" }):
-									@this.Html.DisplayFor(m => m.GuideTeacherSpecialization, new { @class = "form-control" })
-								</div>
 								@if (this.Model.AssistantTeachers!.Any()) {
 									<div class="form-group mb-3">
 										@this.Html.LabelFor(m => m.AssistantTeachers, new { @class = "form-label" }):

@@ -86,6 +86,10 @@ public class GuideTeacherProposalController : ApplicationController {
 		if (await base.CheckSession() is not ApplicationUser user) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
+		this.ViewData["Proposal"] = await this._dbContext.GuideTeacherProposals!
+			.Include(p => p.GuideTeacherOwnerOfTheGuideTeacherProposal)
+			.Where(p => p.GuideTeacherOwnerOfTheGuideTeacherProposal == user && p.ProposalStatus == GuideTeacherProposal.Status.Published)
+			.FirstOrDefaultAsync(p => p.Id == id);
 		var parameters = new[] { nameof(ApplicationUserViewModel.FirstName), nameof(ApplicationUserViewModel.LastName), nameof(ApplicationUserViewModel.StudentUniversityId), nameof(ApplicationUserViewModel.Rut), nameof(ApplicationUserViewModel.Email) };
 		base.SetSortParameters(sortOrder, parameters);
 		if (searchString is not null) {
@@ -95,7 +99,7 @@ public class GuideTeacherProposalController : ApplicationController {
 		}
 		this.ViewData["CurrentFilter"] = searchString;
 		var users = this._dbContext.GuideTeacherProposals!
-			.Where(p => p.GuideTeacherOwnerOfTheGuideTeacherProposal == user)
+			.Where(p => p.GuideTeacherOwnerOfTheGuideTeacherProposal == user && p.Id == id)
 			.Include(p => p.StudentsWhoAreInterestedInThisGuideTeacherProposal)
 			.SelectMany(p => p.StudentsWhoAreInterestedInThisGuideTeacherProposal!.Select(
 				u => new ApplicationUserViewModel {
@@ -418,23 +422,18 @@ public class GuideTeacherProposalController : ApplicationController {
 		}
 		var proposal = await this._dbContext.GuideTeacherProposals!
 			.Include(p => p.GuideTeacherOwnerOfTheGuideTeacherProposal)
-			.Where(p => p.GuideTeacherOwnerOfTheGuideTeacherProposal == user && p.ProposalStatus == GuideTeacherProposal.Status.Draft)
+			.Where(p => p.GuideTeacherOwnerOfTheGuideTeacherProposal == user && p.ProposalStatus == GuideTeacherProposal.Status.Published)
 			.Include(p => p.AssistantTeachersOfTheGuideTeacherProposal)
 			.FirstOrDefaultAsync(p => p.Id == id);
 		if (proposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
-			return this.RedirectToAction(nameof(GuideTeacherProposalController.Index), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(Student) });
+			return this.RedirectToAction(nameof(GuideTeacherProposalController.Index), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(GuideTeacher) });
 		}
 		var output = new GuideTeacherProposalViewModel {
 			Id = id,
 			Title = proposal.Title,
 			Description = proposal.Description,
 			Requirements = proposal.Requirements,
-			GuideTeacherName = $"{proposal.GuideTeacherOwnerOfTheGuideTeacherProposal!.FirstName} {proposal.GuideTeacherOwnerOfTheGuideTeacherProposal!.LastName}",
-			GuideTeacherEmail = proposal.GuideTeacherOwnerOfTheGuideTeacherProposal.Email,
-			GuideTeacherOffice = proposal.GuideTeacherOwnerOfTheGuideTeacherProposal.TeacherOffice,
-			GuideTeacherSchedule = proposal.GuideTeacherOwnerOfTheGuideTeacherProposal.TeacherSchedule,
-			GuideTeacherSpecialization = proposal.GuideTeacherOwnerOfTheGuideTeacherProposal.TeacherSpecialization,
 			AssistantTeachers = proposal.AssistantTeachersOfTheGuideTeacherProposal!.Select(at => $"{at!.FirstName} {at!.LastName}").ToList(),
 			CreatedAt = proposal.CreatedAt,
 			UpdatedAt = proposal.UpdatedAt,
