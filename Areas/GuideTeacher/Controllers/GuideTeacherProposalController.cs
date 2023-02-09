@@ -12,6 +12,7 @@ using Utal.Icc.Sgm.Models;
 using Utal.Icc.Sgm.ViewModels;
 
 using static Utal.Icc.Sgm.Models.ApplicationUser;
+using static Utal.Icc.Sgm.Models.GuideTeacherProposal;
 
 namespace Utal.Icc.Sgm.Areas.GuideTeacher.Controllers;
 
@@ -116,7 +117,7 @@ public class GuideTeacherProposalController : ApplicationController {
 		if (await base.CheckSession() is not ApplicationUser user) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
-		var parameters = new[] { nameof(GuideTeacherProposalViewModel.Title), nameof(GuideTeacherProposalViewModel.GuideTeacherName) };
+		var parameters = new[] { nameof(GuideTeacherProposalViewModel.Title) };
 		base.SetSortParameters(sortOrder, parameters);
 		if (searchString is not null) {
 			pageNumber = 1;
@@ -136,22 +137,18 @@ public class GuideTeacherProposalController : ApplicationController {
 		return this.View(PaginatedList<GuideTeacherProposalViewModel>.Create(output!.AsQueryable(), pageNumber ?? 1, 6));
 	}
 
-	public async Task<IActionResult> Create(string id) {
-		if (await base.CheckSession() is null) {
+	public async Task<IActionResult> Create() {
+		if (await base.CheckSession() is not ApplicationUser user) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
-		if (await base.CheckApplicationUser(id) is not ApplicationUser guideTeacher) {
-			this.TempData["ErrorMessage"] = "Error al obtener al profesor guía.";
-			return this.RedirectToAction(nameof(GuideTeacherProposalController.Index), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(GuideTeacher) });
-		}
-		await this.PopulateAssistantTeachers(guideTeacher);
+		await this.PopulateAssistantTeachers(user);
 		var output = new GuideTeacherProposalViewModel {
-			GuideTeacherId = guideTeacher.Id,
-			GuideTeacherName = $"{guideTeacher.FirstName} {guideTeacher.LastName}",
-			GuideTeacherEmail = guideTeacher.Email,
-			GuideTeacherOffice = guideTeacher.TeacherOffice,
-			GuideTeacherSchedule = guideTeacher.TeacherSchedule,
-			GuideTeacherSpecialization = guideTeacher.TeacherSpecialization,
+			GuideTeacherId = user.Id,
+			GuideTeacherName = $"{user.FirstName} {user.LastName}",
+			GuideTeacherEmail = user.Email,
+			GuideTeacherOffice = user.TeacherOffice,
+			GuideTeacherSchedule = user.TeacherSchedule,
+			GuideTeacherSpecialization = user.TeacherSpecialization,
 		};
 		return this.View(output);
 	}
@@ -167,6 +164,7 @@ public class GuideTeacherProposalController : ApplicationController {
 			Title = input.Title,
 			Description = input.Description,
 			Requirements = input.Requirements,
+			GuideTeacherOwnerOfTheGuideTeacherProposal = user,
 			AssistantTeachersOfTheGuideTeacherProposal = assistantTeachers!,
 			ProposalStatus = GuideTeacherProposal.Status.Draft,
 			CreatedAt = DateTimeOffset.Now,
@@ -345,7 +343,6 @@ public class GuideTeacherProposalController : ApplicationController {
 		}
 		var output = new GuideTeacherProposalViewModel {
 			Id = proposalId,
-			Title = proposal.Title,
 			StudentName = $"{student.FirstName} {student.LastName}",
 			StudentId = studentId,
 			StudentEmail = student.Email,
@@ -384,5 +381,64 @@ public class GuideTeacherProposalController : ApplicationController {
 		_ = await this._dbContext.SaveChangesAsync();
 		this.TempData["SuccessMessage"] = "El estudiante ha sido seleccionado a la propuesta correctamente.";
 		return this.RedirectToAction(nameof(GuideTeacherProposalController.Index), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(GuideTeacher) });
+	}
+
+	public async Task<IActionResult> Convert(string id) {
+		if (await base.CheckSession() is not ApplicationUser user) {
+			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
+		}
+		var proposal = await this._dbContext.GuideTeacherProposals!.AsNoTracking()
+			.Where(p => p.GuideTeacherOwnerOfTheGuideTeacherProposal == user && p.ProposalStatus == GuideTeacherProposal.Status.Ready)
+			.Include(p => p.StudentWhoIsAssignedToThisGuideTeacherProposal).AsNoTracking()
+			.Include(p => p.AssistantTeachersOfTheGuideTeacherProposal).AsNoTracking()
+			.FirstOrDefaultAsync(p => p.Id == id);
+		if (proposal is null) {
+			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
+			return this.RedirectToAction(nameof(GuideTeacherProposalController.Index), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(Student) });
+		}
+		var output = new GuideTeacherProposalViewModel {
+			Id = id,
+			Title = proposal.Title,
+			Description = proposal.Description,
+			Requirements = proposal.Requirements,
+			StudentName = $"{proposal.StudentWhoIsAssignedToThisGuideTeacherProposal!.FirstName} {proposal.StudentWhoIsAssignedToThisGuideTeacherProposal!.LastName}",
+			StudentEmail = proposal.StudentWhoIsAssignedToThisGuideTeacherProposal!.Email,
+			StudentRemainingCourses = proposal.StudentWhoIsAssignedToThisGuideTeacherProposal!.StudentRemainingCourses,
+			StudentIsDoingThePractice = proposal.StudentWhoIsAssignedToThisGuideTeacherProposal!.StudentIsDoingThePractice,
+			StudentIsWorking = proposal.StudentWhoIsAssignedToThisGuideTeacherProposal!.StudentIsWorking,
+			AssistantTeachers = proposal.AssistantTeachersOfTheGuideTeacherProposal!.Select(at => $"{at!.FirstName} {at!.LastName}").ToList(),
+			CreatedAt = proposal.CreatedAt,
+			UpdatedAt = proposal.UpdatedAt
+		};
+		return this.View(output);
+	}
+	public new async Task<IActionResult> View(string id) {
+		if (await base.CheckSession() is not ApplicationUser user) {
+			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
+		}
+		var proposal = await this._dbContext.GuideTeacherProposals!
+			.Include(p => p.GuideTeacherOwnerOfTheGuideTeacherProposal)
+			.Where(p => p.GuideTeacherOwnerOfTheGuideTeacherProposal == user && p.ProposalStatus == GuideTeacherProposal.Status.Draft)
+			.Include(p => p.AssistantTeachersOfTheGuideTeacherProposal)
+			.FirstOrDefaultAsync(p => p.Id == id);
+		if (proposal is null) {
+			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
+			return this.RedirectToAction(nameof(GuideTeacherProposalController.Index), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(Student) });
+		}
+		var output = new GuideTeacherProposalViewModel {
+			Id = id,
+			Title = proposal.Title,
+			Description = proposal.Description,
+			Requirements = proposal.Requirements,
+			GuideTeacherName = $"{proposal.GuideTeacherOwnerOfTheGuideTeacherProposal!.FirstName} {proposal.GuideTeacherOwnerOfTheGuideTeacherProposal!.LastName}",
+			GuideTeacherEmail = proposal.GuideTeacherOwnerOfTheGuideTeacherProposal.Email,
+			GuideTeacherOffice = proposal.GuideTeacherOwnerOfTheGuideTeacherProposal.TeacherOffice,
+			GuideTeacherSchedule = proposal.GuideTeacherOwnerOfTheGuideTeacherProposal.TeacherSchedule,
+			GuideTeacherSpecialization = proposal.GuideTeacherOwnerOfTheGuideTeacherProposal.TeacherSpecialization,
+			AssistantTeachers = proposal.AssistantTeachersOfTheGuideTeacherProposal!.Select(at => $"{at!.FirstName} {at!.LastName}").ToList(),
+			CreatedAt = proposal.CreatedAt,
+			UpdatedAt = proposal.UpdatedAt,
+		};
+		return this.View(output);
 	}
 }
