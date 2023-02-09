@@ -103,6 +103,7 @@ public class GuideTeacherProposalController : ApplicationController {
 		var proposal = await this._dbContext.GuideTeacherProposals!.AsNoTracking()
 			.Where(p => p.ProposalStatus == Status.Published)
 			.Include(p => p.GuideTeacherOwnerOfTheGuideTeacherProposal).AsNoTracking()
+			.Include(p => p.AssistantTeachersOfTheGuideTeacherProposal).AsNoTracking()
 			.FirstOrDefaultAsync(p => p.Id == id);
 		if (proposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
@@ -174,6 +175,7 @@ public class GuideTeacherProposalController : ApplicationController {
 			.Where(p => (p.StudentsWhoAreInterestedInThisGuideTeacherProposal!.Contains(user) || p.StudentWhoIsAssignedToThisGuideTeacherProposal == user) && (p.ProposalStatus == Status.Published || p.ProposalStatus == Status.Ready))
 			.Include(p => p.GuideTeacherOwnerOfTheGuideTeacherProposal).AsNoTracking()
 			.Include(p => p.StudentWhoIsAssignedToThisGuideTeacherProposal).AsNoTracking()
+			.Include(p => p.AssistantTeachersOfTheGuideTeacherProposal).AsNoTracking()
 			.FirstOrDefaultAsync(p => p.Id == id);
 		if (proposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
