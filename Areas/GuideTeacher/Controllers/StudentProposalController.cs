@@ -189,7 +189,6 @@ public class StudentProposalController : ApplicationController {
 		if (proposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
 			return this.RedirectToAction(nameof(StudentProposalController.Index), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(GuideTeacher) });
-
 		}
 		proposal.ProposalStatus = StudentProposal.Status.ApprovedByGuideTeacher;
 		proposal.UpdatedAt = DateTimeOffset.Now;

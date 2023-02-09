@@ -84,7 +84,7 @@ public class StudentProposalController : ApplicationController {
 		if (await base.CheckSession() is null) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
-		var parameters = new[] { nameof(ApplicationUserViewModel.FirstName), nameof(ApplicationUserViewModel.LastName), nameof(ApplicationUserViewModel.Email), nameof(ApplicationUserViewModel.TeacherOffice), nameof(ApplicationUserViewModel.TeacherSchedule), nameof(ApplicationUserViewModel.TeacherSpecialization) };
+		var parameters = new[] { nameof(ApplicationUserViewModel.FirstName), nameof(ApplicationUserViewModel.LastName), nameof(ApplicationUserViewModel.Email), nameof(ApplicationUserViewModel.TeacherSpecialization) };
 		base.SetSortParameters(sortOrder, parameters);
 		if (searchString is not null) {
 			pageNumber = 1;
@@ -99,10 +99,7 @@ public class StudentProposalController : ApplicationController {
 					Id = u.Id,
 					FirstName = u.FirstName,
 					LastName = u.LastName,
-					Rut = u.Rut,
 					Email = u.Email,
-					TeacherOffice = u.TeacherOffice,
-					TeacherSchedule = u.TeacherSchedule,
 					TeacherSpecialization = u.TeacherSpecialization
 				}
 		).AsEnumerable();
