@@ -51,7 +51,7 @@
 											<span class="badge bg-primary">Postulado</span>
 											break;
 										case nameof(GuideTeacherProposal.Status.Ready):
-											if (string.IsNullOrEmpty(item.StudentName)) {
+											if (!item.StudentIsAccepted) {
 												<span class="badge bg-danger">Rechazado</span>
 											} else {
 												<span class="badge bg-success">Aceptado</span>

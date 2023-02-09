@@ -64,6 +64,7 @@ public class GuideTeacherProposalController : ApplicationController {
 				Title = p.Title,
 				GuideTeacherName = $"{p.GuideTeacherOwnerOfTheGuideTeacherProposal!.FirstName} {p.GuideTeacherOwnerOfTheGuideTeacherProposal!.LastName}",
 				ProposalStatus = p.ProposalStatus.ToString(),
+				StudentIsAccepted = p.StudentWhoIsAssignedToThisGuideTeacherProposal! == user
 			}).AsEnumerable();
 		var ordered = this.Sort(sortOrder, proposals, parameters);
 		var output = !searchString.IsNullOrEmpty() ? this.Filter(searchString, ordered!, parameters) : ordered;
@@ -165,5 +166,33 @@ public class GuideTeacherProposalController : ApplicationController {
 		_ = await this._dbContext.SaveChangesAsync();
 		this.TempData["SuccessMessage"] = "Has postulado a la propuesta correctamente.";
 		return this.RedirectToAction(nameof(GuideTeacherProposalController.Index), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(Student) });
+	}
+	public async Task<IActionResult> Summary(string id) {
+		if (await base.CheckSession() is not ApplicationUser user) {
+			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
+		}
+		var proposal = await this._dbContext.GuideTeacherProposals!.AsNoTracking()
+			.Where(p => p.StudentsWhoAreInterestedInThisGuideTeacherProposal!.Contains(user) && (p.ProposalStatus == Status.Published || p.ProposalStatus == Status.Ready))
+			.Include(p => p.GuideTeacherOwnerOfTheGuideTeacherProposal).AsNoTracking()
+			.FirstOrDefaultAsync(p => p.Id == id);
+		if (proposal is null) {
+			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
+			return this.RedirectToAction(nameof(GuideTeacherProposalController.Index), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(Student) });
+		}
+		var output = new GuideTeacherProposalViewModel {
+			Id = id,
+			Title = proposal.Title,
+			Description = proposal.Description,
+			Requirements = proposal.Requirements,
+			GuideTeacherName = $"{proposal.GuideTeacherOwnerOfTheGuideTeacherProposal!.FirstName} {proposal.GuideTeacherOwnerOfTheGuideTeacherProposal!.LastName}",
+			GuideTeacherEmail = proposal.GuideTeacherOwnerOfTheGuideTeacherProposal.Email,
+			GuideTeacherOffice = proposal.GuideTeacherOwnerOfTheGuideTeacherProposal.TeacherOffice,
+			GuideTeacherSchedule = proposal.GuideTeacherOwnerOfTheGuideTeacherProposal.TeacherSchedule,
+			GuideTeacherSpecialization = proposal.GuideTeacherOwnerOfTheGuideTeacherProposal.TeacherSpecialization,
+			AssistantTeachers = proposal.AssistantTeachersOfTheGuideTeacherProposal!.Select(at => $"{at!.FirstName} {at!.LastName}").ToList(),
+			CreatedAt = proposal.CreatedAt,
+			UpdatedAt = proposal.UpdatedAt,
+		};
+		return this.View(output);
 	}
 }

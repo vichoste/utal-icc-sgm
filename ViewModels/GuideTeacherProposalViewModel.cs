@@ -3,6 +3,8 @@ using System.ComponentModel.DataAnnotations;
 namespace Utal.Icc.Sgm.ViewModels;
 
 public class GuideTeacherProposalViewModel : ProposalViewModel {
+	[Display(Name = "¿El estudiante está aceptado?")]
+	public bool StudentIsAccepted { get; set; }
 	[Display(Name = "Requisitos")]
 	public string? Requirements { get; set; }
 	[Display(Name = "Estudiantes interesados")]
