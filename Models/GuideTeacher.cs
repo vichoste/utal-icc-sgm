@@ -1,7 +1,5 @@
 using System.ComponentModel.DataAnnotations.Schema;
 
-using Microsoft.AspNetCore.Identity;
-
 namespace Utal.Icc.Sgm.Models;
 
 public partial class ApplicationUser {

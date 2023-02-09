@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Utal.Icc.Sgm.Models;
+﻿namespace Utal.Icc.Sgm.Models;
 
 public class StudentProposal : Proposal {
 	public enum Status {

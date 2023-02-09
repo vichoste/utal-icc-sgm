@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace Utal.Icc.Sgm.Models;
 
 public class GuideTeacherProposal : Proposal {
