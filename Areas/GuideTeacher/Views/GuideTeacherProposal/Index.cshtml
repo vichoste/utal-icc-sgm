@@ -20,7 +20,7 @@
 			@this.Html.ActionLink("Crear propuesta", nameof(GuideTeacherProposalController.Create), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.GuideTeacher) }, new { @class = "btn btn-success"})
 		</div>
 		<div class="col-12 mb-3">
-			<partial name="_Filter", model=@(new FilterPartialViewModel(nameof(GuideTeacherProposalController.Index), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), nameof(Utal.Icc.Sgm.Areas.Student))) />
+			<partial name="_Filter", model=@(new FilterPartialViewModel(nameof(GuideTeacherProposalController.Index), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), nameof(Utal.Icc.Sgm.Areas.GuideTeacher))) />
 		</div>
 	</div>
 	<div class="row justify-content-center">
