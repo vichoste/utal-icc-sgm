@@ -1,0 +1,80 @@
+﻿@using Utal.Icc.Sgm
+@using Utal.Icc.Sgm.Models
+@using Utal.Icc.Sgm.ViewModels
+@using Utal.Icc.Sgm.Views.Shared
+@using Utal.Icc.Sgm.Areas.Student.Controllers
+
+@model PaginatedList<GuideTeacherProposalViewModel>
+
+@{
+	this.ViewData["Title"] = "Propuestas de profesores guía";
+}
+
+<div class="container">
+	<partial name="_Alerts" />
+	<div class="row justify-content-center">
+		<div class="col-12 mb-3">
+			<h2>@this.ViewData["Title"]</h2>
+		</div>
+		<div class="col-12 mb-3">
+			<partial name="_Filter" , model=@(new FilterPartialViewModel(nameof(GuideTeacherProposalController.Index), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), nameof(Utal.Icc.Sgm.Areas.Student))) />
+		</div>
+	</div>
+	<div class="row justify-content-center">
+		<div class="col-12">
+			<div class="table-responsive">
+				<table class="table table-bordered">
+					<thead class="table-dark">
+						<tr>
+							<th>
+								<a asp-action="@nameof(GuideTeacherProposalController.Index)" asp-route-sortOrder="@this.ViewData[$"{nameof(GuideTeacherProposalViewModel.Title)}SortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+									Título
+								</a>
+							</th>
+							<th>
+								<a asp-action="@nameof(GuideTeacherProposalController.Index)" asp-route-sortOrder="@this.ViewData[$"{nameof(GuideTeacherProposalViewModel.GuideTeacherName)}SortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+									Profesor Guía
+								</a>
+							</th>
+							<th>Acciones</th>
+						</tr>
+					</thead>
+					<tbody>
+						@foreach (var item in this.Model) {
+							<tr>
+								<td>@item.Title</td>
+								<td>@item.GuideTeacherName</td>
+								<td>
+									@this.Html.ActionLink("Ver", nameof(GuideTeacherProposalController.View), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.Student), id = item.Id }, new { @class = "btn btn-yellow mb-3"})
+								</td>
+							</tr>
+						}
+					</tbody>
+				</table>
+				@{
+					var prevDisabled = !this.Model.HasPreviousPage ? "disabled" : "";
+					var nextDisabled = !this.Model.HasNextPage ? "disabled" : "";
+				}
+				<ul class="pagination mb-0">
+					<li class="page-item @prevDisabled">
+						<a asp-action="@nameof(GuideTeacherProposalController.Index)" asp-route-sortOrder="@this.ViewData["CurrentSort"]" asp-route-pageNumber="@(this.Model.PageIndex - 1)" asp-route-currentFilter="@this.ViewData["CurrentFilter"]" class="page-link">
+							Anterior página
+						</a>
+					</li>
+					@for (var i = 0; i < this.Model.TotalPages; i++) {
+						<li class="page-item @(i + 1 == this.Model.PageIndex ? " active" : "")">
+							<a asp-action="@nameof(GuideTeacherProposalController.Index)" asp-route-sortOrder="@this.ViewData["CurrentSort"]" asp-route-pageNumber="@(i + 1)" asp-route-currentFilter="@this.ViewData["CurrentFilter"]" class="page-link">
+								@(i + 1)
+							</a>
+						</li>
+					}
+					<li class="page-item @nextDisabled">
+						<a asp-action="@nameof(GuideTeacherProposalController.Index)" asp-route-sortOrder="@this.ViewData["CurrentSort"]" asp-route-pageNumber="@(this.Model.PageIndex + 1)" asp-route-currentFilter="@this.ViewData["CurrentFilter"]" class="page-link">
+							Siguiente página
+						</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+</div>

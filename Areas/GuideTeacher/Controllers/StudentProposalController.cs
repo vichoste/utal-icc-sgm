@@ -20,7 +20,7 @@ namespace Utal.Icc.Sgm.Areas.GuideTeacher.Controllers;
 public class StudentProposalController : ApplicationController {
 	public StudentProposalController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, SignInManager<ApplicationUser> signInManager) : base(dbContext, userManager, userStore, signInManager) { }
 
-	protected async Task Populate(ApplicationUser guideTeacher) {
+	protected async Task PopulateAssistantTeachers(ApplicationUser guideTeacher) {
 		var assistantTeachers = (
 			await this._userManager.GetUsersInRoleAsync(nameof(Roles.AssistantTeacher)))
 				.Where(at => at != guideTeacher && !at.IsDeactivated)
@@ -189,7 +189,6 @@ public class StudentProposalController : ApplicationController {
 		if (proposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
 			return this.RedirectToAction(nameof(StudentProposalController.Index), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(GuideTeacher) });
-
 		}
 		proposal.ProposalStatus = StudentProposal.Status.ApprovedByGuideTeacher;
 		proposal.UpdatedAt = DateTimeOffset.Now;

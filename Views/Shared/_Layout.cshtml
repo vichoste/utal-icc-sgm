@@ -16,6 +16,7 @@
 	<meta name="author" content="@ViewData["MetaAuthor"]" />
 	<meta name="keywords" content="@ViewData["MetaKeywords"]" />
 	@RenderSection("MetaTag", required: false)
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css" integrity="sha512-SzlrxWUlpfuzQ+pcUCosxcglQRNAq/DZjVsC0lE40xsADsfeQoEypE+enwcOiGjk/bSuGGKHEyjSoQ1zVisanQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 	<link href="~/css/vendor.min.css" rel="stylesheet" />
 	<link href="~/css/app.min.css" rel="stylesheet" />
 	<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
@@ -49,6 +50,7 @@
 			ajax: { ignoreURLs: ['mainHub', '__browserLink', 'browserLinkSignalR'], trackWebSockets: false }
 		};
 	</script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/js/all.min.js" integrity="sha512-2bMhOkE/ACz21dJT8zBOMgMecNxx0d37NND803ExktKiKdSzdwn+L7i9fdccw/3V06gM/DBWKbYmQvKMdAA9Nw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 	<script src="~/js/vendor.min.js"></script>
 	<script src="~/js/app.min.js"></script>
 	@RenderSection("Scripts", required: false)

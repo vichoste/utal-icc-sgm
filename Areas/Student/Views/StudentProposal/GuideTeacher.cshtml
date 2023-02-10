@@ -44,16 +44,6 @@
 								</a>
 							</th>
 							<th>
-								<a asp-action="@nameof(StudentProposalController.GuideTeacher)" asp-route-sortOrder="@this.ViewData[$"{nameof(ApplicationUserViewModel.TeacherOffice)}SortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
-									Oficina
-								</a>
-							</th>
-							<th>
-								<a asp-action="@nameof(StudentProposalController.GuideTeacher)" asp-route-sortOrder="@this.ViewData[$"{nameof(ApplicationUserViewModel.TeacherSchedule)}SortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
-									Horarios
-								</a>
-							</th>
-							<th>
 								<a asp-action="@nameof(StudentProposalController.GuideTeacher)" asp-route-sortOrder="@this.ViewData[$"{nameof(ApplicationUserViewModel.TeacherSpecialization)}SortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
 									Especialización
 								</a>
@@ -67,8 +57,6 @@
 								<td>@item.FirstName</td>
 								<td>@item.LastName</td>
 								<td>@item.Email</td>
-								<td>@item.TeacherOffice</td>
-								<td>@item.TeacherSchedule</td>
 								<td>@item.TeacherSpecialization</td>
 								<td>
 									@this.Html.ActionLink("Seleccionar", nameof(StudentProposalController.Create), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.Student), id = item.Id }, new { @class = "btn btn-success mb-3"})
