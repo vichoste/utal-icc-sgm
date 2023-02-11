@@ -13,7 +13,7 @@ using static Utal.Icc.Sgm.Models.ApplicationUser;
 namespace Utal.Icc.Sgm.Areas.DirectorTeacher.Controllers;
 
 [Area(nameof(DirectorTeacher)), Authorize(Roles = nameof(Roles.DirectorTeacher))]
-public class TeacherController : ApplicationController {
+public class TeacherController : ApplicationUserController {
 	public TeacherController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, SignInManager<ApplicationUser> signInManager) : base(dbContext, userManager, userStore, signInManager) { }
 
 	public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? pageNumber)

@@ -15,7 +15,7 @@ using static Utal.Icc.Sgm.Models.ApplicationUser;
 namespace Utal.Icc.Sgm.Areas.Student.Controllers;
 
 [Area(nameof(Student)), Authorize(Roles = nameof(Roles.Student))]
-public class StudentProposalController : ApplicationController {
+public class StudentProposalController : ProposalController {
 	public StudentProposalController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, SignInManager<ApplicationUser> signInManager) : base(dbContext, userManager, userStore, signInManager) { }
 
 	protected async Task PopulateAssistantTeachers(ApplicationUser guideTeacher) {
@@ -29,7 +29,7 @@ public class StudentProposalController : ApplicationController {
 			Value = at.Id
 		});
 	}
-	
+
 	protected IEnumerable<StudentProposalViewModel> Filter(string searchString, IOrderedEnumerable<StudentProposalViewModel> viewModels, params string[] parameters) {
 		var result = new List<StudentProposalViewModel>();
 		foreach (var parameter in parameters) {
