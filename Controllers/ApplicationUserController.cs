@@ -13,13 +13,10 @@ namespace Utal.Icc.Sgm.Controllers;
 public abstract class ApplicationUserController : ApplicationController {
 	public ApplicationUserController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, SignInManager<ApplicationUser> signInManager) : base(dbContext, userManager, userStore, signInManager) { }
 
-	protected async Task<IActionResult> Create<T1, T2>() where T1 : ApplicationUser where T2 : ApplicationUserViewModel, new() => await this.CheckSession() is not T1 user
-		? this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty })
-		: user.IsDeactivated ? this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty }) : this.View(new T2());
+	protected T Create<T>() where T : ApplicationUserViewModel, new() => new T();
 
-
-	protected async Task<T1?> CreateAsync<T1, T2>([FromForm] T2 input, IEnumerable<string> roles) where T1 : ApplicationUser, new() where T2 : ApplicationUserViewModel {
-		var user = new T1 {
+	protected async Task<ApplicationUser?> CreateAsync<T>([FromForm] T input, IEnumerable<string> roles) where T : ApplicationUserViewModel {
+		var user = new ApplicationUser {
 			FirstName = input.FirstName,
 			LastName = input.LastName,
 			Rut = input.Rut,
@@ -47,12 +44,6 @@ public abstract class ApplicationUserController : ApplicationController {
 			CreatedAt = user.CreatedAt,
 			UpdatedAt = user.UpdatedAt
 		};
-		if (output is EditTeacherViewModel teacher) {
-			teacher.IsAssistantTeacher = await this._userManager.IsInRoleAsync(user, nameof(Roles.AssistantTeacher));
-			teacher.IsCommitteeTeacher = await this._userManager.IsInRoleAsync(user, nameof(Roles.CommitteeTeacher));
-			teacher.IsCourseTeacher = await this._userManager.IsInRoleAsync(user, nameof(Roles.CourseTeacher));
-			teacher.IsGuideTeacher = await this._userManager.IsInRoleAsync(user, nameof(Roles.GuideTeacher));
-		}
 		return output;
 	}
 
@@ -115,7 +106,7 @@ public abstract class ApplicationUserController : ApplicationController {
 			return null;
 		}
 		var output = new T {
-			Id = user.Id,
+			Id = user!.Id,
 			Email = user.Email,
 			IsDeactivated = user.IsDeactivated
 		};
@@ -127,7 +118,7 @@ public abstract class ApplicationUserController : ApplicationController {
 		if (user is null || user.Id == this._userManager.GetUserId(this.User) || (await this._userManager.GetRolesAsync(user)).Contains(nameof(Roles.DirectorTeacher))) {
 			return null;
 		}
-		user.IsDeactivated = !user.IsDeactivated;
+		user!.IsDeactivated = !user.IsDeactivated;
 		user.UpdatedAt = DateTimeOffset.Now;
 		_ = await this._userManager.UpdateAsync(user);
 		return user;

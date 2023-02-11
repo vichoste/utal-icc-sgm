@@ -18,24 +18,35 @@ public class TeacherController : ApplicationUserController {
 
 	public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? pageNumber)
 		=> this.View(await base.GetPaginatedViewModelsAsync<ApplicationUserViewModel>(sortOrder, currentFilter, searchString, pageNumber, new[] { nameof(ApplicationUserViewModel.FirstName), nameof(ApplicationUserViewModel.LastName), nameof(ApplicationUserViewModel.StudentUniversityId), nameof(ApplicationUserViewModel.Rut), nameof(ApplicationUserViewModel.Email) },
-			(await this._userManager.GetUsersInRoleAsync(nameof(Roles.Teacher))).Select(
-						async u => new IndexTeacherViewModel {
-							Id = u.Id,
-							FirstName = u.FirstName,
-							LastName = u.LastName,
-							Rut = u.Rut,
-							Email = u.Email,
-							IsDeactivated = u.IsDeactivated,
-							IsDirectorTeacher = await this._userManager.IsInRoleAsync(u, nameof(Roles.DirectorTeacher)),
-						}
-					).Select(u => u.Result).AsEnumerable()
+			async () => (await this._userManager.GetUsersInRoleAsync(nameof(Roles.Student))).Select(
+				async u => new ApplicationUserViewModel {
+					Id = u.Id,
+					FirstName = u.FirstName,
+					LastName = u.LastName,
+					StudentUniversityId = u.StudentUniversityId,
+					Rut = u.Rut,
+					Email = u.Email,
+					IsDeactivated = u.IsDeactivated,
+					IsDirectorTeacher = await this._userManager.IsInRoleAsync(u, nameof(Roles.DirectorTeacher)),
+				}
+			).Select(u => u.Result)
+			.AsEnumerable()
 		)
 	);
 
-	public async Task<IActionResult> Create() => await base.Create<ApplicationUser, CreateTeacherViewModel>();
+	public async Task<IActionResult> Create() {
+		if (await base.CheckSession() is null) {
+			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
+		}
+		var output = base.Create<CreateTeacherViewModel>();
+		return this.View(output);
+	}
 
-	[HttpPost]
+	[HttpPost, ValidateAntiForgeryToken]
 	public async Task<IActionResult> Create([FromForm] CreateTeacherViewModel input) {
+		if (await base.CheckSession() is null) {
+			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
+		}
 		var roles = new List<string>();
 		if (input.IsGuideTeacher) {
 			roles.Add(nameof(Roles.GuideTeacher));
@@ -49,18 +60,67 @@ public class TeacherController : ApplicationUserController {
 		if (input.IsCommitteeTeacher) {
 			roles.Add(nameof(Roles.CommitteeTeacher));
 		}
-		return await base.Create<CreateTeacherViewModel, ApplicationUser>(input, roles, nameof(TeacherController.Index), nameof(TeacherController).Replace("Controller", string.Empty), nameof(DirectorTeacher));
+		var output = await base.CreateAsync<ApplicationUserViewModel>(input, roles);
+		if (output is null) {
+			this.TempData["ErrorMessage"] = "Error al crear al profesor.";
+			return this.RedirectToAction(nameof(TeacherController.Index), nameof(TeacherController).Replace("Controller", string.Empty), new { area = nameof(DirectorTeacher) });
+		}
+		this.TempData["SuccessMessage"] = "Profesor creado exitosamente.";
+		return this.RedirectToAction(nameof(TeacherController.Index), nameof(TeacherController).Replace("Controller", string.Empty), new { area = nameof(DirectorTeacher) });
 	}
 
-	public async Task<IActionResult> Edit(string id) => await base.Edit<EditTeacherViewModel>(id, nameof(TeacherController.Index), nameof(TeacherController).Replace("Controller", string.Empty), nameof(DirectorTeacher));
+	public async Task<IActionResult> Edit(string id) {
+		if (await base.CheckSession() is null) {
+			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
+		}
+		var output = await base.EditAsync<ApplicationUserViewModel>(id);
+		if (output is null) {
+			this.TempData["ErrorMessage"] = "Error al editar al profesor.";
+			return this.RedirectToAction(nameof(TeacherController.Index), nameof(TeacherController).Replace("Controller", string.Empty), new { area = nameof(DirectorTeacher) });
+		}
+		return this.View(output);
+	}
 
 	[HttpPost, ValidateAntiForgeryToken]
-	public async Task<IActionResult> Edit([FromForm] EditTeacherViewModel input) => await base.Edit<EditTeacherViewModel>(input, nameof(TeacherController.Index), nameof(TeacherController).Replace("Controller", string.Empty), nameof(DirectorTeacher));
+	public async Task<IActionResult> Edit([FromForm] EditTeacherViewModel input) {
+		if (await base.CheckSession() is null) {
+			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
+		}
+		var output = await base.EditAsync<ApplicationUserViewModel>(input);
+		if (output is null) {
+			this.TempData["ErrorMessage"] = "Error al editar al profesor.";
+			return this.RedirectToAction(nameof(TeacherController.Index), nameof(TeacherController).Replace("Controller", string.Empty), new { area = nameof(DirectorTeacher) });
+		}
+		this.TempData["SuccessMessage"] = "Profesor editado exitosamente.";
+		return this.RedirectToAction(nameof(TeacherController.Index), nameof(TeacherController).Replace("Controller", string.Empty), new { area = nameof(DirectorTeacher) });
+	}
 
-	public async Task<IActionResult> ToggleActivation(string id) => await base.ToggleActivation<ApplicationUserViewModel>(id, nameof(TeacherController.Index), nameof(TeacherController).Replace("Controller", string.Empty), nameof(DirectorTeacher));
+	public async Task<IActionResult> ToggleActivation(string id) {
+		if (await base.CheckSession() is null) {
+			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
+		}
+		var output = await base.ToggleActivationAsync<ApplicationUserViewModel>(id);
+		if (output is null) {
+			this.TempData["ErrorMessage"] = "Error al cambiar la activación al profesor.";
+			return this.RedirectToAction(nameof(StudentController.Index), nameof(StudentController).Replace("Controller", string.Empty), new { area = nameof(DirectorTeacher) });
+		}
+		this.TempData["SuccessMessage"] = "Profesor cambiado correctamente.";
+		return this.RedirectToAction(nameof(StudentController.Index), nameof(StudentController).Replace("Controller", string.Empty), new { area = nameof(DirectorTeacher) });
+	}
 
 	[HttpPost, ValidateAntiForgeryToken]
-	public async Task<IActionResult> ToggleActivation([FromForm] ApplicationUserViewModel input) => await base.ToggleActivation<ApplicationUserViewModel>(input, nameof(TeacherController.Index), nameof(TeacherController).Replace("Controller", string.Empty), nameof(DirectorTeacher));
+	public async Task<IActionResult> ToggleActivation([FromForm] ApplicationUserViewModel input) {
+		if (await base.CheckSession() is null) {
+			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
+		}
+		var output = await base.ToggleActivationAsync<ApplicationUserViewModel>(input);
+		if (output is null) {
+			this.TempData["ErrorMessage"] = "Error al cambiar la activación al profesor.";
+			return this.RedirectToAction(nameof(StudentController.Index), nameof(StudentController).Replace("Controller", string.Empty), new { area = nameof(DirectorTeacher) });
+		}
+		this.TempData["SuccessMessage"] = "Profesor cambiado correctamente.";
+		return this.RedirectToAction(nameof(StudentController.Index), nameof(StudentController).Replace("Controller", string.Empty), new { area = nameof(DirectorTeacher) });
+	}
 
 	public async Task<IActionResult> Transfer(string currentDirectorTeacherId, string newDirectorTeacherId) {
 		if (await base.CheckSession() is null) {

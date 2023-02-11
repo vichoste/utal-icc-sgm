@@ -9,4 +9,6 @@ public partial class ApplicationUserViewModel {
 	public string? TeacherSchedule { get; set; }
 	[Display(Name = "Especialización")]
 	public string? TeacherSpecialization { get; set; }
+	[Display(Name = "¿Es director de carrera?")]
+	public bool? IsDirectorTeacher { get; set; }
 }
