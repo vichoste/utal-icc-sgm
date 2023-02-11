@@ -10,5 +10,5 @@ public partial class ProposalViewModel : ApplicationViewModel {
 	[Display(Name = "Estado de la propuesta")]
 	public string? ProposalStatus { get; set; }
 	[Display(Name = "Profesores co-guía")]
-	public ICollection<string>? AssistantTeachers { get; set; } = new HashSet<string>();
+	public IEnumerable<string?>? AssistantTeachers { get; set; } = new HashSet<string?>();
 }

@@ -59,7 +59,7 @@
 					<tbody>
 						@foreach (var item in this.Model) {
 							<tr>
-								@if (item.IsDeactivated) {
+								@if (item.IsDeactivated is true) {
 									<td class="text-muted">@item.FirstName</td>
 									<td class="text-muted">@item.LastName</td>
 									<td class="text-muted">@item.Rut</td>

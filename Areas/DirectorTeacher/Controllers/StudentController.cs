@@ -33,12 +33,13 @@ public class StudentController : ApplicationUserController {
 					Email = u.Email,
 					IsDeactivated = u.IsDeactivated
 				}
-			).AsEnumerable()
+				)
+			.AsEnumerable()
 		);
 
 	public async Task<IActionResult> Create() => await base.CheckSession() is not ApplicationUser user
-			? this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty })
-			: user.IsDeactivated ? this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty }) : this.View(new CsvFileViewModel());
+		? this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty })
+		: user.IsDeactivated ? this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty }) : this.View(new CsvFileViewModel());
 
 	[HttpPost]
 	public async Task<IActionResult> Create([FromForm] CsvFileViewModel input) {

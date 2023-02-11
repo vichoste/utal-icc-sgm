@@ -18,5 +18,5 @@ public partial class ProposalViewModel {
 	[Display(Name = "Especialización")]
 	public string? GuideTeacherSpecialization { get; set; }
 	[Display(Name = "Estudiantes interesados")]
-	public ICollection<string>? StudentsWhoAreInterestedInThisProposal { get; set; } = new HashSet<string>();
+	public IEnumerable<string?>? StudentsWhoAreInterestedInThisProposal { get; set; } = new HashSet<string>();
 }

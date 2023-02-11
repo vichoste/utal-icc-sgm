@@ -41,22 +41,60 @@ public abstract class ProposalController : ApplicationController {
 			AssistantTeachers = proposal.AssistantTeachersOfTheProposal!.Select(at => $"{at!.FirstName} {at!.LastName}").ToList(),
 			CreatedAt = proposal.CreatedAt,
 			UpdatedAt = proposal.UpdatedAt,
+			GuideTeacherId = proposal.GuideTeacherOfTheProposal?.Id,
+			GuideTeacherName = $"{proposal.GuideTeacherOfTheProposal?.FirstName} {proposal.GuideTeacherOfTheProposal?.LastName}",
+			Requirements = proposal.Requirements,
+			GuideTeacherEmail = proposal.GuideTeacherOfTheProposal?.Email,
+			GuideTeacherOffice = proposal.GuideTeacherOfTheProposal?.TeacherOffice,
+			GuideTeacherSchedule = proposal.GuideTeacherOfTheProposal?.TeacherSchedule,
+			GuideTeacherSpecialization = proposal.GuideTeacherOfTheProposal?.TeacherSpecialization,
+			StudentsWhoAreInterestedInThisProposal = proposal.StudentsWhoAreInterestedInThisProposal?.Select(s => $"{s!.FirstName} {s!.LastName}"),
+			StudentId = proposal.StudentOfTheProposal?.Id,
+			StudentName = $"{proposal.StudentOfTheProposal?.FirstName} {proposal.StudentOfTheProposal?.LastName}",
+			StudentEmail = proposal.StudentOfTheProposal?.Email,
+			StudentUniversityId = proposal.StudentOfTheProposal?.StudentUniversityId,
+			StudentRemainingCourses = proposal.StudentOfTheProposal?.StudentRemainingCourses,
+			StudentIsDoingThePractice = proposal.StudentOfTheProposal?.StudentIsDoingThePractice,
+			StudentIsWorking = proposal.StudentOfTheProposal?.StudentIsWorking,
 		};
-		if (proposal is GuideTeacherProposal guideTeacherProposal && output is GuideTeacherProposalViewModel guideTeacherProposalViewModel) {
-			guideTeacherProposalViewModel.Requirements = guideTeacherProposal.Requirements;
-			guideTeacherProposalViewModel.GuideTeacherName = $"{guideTeacherProposal.GuideTeacherOwnerOfTheGuideTeacherProposal!.FirstName} {guideTeacherProposal.GuideTeacherOwnerOfTheGuideTeacherProposal!.LastName}";
-			guideTeacherProposalViewModel.GuideTeacherEmail = guideTeacherProposal.GuideTeacherOwnerOfTheGuideTeacherProposal!.Email;
-			guideTeacherProposalViewModel.GuideTeacherOffice = guideTeacherProposal.GuideTeacherOwnerOfTheGuideTeacherProposal!.TeacherOffice;
-			guideTeacherProposalViewModel.GuideTeacherSchedule = guideTeacherProposal.GuideTeacherOwnerOfTheGuideTeacherProposal!.TeacherSpecialization;
-			guideTeacherProposalViewModel.GuideTeacherSpecialization = guideTeacherProposal.GuideTeacherOwnerOfTheGuideTeacherProposal!.TeacherSpecialization;
-		} else if (proposal is StudentProposal studentProposal && output is StudentProposalViewModel studentProposalViewModel) {
-			studentProposalViewModel.StudentUniversityId = studentProposal.StudentOwnerOfTheStudentProposal!.StudentUniversityId;
-			studentProposalViewModel.StudentName = $"{studentProposal.StudentOwnerOfTheStudentProposal!.FirstName} {studentProposal.StudentOwnerOfTheStudentProposal!.LastName}";
-			studentProposalViewModel.StudentEmail = studentProposal.StudentOwnerOfTheStudentProposal!.Email;
-			studentProposalViewModel.StudentRemainingCourses = studentProposal.StudentOwnerOfTheStudentProposal!.StudentRemainingCourses;
-			studentProposalViewModel.StudentIsDoingThePractice = studentProposal.StudentOwnerOfTheStudentProposal!.StudentIsDoingThePractice;
-			studentProposalViewModel.StudentIsWorking = studentProposal.StudentOwnerOfTheStudentProposal!.StudentIsWorking;
-		}
 		return this.View(output);
+	}
+
+	public async Task<IActionResult> Create(bool isStudent) {
+		if (await base.CheckSession() is not ApplicationUser user) {
+			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
+		}
+		await this.PopulateAssistantTeachers(user);
+		var output = new ProposalViewModel {
+			GuideTeacherId = user.Id,
+			GuideTeacherName = $"{user.FirstName} {user.LastName}",
+			GuideTeacherEmail = user.Email,
+			GuideTeacherOffice = user.TeacherOffice,
+			GuideTeacherSchedule = user.TeacherSchedule,
+			GuideTeacherSpecialization = user.TeacherSpecialization,
+		};
+		return this.View(output);
+	}
+
+	public async Task<IActionResult> Create([FromForm] GuideTeacherProposalViewModel input) {
+		if (await base.CheckSession() is not ApplicationUser user) {
+			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
+		}
+		var assistantTeachers = input.AssistantTeachers!.Select(async at => await this.CheckApplicationUser(at)).Select(at => at.Result).ToList();
+		var proposal = new GuideTeacherProposal {
+			Id = Guid.NewGuid().ToString(),
+			Title = input.Title,
+			Description = input.Description,
+			Requirements = input.Requirements,
+			GuideTeacherOwnerOfTheGuideTeacherProposal = user,
+			AssistantTeachersOfTheGuideTeacherProposal = assistantTeachers!,
+			ProposalStatus = GuideTeacherProposal.Status.Draft,
+			CreatedAt = DateTimeOffset.Now,
+			UpdatedAt = DateTimeOffset.Now
+		};
+		_ = await this._dbContext.GuideTeacherProposals!.AddAsync(proposal);
+		_ = await this._dbContext.SaveChangesAsync();
+		this.TempData["SuccessMessage"] = "Tu propuesta ha sido registrada correctamente.";
+		return this.RedirectToAction(nameof(GuideTeacherProposalController.Index), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(GuideTeacher) });
 	}
 }

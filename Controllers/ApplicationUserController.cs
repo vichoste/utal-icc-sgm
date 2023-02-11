@@ -14,8 +14,8 @@ public abstract class ApplicationUserController : ApplicationController {
 	public ApplicationUserController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, SignInManager<ApplicationUser> signInManager) : base(dbContext, userManager, userStore, signInManager) { }
 
 	protected async Task<IActionResult> Create<T1, T2>() where T1 : ApplicationUser where T2 : ApplicationUserViewModel, new() => await this.CheckSession() is not T1 user
-			? this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty })
-			: user.IsDeactivated ? this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty }) : this.View(new T2());
+		? this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty })
+		: user.IsDeactivated ? this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty }) : this.View(new T2());
 
 
 	protected async Task<IActionResult> Create<T1, T2>([FromForm] T1 input, IEnumerable<string> roles, string action, string controller, string area) where T1 : ApplicationUserViewModel where T2 : ApplicationUser, new() {

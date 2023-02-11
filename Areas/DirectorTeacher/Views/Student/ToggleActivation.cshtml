@@ -4,7 +4,7 @@
 @model ApplicationUserViewModel
 
 @{
-	this.ViewData["Title"] = !this.Model.IsDeactivated ? "Desactivar estudiante" : "Activar estudiante";
+	this.ViewData["Title"] = this.Model.IsDeactivated is false ? "Desactivar estudiante" : "Activar estudiante";
 }
 
 <div class="container">
@@ -15,7 +15,7 @@
 			@using (this.Html.BeginForm(nameof(StudentController.ToggleActivation), nameof(StudentController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.DirectorTeacher) })) {
 				@this.Html.AntiForgeryToken()
 				@this.Html.HiddenFor(m => m.Id)
-				@if (!this.Model.IsDeactivated) {
+				@if (this.Model.IsDeactivated is false) {
 					<h5 class="card-title mb-3">¿Estás seguro que quieres <b class="text-danger">desactivar</b> a este estudiante?</h5>
 				} else {
 					<h5 class="card-title mb-3">¿Estás seguro que quieres <b class="text-success">activar</b> a este estudiante?</h5>
@@ -23,7 +23,7 @@
 				<h6 class="card-subtitle mb-3 text-muted">@this.Html.DisplayFor(m => m.Email)</h6>
 				<div>
 					@this.Html.ActionLink("Cancelar", nameof(StudentController.Index), nameof(StudentController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.DirectorTeacher) }, new { @class = "btn btn-secondary" })
-					@if (!this.Model.IsDeactivated) {
+					@if (this.Model.IsDeactivated is false) {
 						<button type="submit" class="btn btn-danger">Desactivar</button>
 					} else {
 						<button type="submit" class="btn btn-success">Activar</button>

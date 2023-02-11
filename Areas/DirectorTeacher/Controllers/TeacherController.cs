@@ -28,7 +28,8 @@ public class TeacherController : ApplicationUserController {
 					IsDeactivated = u.IsDeactivated,
 					IsDirectorTeacher = await this._userManager.IsInRoleAsync(u, nameof(Roles.DirectorTeacher)),
 				}
-			).Select(u => u.Result).AsEnumerable()
+			).Select(u => u.Result)
+			.AsEnumerable()
 		);
 
 	public async Task<IActionResult> Create() => await base.Create<ApplicationUser, CreateTeacherViewModel>();

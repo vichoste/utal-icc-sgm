@@ -10,8 +10,7 @@ public partial class Proposal {
 		Ready
 	}
 	public Status? ProposalStatus { get; set; }
-	public virtual ApplicationUser? StudentOwnerOfTheProposal { get; set; }
-	public virtual ApplicationUser? GuideTeacherOfTheProposal { get; set; }
+	public virtual ApplicationUser? StudentOfTheProposal { get; set; }
 	public virtual ApplicationUser? WhoRejectedThisProposal { get; set; }
 	public string? RejectionReason { get; set; }
 }
