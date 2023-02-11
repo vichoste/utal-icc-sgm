@@ -20,18 +20,6 @@ namespace Utal.Icc.Sgm.Areas.GuideTeacher.Controllers;
 public class GuideTeacherProposalController : ApplicationController {
 	public GuideTeacherProposalController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, SignInManager<ApplicationUser> signInManager) : base(dbContext, userManager, userStore, signInManager) { }
 
-	protected async Task PopulateAssistantTeachers(ApplicationUser guideTeacher) {
-		var assistantTeachers = (
-			await this._userManager.GetUsersInRoleAsync(nameof(Roles.AssistantTeacher)))
-				.Where(at => at != guideTeacher && !at.IsDeactivated)
-				.OrderBy(at => at.LastName)
-				.ToList();
-		this.ViewData[$"{nameof(Roles.AssistantTeacher)}s"] = assistantTeachers.Select(at => new SelectListItem {
-			Text = $"{at.FirstName} {at.LastName}",
-			Value = at.Id
-		});
-	}
-
 	protected IEnumerable<GuideTeacherProposalViewModel> Filter(string searchString, IOrderedEnumerable<GuideTeacherProposalViewModel> viewModels, params string[] parameters) {
 		var result = new List<GuideTeacherProposalViewModel>();
 		foreach (var parameter in parameters) {

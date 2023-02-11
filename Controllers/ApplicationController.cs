@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.IdentityModel.Tokens;
 
 using Utal.Icc.Sgm.Areas.DirectorTeacher.ViewModels.Teacher;
@@ -35,6 +36,18 @@ public abstract class ApplicationController : Controller {
 	protected async Task<ApplicationUser> CheckApplicationUser(string applicationUserId) {
 		var applicationUser = await this._userManager.FindByIdAsync(applicationUserId);
 		return applicationUser is null || applicationUser.IsDeactivated ? null! : applicationUser;
+	}
+
+	protected async Task PopulateAssistantTeachers(ApplicationUser guideTeacher) {
+		var assistantTeachers = (
+			await this._userManager.GetUsersInRoleAsync(nameof(Roles.AssistantTeacher)))
+				.Where(at => at != guideTeacher && !at.IsDeactivated)
+				.OrderBy(at => at.LastName)
+				.ToList();
+		this.ViewData[$"{nameof(Roles.AssistantTeacher)}s"] = assistantTeachers.Select(at => new SelectListItem {
+			Text = $"{at.FirstName} {at.LastName}",
+			Value = at.Id
+		});
 	}
 
 	protected void SetSortParameters(string sortOrder, params string[] parameters) {
@@ -246,5 +259,9 @@ public abstract class ApplicationController : Controller {
 		this.TempData["SuccessMessage"] = user.IsDeactivated ? "Usuario desactivado correctamente." : "Usuario activado correctamente.";
 		return this.RedirectToAction(action, controller, new { area });
 	}
+	#endregion
+
+	#region Proposals
+
 	#endregion
 }

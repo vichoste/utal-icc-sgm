@@ -17,17 +17,7 @@ public class TeacherController : ApplicationController {
 	public TeacherController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, SignInManager<ApplicationUser> signInManager) : base(dbContext, userManager, userStore, signInManager) { }
 
 	public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? pageNumber)
-		=> await base.Index(
-			sortOrder,
-			currentFilter,
-			searchString,
-			pageNumber,
-			new[] {
-				nameof(ApplicationUserViewModel.FirstName),
-				nameof(ApplicationUserViewModel.LastName),
-				nameof(ApplicationUserViewModel.Rut),
-				nameof(ApplicationUserViewModel.Email)
-			},
+		=> await base.Index<ApplicationUserViewModel>(sortOrder, currentFilter, searchString, pageNumber, new[] { nameof(ApplicationUserViewModel.FirstName), nameof(ApplicationUserViewModel.LastName), nameof(ApplicationUserViewModel.StudentUniversityId), nameof(ApplicationUserViewModel.Rut), nameof(ApplicationUserViewModel.Email) },
 			async () => (await this._userManager.GetUsersInRoleAsync(nameof(Roles.Teacher))).Select(
 				async u => new IndexTeacherViewModel {
 					Id = u.Id,
