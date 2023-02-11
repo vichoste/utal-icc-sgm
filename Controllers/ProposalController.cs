@@ -60,11 +60,24 @@ public abstract class ProposalController : ApplicationController {
 		return this.View(output);
 	}
 
-	public async Task<IActionResult> Create(bool isStudent) {
+	public async Task<IActionResult> Create(string? id, string action, string controller, string area) {
 		if (await base.CheckSession() is not ApplicationUser user) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
 		await this.PopulateAssistantTeachers(user);
+		var output = new ProposalViewModel();
+		if (id is string guideTeacherId) {
+			if (await base.CheckApplicationUser(id) is not ApplicationUser guideTeacher) {
+				this.TempData["ErrorMessage"] = "Error al obtener al profesor guía.";
+				return this.RedirectToAction(action, controller, new { area });
+			}
+			output.GuideTeacherId = guideTeacher.Id;
+			output.GuideTeacherName = $"{guideTeacher.FirstName} {guideTeacher.LastName}";
+			output.GuideTeacherEmail = guideTeacher.Email;
+			output.GuideTeacherOffice = guideTeacher.TeacherOffice;
+			output.GuideTeacherSchedule = guideTeacher.TeacherSchedule;
+			output.GuideTeacherSpecialization = guideTeacher.TeacherSpecialization;
+		}
 		var output = new ProposalViewModel {
 			GuideTeacherId = user.Id,
 			GuideTeacherName = $"{user.FirstName} {user.LastName}",
