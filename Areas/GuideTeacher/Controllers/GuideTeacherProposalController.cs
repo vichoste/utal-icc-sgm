@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
@@ -18,6 +19,35 @@ namespace Utal.Icc.Sgm.Areas.GuideTeacher.Controllers;
 [Area(nameof(GuideTeacher)), Authorize(Roles = nameof(Roles.GuideTeacher))]
 public class GuideTeacherProposalController : ApplicationController {
 	public GuideTeacherProposalController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, SignInManager<ApplicationUser> signInManager) : base(dbContext, userManager, userStore, signInManager) { }
+
+	protected async Task PopulateAssistantTeachers(ApplicationUser guideTeacher) {
+		var assistantTeachers = (
+			await this._userManager.GetUsersInRoleAsync(nameof(Roles.AssistantTeacher)))
+				.Where(at => at != guideTeacher && !at.IsDeactivated)
+				.OrderBy(at => at.LastName)
+				.ToList();
+		this.ViewData[$"{nameof(Roles.AssistantTeacher)}s"] = assistantTeachers.Select(at => new SelectListItem {
+			Text = $"{at.FirstName} {at.LastName}",
+			Value = at.Id
+		});
+	}
+
+
+	public async Task<IActionResult> Students(string sortOrder, string currentFilter, string searchString, int? pageNumber)
+		=> this.View(await base.GetPaginatedViewModelsAsync<ApplicationUserViewModel>(sortOrder, currentFilter, searchString, pageNumber, new[] { nameof(ApplicationUserViewModel.FirstName), nameof(ApplicationUserViewModel.LastName), nameof(ApplicationUserViewModel.StudentUniversityId), nameof(ApplicationUserViewModel.Rut), nameof(ApplicationUserViewModel.Email) },
+			async () => (await this._userManager.GetUsersInRoleAsync(nameof(Roles.Student))).Select(
+				u => new ApplicationUserViewModel {
+					Id = u.Id,
+					FirstName = u.FirstName,
+					LastName = u.LastName,
+					StudentUniversityId = u.StudentUniversityId,
+					Rut = u.Rut,
+					Email = u.Email,
+					IsDeactivated = u.IsDeactivated
+				}
+			).AsEnumerable()
+		)
+	);
 
 	public async Task<IActionResult> Students(string id, string sortOrder, string currentFilter, string searchString, int? pageNumber) {
 		if (await base.CheckSession() is not ApplicationUser user) {

@@ -14,18 +14,6 @@ namespace Utal.Icc.Sgm.Controllers;
 public abstract class ProposalController : ApplicationController {
 	public ProposalController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, SignInManager<ApplicationUser> signInManager) : base(dbContext, userManager, userStore, signInManager) { }
 
-	protected async Task PopulateAssistantTeachers(ApplicationUser guideTeacher) {
-		var assistantTeachers = (
-			await this._userManager.GetUsersInRoleAsync(nameof(Roles.AssistantTeacher)))
-				.Where(at => at != guideTeacher && !at.IsDeactivated)
-				.OrderBy(at => at.LastName)
-				.ToList();
-		this.ViewData[$"{nameof(Roles.AssistantTeacher)}s"] = assistantTeachers.Select(at => new SelectListItem {
-			Text = $"{at.FirstName} {at.LastName}",
-			Value = at.Id
-		});
-	}
-
 	protected async Task<IActionResult> View<T>(string id, string action, string controller, string area, Func<Task<Proposal>> getProposal) where T : ProposalViewModel, new() {
 		if (await base.CheckSession() is not ApplicationUser user) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });

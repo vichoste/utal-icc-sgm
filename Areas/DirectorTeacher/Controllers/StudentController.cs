@@ -19,10 +19,27 @@ namespace Utal.Icc.Sgm.Areas.DirectorTeacher.Controllers;
 
 [Area(nameof(DirectorTeacher)), Authorize(Roles = nameof(Roles.DirectorTeacher))]
 public class StudentController : ApplicationUserController {
+	public override string?[]? Parameters { get; set; }
+
 	public StudentController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, SignInManager<ApplicationUser> signInManager) : base(dbContext, userManager, userStore, signInManager) { }
 
-	public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? pageNumber)
-		=> this.View(await base.GetPaginatedViewModelsAsync<ApplicationUserViewModel>(sortOrder, currentFilter, searchString, pageNumber, new[] { nameof(ApplicationUserViewModel.FirstName), nameof(ApplicationUserViewModel.LastName), nameof(ApplicationUserViewModel.StudentUniversityId), nameof(ApplicationUserViewModel.Rut), nameof(ApplicationUserViewModel.Email) },
+	public override void SetSortParameters(string sortOrder, params string[] parameters) {
+		foreach (var parameter in parameters) {
+			this.ViewData[$"{parameter}SortParam"] = sortOrder == parameter ? $"{parameter}Desc" : parameter;
+		}
+		this.ViewData["CurrentSort"] = sortOrder;
+	}
+	
+	public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
+		var parameters = new[] { nameof(ApplicationUserViewModel.FirstName), nameof(ApplicationUserViewModel.LastName), nameof(ApplicationUserViewModel.StudentUniversityId), nameof(ApplicationUserViewModel.Rut), nameof(ApplicationUserViewModel.Email) };
+		this.SetSortParameters(sortOrder, parameters);
+		if (searchString is not null) {
+			pageNumber = 1;
+		} else {
+			searchString = currentFilter;
+		}
+		this.ViewData["CurrentFilter"] = searchString;
+		return this.View(await base.GetPaginatedViewModelsAsync<ApplicationUserViewModel>(sortOrder, currentFilter, searchString, pageNumber, parameters,
 			async () => (await this._userManager.GetUsersInRoleAsync(nameof(Roles.Student))).Select(
 				u => new ApplicationUserViewModel {
 					Id = u.Id,
@@ -33,9 +50,10 @@ public class StudentController : ApplicationUserController {
 					Email = u.Email,
 					IsDeactivated = u.IsDeactivated
 				}
-			).AsEnumerable()
-		)
-	);
+				).AsEnumerable()
+			)
+		);
+	}
 
 	public async Task<IActionResult> Create() => await base.CheckSession() is not ApplicationUser user
 		? this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty })
