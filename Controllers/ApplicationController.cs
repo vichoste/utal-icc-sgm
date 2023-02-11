@@ -15,7 +15,7 @@ public abstract class ApplicationController : Controller {
 	protected readonly IUserEmailStore<ApplicationUser> _emailStore;
 	protected readonly SignInManager<ApplicationUser> _signInManager;
 
-	protected ApplicationController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, SignInManager<ApplicationUser> signInManager) {
+	public ApplicationController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, SignInManager<ApplicationUser> signInManager) {
 		this._dbContext = dbContext;
 		this._userManager = userManager;
 		this._userStore = userStore;
@@ -23,24 +23,14 @@ public abstract class ApplicationController : Controller {
 		this._signInManager = signInManager;
 	}
 
-	protected async Task<ApplicationUser> CheckSession() {
-		var applicationUser = await this._userManager.GetUserAsync(this.User);
-		return applicationUser is null || applicationUser.IsDeactivated ? null! : applicationUser;
-	}
-
-	protected async Task<ApplicationUser> CheckApplicationUser(string applicationUserId) {
-		var applicationUser = await this._userManager.FindByIdAsync(applicationUserId);
-		return applicationUser is null || applicationUser.IsDeactivated ? null! : applicationUser;
-	}
-
-	protected void SetSortParameters(string sortOrder, params string[] parameters) {
+	private void SetSortParameters(string sortOrder, params string[] parameters) {
 		foreach (var parameter in parameters) {
 			this.ViewData[$"{parameter}SortParam"] = sortOrder == parameter ? $"{parameter}Desc" : parameter;
 		}
 		this.ViewData["CurrentSort"] = sortOrder;
 	}
 
-	protected IEnumerable<T> Filter<T>(string searchString, IOrderedEnumerable<T> viewModels, params string[] parameters) where T : ApplicationViewModel {
+	private IEnumerable<T> Filter<T>(string searchString, IEnumerable<T> viewModels, params string[] parameters) where T : ApplicationViewModel {
 		var result = new List<T>();
 		foreach (var parameter in parameters) {
 			var partials = viewModels
@@ -54,7 +44,7 @@ public abstract class ApplicationController : Controller {
 		return result.AsEnumerable();
 	}
 
-	protected IOrderedEnumerable<T> Sort<T>(string sortOrder, IEnumerable<T> viewModels, params string[] parameters) where T : ApplicationViewModel {
+	private IEnumerable<T> Sort<T>(string sortOrder, IEnumerable<T> viewModels, params string[] parameters) where T : ApplicationViewModel {
 		foreach (var parameter in parameters) {
 			if (parameter == sortOrder) {
 				return viewModels.OrderBy(vm => vm.GetType().GetProperty(parameter)!.GetValue(vm, null));
@@ -62,12 +52,20 @@ public abstract class ApplicationController : Controller {
 				return viewModels.OrderByDescending(vm => vm.GetType().GetProperty(parameter)!.GetValue(vm, null));
 			}
 		}
-		return viewModels.OrderBy(vm => vm.GetType().GetProperty(parameters[0]));
+		return viewModels.OrderBy(vm => vm.GetType().GetProperty(parameters[0])).AsEnumerable();
 	}
-	protected async Task<IActionResult> Index<T>(string sortOrder, string currentFilter, string searchString, int? pageNumber, string[] parameters, Func<Task<IEnumerable<T>>> getViewModels) where T : ApplicationViewModel {
-		if (await this.CheckSession() is null) {
-			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
-		}
+
+	protected async Task<ApplicationUser> CheckSession() {
+		var applicationUser = await this._userManager.GetUserAsync(this.User);
+		return applicationUser is null || applicationUser.IsDeactivated ? null! : applicationUser;
+	}
+
+	protected async Task<ApplicationUser> CheckApplicationUser(string applicationUserId) {
+		var applicationUser = await this._userManager.FindByIdAsync(applicationUserId);
+		return applicationUser is null || applicationUser.IsDeactivated ? null! : applicationUser;
+	}
+
+	protected async Task<IQueryable<ApplicationViewModel>> GetPaginatedViewModelsAsync<T>(string sortOrder, string currentFilter, string searchString, int? pageNumber, string[] parameters, Func<Task<IEnumerable<T>>> getViewModels) where T : ApplicationViewModel {
 		this.SetSortParameters(sortOrder, parameters);
 		if (searchString is not null) {
 			pageNumber = 1;
@@ -78,13 +76,10 @@ public abstract class ApplicationController : Controller {
 		var users = await getViewModels();
 		var ordered = this.Sort(sortOrder, users, parameters);
 		var output = !searchString.IsNullOrEmpty() ? this.Filter(searchString, ordered, parameters) : ordered;
-		return this.View(PaginatedList<T>.Create(output.AsQueryable(), pageNumber ?? 1, 6));
+		return output.AsQueryable();
 	}
 
-	protected async Task<IActionResult> Index<T>(string sortOrder, string currentFilter, string searchString, int? pageNumber, string[] parameters, Func<IEnumerable<T>> getViewModels) where T : ApplicationViewModel {
-		if (await this.CheckSession() is null) {
-			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
-		}
+	protected IQueryable<ApplicationViewModel> GetPaginatedViewModels<T>(string sortOrder, string currentFilter, string searchString, int? pageNumber, string[] parameters, Func<IEnumerable<T>> getViewModels) where T : ApplicationViewModel {
 		this.SetSortParameters(sortOrder, parameters);
 		if (searchString is not null) {
 			pageNumber = 1;
@@ -95,6 +90,6 @@ public abstract class ApplicationController : Controller {
 		var users = getViewModels();
 		var ordered = this.Sort(sortOrder, users, parameters);
 		var output = !searchString.IsNullOrEmpty() ? this.Filter(searchString, ordered, parameters) : ordered;
-		return this.View(PaginatedList<T>.Create(output.AsQueryable(), pageNumber ?? 1, 6));
+		return output.AsQueryable();
 	}
 }

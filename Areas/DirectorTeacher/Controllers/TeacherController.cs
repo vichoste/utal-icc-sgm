@@ -17,20 +17,20 @@ public class TeacherController : ApplicationUserController {
 	public TeacherController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, SignInManager<ApplicationUser> signInManager) : base(dbContext, userManager, userStore, signInManager) { }
 
 	public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? pageNumber)
-		=> await base.Index<ApplicationUserViewModel>(sortOrder, currentFilter, searchString, pageNumber, new[] { nameof(ApplicationUserViewModel.FirstName), nameof(ApplicationUserViewModel.LastName), nameof(ApplicationUserViewModel.StudentUniversityId), nameof(ApplicationUserViewModel.Rut), nameof(ApplicationUserViewModel.Email) },
-			async () => (await this._userManager.GetUsersInRoleAsync(nameof(Roles.Teacher))).Select(
-				async u => new IndexTeacherViewModel {
-					Id = u.Id,
-					FirstName = u.FirstName,
-					LastName = u.LastName,
-					Rut = u.Rut,
-					Email = u.Email,
-					IsDeactivated = u.IsDeactivated,
-					IsDirectorTeacher = await this._userManager.IsInRoleAsync(u, nameof(Roles.DirectorTeacher)),
-				}
-			).Select(u => u.Result)
-			.AsEnumerable()
-		);
+		=> this.View(await base.GetPaginatedViewModelsAsync<ApplicationUserViewModel>(sortOrder, currentFilter, searchString, pageNumber, new[] { nameof(ApplicationUserViewModel.FirstName), nameof(ApplicationUserViewModel.LastName), nameof(ApplicationUserViewModel.StudentUniversityId), nameof(ApplicationUserViewModel.Rut), nameof(ApplicationUserViewModel.Email) },
+			(await this._userManager.GetUsersInRoleAsync(nameof(Roles.Teacher))).Select(
+						async u => new IndexTeacherViewModel {
+							Id = u.Id,
+							FirstName = u.FirstName,
+							LastName = u.LastName,
+							Rut = u.Rut,
+							Email = u.Email,
+							IsDeactivated = u.IsDeactivated,
+							IsDirectorTeacher = await this._userManager.IsInRoleAsync(u, nameof(Roles.DirectorTeacher)),
+						}
+					).Select(u => u.Result).AsEnumerable()
+		)
+	);
 
 	public async Task<IActionResult> Create() => await base.Create<ApplicationUser, CreateTeacherViewModel>();
 

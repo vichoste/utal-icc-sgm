@@ -22,7 +22,7 @@ public class StudentController : ApplicationUserController {
 	public StudentController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, SignInManager<ApplicationUser> signInManager) : base(dbContext, userManager, userStore, signInManager) { }
 
 	public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? pageNumber)
-		=> await base.Index<ApplicationUserViewModel>(sortOrder, currentFilter, searchString, pageNumber, new[] { nameof(ApplicationUserViewModel.FirstName), nameof(ApplicationUserViewModel.LastName), nameof(ApplicationUserViewModel.StudentUniversityId), nameof(ApplicationUserViewModel.Rut), nameof(ApplicationUserViewModel.Email) },
+		=> this.View(await base.GetPaginatedViewModelsAsync<ApplicationUserViewModel>(sortOrder, currentFilter, searchString, pageNumber, new[] { nameof(ApplicationUserViewModel.FirstName), nameof(ApplicationUserViewModel.LastName), nameof(ApplicationUserViewModel.StudentUniversityId), nameof(ApplicationUserViewModel.Rut), nameof(ApplicationUserViewModel.Email) },
 			async () => (await this._userManager.GetUsersInRoleAsync(nameof(Roles.Student))).Select(
 				u => new ApplicationUserViewModel {
 					Id = u.Id,
@@ -33,9 +33,9 @@ public class StudentController : ApplicationUserController {
 					Email = u.Email,
 					IsDeactivated = u.IsDeactivated
 				}
-				)
-			.AsEnumerable()
-		);
+			).AsEnumerable()
+		)
+	);
 
 	public async Task<IActionResult> Create() => await base.CheckSession() is not ApplicationUser user
 		? this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty })
@@ -84,13 +84,56 @@ public class StudentController : ApplicationUserController {
 		}
 	}
 
-	public async Task<IActionResult> Edit(string id) => await base.Edit<ApplicationUserViewModel>(id, nameof(StudentController.Index), nameof(StudentController).Replace("Controller", string.Empty), nameof(DirectorTeacher));
+	public async Task<IActionResult> Edit(string id) {
+		if (await base.CheckSession() is null) {
+			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
+		}
+		var output = await base.EditAsync<ApplicationUserViewModel>(id);
+		if (output is null) {
+			this.TempData["ErrorMessage"] = "Error al obtener al estudiante.";
+			return this.RedirectToAction(nameof(StudentController.Index), nameof(StudentController).Replace("Controller", string.Empty), new { area = nameof(DirectorTeacher) });
+		}
+		return this.View(output);
+	}
 
 	[HttpPost, ValidateAntiForgeryToken]
-	public async Task<IActionResult> Edit([FromForm] ApplicationUserViewModel input) => await base.Edit<ApplicationUserViewModel>(input, nameof(StudentController.Index), nameof(StudentController).Replace("Controller", string.Empty), nameof(DirectorTeacher));
+	public async Task<IActionResult> Edit([FromForm] ApplicationUserViewModel input) {
+		if (await base.CheckSession() is null) {
+			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
+		}
+		var output = await base.EditAsync<ApplicationUserViewModel>(input);
+		if (output is null) {
+			this.TempData["ErrorMessage"] = "Error al editar al estudiante.";
+			return this.RedirectToAction(nameof(StudentController.Index), nameof(StudentController).Replace("Controller", string.Empty), new { area = nameof(DirectorTeacher) });
+		}
+		this.TempData["SuccessMessage"] = "Estudiante editado correctamente.";
+		return this.View(output);
+	}
 
-	public async Task<IActionResult> ToggleActivation(string id) => await base.ToggleActivation<ApplicationUserViewModel>(id, nameof(TeacherController.Index), nameof(TeacherController).Replace("Controller", string.Empty), nameof(DirectorTeacher));
+	public async Task<IActionResult> ToggleActivation(string id) {
+		if (await base.CheckSession() is null) {
+			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
+		}
+		var output = await base.ToggleActivationAsync<ApplicationUserViewModel>(id);
+		if (output is null) {
+			this.TempData["ErrorMessage"] = "Error al cambiar la activación al estudiante.";
+			return this.RedirectToAction(nameof(StudentController.Index), nameof(StudentController).Replace("Controller", string.Empty), new { area = nameof(DirectorTeacher) });
+		}
+		this.TempData["SuccessMessage"] = "Estudiante cambiado correctamente.";
+		return this.RedirectToAction(nameof(StudentController.Index), nameof(StudentController).Replace("Controller", string.Empty), new { area = nameof(DirectorTeacher) });
+	}
 
 	[HttpPost, ValidateAntiForgeryToken]
-	public async Task<IActionResult> ToggleActivation([FromForm] ApplicationUserViewModel input) => await base.ToggleActivation<ApplicationUserViewModel>(input, nameof(TeacherController.Index), nameof(TeacherController).Replace("Controller", string.Empty), nameof(DirectorTeacher));
+	public async Task<IActionResult> ToggleActivation([FromForm] ApplicationUserViewModel input) {
+		if (await base.CheckSession() is null) {
+			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
+		}
+		var output = await base.ToggleActivationAsync<ApplicationUserViewModel>(input);
+		if (output is null) {
+			this.TempData["ErrorMessage"] = "Error al cambiar la activación al estudiante.";
+			return this.RedirectToAction(nameof(StudentController.Index), nameof(StudentController).Replace("Controller", string.Empty), new { area = nameof(DirectorTeacher) });
+		}
+		this.TempData["SuccessMessage"] = "Estudiante cambiado correctamente.";
+		return this.RedirectToAction(nameof(StudentController.Index), nameof(StudentController).Replace("Controller", string.Empty), new { area = nameof(DirectorTeacher) });
+	}
 }

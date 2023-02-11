@@ -18,11 +18,8 @@ public abstract class ApplicationUserController : ApplicationController {
 		: user.IsDeactivated ? this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty }) : this.View(new T2());
 
 
-	protected async Task<IActionResult> Create<T1, T2>([FromForm] T1 input, IEnumerable<string> roles, string action, string controller, string area) where T1 : ApplicationUserViewModel where T2 : ApplicationUser, new() {
-		if (await this.CheckSession() is null) {
-			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
-		}
-		var user = new T2 {
+	protected async Task<T1?> CreateAsync<T1, T2>([FromForm] T2 input, IEnumerable<string> roles) where T1 : ApplicationUser, new() where T2 : ApplicationUserViewModel {
+		var user = new T1 {
 			FirstName = input.FirstName,
 			LastName = input.LastName,
 			Rut = input.Rut,
@@ -34,17 +31,12 @@ public abstract class ApplicationUserController : ApplicationController {
 		_ = await this._userManager.CreateAsync(user, input.Password!);
 		_ = await this._userManager.AddToRoleAsync(user, nameof(Roles.Teacher));
 		_ = await this._userManager.AddToRolesAsync(user, roles);
-		this.TempData["SuccessMessage"] = "Usuario creado correctamente.";
-		return this.RedirectToAction(action, controller, new { area });
+		return user;
 	}
 
-	protected async Task<IActionResult> Edit<T>(string id, string action, string controller, string area) where T : ApplicationUserViewModel, new() {
-		if (await this.CheckSession() is null) {
-			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
-		}
+	protected async Task<T?> EditAsync<T>(string id) where T : ApplicationUserViewModel, new() {
 		if (await this.CheckApplicationUser(id) is not ApplicationUser user) {
-			this.TempData["ErrorMessage"] = "Error al obtener al usuario.";
-			return this.RedirectToAction(action, controller, new { area });
+			return null;
 		}
 		var output = new T {
 			Id = id,
@@ -61,16 +53,12 @@ public abstract class ApplicationUserController : ApplicationController {
 			teacher.IsCourseTeacher = await this._userManager.IsInRoleAsync(user, nameof(Roles.CourseTeacher));
 			teacher.IsGuideTeacher = await this._userManager.IsInRoleAsync(user, nameof(Roles.GuideTeacher));
 		}
-		return this.View(output);
+		return output;
 	}
 
-	protected async Task<IActionResult> Edit<T>([FromForm] T input, string action, string controller, string area) where T : ApplicationUserViewModel, new() {
-		if (await this.CheckSession() is null) {
-			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
-		}
+	protected async Task<T?> EditAsync<T>([FromForm] T input) where T : ApplicationUserViewModel, new() {
 		if (await this.CheckApplicationUser(input.Id!) is not ApplicationUser user) {
-			this.TempData["ErrorMessage"] = "Error al obtener al usuario.";
-			return this.RedirectToAction(action, controller, new { area });
+			return null;
 		}
 		await this._userStore.SetUserNameAsync(user, input.Email, CancellationToken.None);
 		await this._emailStore.SetEmailAsync(user, input.Email, CancellationToken.None);
@@ -118,58 +106,30 @@ public abstract class ApplicationUserController : ApplicationController {
 			teacher1.IsCourseTeacher = await this._userManager.IsInRoleAsync(user, nameof(Roles.CourseTeacher));
 			teacher1.IsGuideTeacher = await this._userManager.IsInRoleAsync(user, nameof(Roles.GuideTeacher));
 		}
-		this.ViewBag.SuccessMessage = "Usuario actualizado correctamente.";
-		return this.View(output);
+		return output;
 	}
 
-	protected async Task<IActionResult> ToggleActivation<T>(string id, string action, string controller, string area) where T : ApplicationUserViewModel, new() {
-		if (await this.CheckSession() is null) {
-			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
-		}
+	protected async Task<T?> ToggleActivationAsync<T>(string id) where T : ApplicationUserViewModel, new() {
 		var user = await this._userManager.FindByIdAsync(id);
-		if (user is null) {
-			this.TempData["ErrorMessage"] = "Error al obtener al usuario.";
-			return this.RedirectToAction(action, controller, new { area });
+		if (user is null || user.Id == this._userManager.GetUserId(this.User) || (await this._userManager.GetRolesAsync(user)).Contains(nameof(Roles.DirectorTeacher))) {
+			return null;
 		}
-		if (user!.Id == this._userManager.GetUserId(this.User)) {
-			this.TempData["ErrorMessage"] = "No te puedes desactivar a tí mismo.";
-			return this.RedirectToAction(action, controller, new { area });
-		}
-		var roles = (await this._userManager.GetRolesAsync(user)).ToList();
-		if (roles.Contains(nameof(Roles.DirectorTeacher))) {
-			this.TempData["ErrorMessage"] = "No puedes desactivar al director de carrera actual.";
-			return this.RedirectToAction(action, controller, new { area });
-		}
-		var output = new ApplicationUserViewModel {
+		var output = new T {
 			Id = user.Id,
 			Email = user.Email,
 			IsDeactivated = user.IsDeactivated
 		};
-		return this.View(output);
+		return output;
 	}
 
-	protected async Task<IActionResult> ToggleActivation<T>([FromForm] ApplicationUserViewModel input, string action, string controller, string area) where T : ApplicationUserViewModel, new() {
-		if (await this.CheckSession() is null) {
-			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
-		}
+	protected async Task<ApplicationUser?> ToggleActivationAsync<T>([FromForm] ApplicationUserViewModel input) where T : ApplicationUserViewModel, new() {
 		var user = await this._userManager.FindByIdAsync(input.Id!);
-		if (user is null) {
-			this.TempData["ErrorMessage"] = "Error al obtener al usuario.";
-			return this.RedirectToAction(action, controller, new { area });
-		}
-		if (user!.Id == this._userManager.GetUserId(this.User)) {
-			this.TempData["ErrorMessage"] = "No te puedes desactivar a tí mismo.";
-			return this.RedirectToAction(action, controller, new { area });
-		}
-		var roles = (await this._userManager.GetRolesAsync(user)).ToList();
-		if (roles.Contains(nameof(Roles.DirectorTeacher))) {
-			this.TempData["ErrorMessage"] = "No puedes desactivar al director de carrera actual.";
-			return this.RedirectToAction(action, controller, new { area });
+		if (user is null || user.Id == this._userManager.GetUserId(this.User) || (await this._userManager.GetRolesAsync(user)).Contains(nameof(Roles.DirectorTeacher))) {
+			return null;
 		}
 		user.IsDeactivated = !user.IsDeactivated;
 		user.UpdatedAt = DateTimeOffset.Now;
 		_ = await this._userManager.UpdateAsync(user);
-		this.TempData["SuccessMessage"] = user.IsDeactivated ? "Usuario desactivado correctamente." : "Usuario activado correctamente.";
-		return this.RedirectToAction(action, controller, new { area });
+		return user;
 	}
 }
