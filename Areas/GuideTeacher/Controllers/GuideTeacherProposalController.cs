@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
@@ -12,63 +11,12 @@ using Utal.Icc.Sgm.Models;
 using Utal.Icc.Sgm.ViewModels;
 
 using static Utal.Icc.Sgm.Models.ApplicationUser;
-using static Utal.Icc.Sgm.Models.GuideTeacherProposal;
 
 namespace Utal.Icc.Sgm.Areas.GuideTeacher.Controllers;
 
 [Area(nameof(GuideTeacher)), Authorize(Roles = nameof(Roles.GuideTeacher))]
 public class GuideTeacherProposalController : ApplicationController {
 	public GuideTeacherProposalController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, SignInManager<ApplicationUser> signInManager) : base(dbContext, userManager, userStore, signInManager) { }
-
-	protected IEnumerable<GuideTeacherProposalViewModel> Filter(string searchString, IOrderedEnumerable<GuideTeacherProposalViewModel> viewModels, params string[] parameters) {
-		var result = new List<GuideTeacherProposalViewModel>();
-		foreach (var parameter in parameters) {
-			var partials = viewModels
-					.Where(vm => (vm.GetType().GetProperty(parameter)!.GetValue(vm, null) as string)!.Contains(searchString));
-			foreach (var partial in partials) {
-				if (!result.Any(vm => vm.Id == partial.Id)) {
-					result.Add(partial);
-				}
-			}
-		}
-		return result.AsEnumerable();
-	}
-
-	protected IOrderedEnumerable<GuideTeacherProposalViewModel> Sort(string sortOrder, IEnumerable<GuideTeacherProposalViewModel> viewModels, params string[] parameters) {
-		foreach (var parameter in parameters) {
-			if (parameter == sortOrder) {
-				return viewModels.OrderBy(vm => vm.GetType().GetProperty(parameter)!.GetValue(vm, null));
-			} else if ($"{parameter}Desc" == sortOrder) {
-				return viewModels.OrderByDescending(vm => vm.GetType().GetProperty(parameter)!.GetValue(vm, null));
-			}
-		}
-		return viewModels.OrderBy(vm => vm.GetType().GetProperty(parameters[0]));
-	}
-
-	protected IEnumerable<ApplicationUserViewModel> Filter(string searchString, IOrderedEnumerable<ApplicationUserViewModel> viewModels, params string[] parameters) {
-		var result = new List<ApplicationUserViewModel>();
-		foreach (var parameter in parameters) {
-			var partials = viewModels
-					.Where(vm => !(vm.GetType().GetProperty(parameter)!.GetValue(vm, null) as string)!.IsNullOrEmpty() && (vm.GetType().GetProperty(parameter)!.GetValue(vm, null) as string)!.Contains(searchString));
-			foreach (var partial in partials) {
-				if (!result.Any(vm => vm.Id == partial.Id)) {
-					result.Add(partial);
-				}
-			}
-		}
-		return result.AsEnumerable();
-	}
-
-	protected IOrderedEnumerable<ApplicationUserViewModel> Sort(string sortOrder, IEnumerable<ApplicationUserViewModel> viewModels, params string[] parameters) {
-		foreach (var parameter in parameters) {
-			if (parameter == sortOrder) {
-				return viewModels.OrderBy(vm => vm.GetType().GetProperty(parameter)!.GetValue(vm, null));
-			} else if ($"{parameter}Desc" == sortOrder) {
-				return viewModels.OrderByDescending(vm => vm.GetType().GetProperty(parameter)!.GetValue(vm, null));
-			}
-		}
-		return viewModels.OrderBy(vm => vm.GetType().GetProperty(parameters[0]));
-	}
 
 	public async Task<IActionResult> Students(string id, string sortOrder, string currentFilter, string searchString, int? pageNumber) {
 		if (await base.CheckSession() is not ApplicationUser user) {

@@ -1,15 +1,8 @@
 namespace Utal.Icc.Sgm.Models;
 
-public class GuideTeacherProposal : Proposal {
-	public enum Status {
-		Draft,
-		Published,
-		Ready
-	}
+public partial class Proposal {
 	public string? Requirements { get; set; }
-	public Status? ProposalStatus { get; set; }
-	public virtual ApplicationUser? GuideTeacherOwnerOfTheGuideTeacherProposal { get; set; }
-	public virtual ICollection<ApplicationUser?>? AssistantTeachersOfTheGuideTeacherProposal { get; set; } = new HashSet<ApplicationUser?>();
-	public virtual ICollection<ApplicationUser?>? StudentsWhoAreInterestedInThisGuideTeacherProposal { get; set; } = new HashSet<ApplicationUser?>();
-	public virtual ApplicationUser? StudentWhoIsAssignedToThisGuideTeacherProposal { get; set; }
+	public virtual ApplicationUser? GuideTeacherOwnerOfTheProposal { get; set; }
+	public virtual ICollection<ApplicationUser?>? StudentsWhoAreInterestedInThisProposal { get; set; } = new HashSet<ApplicationUser?>();
+	public virtual ApplicationUser? StudentWhoIsAssignedToThisProposal { get; set; }
 }

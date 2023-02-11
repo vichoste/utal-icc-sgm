@@ -1,16 +1,17 @@
 ﻿namespace Utal.Icc.Sgm.Models;
 
-public class StudentProposal : Proposal {
+public partial class Proposal {
 	public enum Status {
 		Draft,
-		SentToGuideTeacher,
-		ApprovedByGuideTeacher,
-		RejectedByGuideTeacher
+		Sent,
+		Approved,
+		Rejected,
+		Published,
+		Ready
 	}
 	public Status? ProposalStatus { get; set; }
-	public virtual ApplicationUser? StudentOwnerOfTheStudentProposal { get; set; }
-	public virtual ApplicationUser? GuideTeacherOfTheStudentProposal { get; set; }
-	public virtual ICollection<ApplicationUser?>? AssistantTeachersOfTheStudentProposal { get; set; } = new HashSet<ApplicationUser?>();
-	public virtual ApplicationUser? GuideTeacherWhoRejectedThisStudentProposal { get; set; }
+	public virtual ApplicationUser? StudentOwnerOfTheProposal { get; set; }
+	public virtual ApplicationUser? GuideTeacherOfTheProposal { get; set; }
+	public virtual ApplicationUser? WhoRejectedThisProposal { get; set; }
 	public string? RejectionReason { get; set; }
 }

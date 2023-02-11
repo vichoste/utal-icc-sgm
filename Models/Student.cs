@@ -8,13 +8,13 @@ public partial class ApplicationUser {
 	public bool StudentIsDoingThePractice { get; set; }
 	public bool StudentIsWorking { get; set; }
 	#region StudentProposal
-	[InverseProperty(nameof(StudentProposal.StudentOwnerOfTheStudentProposal))]
-	public virtual ICollection<StudentProposal?>? StudentProposalsWhichIOwn { get; set; } = new HashSet<StudentProposal?>();
+	[InverseProperty(nameof(Proposal.StudentOwnerOfTheProposal))]
+	public virtual ICollection<Proposal?>? StudentProposalsWhichIOwn { get; set; } = new HashSet<Proposal?>();
 	#endregion
 	#region GuideTeacherProposal
-	[InverseProperty(nameof(GuideTeacherProposal.StudentsWhoAreInterestedInThisGuideTeacherProposal))]
-	public virtual ICollection<GuideTeacherProposal?>? GuideTeacherProposalsWhichImInterested  { get; set; } = new HashSet<GuideTeacherProposal?>();
-	[InverseProperty(nameof(GuideTeacherProposal.StudentWhoIsAssignedToThisGuideTeacherProposal))]
-	public virtual ICollection<GuideTeacherProposal>? GuideTeacherProposalsWhichIHaveBeenAssigned { get; set; } = new HashSet<GuideTeacherProposal>();
+	[InverseProperty(nameof(Proposal.StudentsWhoAreInterestedInThisProposal))]
+	public virtual ICollection<Proposal?>? ProposalsWhichImInterested { get; set; } = new HashSet<Proposal?>();
+	[InverseProperty(nameof(Proposal.StudentWhoIsAssignedToThisProposal))]
+	public virtual ICollection<Proposal?>? ProposalsWhichIHaveBeenAssigned { get; set; } = new HashSet<Proposal?>();
 	#endregion
 }

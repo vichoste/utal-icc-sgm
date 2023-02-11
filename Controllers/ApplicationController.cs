@@ -64,7 +64,7 @@ public abstract class ApplicationController : Controller {
 		}
 		return viewModels.OrderBy(vm => vm.GetType().GetProperty(parameters[0]));
 	}
-	public async Task<IActionResult> Index<T>(string sortOrder, string currentFilter, string searchString, int? pageNumber, string[] parameters, Func<Task<IEnumerable<T>>> getViewModels) where T : ApplicationViewModel {
+	protected async Task<IActionResult> Index<T>(string sortOrder, string currentFilter, string searchString, int? pageNumber, string[] parameters, Func<Task<IEnumerable<T>>> getViewModels) where T : ApplicationViewModel {
 		if (await this.CheckSession() is null) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
@@ -76,6 +76,23 @@ public abstract class ApplicationController : Controller {
 		}
 		this.ViewData["CurrentFilter"] = searchString;
 		var users = await getViewModels();
+		var ordered = this.Sort(sortOrder, users, parameters);
+		var output = !searchString.IsNullOrEmpty() ? this.Filter(searchString, ordered, parameters) : ordered;
+		return this.View(PaginatedList<T>.Create(output.AsQueryable(), pageNumber ?? 1, 6));
+	}
+
+	protected async Task<IActionResult> Index<T>(string sortOrder, string currentFilter, string searchString, int? pageNumber, string[] parameters, Func<IEnumerable<T>> getViewModels) where T : ApplicationViewModel {
+		if (await this.CheckSession() is null) {
+			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
+		}
+		this.SetSortParameters(sortOrder, parameters);
+		if (searchString is not null) {
+			pageNumber = 1;
+		} else {
+			searchString = currentFilter;
+		}
+		this.ViewData["CurrentFilter"] = searchString;
+		var users = getViewModels();
 		var ordered = this.Sort(sortOrder, users, parameters);
 		var output = !searchString.IsNullOrEmpty() ? this.Filter(searchString, ordered, parameters) : ordered;
 		return this.View(PaginatedList<T>.Create(output.AsQueryable(), pageNumber ?? 1, 6));
