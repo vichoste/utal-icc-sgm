@@ -178,6 +178,7 @@ namespace Utal.Icc.Sgm.Migrations
                     GuideTeacherOfTheProposalId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    WhoIsTheAuthor = table.Column<int>(type: "int", nullable: false),
                     CreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
                     UpdatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
                     RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: true),

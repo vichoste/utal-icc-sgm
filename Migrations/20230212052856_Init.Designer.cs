@@ -12,7 +12,7 @@ using Utal.Icc.Sgm.Data;
 namespace Utal.Icc.Sgm.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230212035402_Init")]
+    [Migration("20230212052856_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -328,6 +328,9 @@ namespace Utal.Icc.Sgm.Migrations
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("WhoIsTheAuthor")
+                        .HasColumnType("int");
 
                     b.Property<string>("WhoRejectedId")
                         .HasColumnType("nvarchar(450)");

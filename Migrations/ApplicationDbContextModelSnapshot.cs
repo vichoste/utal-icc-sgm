@@ -326,6 +326,9 @@ namespace Utal.Icc.Sgm.Migrations
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<int>("WhoIsTheAuthor")
+                        .HasColumnType("int");
+
                     b.Property<string>("WhoRejectedId")
                         .HasColumnType("nvarchar(450)");
 
