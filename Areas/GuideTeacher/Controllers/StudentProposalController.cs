@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
@@ -18,6 +19,18 @@ namespace Utal.Icc.Sgm.Areas.GuideTeacher.Controllers;
 [Area(nameof(GuideTeacher)), Authorize(Roles = nameof(Roles.GuideTeacher))]
 public class StudentProposalController : ApplicationController {
 	public StudentProposalController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, SignInManager<ApplicationUser> signInManager) : base(dbContext, userManager, userStore, signInManager) { }
+
+	protected async Task PopulateAssistantTeachers(ApplicationUser guideTeacher) {
+		var assistantTeachers = (
+			await this._userManager.GetUsersInRoleAsync(nameof(Roles.AssistantTeacher)))
+				.Where(at => at != guideTeacher && !at.IsDeactivated)
+				.OrderBy(at => at.LastName)
+				.ToList();
+		this.ViewData[$"{nameof(Roles.AssistantTeacher)}s"] = assistantTeachers.Select(at => new SelectListItem {
+			Text = $"{at.FirstName} {at.LastName}",
+			Value = at.Id
+		});
+	}
 
 	protected IEnumerable<StudentProposalViewModel> Filter(string searchString, IOrderedEnumerable<StudentProposalViewModel> viewModels, params string[] parameters) {
 		var result = new List<StudentProposalViewModel>();

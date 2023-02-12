@@ -19,7 +19,7 @@ namespace Utal.Icc.Sgm.Areas.DirectorTeacher.Controllers;
 
 [Area(nameof(DirectorTeacher)), Authorize(Roles = nameof(Roles.DirectorTeacher))]
 public class StudentController : ApplicationUserController {
-	public override string?[]? Parameters { get; set; }
+	public override string[]? Parameters { get; set; }
 
 	public StudentController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, SignInManager<ApplicationUser> signInManager) : base(dbContext, userManager, userStore, signInManager) { }
 

@@ -10,8 +10,12 @@ using static Utal.Icc.Sgm.Models.ApplicationUser;
 
 namespace Utal.Icc.Sgm.Controllers;
 
-public abstract class ApplicationUserController : ApplicationController {
+public abstract class ApplicationUserController : ApplicationController, ISortable {
+	public abstract string[]? Parameters { get; set; }
+
 	public ApplicationUserController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, SignInManager<ApplicationUser> signInManager) : base(dbContext, userManager, userStore, signInManager) { }
+
+	public abstract void SetSortParameters(string sortOrder, params string[] parameters);
 
 	protected T Create<T>() where T : ApplicationUserViewModel, new() => new T();
 

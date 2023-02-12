@@ -12,15 +12,16 @@ using Utal.Icc.Sgm.Models;
 using Utal.Icc.Sgm.ViewModels;
 
 using static Utal.Icc.Sgm.Models.ApplicationUser;
-using static Utal.Icc.Sgm.Models.Proposal;
 
 namespace Utal.Icc.Sgm.Areas.GuideTeacher.Controllers;
 
 [Area(nameof(GuideTeacher)), Authorize(Roles = nameof(Roles.GuideTeacher))]
-public class GuideTeacherProposalController : ApplicationController {
+public class GuideTeacherProposalController : ProposalController {
+	public override string[]? Parameters { get; set; }
+
 	public GuideTeacherProposalController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, SignInManager<ApplicationUser> signInManager) : base(dbContext, userManager, userStore, signInManager) { }
 
-	protected async Task PopulateAssistantTeachers(ApplicationUser guideTeacher) {
+	public override async Task PopulateAssistantTeachers(ApplicationUser guideTeacher) {
 		var assistantTeachers = (
 			await this._userManager.GetUsersInRoleAsync(nameof(Roles.AssistantTeacher)))
 				.Where(at => at != guideTeacher && !at.IsDeactivated)
@@ -32,72 +33,106 @@ public class GuideTeacherProposalController : ApplicationController {
 		});
 	}
 
-
-	public async Task<IActionResult> Students(string sortOrder, string currentFilter, string searchString, int? pageNumber)
-		=> this.View(await base.GetPaginatedViewModelsAsync<ApplicationUserViewModel>(sortOrder, currentFilter, searchString, pageNumber, new[] { nameof(ApplicationUserViewModel.FirstName), nameof(ApplicationUserViewModel.LastName), nameof(ApplicationUserViewModel.StudentUniversityId), nameof(ApplicationUserViewModel.Rut), nameof(ApplicationUserViewModel.Email) },
-			async () => (await this._userManager.GetUsersInRoleAsync(nameof(Roles.Student))).Select(
-				u => new ApplicationUserViewModel {
-					Id = u.Id,
-					FirstName = u.FirstName,
-					LastName = u.LastName,
-					StudentUniversityId = u.StudentUniversityId,
-					Rut = u.Rut,
-					Email = u.Email,
-					IsDeactivated = u.IsDeactivated
-				}
-			).AsEnumerable()
-		)
-	);
+	public override void SetSortParameters(string sortOrder, params string[] parameters) {
+		foreach (var parameter in parameters) {
+			this.ViewData[$"{parameter}SortParam"] = sortOrder == parameter ? $"{parameter}Desc" : parameter;
+		}
+		this.ViewData["CurrentSort"] = sortOrder;
+	}
 
 	public async Task<IActionResult> Students(string id, string sortOrder, string currentFilter, string searchString, int? pageNumber) {
 		if (await base.CheckSession() is not ApplicationUser user) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
-		this.ViewData["Proposal"] = await this._dbContext.Proposals!
-			.Include(p => p.GuideTeacherOfTheProposal)
-			.Where(p => p.GuideTeacherOfTheProposal == user && p.ProposalStatus == Status.Published)
-			.FirstOrDefaultAsync(p => p.Id == id);
-		return await base.Index<ApplicationUserViewModel>(sortOrder, currentFilter, searchString, pageNumber, new[] { nameof(ApplicationUserViewModel.FirstName), nameof(ApplicationUserViewModel.LastName), nameof(ApplicationUserViewModel.StudentUniversityId), nameof(ApplicationUserViewModel.Rut), nameof(ApplicationUserViewModel.Email) },
-			() => this._dbContext.Proposals!
-					.Where(p => p.GuideTeacherOfTheProposal == user && p.Id == id)
-					.Include(p => p.StudentsWhoAreInterestedInThisProposal)
-					.SelectMany(p => p.StudentsWhoAreInterestedInThisProposal!.Select(
-						u => new ApplicationUserViewModel {
-							Id = u!.Id,
-							FirstName = u.FirstName,
-							LastName = u.LastName,
-							StudentUniversityId = u.StudentUniversityId,
-							Rut = u.Rut,
-							Email = u.Email,
-							IsDeactivated = u.IsDeactivated
-						}
-					)
-				)
-			.AsEnumerable()
-		);
+		var parameters = new[] { nameof(ApplicationUserViewModel.FirstName), nameof(ApplicationUserViewModel.LastName), nameof(ApplicationUserViewModel.StudentUniversityId), nameof(ApplicationUserViewModel.Rut), nameof(ApplicationUserViewModel.Email) };
+		this.SetSortParameters(sortOrder, parameters);
+		if (searchString is not null) {
+			pageNumber = 1;
+		} else {
+			searchString = currentFilter;
+		}
+		this.ViewData["CurrentFilter"] = searchString;
+		return this.View(base.GetPaginatedViewModels<ApplicationUserViewModel>(sortOrder, currentFilter, searchString, pageNumber, parameters,
+			() => (this._dbContext.Proposals!
+				.Where(p => p.GuideTeacherOfTheProposal == user && p.Id == id)
+				.Include(p => p.StudentsWhoAreInterestedInThisProposal)
+				.SelectMany(p => p.StudentsWhoAreInterestedInThisProposal!.Select(
+					u => new ApplicationUserViewModel {
+						Id = u!.Id,
+						FirstName = u.FirstName,
+						LastName = u.LastName,
+						StudentUniversityId = u.StudentUniversityId,
+						Rut = u.Rut,
+						Email = u.Email,
+						IsDeactivated = u.IsDeactivated
+					}
+				)).AsEnumerable()
+			)
+		));
 	}
 
 	public async Task<IActionResult> Index(string id, string sortOrder, string currentFilter, string searchString, int? pageNumber) {
 		if (await base.CheckSession() is not ApplicationUser user) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
-		this.ViewData["Proposal"] = await this._dbContext.Proposals!
-			.Include(p => p.GuideTeacherOfTheProposal)
-			.Where(p => p.GuideTeacherOfTheProposal == user && p.ProposalStatus == Status.Published)
-			.FirstOrDefaultAsync(p => p.Id == id);
-		return await base.Index<ProposalViewModel>(sortOrder, currentFilter, searchString, pageNumber, new[] { nameof(ApplicationUserViewModel.FirstName), nameof(ApplicationUserViewModel.LastName), nameof(ApplicationUserViewModel.StudentUniversityId), nameof(ApplicationUserViewModel.Rut), nameof(ApplicationUserViewModel.Email) },
-			() => this._dbContext.Proposals!.AsNoTracking()
+		var parameters = new[] { nameof(ApplicationUserViewModel.FirstName), nameof(ApplicationUserViewModel.LastName), nameof(ApplicationUserViewModel.StudentUniversityId), nameof(ApplicationUserViewModel.Rut), nameof(ApplicationUserViewModel.Email) };
+		this.SetSortParameters(sortOrder, parameters);
+		if (searchString is not null) {
+			pageNumber = 1;
+		} else {
+			searchString = currentFilter;
+		}
+		this.ViewData["CurrentFilter"] = searchString;
+		return this.View(base.GetPaginatedViewModels<ProposalViewModel>(sortOrder, currentFilter, searchString, pageNumber, parameters,
+			() => (this._dbContext.Proposals!.AsNoTracking()
 				.Where(p => p.GuideTeacherOfTheProposal == user)
 				.Select(p => new ProposalViewModel {
 					Id = p.Id,
 					Title = p.Title,
 					ProposalStatus = p.ProposalStatus.ToString(),
-				}
-			).AsEnumerable()
-		);
+				}).AsEnumerable()
+			)
+		));
 	}
 
+	public async Task<IActionResult> Create() {
+		if (await base.CheckSession() is not ApplicationUser user) {
+			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
+		}
+		await this.PopulateAssistantTeachers(user);
+		var output = new GuideTeacherProposalViewModel {
+			GuideTeacherId = user.Id,
+			GuideTeacherName = $"{user.FirstName} {user.LastName}",
+			GuideTeacherEmail = user.Email,
+			GuideTeacherOffice = user.TeacherOffice,
+			GuideTeacherSchedule = user.TeacherSchedule,
+			GuideTeacherSpecialization = user.TeacherSpecialization,
+		};
+		return this.View(output);
+	}
 
+	[HttpPost, ValidateAntiForgeryToken]
+	public async Task<IActionResult> Create([FromForm] GuideTeacherProposalViewModel input) {
+		if (await base.CheckSession() is not ApplicationUser user) {
+			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
+		}
+		var assistantTeachers = input.AssistantTeachers!.Select(async at => await this.CheckApplicationUser(at)).Select(at => at.Result).ToList();
+		var proposal = new GuideTeacherProposal {
+			Id = Guid.NewGuid().ToString(),
+			Title = input.Title,
+			Description = input.Description,
+			Requirements = input.Requirements,
+			GuideTeacherOwnerOfTheGuideTeacherProposal = user,
+			AssistantTeachersOfTheGuideTeacherProposal = assistantTeachers!,
+			ProposalStatus = GuideTeacherProposal.Status.Draft,
+			CreatedAt = DateTimeOffset.Now,
+			UpdatedAt = DateTimeOffset.Now
+		};
+		_ = await this._dbContext.GuideTeacherProposals!.AddAsync(proposal);
+		_ = await this._dbContext.SaveChangesAsync();
+		this.TempData["SuccessMessage"] = "Tu propuesta ha sido registrada correctamente.";
+		return this.RedirectToAction(nameof(GuideTeacherProposalController.Index), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(GuideTeacher) });
+	}
 
 	public async Task<IActionResult> Edit(string id) {
 		if (await base.CheckSession() is not ApplicationUser user) {

@@ -14,8 +14,7 @@ namespace Utal.Icc.Sgm.Areas.DirectorTeacher.Controllers;
 
 [Area(nameof(DirectorTeacher)), Authorize(Roles = nameof(Roles.DirectorTeacher))]
 public class TeacherController : ApplicationUserController {
-	public override string?[]? Parameters { get; set; }
-
+	public override string[]? Parameters { get; set; }
 
 	public TeacherController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, SignInManager<ApplicationUser> signInManager) : base(dbContext, userManager, userStore, signInManager) { }
 
@@ -25,7 +24,6 @@ public class TeacherController : ApplicationUserController {
 		}
 		this.ViewData["CurrentSort"] = sortOrder;
 	}
-
 
 	public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
 		var parameters = new[] { nameof(ApplicationUserViewModel.FirstName), nameof(ApplicationUserViewModel.LastName), nameof(ApplicationUserViewModel.StudentUniversityId), nameof(ApplicationUserViewModel.Rut), nameof(ApplicationUserViewModel.Email) };

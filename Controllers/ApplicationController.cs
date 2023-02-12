@@ -8,14 +8,13 @@ using Utal.Icc.Sgm.ViewModels;
 
 namespace Utal.Icc.Sgm.Controllers;
 
-public abstract class ApplicationController : Controller, ISortable {
+public abstract class ApplicationController : Controller {
 	protected readonly ApplicationDbContext _dbContext;
 	protected readonly UserManager<ApplicationUser> _userManager;
 	protected readonly IUserStore<ApplicationUser> _userStore;
 	protected readonly IUserEmailStore<ApplicationUser> _emailStore;
 	protected readonly SignInManager<ApplicationUser> _signInManager;
 
-	public abstract string?[]? Parameters { get; set; }
 
 	public ApplicationController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, SignInManager<ApplicationUser> signInManager) {
 		this._dbContext = dbContext;
@@ -60,19 +59,17 @@ public abstract class ApplicationController : Controller, ISortable {
 		return applicationUser is null || applicationUser.IsDeactivated ? null! : applicationUser;
 	}
 
-	protected async Task<IQueryable<ApplicationViewModel>> GetPaginatedViewModelsAsync<T>(string sortOrder, string currentFilter, string searchString, int? pageNumber, string[] parameters, Func<Task<IEnumerable<T>>> getViewModels) where T : ApplicationViewModel {
+	protected async Task<IQueryable<T>> GetPaginatedViewModelsAsync<T>(string sortOrder, string currentFilter, string searchString, int? pageNumber, string[] parameters, Func<Task<IEnumerable<T>>> getViewModels) where T : ApplicationViewModel {
 		var users = await getViewModels();
 		var ordered = this.Sort(sortOrder, users, parameters);
 		var output = !searchString.IsNullOrEmpty() ? this.Filter(searchString, ordered, parameters) : ordered;
 		return output.AsQueryable();
 	}
 
-	protected IQueryable<ApplicationViewModel> GetPaginatedViewModels<T>(string sortOrder, string currentFilter, string searchString, int? pageNumber, string[] parameters, Func<IEnumerable<T>> getViewModels) where T : ApplicationViewModel {
+	protected IQueryable<T> GetPaginatedViewModels<T>(string sortOrder, string currentFilter, string searchString, int? pageNumber, string[] parameters, Func<IEnumerable<T>> getViewModels) where T : ApplicationViewModel {
 		var users = getViewModels();
 		var ordered = this.Sort(sortOrder, users, parameters);
 		var output = !searchString.IsNullOrEmpty() ? this.Filter(searchString, ordered, parameters) : ordered;
 		return output.AsQueryable();
 	}
-
-	public abstract void SetSortParameters(string sortOrder, params string[] parameters);
 }
