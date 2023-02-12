@@ -12,15 +12,17 @@ using Utal.Icc.Sgm.Models;
 using Utal.Icc.Sgm.ViewModels;
 
 using static Utal.Icc.Sgm.Models.ApplicationUser;
-using static Utal.Icc.Sgm.Models.StudentProposal;
+using static Utal.Icc.Sgm.Models.Proposal;
 
 namespace Utal.Icc.Sgm.Areas.GuideTeacher.Controllers;
 
 [Area(nameof(GuideTeacher)), Authorize(Roles = nameof(Roles.GuideTeacher))]
-public class StudentProposalController : ApplicationController {
+public class StudentProposalController : ProposalController {
+	public override string[]? Parameters { get; set; }
+
 	public StudentProposalController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, SignInManager<ApplicationUser> signInManager) : base(dbContext, userManager, userStore, signInManager) { }
 
-	protected async Task PopulateAssistantTeachers(ApplicationUser guideTeacher) {
+	public override async Task PopulateAssistantTeachers(ApplicationUser guideTeacher) {
 		var assistantTeachers = (
 			await this._userManager.GetUsersInRoleAsync(nameof(Roles.AssistantTeacher)))
 				.Where(at => at != guideTeacher && !at.IsDeactivated)
@@ -32,85 +34,47 @@ public class StudentProposalController : ApplicationController {
 		});
 	}
 
-	protected IEnumerable<StudentProposalViewModel> Filter(string searchString, IOrderedEnumerable<StudentProposalViewModel> viewModels, params string[] parameters) {
-		var result = new List<StudentProposalViewModel>();
+	public override void SetSortParameters(string sortOrder, params string[] parameters) {
 		foreach (var parameter in parameters) {
-			var partials = viewModels
-					.Where(vm => (vm.GetType().GetProperty(parameter)!.GetValue(vm, null) as string)!.Contains(searchString));
-			foreach (var partial in partials) {
-				if (!result.Any(vm => vm.Id == partial.Id)) {
-					result.Add(partial);
-				}
-			}
+			this.ViewData[$"{parameter}SortParam"] = sortOrder == parameter ? $"{parameter}Desc" : parameter;
 		}
-		return result.AsEnumerable();
-	}
-
-	protected IOrderedEnumerable<StudentProposalViewModel> Sort(string sortOrder, IEnumerable<StudentProposalViewModel> viewModels, params string[] parameters) {
-		foreach (var parameter in parameters) {
-			if (parameter == sortOrder) {
-				return viewModels.OrderBy(vm => vm.GetType().GetProperty(parameter)!.GetValue(vm, null));
-			} else if ($"{parameter}Desc" == sortOrder) {
-				return viewModels.OrderByDescending(vm => vm.GetType().GetProperty(parameter)!.GetValue(vm, null));
-			}
-		}
-		return viewModels.OrderBy(vm => vm.GetType().GetProperty(parameters[0]));
+		this.ViewData["CurrentSort"] = sortOrder;
 	}
 
 	public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
 		if (await base.CheckSession() is not ApplicationUser user) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
-		var parameters = new[] { nameof(StudentProposalViewModel.Title), nameof(StudentProposalViewModel.StudentName) };
-		base.SetSortParameters(sortOrder, parameters);
+		var parameters = new[] { nameof(ProposalViewModel.Title), nameof(ProposalViewModel.GuideTeacherName) };
+		this.SetSortParameters(sortOrder, parameters);
 		if (searchString is not null) {
 			pageNumber = 1;
 		} else {
 			searchString = currentFilter;
 		}
 		this.ViewData["CurrentFilter"] = searchString;
-		var proposals = this._dbContext.StudentProposals!.AsNoTracking()
-			.Where(p => p.GuideTeacherOfTheStudentProposal == user && (p.ProposalStatus == Status.SentToGuideTeacher || p.ProposalStatus == Status.ApprovedByGuideTeacher))
-			.Include(p => p.GuideTeacherOfTheStudentProposal).AsNoTracking()
-			.Select(p => new StudentProposalViewModel {
-				Id = p.Id,
-				Title = p.Title,
-				StudentName = $"{p.StudentOwnerOfTheStudentProposal!.FirstName} {p.StudentOwnerOfTheStudentProposal!.LastName}",
-				ProposalStatus = p.ProposalStatus.ToString(),
-			}).AsEnumerable();
-		var ordered = this.Sort(sortOrder, proposals, parameters);
-		var output = !searchString.IsNullOrEmpty() ? this.Filter(searchString, ordered!, parameters) : ordered;
-		return this.View(PaginatedList<StudentProposalViewModel>.Create(output!.AsQueryable(), pageNumber ?? 1, 6));
+		return this.View(base.GetPaginatedViewModels<ProposalViewModel>(sortOrder, currentFilter, searchString, pageNumber, parameters,
+			() => this._dbContext.Proposals!.AsNoTracking()
+				.Where(p => p.GuideTeacherOfTheProposal == user && (p.ProposalStatus == Status.Published || p.ProposalStatus == Status.Ready))
+				.Include(p => p.StudentOfTheProposal).AsNoTracking()
+				.Select(p => new ProposalViewModel {
+					Id = p.Id,
+					Title = p.Title,
+					StudentName = $"{p.StudentOfTheProposal!.FirstName} {p.StudentOfTheProposal.LastName}",
+					ProposalStatus = p.ProposalStatus.ToString(),
+				}).AsEnumerable()
+		));
 	}
 
 	public new async Task<IActionResult> View(string id) {
 		if (await base.CheckSession() is not ApplicationUser user) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
-		var proposal = await this._dbContext.StudentProposals!.AsNoTracking()
-			.Include(p => p.GuideTeacherOfTheStudentProposal).AsNoTracking()
-			.Where(p => p.GuideTeacherOfTheStudentProposal == user && (p.ProposalStatus == Status.SentToGuideTeacher || p.ProposalStatus == Status.ApprovedByGuideTeacher))
-			.Include(p => p.StudentOwnerOfTheStudentProposal).AsNoTracking()
-			.Include(p => p.AssistantTeachersOfTheStudentProposal).AsNoTracking()
-			.FirstOrDefaultAsync(p => p.Id == id);
-		if (proposal is null) {
+		var output = await base.GetAsync<ProposalViewModel>(id, user);
+		if (output is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
-			return this.RedirectToAction(nameof(StudentProposalController.Index), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(GuideTeacher) });
+			return this.RedirectToAction(nameof(GuideTeacherProposalController.Index), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(GuideTeacher) });
 		}
-		var output = new StudentProposalViewModel {
-			Id = id,
-			Title = proposal.Title,
-			Description = proposal.Description,
-			StudentUniversityId = proposal.StudentOwnerOfTheStudentProposal!.StudentUniversityId,
-			StudentName = $"{proposal.StudentOwnerOfTheStudentProposal!.FirstName} {proposal.StudentOwnerOfTheStudentProposal!.LastName}",
-			StudentEmail = proposal.StudentOwnerOfTheStudentProposal.Email,
-			StudentRemainingCourses = proposal.StudentOwnerOfTheStudentProposal.StudentRemainingCourses,
-			StudentIsDoingThePractice = proposal.StudentOwnerOfTheStudentProposal.StudentIsDoingThePractice,
-			StudentIsWorking = proposal.StudentOwnerOfTheStudentProposal.StudentIsWorking,
-			AssistantTeachers = proposal.AssistantTeachersOfTheStudentProposal!.Select(at => $"{at!.FirstName} {at!.LastName}").ToList(),
-			CreatedAt = proposal.CreatedAt,
-			UpdatedAt = proposal.UpdatedAt,
-		};
 		return this.View(output);
 	}
 
@@ -118,40 +82,40 @@ public class StudentProposalController : ApplicationController {
 		if (await base.CheckSession() is not ApplicationUser user) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
-		var proposal = await this._dbContext.StudentProposals!.AsNoTracking()
-			.Where(p => p.GuideTeacherOfTheStudentProposal == user && p.ProposalStatus == Status.SentToGuideTeacher)
-			.Include(p => p.StudentOwnerOfTheStudentProposal).AsNoTracking()
+		var proposal = await this._dbContext.Proposals!.AsNoTracking()
+			.Where(p => p.GuideTeacherOfTheProposal == user && p.ProposalStatus == Status.Published)
+			.Include(p => p.StudentOfTheProposal).AsNoTracking()
 			.FirstOrDefaultAsync(p => p.Id == id);
 		if (proposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
 			return this.RedirectToAction(nameof(StudentProposalController.Index), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(GuideTeacher) });
 		}
-		var output = new StudentProposalViewModel {
+		var output = new ProposalViewModel {
 			Id = id,
 			Title = proposal.Title,
-			StudentName = $"{proposal.StudentOwnerOfTheStudentProposal!.FirstName} {proposal.StudentOwnerOfTheStudentProposal.LastName}"
+			StudentName = $"{proposal.StudentOfTheProposal!.FirstName} {proposal.StudentOfTheProposal.LastName}"
 		};
 		return this.View(output);
 	}
 
 	[HttpPost, ValidateAntiForgeryToken]
-	public async Task<IActionResult> Reject([FromForm] StudentProposalViewModel input) {
+	public async Task<IActionResult> Reject([FromForm] ProposalViewModel input) {
 		if (await base.CheckSession() is not ApplicationUser user) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
-		var proposal = await this._dbContext.StudentProposals!
-			.Where(p => p.GuideTeacherOfTheStudentProposal == user && p.ProposalStatus == Status.SentToGuideTeacher)
+		var proposal = await this._dbContext.Proposals!
+			.Where(p => p.GuideTeacherOfTheProposal == user && p.ProposalStatus == Status.Published)
 			.FirstOrDefaultAsync(p => p.Id == input.Id);
 		if (proposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
 			return this.RedirectToAction(nameof(StudentProposalController.Index), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(GuideTeacher) });
 
 		}
-		proposal.ProposalStatus = StudentProposal.Status.RejectedByGuideTeacher;
-		proposal.GuideTeacherWhoRejectedThisStudentProposal = user;
-		proposal.RejectionReason = input.RejectionReason;
+		proposal.ProposalStatus = Status.Rejected;
+		proposal.WhoRejected = user;
+		proposal.Reason = input.Reason;
 		proposal.UpdatedAt = DateTimeOffset.Now;
-		_ = this._dbContext.StudentProposals!.Update(proposal);
+		_ = this._dbContext.Proposals!.Update(proposal);
 		_ = await this._dbContext.SaveChangesAsync();
 		this.TempData["SuccessMessage"] = "La propuesta ha sido rechazada correctamente.";
 		return this.RedirectToAction(nameof(StudentProposalController.Index), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(GuideTeacher) });
@@ -161,38 +125,38 @@ public class StudentProposalController : ApplicationController {
 		if (await base.CheckSession() is not ApplicationUser user) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
-		var proposal = await this._dbContext.StudentProposals!.AsNoTracking()
-			.Where(p => p.GuideTeacherOfTheStudentProposal == user && p.ProposalStatus == Status.SentToGuideTeacher)
-			.Include(p => p.StudentOwnerOfTheStudentProposal).AsNoTracking()
+		var proposal = await this._dbContext.Proposals!.AsNoTracking()
+			.Where(p => p.GuideTeacherOfTheProposal == user && p.ProposalStatus == Status.Published)
+			.Include(p => p.StudentOfTheProposal).AsNoTracking()
 			.FirstOrDefaultAsync(p => p.Id == id);
 		if (proposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
 			return this.RedirectToAction(nameof(StudentProposalController.Index), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(GuideTeacher) });
 
 		}
-		var output = new StudentProposalViewModel {
+		var output = new ProposalViewModel {
 			Id = id,
 			Title = proposal.Title,
-			StudentName = $"{proposal.StudentOwnerOfTheStudentProposal!.FirstName} {proposal.StudentOwnerOfTheStudentProposal.LastName}"
+			StudentName = $"{proposal.StudentOfTheProposal!.FirstName} {proposal.StudentOfTheProposal.LastName}"
 		};
 		return this.View(output);
 	}
 
 	[HttpPost, ValidateAntiForgeryToken]
-	public async Task<IActionResult> Approve([FromForm] StudentProposalViewModel input) {
+	public async Task<IActionResult> Approve([FromForm] ProposalViewModel input) {
 		if (await base.CheckSession() is not ApplicationUser user) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
-		var proposal = await this._dbContext.StudentProposals!
-			.Where(p => p.GuideTeacherOfTheStudentProposal == user && (p.ProposalStatus != Status.Draft || p.ProposalStatus != Status.RejectedByGuideTeacher))
+		var proposal = await this._dbContext.Proposals!
+			.Where(p => p.GuideTeacherOfTheProposal == user && (p.ProposalStatus != Status.Draft || p.ProposalStatus != Status.Rejected))
 			.FirstOrDefaultAsync(p => p.Id == input.Id);
 		if (proposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
 			return this.RedirectToAction(nameof(StudentProposalController.Index), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(GuideTeacher) });
 		}
-		proposal.ProposalStatus = StudentProposal.Status.ApprovedByGuideTeacher;
+		proposal.ProposalStatus = Status.Ready;
 		proposal.UpdatedAt = DateTimeOffset.Now;
-		_ = this._dbContext.StudentProposals!.Update(proposal);
+		_ = this._dbContext.Proposals!.Update(proposal);
 		_ = await this._dbContext.SaveChangesAsync();
 		this.TempData["SuccessMessage"] = "La propuesta ha sido aceptada correctamente.";
 		return this.RedirectToAction(nameof(StudentProposalController.Index), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(GuideTeacher) });
