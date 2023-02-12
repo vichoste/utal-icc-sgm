@@ -3,6 +3,12 @@ using System.ComponentModel.DataAnnotations;
 namespace Utal.Icc.Sgm.Models;
 
 public partial class Proposal {
+	public enum Status {
+		Draft,
+		Published,
+		Rejected,
+		Ready
+	}
 	[Key]
 	public string? Id { get; set; }
 	public string? Title { get; set; }

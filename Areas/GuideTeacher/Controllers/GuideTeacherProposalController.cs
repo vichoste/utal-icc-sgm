@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 
 using Utal.Icc.Sgm.Controllers;
 using Utal.Icc.Sgm.Data;
@@ -161,53 +160,52 @@ public class GuideTeacherProposalController : ProposalController {
 		return this.RedirectToAction(nameof(GuideTeacherProposalController.Index), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(GuideTeacher) });
 	}
 
+	public async Task<IActionResult> Convert(string id) {
+		if (await base.CheckSession() is not ApplicationUser user) {
+			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
+		}
+		var output = await base.GetAsync<ProposalViewModel>(id, user);
+		if (output is null) {
+			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
+			return this.RedirectToAction(nameof(GuideTeacherProposalController.Index), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(GuideTeacher) });
+		}
+		return this.View(output);
+	}
+
+	public new async Task<IActionResult> View(string id) {
+		if (await base.CheckSession() is not ApplicationUser user) {
+			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
+		}
+		var output = await base.GetAsync<ProposalViewModel>(id, user);
+		if (output is null) {
+			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
+			return this.RedirectToAction(nameof(GuideTeacherProposalController.Index), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(GuideTeacher) });
+		}
+		return this.View(output);
+	}
+
 	public async Task<IActionResult> Publish(string id) {
 		if (await base.CheckSession() is not ApplicationUser user) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
-		var proposal = await this._dbContext.GuideTeacherProposals!.AsNoTracking()
-			.Where(p => p.GuideTeacherOwnerOfTheGuideTeacherProposal == user && p.ProposalStatus == GuideTeacherProposal.Status.Draft)
-			.FirstOrDefaultAsync(p => p.Id == id);
-		if (proposal is null) {
+		var output = await base.PublishAsync<ProposalViewModel>(id, user);
+		if (output is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
 			return this.RedirectToAction(nameof(GuideTeacherProposalController.Index), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(GuideTeacher) });
 		}
-		var output = new GuideTeacherProposalViewModel {
-			Id = id,
-			Title = proposal.Title,
-		};
 		return this.View(output);
 	}
 
 	[HttpPost, ValidateAntiForgeryToken]
-	public async Task<IActionResult> Publish([FromForm] GuideTeacherProposalViewModel input) {
+	public async Task<IActionResult> Publish([FromForm] ProposalViewModel input) {
 		if (await base.CheckSession() is not ApplicationUser user) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
-		var proposal = await this._dbContext.GuideTeacherProposals!
-			.Where(p => p.GuideTeacherOwnerOfTheGuideTeacherProposal == user && p.ProposalStatus == GuideTeacherProposal.Status.Draft)
-			.Include(p => p.GuideTeacherOwnerOfTheGuideTeacherProposal)
-			.Include(p => p.AssistantTeachersOfTheGuideTeacherProposal)
-			.FirstOrDefaultAsync(p => p.Id == input.Id);
-		if (proposal is null) {
-			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
+		if (!await base.PublishAsync<ProposalViewModel>(input, user)) {
+			this.TempData["ErrorMessage"] = base._userManager.IsInRoleAsync(user, nameof(Roles.Student)) ? "Error al enviar tu propuesta." : "Error al publicar tu propuesta.";
 			return this.RedirectToAction(nameof(GuideTeacherProposalController.Index), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(GuideTeacher) });
 		}
-		if (await base.CheckApplicationUser(proposal.GuideTeacherOwnerOfTheGuideTeacherProposal!.Id) is null) {
-			this.TempData["ErrorMessage"] = "Error al obtener el profesor guía.";
-			return this.RedirectToAction(nameof(GuideTeacherProposalController.Index), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(GuideTeacher) });
-		}
-		foreach (var assistantTeacher in proposal.AssistantTeachersOfTheGuideTeacherProposal!) {
-			if (await base.CheckApplicationUser(assistantTeacher!.Id) is null) {
-				this.TempData["ErrorMessage"] = "Error al obtener el profesor co-guía.";
-				return this.RedirectToAction(nameof(GuideTeacherProposalController.Index), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(GuideTeacher) });
-			}
-		}
-		proposal.ProposalStatus = GuideTeacherProposal.Status.Published;
-		proposal.UpdatedAt = DateTimeOffset.Now;
-		_ = this._dbContext.GuideTeacherProposals!.Update(proposal);
-		_ = await this._dbContext.SaveChangesAsync();
-		this.TempData["SuccessMessage"] = "Tu propuesta ha sido enviada correctamente.";
+		this.TempData["SuccessMessage"] = base._userManager.IsInRoleAsync(user, nameof(Roles.Student)) ? "Tu propuesta ha sido enviada correctamente." : "Tu propuesta ha sido publicada correctamente.";
 		return this.RedirectToAction(nameof(GuideTeacherProposalController.Index), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(GuideTeacher) });
 	}
 
@@ -268,60 +266,5 @@ public class GuideTeacherProposalController : ProposalController {
 		_ = await this._dbContext.SaveChangesAsync();
 		this.TempData["SuccessMessage"] = "El estudiante ha sido seleccionado a la propuesta correctamente.";
 		return this.RedirectToAction(nameof(GuideTeacherProposalController.Index), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(GuideTeacher) });
-	}
-
-	public async Task<IActionResult> Convert(string id) {
-		if (await base.CheckSession() is not ApplicationUser user) {
-			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
-		}
-		var proposal = await this._dbContext.GuideTeacherProposals!.AsNoTracking()
-			.Where(p => p.GuideTeacherOwnerOfTheGuideTeacherProposal == user && p.ProposalStatus == GuideTeacherProposal.Status.Ready)
-			.Include(p => p.StudentWhoIsAssignedToThisGuideTeacherProposal).AsNoTracking()
-			.Include(p => p.AssistantTeachersOfTheGuideTeacherProposal).AsNoTracking()
-			.FirstOrDefaultAsync(p => p.Id == id);
-		if (proposal is null) {
-			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
-			return this.RedirectToAction(nameof(GuideTeacherProposalController.Index), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(Student) });
-		}
-		var output = new GuideTeacherProposalViewModel {
-			Id = id,
-			Title = proposal.Title,
-			Description = proposal.Description,
-			Requirements = proposal.Requirements,
-			StudentName = $"{proposal.StudentWhoIsAssignedToThisGuideTeacherProposal!.FirstName} {proposal.StudentWhoIsAssignedToThisGuideTeacherProposal!.LastName}",
-			StudentEmail = proposal.StudentWhoIsAssignedToThisGuideTeacherProposal!.Email,
-			StudentUniversityId = proposal.StudentWhoIsAssignedToThisGuideTeacherProposal!.StudentUniversityId,
-			StudentRemainingCourses = proposal.StudentWhoIsAssignedToThisGuideTeacherProposal!.StudentRemainingCourses,
-			StudentIsDoingThePractice = proposal.StudentWhoIsAssignedToThisGuideTeacherProposal!.StudentIsDoingThePractice,
-			StudentIsWorking = proposal.StudentWhoIsAssignedToThisGuideTeacherProposal!.StudentIsWorking,
-			AssistantTeachers = proposal.AssistantTeachersOfTheGuideTeacherProposal!.Select(at => $"{at!.FirstName} {at!.LastName}").ToList(),
-			CreatedAt = proposal.CreatedAt,
-			UpdatedAt = proposal.UpdatedAt
-		};
-		return this.View(output);
-	}
-	public new async Task<IActionResult> View(string id) {
-		if (await base.CheckSession() is not ApplicationUser user) {
-			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
-		}
-		var proposal = await this._dbContext.GuideTeacherProposals!
-			.Include(p => p.GuideTeacherOwnerOfTheGuideTeacherProposal)
-			.Where(p => p.GuideTeacherOwnerOfTheGuideTeacherProposal == user && p.ProposalStatus == GuideTeacherProposal.Status.Published)
-			.Include(p => p.AssistantTeachersOfTheGuideTeacherProposal)
-			.FirstOrDefaultAsync(p => p.Id == id);
-		if (proposal is null) {
-			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
-			return this.RedirectToAction(nameof(GuideTeacherProposalController.Index), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(GuideTeacher) });
-		}
-		var output = new GuideTeacherProposalViewModel {
-			Id = id,
-			Title = proposal.Title,
-			Description = proposal.Description,
-			Requirements = proposal.Requirements,
-			AssistantTeachers = proposal.AssistantTeachersOfTheGuideTeacherProposal!.Select(at => $"{at!.FirstName} {at!.LastName}").ToList(),
-			CreatedAt = proposal.CreatedAt,
-			UpdatedAt = proposal.UpdatedAt,
-		};
-		return this.View(output);
 	}
 }

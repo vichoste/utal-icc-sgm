@@ -4,5 +4,5 @@ namespace Utal.Icc.Sgm.Models;
 
 public partial class ApplicationUser {
 	[InverseProperty(nameof(Proposal.GuideTeacherOfTheProposal))]
-	public virtual ICollection<Proposal?>? ImGuideTeacherOfTheProposals { get; set; } = new HashSet<Proposal?>();
+	public virtual ICollection<Proposal?>? ImGuideTeacherOfTheseProposals { get; set; } = new HashSet<Proposal?>();
 }

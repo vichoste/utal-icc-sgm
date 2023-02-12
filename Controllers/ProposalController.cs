@@ -5,6 +5,7 @@ using Utal.Icc.Sgm.Data;
 using Utal.Icc.Sgm.Models;
 using Utal.Icc.Sgm.ViewModels;
 
+using static Utal.Icc.Sgm.Models.ApplicationUser;
 using static Utal.Icc.Sgm.Models.Proposal;
 
 namespace Utal.Icc.Sgm.Controllers;
@@ -60,7 +61,7 @@ public abstract class ProposalController : ApplicationController, IPopulatable, 
 		return output;
 	}
 
-	protected async Task<T?> EditAsync<T>(ProposalViewModel input, ApplicationUser user) where T : ProposalViewModel, new() {
+	protected async Task<T?> EditAsync<T>(T input, ApplicationUser user) where T : ProposalViewModel, new() {
 		var proposal = await base._dbContext.Proposals!
 			.Include(p => p.GuideTeacherOfTheProposal)
 			.Where(p => p.GuideTeacherOfTheProposal == user && p.ProposalStatus == Status.Draft)
@@ -104,7 +105,7 @@ public abstract class ProposalController : ApplicationController, IPopulatable, 
 		return output;
 	}
 
-	protected async Task<bool> DeleteAsync<T>(ProposalViewModel input, ApplicationUser user) where T: ProposalViewModel, new() {
+	protected async Task<bool> DeleteAsync<T>(T input, ApplicationUser user) where T: ProposalViewModel, new() {
 		var proposal = await this._dbContext.Proposals!
 			.Where(p => p.GuideTeacherOfTheProposal == user && p.ProposalStatus == Status.Draft)
 			.FirstOrDefaultAsync(p => p.Id == input.Id);
@@ -113,6 +114,105 @@ public abstract class ProposalController : ApplicationController, IPopulatable, 
 		}
 		_ = base._dbContext.Proposals!.Remove(proposal);
 		_ = base._dbContext.SaveChangesAsync();
+		return true;
+	}
+
+	protected async Task<T?> GetAsync<T>(string id, ApplicationUser user) where T : ProposalViewModel, new() {
+		var proposal = user switch {
+			_ when base._userManager.IsInRoleAsync(user, nameof(Roles.Student)) => await base._dbContext.Proposals!.AsNoTracking()
+				.Include(p => p.StudentOfTheProposal).AsNoTracking()
+				.Where(p => p.StudentOfTheProposal == user && p.ProposalStatus == Status.Ready)
+				.Include(p => p.GuideTeacherOfTheProposal).AsNoTracking()
+				.Include(p => p.AssistantTeachersOfTheProposal).AsNoTracking()
+				.FirstOrDefaultAsync(p => p.Id == id),
+			_ when base._userManager.IsInRoleAsync(user, nameof(Roles.GuideTeacher)) => await base._dbContext.Proposals!.AsNoTracking()
+				.Include(p => p.GuideTeacherOfTheProposal).AsNoTracking()
+				.Where(p => p.GuideTeacherOfTheProposal == user && p.ProposalStatus == Status.Ready)
+				.Include(p => p.StudentOfTheProposal).AsNoTracking()
+				.Include(p => p.AssistantTeachersOfTheProposal).AsNoTracking()
+				.FirstOrDefaultAsync(p => p.Id == id),
+			_ => null
+		};
+		if (proposal is null) {
+			return null;
+		}
+		var output = new T {
+			Id = id,
+			Title = proposal.Title,
+			Description = proposal.Description,
+			AssistantTeachers = proposal.AssistantTeachersOfTheProposal!.Select(at => $"{at!.FirstName} {at!.LastName}").ToList(),
+			CreatedAt = proposal.CreatedAt,
+			UpdatedAt = proposal.UpdatedAt
+		};
+		if (base._userManager.IsInRoleAsync(user, nameof(Roles.Student))) {
+			output.GuideTeacherId = proposal.GuideTeacherOfTheProposal!.Id;
+			output.GuideTeacherName = $"{proposal.GuideTeacherOfTheProposal.FirstName} {proposal.GuideTeacherOfTheProposal.LastName}";
+			output.GuideTeacherEmail = proposal.GuideTeacherOfTheProposal.Email;
+			output.GuideTeacherOffice = proposal.GuideTeacherOfTheProposal.TeacherOffice;
+			output.GuideTeacherSchedule = proposal.GuideTeacherOfTheProposal.TeacherSchedule;
+			output.GuideTeacherSpecialization = proposal.GuideTeacherOfTheProposal.TeacherSpecialization;
+		} else if (base._userManager.IsInRoleAsync(user, nameof(Roles.GuideTeacher))) {
+			output.Requirements = proposal.Requirements;
+			output.StudentId = proposal.StudentOfTheProposal!.Id;
+			output.StudentName = $"{proposal.StudentOfTheProposal.FirstName} {proposal.StudentOfTheProposal.LastName}";
+			output.StudentEmail = proposal.StudentOfTheProposal.Email;
+			output.StudentUniversityId = proposal.StudentOfTheProposal.StudentUniversityId;
+			output.StudentRemainingCourses = proposal.StudentOfTheProposal.StudentRemainingCourses;
+			output.StudentIsDoingThePractice = proposal.StudentOfTheProposal.StudentIsDoingThePractice;
+			output.StudentIsWorking = proposal.StudentOfTheProposal.StudentIsWorking;
+		}
+		return output;
+	}
+
+	protected async Task<T?> PublishAsync<T>(string id, ApplicationUser user) where T : ProposalViewModel, new() {
+		var proposal = user switch {
+			_ when base._userManager.IsInRoleAsync(user, nameof(Roles.Student)) => await base._dbContext.Proposals!.AsNoTracking()
+				.Include(p => p.StudentOfTheProposal).AsNoTracking()
+				.Where(p => p.StudentOfTheProposal == user && p.ProposalStatus == Status.Ready)
+				.FirstOrDefaultAsync(p => p.Id == id),
+			_ when base._userManager.IsInRoleAsync(user, nameof(Roles.GuideTeacher)) => await base._dbContext.Proposals!.AsNoTracking()
+				.Include(p => p.GuideTeacherOfTheProposal).AsNoTracking()
+				.Where(p => p.GuideTeacherOfTheProposal == user && p.ProposalStatus == Status.Ready)
+				.FirstOrDefaultAsync(p => p.Id == id),
+			_ => null
+		};
+		if (proposal is null) {
+			return null;
+		}
+		var output = new T {
+			Id = id,
+			Title = proposal.Title,
+		};
+		return output;
+	}
+
+	protected async Task<bool> PublishAsync<T>(T input, ApplicationUser user) where T : ProposalViewModel, new() {
+		var proposal = user switch {
+			_ when base._userManager.IsInRoleAsync(user, nameof(Roles.Student)) => await base._dbContext.Proposals!.AsNoTracking()
+				.Include(p => p.StudentOfTheProposal).AsNoTracking()
+				.Where(p => p.StudentOfTheProposal == user && p.ProposalStatus == Status.Ready)
+				.FirstOrDefaultAsync(p => p.Id == input.Id),
+			_ when base._userManager.IsInRoleAsync(user, nameof(Roles.GuideTeacher)) => await base._dbContext.Proposals!.AsNoTracking()
+				.Include(p => p.GuideTeacherOfTheProposal).AsNoTracking()
+				.Where(p => p.GuideTeacherOfTheProposal == user && p.ProposalStatus == Status.Ready)
+				.FirstOrDefaultAsync(p => p.Id == input.Id),
+			_ => null
+		};
+		if (proposal is null) {
+			return false;
+		}
+		if (await base.CheckApplicationUser(proposal.StudentOfTheProposal!.Id) is null || await base.CheckApplicationUser(proposal.GuideTeacherOfTheProposal!.Id) is null) {
+			return false;
+		}
+		foreach (var assistantTeacher in proposal.AssistantTeachersOfTheProposal!) {
+			if (await base.CheckApplicationUser(assistantTeacher!.Id) is null) {
+				return false;
+			}
+		}
+		proposal.ProposalStatus = Status.Published;
+		proposal.UpdatedAt = DateTimeOffset.Now;
+		_ = base._dbContext.Proposals!.Update(proposal);
+		_ = await base._dbContext.SaveChangesAsync();
 		return true;
 	}
 }
