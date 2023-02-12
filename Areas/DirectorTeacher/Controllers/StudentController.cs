@@ -42,7 +42,7 @@ public class StudentController : ApplicationUserController {
 			searchString = currentFilter;
 		}
 		this.ViewData["CurrentFilter"] = searchString;
-		return this.View(await base.GetPaginatedViewModelsAsync<ApplicationUserViewModel>(sortOrder, currentFilter, searchString, pageNumber, parameters,
+		return this.View(PaginatedList<ApplicationUserViewModel>.Create((await base.GetPaginatedViewModelsAsync<ApplicationUserViewModel>(sortOrder, currentFilter, searchString, pageNumber, parameters,
 			async () => (await this._userManager.GetUsersInRoleAsync(nameof(Roles.Student))).Select(
 				u => new ApplicationUserViewModel {
 					Id = u.Id,
@@ -55,7 +55,7 @@ public class StudentController : ApplicationUserController {
 				}
 				).AsEnumerable()
 			)
-		);
+		), pageNumber ?? 1, 6));
 	}
 
 	public async Task<IActionResult> Create() => await base.CheckSession() is not ApplicationUser user

@@ -52,7 +52,7 @@ public class StudentProposalController : ProposalController {
 			searchString = currentFilter;
 		}
 		this.ViewData["CurrentFilter"] = searchString;
-		return this.View(base.GetPaginatedViewModelsAsync<ApplicationUserViewModel>(sortOrder, currentFilter, searchString, pageNumber, parameters,
+		return this.View(PaginatedList<ApplicationUserViewModel>.Create((await base.GetPaginatedViewModelsAsync<ApplicationUserViewModel>(sortOrder, currentFilter, searchString, pageNumber, parameters,
 			async () => (await this._userManager.GetUsersInRoleAsync(nameof(Roles.GuideTeacher)))
 				.Where(u => !u.IsDeactivated)
 				.Select(
@@ -64,8 +64,7 @@ public class StudentProposalController : ProposalController {
 						TeacherSpecialization = u.TeacherSpecialization
 					}
 				).AsEnumerable()
-			)
-		);
+		)), pageNumber ?? 1, 6));
 	}
 
 	public async Task<IActionResult> Index(string id, string sortOrder, string currentFilter, string searchString, int? pageNumber) {

@@ -52,7 +52,7 @@ public class GuideTeacherProposalController : ProposalController {
 			searchString = currentFilter;
 		}
 		this.ViewData["CurrentFilter"] = searchString;
-		return this.View(base.GetPaginatedViewModels<ProposalViewModel>(sortOrder, currentFilter, searchString, pageNumber, parameters,
+		return this.View(PaginatedList<ProposalViewModel>.Create((base.GetPaginatedViewModels<ProposalViewModel>(sortOrder, currentFilter, searchString, pageNumber, parameters,
 			() => this._dbContext.Proposals!.AsNoTracking()
 				.Where(p => (p.StudentsWhoAreInterestedInThisProposal!.Contains(user) || p.StudentOfTheProposal == user) && (p.ProposalStatus == Status.Published || p.ProposalStatus == Status.Ready))
 				.Include(p => p.GuideTeacherOfTheProposal).AsNoTracking()
@@ -62,7 +62,7 @@ public class GuideTeacherProposalController : ProposalController {
 					GuideTeacherName = $"{p.GuideTeacherOfTheProposal!.FirstName} {p.GuideTeacherOfTheProposal!.LastName}",
 					ProposalStatus = p.ProposalStatus.ToString()
 				}).AsEnumerable()
-		));
+		)), pageNumber ?? 1, 6));
 	}
 
 	public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? pageNumber) {

@@ -52,7 +52,7 @@ public class GuideTeacherProposalController : ProposalController {
 			searchString = currentFilter;
 		}
 		this.ViewData["CurrentFilter"] = searchString;
-		return this.View(base.GetPaginatedViewModels<ApplicationUserViewModel>(sortOrder, currentFilter, searchString, pageNumber, parameters,
+		return this.View(PaginatedList<ApplicationUserViewModel>.Create((base.GetPaginatedViewModels<ApplicationUserViewModel>(sortOrder, currentFilter, searchString, pageNumber, parameters,
 			() => this._dbContext.Proposals!
 				.Where(p => p.GuideTeacherOfTheProposal == user && p.Id == id)
 				.Include(p => p.StudentsWhoAreInterestedInThisProposal)
@@ -67,7 +67,7 @@ public class GuideTeacherProposalController : ProposalController {
 						IsDeactivated = u.IsDeactivated
 					}
 			)).AsEnumerable()
-		));
+		)), pageNumber ?? 1, 6));
 	}
 
 	public async Task<IActionResult> Index(string id, string sortOrder, string currentFilter, string searchString, int? pageNumber) {
@@ -82,7 +82,7 @@ public class GuideTeacherProposalController : ProposalController {
 			searchString = currentFilter;
 		}
 		this.ViewData["CurrentFilter"] = searchString;
-		return this.View(base.GetPaginatedViewModels<ProposalViewModel>(sortOrder, currentFilter, searchString, pageNumber, parameters,
+		return this.View(PaginatedList<ProposalViewModel>.Create((base.GetPaginatedViewModels<ProposalViewModel>(sortOrder, currentFilter, searchString, pageNumber, parameters,
 			() => this._dbContext.Proposals!.AsNoTracking()
 				.Where(p => p.GuideTeacherOfTheProposal == user)
 				.Select(p => new ProposalViewModel {
@@ -90,7 +90,7 @@ public class GuideTeacherProposalController : ProposalController {
 					Title = p.Title,
 					ProposalStatus = p.ProposalStatus.ToString(),
 			}).AsEnumerable()
-		));
+		)), pageNumber ?? 1, 6));
 	}
 
 	public async Task<IActionResult> Create() {

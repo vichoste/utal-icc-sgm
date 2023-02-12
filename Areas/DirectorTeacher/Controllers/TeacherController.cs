@@ -34,7 +34,7 @@ public class TeacherController : ApplicationUserController {
 			searchString = currentFilter;
 		}
 		this.ViewData["CurrentFilter"] = searchString;
-		return this.View(await base.GetPaginatedViewModelsAsync<ApplicationUserViewModel>(sortOrder, currentFilter, searchString, pageNumber, parameters,
+		return this.View(PaginatedList<ApplicationUserViewModel>.Create((await base.GetPaginatedViewModelsAsync<ApplicationUserViewModel>(sortOrder, currentFilter, searchString, pageNumber, parameters,
 			async () => (await this._userManager.GetUsersInRoleAsync(nameof(Roles.Student))).Select(
 				async u => new ApplicationUserViewModel {
 					Id = u.Id,
@@ -47,7 +47,7 @@ public class TeacherController : ApplicationUserController {
 					IsDirectorTeacher = await this._userManager.IsInRoleAsync(u, nameof(Roles.DirectorTeacher)),
 				}
 			).Select(u => u.Result).AsEnumerable()
-		));
+		)), pageNumber ?? 1, 6));
 	}
 
 	public async Task<IActionResult> Create() {
