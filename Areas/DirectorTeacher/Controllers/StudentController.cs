@@ -31,6 +31,9 @@ public class StudentController : ApplicationUserController {
 	}
 	
 	public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
+		if (await base.CheckSession() is null) {
+			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
+		}
 		var parameters = new[] { nameof(ApplicationUserViewModel.FirstName), nameof(ApplicationUserViewModel.LastName), nameof(ApplicationUserViewModel.StudentUniversityId), nameof(ApplicationUserViewModel.Rut), nameof(ApplicationUserViewModel.Email) };
 		this.SetSortParameters(sortOrder, parameters);
 		if (searchString is not null) {
@@ -79,14 +82,14 @@ public class StudentController : ApplicationUserController {
 					CreatedAt = DateTimeOffset.Now,
 					UpdatedAt = DateTimeOffset.Now
 				};
-				await this._userStore.SetUserNameAsync(user, record.Email, CancellationToken.None);
-				await this._emailStore.SetEmailAsync(user, record.Email, CancellationToken.None);
+				await base._userStore.SetUserNameAsync(user, record.Email, CancellationToken.None);
+				await base._emailStore.SetEmailAsync(user, record.Email, CancellationToken.None);
 				var result = await this._userManager.CreateAsync(user, record!.Password!);
 				if (!result.Succeeded) {
 					errorMessages.Add($"Estudiante {record.Email} ya existe");
 					continue;
 				}
-				_ = await this._userManager.AddToRoleAsync(user, nameof(Roles.Student));
+				_ = await base._userManager.AddToRoleAsync(user, nameof(Roles.Student));
 				successMessages.Add($"Estudiante {record.Email} creado correctamente.");
 			}
 			if (errorMessages.Any()) {

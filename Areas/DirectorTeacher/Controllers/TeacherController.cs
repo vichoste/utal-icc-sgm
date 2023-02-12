@@ -142,8 +142,8 @@ public class TeacherController : ApplicationUserController {
 		if (await base.CheckSession() is null) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
-		var currentDirectorTeacher = await this._userManager.FindByIdAsync(currentDirectorTeacherId);
-		var newDirectorTeacher = await this._userManager.FindByIdAsync(newDirectorTeacherId);
+		var currentDirectorTeacher = await base._userManager.FindByIdAsync(currentDirectorTeacherId);
+		var newDirectorTeacher = await base._userManager.FindByIdAsync(newDirectorTeacherId);
 		var check = (currentDirectorTeacher, newDirectorTeacher) switch {
 			(ApplicationUser, ApplicationUser) => true,
 			(ApplicationUser teacher, _) when teacher.IsDeactivated => false,
@@ -164,7 +164,7 @@ public class TeacherController : ApplicationUserController {
 
 	[HttpPost, ValidateAntiForgeryToken]
 	public async Task<IActionResult> Transfer([FromForm] TransferViewModel model) {
-		var teacherSession = await this._userManager.GetUserAsync(this.User);
+		var teacherSession = await base._userManager.GetUserAsync(this.User);
 		if (teacherSession is null) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
@@ -175,12 +175,12 @@ public class TeacherController : ApplicationUserController {
 			this.TempData["ErrorMessage"] = "Error al obtener al profesor fuente.";
 			return this.RedirectToAction(nameof(TeacherController.Index), nameof(TeacherController).Replace("Controller", string.Empty), new { area = nameof(DirectorTeacher) });
 		}
-		var currentDirectorTeacherRoles = (await this._userManager.GetRolesAsync(currentDirectorTeacher)).ToList();
+		var currentDirectorTeacherRoles = (await base._userManager.GetRolesAsync(currentDirectorTeacher)).ToList();
 		if (!currentDirectorTeacherRoles.Contains(nameof(Roles.DirectorTeacher))) {
 			this.TempData["ErrorMessage"] = "El profesor fuente no es director de carrera.";
 			return this.RedirectToAction(nameof(TeacherController.Index), nameof(TeacherController).Replace("Controller", string.Empty), new { area = nameof(DirectorTeacher) });
 		}
-		if (await this.CheckApplicationUser(model.NewDirectorTeacherId!) is not ApplicationUser newDirectorTeacher) {
+		if (await base.CheckApplicationUser(model.NewDirectorTeacherId!) is not ApplicationUser newDirectorTeacher) {
 			this.TempData["ErrorMessage"] = "Error al obtener al profesor objetivo.";
 			return this.RedirectToAction(nameof(TeacherController.Index), nameof(TeacherController).Replace("Controller", string.Empty), new { area = nameof(DirectorTeacher) });
 		}
@@ -188,11 +188,11 @@ public class TeacherController : ApplicationUserController {
 			this.TempData["ErrorMessage"] = "Ambos profesores involucrados en la transferencia son el mismo.";
 			return this.RedirectToAction(nameof(TeacherController.Index), nameof(TeacherController).Replace("Controller", string.Empty), new { area = nameof(DirectorTeacher) });
 		}
-		_ = await this._userManager.RemoveFromRoleAsync(currentDirectorTeacher, nameof(Roles.DirectorTeacher));
-		_ = await this._userManager.AddToRoleAsync(newDirectorTeacher, nameof(Roles.DirectorTeacher));
+		_ = await base._userManager.RemoveFromRoleAsync(currentDirectorTeacher, nameof(Roles.DirectorTeacher));
+		_ = await base._userManager.AddToRoleAsync(newDirectorTeacher, nameof(Roles.DirectorTeacher));
 		currentDirectorTeacher.UpdatedAt = DateTimeOffset.Now;
 		newDirectorTeacher.UpdatedAt = DateTimeOffset.Now;
-		_ = await this._userManager.UpdateAsync(currentDirectorTeacher);
+		_ = await base._userManager.UpdateAsync(currentDirectorTeacher);
 		this.TempData["SuccessMessage"] = "Director de carrera transferido correctamente.";
 		return this.RedirectToAction(nameof(TeacherController.Index), nameof(TeacherController).Replace("Controller", string.Empty), new { area = nameof(DirectorTeacher) });
 	}

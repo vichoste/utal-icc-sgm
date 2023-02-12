@@ -19,7 +19,7 @@ public abstract class ApplicationUserController : ApplicationController, ISortab
 
 	protected T Create<T>() where T : ApplicationUserViewModel, new() => new T();
 
-	protected async Task<ApplicationUser?> CreateAsync<T>([FromForm] T input, IEnumerable<string> roles) where T : ApplicationUserViewModel {
+	protected async Task<ApplicationUser?> CreateAsync<T>(T input, IEnumerable<string> roles) where T : ApplicationUserViewModel {
 		var user = new ApplicationUser {
 			FirstName = input.FirstName,
 			LastName = input.LastName,
@@ -27,16 +27,16 @@ public abstract class ApplicationUserController : ApplicationController, ISortab
 			CreatedAt = DateTimeOffset.Now,
 			UpdatedAt = DateTimeOffset.Now
 		};
-		await this._userStore.SetUserNameAsync(user, input.Email, CancellationToken.None);
-		await this._emailStore.SetEmailAsync(user, input.Email, CancellationToken.None);
-		_ = await this._userManager.CreateAsync(user, input.Password!);
-		_ = await this._userManager.AddToRoleAsync(user, nameof(Roles.Teacher));
-		_ = await this._userManager.AddToRolesAsync(user, roles);
+		await base._userStore.SetUserNameAsync(user, input.Email, CancellationToken.None);
+		await base._emailStore.SetEmailAsync(user, input.Email, CancellationToken.None);
+		_ = await base._userManager.CreateAsync(user, input.Password!);
+		_ = await base._userManager.AddToRoleAsync(user, nameof(Roles.Teacher));
+		_ = await base._userManager.AddToRolesAsync(user, roles);
 		return user;
 	}
 
 	protected async Task<T?> EditAsync<T>(string id) where T : ApplicationUserViewModel, new() {
-		if (await this.CheckApplicationUser(id) is not ApplicationUser user) {
+		if (await base.CheckApplicationUser(id) is not ApplicationUser user) {
 			return null;
 		}
 		var output = new T {
@@ -51,26 +51,26 @@ public abstract class ApplicationUserController : ApplicationController, ISortab
 		return output;
 	}
 
-	protected async Task<T?> EditAsync<T>([FromForm] T input) where T : ApplicationUserViewModel, new() {
-		if (await this.CheckApplicationUser(input.Id!) is not ApplicationUser user) {
+	protected async Task<T?> EditAsync<T>(T input) where T : ApplicationUserViewModel, new() {
+		if (await base.CheckApplicationUser(input.Id!) is not ApplicationUser user) {
 			return null;
 		}
-		await this._userStore.SetUserNameAsync(user, input.Email, CancellationToken.None);
-		await this._emailStore.SetEmailAsync(user, input.Email, CancellationToken.None);
+		await base._userStore.SetUserNameAsync(user, input.Email, CancellationToken.None);
+		await base._emailStore.SetEmailAsync(user, input.Email, CancellationToken.None);
 		user.FirstName = input.FirstName;
 		user.LastName = input.LastName;
 		user.Rut = input.Rut;
 		user.UpdatedAt = DateTimeOffset.Now;
-		_ = await this._userManager.UpdateAsync(user);
+		_ = await base._userManager.UpdateAsync(user);
 		if (input is EditTeacherViewModel teacher) {
-			var roles = (await this._userManager.GetRolesAsync(user)).ToList();
+			var roles = (await base._userManager.GetRolesAsync(user)).ToList();
 			if (roles.Contains(nameof(Roles.Teacher))) {
 				_ = roles.Remove(nameof(Roles.Teacher));
 			}
 			if (roles.Contains(nameof(Roles.DirectorTeacher))) {
 				_ = roles.Remove(nameof(Roles.DirectorTeacher));
 			}
-			var removeRankRolesResult = await this._userManager.RemoveFromRolesAsync(user, roles);
+			var removeRankRolesResult = await base._userManager.RemoveFromRolesAsync(user, roles);
 			var rankRoles = new List<string>();
 			if (teacher.IsGuideTeacher) {
 				rankRoles.Add(nameof(Roles.GuideTeacher));
@@ -84,7 +84,7 @@ public abstract class ApplicationUserController : ApplicationController, ISortab
 			if (teacher.IsCommitteeTeacher) {
 				rankRoles.Add(nameof(Roles.CommitteeTeacher));
 			}
-			_ = await this._userManager.AddToRolesAsync(user, rankRoles);
+			_ = await base._userManager.AddToRolesAsync(user, rankRoles);
 		}
 		var output = new T {
 			Id = user.Id,
@@ -96,17 +96,17 @@ public abstract class ApplicationUserController : ApplicationController, ISortab
 			UpdatedAt = user.UpdatedAt
 		};
 		if (output is EditTeacherViewModel teacher1) {
-			teacher1.IsAssistantTeacher = await this._userManager.IsInRoleAsync(user, nameof(Roles.AssistantTeacher));
-			teacher1.IsCommitteeTeacher = await this._userManager.IsInRoleAsync(user, nameof(Roles.CommitteeTeacher));
-			teacher1.IsCourseTeacher = await this._userManager.IsInRoleAsync(user, nameof(Roles.CourseTeacher));
-			teacher1.IsGuideTeacher = await this._userManager.IsInRoleAsync(user, nameof(Roles.GuideTeacher));
+			teacher1.IsAssistantTeacher = await base._userManager.IsInRoleAsync(user, nameof(Roles.AssistantTeacher));
+			teacher1.IsCommitteeTeacher = await base._userManager.IsInRoleAsync(user, nameof(Roles.CommitteeTeacher));
+			teacher1.IsCourseTeacher = await base._userManager.IsInRoleAsync(user, nameof(Roles.CourseTeacher));
+			teacher1.IsGuideTeacher = await base._userManager.IsInRoleAsync(user, nameof(Roles.GuideTeacher));
 		}
 		return output;
 	}
 
 	protected async Task<T?> ToggleActivationAsync<T>(string id) where T : ApplicationUserViewModel, new() {
-		var user = await this._userManager.FindByIdAsync(id);
-		if (user is null || user.Id == this._userManager.GetUserId(this.User) || (await this._userManager.GetRolesAsync(user)).Contains(nameof(Roles.DirectorTeacher))) {
+		var user = await base._userManager.FindByIdAsync(id);
+		if (user is null || user.Id == base._userManager.GetUserId(base.User) || (await base._userManager.GetRolesAsync(user)).Contains(nameof(Roles.DirectorTeacher))) {
 			return null;
 		}
 		var output = new T {
@@ -117,14 +117,14 @@ public abstract class ApplicationUserController : ApplicationController, ISortab
 		return output;
 	}
 
-	protected async Task<ApplicationUser?> ToggleActivationAsync<T>([FromForm] ApplicationUserViewModel input) where T : ApplicationUserViewModel, new() {
-		var user = await this._userManager.FindByIdAsync(input.Id!);
-		if (user is null || user.Id == this._userManager.GetUserId(this.User) || (await this._userManager.GetRolesAsync(user)).Contains(nameof(Roles.DirectorTeacher))) {
+	protected async Task<ApplicationUser?> ToggleActivationAsync<T>(ApplicationUserViewModel input) where T : ApplicationUserViewModel, new() {
+		var user = await base._userManager.FindByIdAsync(input.Id!);
+		if (user is null || user.Id == base._userManager.GetUserId(base.User) || (await base._userManager.GetRolesAsync(user)).Contains(nameof(Roles.DirectorTeacher))) {
 			return null;
 		}
 		user!.IsDeactivated = !user.IsDeactivated;
 		user.UpdatedAt = DateTimeOffset.Now;
-		_ = await this._userManager.UpdateAsync(user);
+		_ = await base._userManager.UpdateAsync(user);
 		return user;
 	}
 }

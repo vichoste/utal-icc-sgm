@@ -100,36 +100,20 @@ public class GuideTeacherProposalController : ProposalController {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
 		await this.PopulateAssistantTeachers(user);
-		var output = new GuideTeacherProposalViewModel {
-			GuideTeacherId = user.Id,
-			GuideTeacherName = $"{user.FirstName} {user.LastName}",
-			GuideTeacherEmail = user.Email,
-			GuideTeacherOffice = user.TeacherOffice,
-			GuideTeacherSchedule = user.TeacherSchedule,
-			GuideTeacherSpecialization = user.TeacherSpecialization,
-		};
+		var output = base.Create<ProposalViewModel>();
 		return this.View(output);
 	}
 
 	[HttpPost, ValidateAntiForgeryToken]
-	public async Task<IActionResult> Create([FromForm] GuideTeacherProposalViewModel input) {
+	public async Task<IActionResult> Create([FromForm] ProposalViewModel input) {
 		if (await base.CheckSession() is not ApplicationUser user) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
-		var assistantTeachers = input.AssistantTeachers!.Select(async at => await this.CheckApplicationUser(at)).Select(at => at.Result).ToList();
-		var proposal = new GuideTeacherProposal {
-			Id = Guid.NewGuid().ToString(),
-			Title = input.Title,
-			Description = input.Description,
-			Requirements = input.Requirements,
-			GuideTeacherOwnerOfTheGuideTeacherProposal = user,
-			AssistantTeachersOfTheGuideTeacherProposal = assistantTeachers!,
-			ProposalStatus = GuideTeacherProposal.Status.Draft,
-			CreatedAt = DateTimeOffset.Now,
-			UpdatedAt = DateTimeOffset.Now
-		};
-		_ = await this._dbContext.GuideTeacherProposals!.AddAsync(proposal);
-		_ = await this._dbContext.SaveChangesAsync();
+		var output = base.CreateAsync<ProposalViewModel>(input, user);
+		if (output is null) {
+			this.TempData["ErrorMessage"] = "Error al registrar tu propuesta.";
+			return this.RedirectToAction(nameof(GuideTeacherProposalController.Index), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(GuideTeacher) });
+		}
 		this.TempData["SuccessMessage"] = "Tu propuesta ha sido registrada correctamente.";
 		return this.RedirectToAction(nameof(GuideTeacherProposalController.Index), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(GuideTeacher) });
 	}
@@ -138,60 +122,20 @@ public class GuideTeacherProposalController : ProposalController {
 		if (await base.CheckSession() is not ApplicationUser user) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
-		var proposal = await this._dbContext.GuideTeacherProposals!.AsNoTracking()
-			.Include(p => p.GuideTeacherOwnerOfTheGuideTeacherProposal).AsNoTracking()
-			.Where(p => p.GuideTeacherOwnerOfTheGuideTeacherProposal == user && p.ProposalStatus == GuideTeacherProposal.Status.Draft)
-			.Include(p => p.AssistantTeachersOfTheGuideTeacherProposal).AsNoTracking()
-			.FirstOrDefaultAsync(p => p.Id == id);
-		if (proposal is null) {
-			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
-			return this.RedirectToAction(nameof(GuideTeacherProposalController.Index), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(GuideTeacher) });
-		}
-		await this.PopulateAssistantTeachers(proposal.GuideTeacherOwnerOfTheGuideTeacherProposal!);
-		var output = new GuideTeacherProposalViewModel {
-			Id = id,
-			Title = proposal!.Title,
-			Description = proposal.Description,
-			Requirements = proposal.Requirements,
-			AssistantTeachers = proposal.AssistantTeachersOfTheGuideTeacherProposal!.Select(at => at!.Id).ToList(),
-			CreatedAt = proposal.CreatedAt,
-			UpdatedAt = proposal.UpdatedAt
-		};
+		var output = await base.EditAsync<ProposalViewModel>(id, user);
 		return this.View(output);
 	}
 
 	[HttpPost, ValidateAntiForgeryToken]
-	public async Task<IActionResult> Edit([FromForm] GuideTeacherProposalViewModel input) {
+	public async Task<IActionResult> Edit([FromForm] ProposalViewModel input) {
 		if (await base.CheckSession() is not ApplicationUser user) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
-		var proposal = await this._dbContext.GuideTeacherProposals!
-			.Include(p => p.GuideTeacherOwnerOfTheGuideTeacherProposal)
-			.Where(p => p.GuideTeacherOwnerOfTheGuideTeacherProposal == user && p.ProposalStatus == GuideTeacherProposal.Status.Draft)
-			.Include(p => p.AssistantTeachersOfTheGuideTeacherProposal)
-			.FirstOrDefaultAsync(p => p.Id == input.Id);
-		if (proposal is null) {
-			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
+		var output = await base.EditAsync<ProposalViewModel>(input, user);
+		if (output is null) {
+			this.TempData["ErrorMessage"] = "Error al actualizar tu propuesta.";
 			return this.RedirectToAction(nameof(GuideTeacherProposalController.Index), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(GuideTeacher) });
 		}
-		await this.PopulateAssistantTeachers(proposal.GuideTeacherOwnerOfTheGuideTeacherProposal!);
-		proposal.Title = input.Title;
-		proposal.Description = input.Description;
-		proposal.Requirements = input.Requirements;
-		var assistantTeachers = input.AssistantTeachers!.Select(async at => await this.CheckApplicationUser(at)).Select(at => at.Result).ToList();
-		proposal.AssistantTeachersOfTheGuideTeacherProposal = assistantTeachers!;
-		proposal.UpdatedAt = DateTimeOffset.Now;
-		_ = this._dbContext.GuideTeacherProposals!.Update(proposal);
-		_ = await this._dbContext.SaveChangesAsync();
-		var output = new GuideTeacherProposalViewModel {
-			Id = proposal!.Id,
-			Title = proposal!.Title,
-			Description = proposal.Description,
-			Requirements = proposal.Requirements,
-			AssistantTeachers = proposal.AssistantTeachersOfTheGuideTeacherProposal!.Select(at => at!.Id).ToList(),
-			CreatedAt = proposal.CreatedAt,
-			UpdatedAt = proposal.UpdatedAt
-		};
 		this.ViewBag.SuccessMessage = "Tu propuesta ha sido actualizada correctamente.";
 		return this.View(output);
 	}
