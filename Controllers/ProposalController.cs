@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 using Utal.Icc.Sgm.Data;
@@ -89,5 +88,31 @@ public abstract class ProposalController : ApplicationController, IPopulatable, 
 			UpdatedAt = proposal.UpdatedAt
 		};
 		return output;
+	}
+
+	protected async Task<T?> DeleteAsync<T>(string id, ApplicationUser user) where T : ProposalViewModel, new() {
+		var proposal = await this._dbContext.Proposals!.AsNoTracking()
+			.Where(p => p.GuideTeacherOfTheProposal == user && p.ProposalStatus == Status.Draft)
+			.FirstOrDefaultAsync(p => p.Id == id);
+		if (proposal is null) {
+			return null;
+		}
+		var output = new T {
+			Id = id,
+			Title = proposal.Title
+		};
+		return output;
+	}
+
+	protected async Task<bool> DeleteAsync<T>(ProposalViewModel input, ApplicationUser user) where T: ProposalViewModel, new() {
+		var proposal = await this._dbContext.Proposals!
+			.Where(p => p.GuideTeacherOfTheProposal == user && p.ProposalStatus == Status.Draft)
+			.FirstOrDefaultAsync(p => p.Id == input.Id);
+		if (proposal is null) {
+			return false;
+		}
+		_ = base._dbContext.Proposals!.Remove(proposal);
+		_ = base._dbContext.SaveChangesAsync();
+		return true;
 	}
 }
