@@ -49,8 +49,8 @@ public static class StartupSeeder {
 			CreatedAt = DateTimeOffset.Now,
 			UpdatedAt = DateTimeOffset.Now
 		};
-		var directorTeacherCheck = await userManager.FindByIdAsync(email);
-		if (directorTeacherCheck is null) {
+		var check = await userManager.FindByIdAsync(email);
+		if (check is null) {
 			await userStore.SetUserNameAsync(directorTeacher, email, CancellationToken.None);
 			await emailStore.SetEmailAsync(directorTeacher, email, CancellationToken.None);
 			_ = await userManager.CreateAsync(directorTeacher, password);

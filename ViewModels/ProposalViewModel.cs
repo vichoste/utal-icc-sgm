@@ -9,8 +9,6 @@ public partial class ProposalViewModel : ApplicationViewModel {
 	public string? Description { get; set; }
 	[Display(Name = "Estado de la propuesta")]
 	public string? ProposalStatus { get; set; }
-	[Display(Name = "¿Quién lo hizo?")]
-	public string? WhoIsTheAuthor { get; set; }
 	[Display(Name = "Profesores co-guía")]
 	public IEnumerable<string?>? AssistantTeachers { get; set; } = new HashSet<string?>();
 }

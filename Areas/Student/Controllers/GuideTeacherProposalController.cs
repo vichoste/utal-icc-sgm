@@ -54,7 +54,7 @@ public class GuideTeacherProposalController : ProposalController {
 		this.ViewData["CurrentFilter"] = searchString;
 		return this.View(PaginatedList<ProposalViewModel>.Create((base.GetPaginatedViewModels<ProposalViewModel>(sortOrder, currentFilter, searchString, pageNumber, parameters,
 			() => this._dbContext.Proposals!.AsNoTracking()
-				.Where(p => (p.StudentsWhoAreInterestedInThisProposal!.Contains(user) || p.StudentOfTheProposal == user) && (p.ProposalStatus == Status.Published || p.ProposalStatus == Status.Ready))
+				.Where(p => (p.StudentsWhoAreInterestedInThisProposal!.Contains(user) || p.StudentOfTheProposal == user) && (p.ProposalStatus == Status.Published || p.ProposalStatus == Status.Ready) && p.WasMadeByGuideTeacher)
 				.Include(p => p.GuideTeacherOfTheProposal).AsNoTracking()
 				.Select(p => new ProposalViewModel {
 					Id = p.Id,
@@ -79,7 +79,7 @@ public class GuideTeacherProposalController : ProposalController {
 		this.ViewData["CurrentFilter"] = searchString;
 		return this.View(PaginatedList<ProposalViewModel>.Create(base.GetPaginatedViewModels<ProposalViewModel>(sortOrder, currentFilter, searchString, pageNumber, parameters,
 			() => this._dbContext.Proposals!.AsNoTracking()
-				.Where(p => (p.StudentsWhoAreInterestedInThisProposal!.Contains(user) || p.StudentOfTheProposal == user) && p.ProposalStatus == Status.Published)
+				.Where(p => (p.StudentsWhoAreInterestedInThisProposal!.Contains(user) || p.StudentOfTheProposal == user) && p.ProposalStatus == Status.Published && p.WasMadeByGuideTeacher)
 				.Include(p => p.GuideTeacherOfTheProposal).AsNoTracking()
 				.Select(p => new ProposalViewModel {
 					Id = p.Id,
@@ -107,7 +107,7 @@ public class GuideTeacherProposalController : ProposalController {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
 		var proposal = await this._dbContext.Proposals!.AsNoTracking()
-			.Where(p => p.ProposalStatus == Status.Published)
+			.Where(p => p.ProposalStatus == Status.Published && p.WasMadeByGuideTeacher)
 			.Include(p => p.GuideTeacherOfTheProposal).AsNoTracking()
 			.FirstOrDefaultAsync(p => p.Id == id);
 		if (proposal is null) {
@@ -129,7 +129,7 @@ public class GuideTeacherProposalController : ProposalController {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
 		var proposal = await this._dbContext.Proposals!.AsNoTracking()
-			.Where(p => p.ProposalStatus == Status.Published)
+			.Where(p => p.ProposalStatus == Status.Published && p.WasMadeByGuideTeacher)
 			.Include(p => p.GuideTeacherOfTheProposal).AsNoTracking()
 			.FirstOrDefaultAsync(p => p.Id == input.Id);
 		if (proposal is null) {
@@ -148,7 +148,7 @@ public class GuideTeacherProposalController : ProposalController {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
 		var proposal = await this._dbContext.Proposals!.AsNoTracking()
-			.Where(p => (p.StudentsWhoAreInterestedInThisProposal!.Contains(user) || p.StudentOfTheProposal == user) && (p.ProposalStatus == Status.Published || p.ProposalStatus == Status.Ready))
+			.Where(p => (p.StudentsWhoAreInterestedInThisProposal!.Contains(user) || p.StudentOfTheProposal == user) && (p.ProposalStatus == Status.Published || p.ProposalStatus == Status.Ready) && p.WasMadeByGuideTeacher)
 			.Include(p => p.GuideTeacherOfTheProposal).AsNoTracking()
 			.Include(p => p.StudentOfTheProposal).AsNoTracking()
 			.Include(p => p.AssistantTeachersOfTheProposal).AsNoTracking()

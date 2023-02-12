@@ -81,7 +81,7 @@ public class StudentProposalController : ProposalController {
 		this.ViewData["CurrentFilter"] = searchString;
 		return this.View(PaginatedList<ProposalViewModel>.Create(base.GetPaginatedViewModels<ProposalViewModel>(sortOrder, currentFilter, searchString, pageNumber, parameters,
 			() => this._dbContext.Proposals!.AsNoTracking()
-				.Where(p => p.StudentOfTheProposal == user)
+				.Where(p => p.StudentOfTheProposal == user && !p.WasMadeByGuideTeacher)
 				.Include(p => p.GuideTeacherOfTheProposal).AsNoTracking()
 				.Select(p => new ProposalViewModel {
 					Id = p.Id,
@@ -133,7 +133,7 @@ public class StudentProposalController : ProposalController {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
 		if (await this._dbContext.Proposals!.AsNoTracking()
-				.Where(p => p.Id == id)
+				.Where(p => p.Id == id && !p.WasMadeByGuideTeacher)
 				.Include(p => p.GuideTeacherOfTheProposal)
 				.Select(p => p.GuideTeacherOfTheProposal)
 				.FirstOrDefaultAsync()
@@ -152,7 +152,7 @@ public class StudentProposalController : ProposalController {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
 		if (await this._dbContext.Proposals!.AsNoTracking()
-				.Where(p => p.Id == input.Id)
+				.Where(p => p.Id == input.Id && !p.WasMadeByGuideTeacher)
 				.Include(p => p.GuideTeacherOfTheProposal)
 				.Select(p => p.GuideTeacherOfTheProposal)
 				.FirstOrDefaultAsync()
@@ -245,7 +245,7 @@ public class StudentProposalController : ProposalController {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
 		var proposal = await this._dbContext.Proposals!.AsNoTracking()
-			.Where(p => p.StudentOfTheProposal == user && p.ProposalStatus == Status.Rejected)
+			.Where(p => p.StudentOfTheProposal == user && p.ProposalStatus == Status.Rejected && !p.WasMadeByGuideTeacher)
 			.Include(p => p.WhoRejected)
 			.FirstOrDefaultAsync(p => p.Id == id);
 		if (proposal is null) {

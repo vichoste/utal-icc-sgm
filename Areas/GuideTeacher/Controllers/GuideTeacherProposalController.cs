@@ -54,7 +54,7 @@ public class GuideTeacherProposalController : ProposalController {
 		this.ViewData["CurrentFilter"] = searchString;
 		return this.View(PaginatedList<ApplicationUserViewModel>.Create((base.GetPaginatedViewModels<ApplicationUserViewModel>(sortOrder, currentFilter, searchString, pageNumber, parameters,
 			() => this._dbContext.Proposals!
-				.Where(p => p.GuideTeacherOfTheProposal == user && p.Id == id)
+				.Where(p => p.GuideTeacherOfTheProposal == user && p.Id == id && p.WasMadeByGuideTeacher)
 				.Include(p => p.StudentsWhoAreInterestedInThisProposal)
 				.SelectMany(p => p.StudentsWhoAreInterestedInThisProposal!.Select(
 					u => new ApplicationUserViewModel {
@@ -84,7 +84,7 @@ public class GuideTeacherProposalController : ProposalController {
 		this.ViewData["CurrentFilter"] = searchString;
 		return this.View(PaginatedList<ProposalViewModel>.Create((base.GetPaginatedViewModels<ProposalViewModel>(sortOrder, currentFilter, searchString, pageNumber, parameters,
 			() => this._dbContext.Proposals!.AsNoTracking()
-				.Where(p => p.GuideTeacherOfTheProposal == user)
+				.Where(p => p.GuideTeacherOfTheProposal == user && p.WasMadeByGuideTeacher)
 				.Select(p => new ProposalViewModel {
 					Id = p.Id,
 					Title = p.Title,
@@ -220,7 +220,7 @@ public class GuideTeacherProposalController : ProposalController {
 			return this.RedirectToAction(nameof(GuideTeacherProposalController.Index), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(GuideTeacher) });
 		}
 		var proposal = await this._dbContext.Proposals!.AsNoTracking()
-			.Where(p => p.GuideTeacherOfTheProposal == user && p.ProposalStatus == Status.Published)
+			.Where(p => p.GuideTeacherOfTheProposal == user && p.ProposalStatus == Status.Published && p.WasMadeByGuideTeacher)
 			.Include(p => p.StudentsWhoAreInterestedInThisProposal).AsNoTracking()
 			.Where(p => p.StudentsWhoAreInterestedInThisProposal!.Any(s => s!.Id == studentId))
 			.FirstOrDefaultAsync(p => p.Id == proposalId);
@@ -250,7 +250,7 @@ public class GuideTeacherProposalController : ProposalController {
 			return this.RedirectToAction(nameof(GuideTeacherProposalController.Index), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(GuideTeacher) });
 		}
 		var proposal = await this._dbContext.Proposals!
-			.Where(p => p.GuideTeacherOfTheProposal == user && p.ProposalStatus == Status.Published)
+			.Where(p => p.GuideTeacherOfTheProposal == user && p.ProposalStatus == Status.Published && p.WasMadeByGuideTeacher)
 			.Include(p => p.StudentsWhoAreInterestedInThisProposal)
 			.Where(p => p.StudentsWhoAreInterestedInThisProposal!.Any(s => s!.Id == input.StudentId!))
 			.FirstOrDefaultAsync(p => p.Id == input.Id);

@@ -55,7 +55,7 @@ public class StudentProposalController : ProposalController {
 		this.ViewData["CurrentFilter"] = searchString;
 		return this.View(PaginatedList<ProposalViewModel>.Create((base.GetPaginatedViewModels<ProposalViewModel>(sortOrder, currentFilter, searchString, pageNumber, parameters,
 			() => this._dbContext.Proposals!.AsNoTracking()
-				.Where(p => p.GuideTeacherOfTheProposal == user && (p.ProposalStatus == Status.Published || p.ProposalStatus == Status.Ready))
+				.Where(p => p.GuideTeacherOfTheProposal == user && (p.ProposalStatus == Status.Published || p.ProposalStatus == Status.Ready) && !p.WasMadeByGuideTeacher)
 				.Include(p => p.StudentOfTheProposal).AsNoTracking()
 				.Select(p => new ProposalViewModel {
 					Id = p.Id,
@@ -95,7 +95,7 @@ public class StudentProposalController : ProposalController {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
 		var proposal = await this._dbContext.Proposals!.AsNoTracking()
-			.Where(p => p.GuideTeacherOfTheProposal == user && p.ProposalStatus == Status.Published)
+			.Where(p => p.GuideTeacherOfTheProposal == user && p.ProposalStatus == Status.Published && !p.WasMadeByGuideTeacher)
 			.Include(p => p.StudentOfTheProposal).AsNoTracking()
 			.FirstOrDefaultAsync(p => p.Id == id);
 		if (proposal is null) {
@@ -116,7 +116,7 @@ public class StudentProposalController : ProposalController {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
 		var proposal = await this._dbContext.Proposals!
-			.Where(p => p.GuideTeacherOfTheProposal == user && p.ProposalStatus == Status.Published)
+			.Where(p => p.GuideTeacherOfTheProposal == user && p.ProposalStatus == Status.Published && !p.WasMadeByGuideTeacher)
 			.FirstOrDefaultAsync(p => p.Id == input.Id);
 		if (proposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
@@ -138,7 +138,7 @@ public class StudentProposalController : ProposalController {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
 		var proposal = await this._dbContext.Proposals!.AsNoTracking()
-			.Where(p => p.GuideTeacherOfTheProposal == user && p.ProposalStatus == Status.Published)
+			.Where(p => p.GuideTeacherOfTheProposal == user && p.ProposalStatus == Status.Published && !p.WasMadeByGuideTeacher)
 			.Include(p => p.StudentOfTheProposal).AsNoTracking()
 			.FirstOrDefaultAsync(p => p.Id == id);
 		if (proposal is null) {
@@ -160,7 +160,7 @@ public class StudentProposalController : ProposalController {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
 		var proposal = await this._dbContext.Proposals!
-			.Where(p => p.GuideTeacherOfTheProposal == user && (p.ProposalStatus != Status.Draft || p.ProposalStatus != Status.Rejected))
+			.Where(p => p.GuideTeacherOfTheProposal == user && p.ProposalStatus == Status.Published && !p.WasMadeByGuideTeacher)
 			.FirstOrDefaultAsync(p => p.Id == input.Id);
 		if (proposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
