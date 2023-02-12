@@ -212,13 +212,13 @@ public abstract class ProposalController : ApplicationController, IPopulatable, 
 		var proposal = user switch {
 			_ when await base._userManager.IsInRoleAsync(user, nameof(Roles.Student)) => await base._dbContext.Proposals!.AsNoTracking()
 				.Include(p => p.StudentOfTheProposal).AsNoTracking()
-				.Where(p => p.StudentOfTheProposal == user && p.ProposalStatus == Status.Ready)
+				.Where(p => p.StudentOfTheProposal == user && (p.ProposalStatus == Status.Published || p.ProposalStatus == Status.Ready))
 				.Include(p => p.GuideTeacherOfTheProposal).AsNoTracking()
 				.Include(p => p.AssistantTeachersOfTheProposal).AsNoTracking()
 				.FirstOrDefaultAsync(p => p.Id == id),
 			_ when await base._userManager.IsInRoleAsync(user, nameof(Roles.GuideTeacher)) => await base._dbContext.Proposals!.AsNoTracking()
 				.Include(p => p.GuideTeacherOfTheProposal).AsNoTracking()
-				.Where(p => p.GuideTeacherOfTheProposal == user && p.ProposalStatus == Status.Ready)
+				.Where(p => p.GuideTeacherOfTheProposal == user && (p.ProposalStatus == Status.Published || p.ProposalStatus == Status.Ready))
 				.Include(p => p.StudentOfTheProposal).AsNoTracking()
 				.Include(p => p.AssistantTeachersOfTheProposal).AsNoTracking()
 				.FirstOrDefaultAsync(p => p.Id == id),

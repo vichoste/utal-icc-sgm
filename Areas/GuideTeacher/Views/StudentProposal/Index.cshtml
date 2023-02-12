@@ -59,7 +59,7 @@
 									@if (item.ProposalStatus == nameof(Status.Published)) {
 										@this.Html.ActionLink("Ver", nameof(StudentProposalController.View), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.GuideTeacher), id = item.Id }, new { @class = "btn btn-yellow mb-3"})
 									} else if (item.ProposalStatus == nameof(Status.Ready)) {
-										<p class="text-muted">El estudiante debe enviar esta propuesta al comité.</p>
+										@this.Html.ActionLink("Ver", nameof(StudentProposalController.Summary), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.GuideTeacher), id = item.Id }, new { @class = "btn btn-success mb-3"})
 									}
 								</td>
 							</tr>

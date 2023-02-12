@@ -70,7 +70,7 @@
 										@this.Html.ActionLink("Eliminar", nameof(StudentProposalController.Delete), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.Student), id = item.Id }, new { @class = "btn btn-danger mb-3"})
 										@this.Html.ActionLink("Enviar", nameof(StudentProposalController.Publish), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.Student), id = item.Id }, new { @class = "btn btn-primary mb-3"})
 									} else if (item.ProposalStatus == nameof(Status.Published)) {
-										<p class="text-muted">Debes esperar a que el profesor guía apruebe o rechace esta propuesta.</p>
+										@this.Html.ActionLink("Ver", nameof(StudentProposalController.View), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.Student), id = item.Id }, new { @class = "btn btn-primary mb-3"})
 									} else if (item.ProposalStatus == nameof(Status.Ready)) {
 										@this.Html.ActionLink("Convertir", nameof(StudentProposalController.Convert), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.Student), id = item.Id }, new { @class = "btn btn-success mb-3"})
 									} else if (item.ProposalStatus == nameof(Status.Rejected)) {
