@@ -108,7 +108,7 @@ public class GuideTeacherProposalController : ProposalController {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
 		await this.PopulateAssistantTeachers(user);
-		var output = base.CreateAsync<ProposalViewModel>(input, user);
+		var output = await base.CreateAsync<ProposalViewModel>(input, user);
 		if (output is null) {
 			this.TempData["ErrorMessage"] = "Error al registrar tu propuesta.";
 			return this.RedirectToAction(nameof(GuideTeacherProposalController.Index), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(GuideTeacher) });

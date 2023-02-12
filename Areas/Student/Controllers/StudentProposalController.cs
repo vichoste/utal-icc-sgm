@@ -86,7 +86,8 @@ public class StudentProposalController : ProposalController {
 				.Select(p => new ProposalViewModel {
 					Id = p.Id,
 					Title = p.Title,
-					GuideTeacherName = $"{p.GuideTeacherOfTheProposal!.FirstName} {p.GuideTeacherOfTheProposal!.LastName}",
+					GuideTeacherId = p.GuideTeacherOfTheProposal!.Id,
+					GuideTeacherName = $"{p.GuideTeacherOfTheProposal.FirstName} {p.GuideTeacherOfTheProposal.LastName}",
 					ProposalStatus = p.ProposalStatus.ToString(),
 			}).AsEnumerable()
 		), pageNumber ?? 1, 6));
@@ -100,7 +101,7 @@ public class StudentProposalController : ProposalController {
 			this.TempData["ErrorMessage"] = "Error al registrar tu propuesta.";
 			return this.RedirectToAction(nameof(StudentProposalController.Index), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Student) });		}
 		await this.PopulateAssistantTeachers(guideTeacher);
-		var output = base.CreateAsync<ProposalViewModel>(id);
+		var output = await base.CreateAsync<ProposalViewModel>(id);
 		if (output is null) {
 			this.TempData["ErrorMessage"] = "Error al registrar tu propuesta.";
 			return this.RedirectToAction(nameof(StudentProposalController.Index), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Student) });
@@ -113,12 +114,12 @@ public class StudentProposalController : ProposalController {
 		if (await base.CheckSession() is not ApplicationUser user) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
-		if (await base.CheckApplicationUser(input.Id!) is not ApplicationUser guideTeacher) {
+		if (await base.CheckApplicationUser(input.GuideTeacherId!) is not ApplicationUser guideTeacher) {
 			this.TempData["ErrorMessage"] = "Error al registrar tu propuesta.";
 			return this.RedirectToAction(nameof(StudentProposalController.Index), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Student) });
 		}
 		await this.PopulateAssistantTeachers(guideTeacher);
-		var output = base.CreateAsync<ProposalViewModel>(input, user);
+		var output = await base.CreateAsync<ProposalViewModel>(input, user);
 		if (output is null) {
 			this.TempData["ErrorMessage"] = "Error al registrar tu propuesta.";
 			return this.RedirectToAction(nameof(StudentProposalController.Index), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Student) });
@@ -132,10 +133,10 @@ public class StudentProposalController : ProposalController {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
 		if (await this._dbContext.Proposals!.AsNoTracking()
-			.Where(p => p.Id == id)
-			.Include(p => p.GuideTeacherOfTheProposal)
-			.Select(p => p.GuideTeacherOfTheProposal)
-			.FirstOrDefaultAsync() 
+				.Where(p => p.Id == id)
+				.Include(p => p.GuideTeacherOfTheProposal)
+				.Select(p => p.GuideTeacherOfTheProposal)
+				.FirstOrDefaultAsync()
 			is not ApplicationUser guideTeacher) {
 			this.TempData["ErrorMessage"] = "Error al actualizar tu propuesta.";
 			return this.RedirectToAction(nameof(StudentProposalController.Index), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Student) });

@@ -36,7 +36,7 @@ public abstract class ProposalController : ApplicationController, IPopulatable, 
 	}
 
 	protected async Task<Proposal?> CreateAsync<T>(T input, ApplicationUser user) where T : ProposalViewModel {
-		if (await base.CheckApplicationUser(input.GuideTeacherId!) is null || await base.CheckApplicationUser(input.StudentId!) is null) {
+		if (await base.CheckApplicationUser(input.GuideTeacherId!) is not ApplicationUser guideTeacher) {
 			return null;
 		}
 		var assistantTeachers = input.AssistantTeachers!.Select(async at => await base.CheckApplicationUser(at!)).Select(at => at.Result).ToList();
@@ -45,6 +45,7 @@ public abstract class ProposalController : ApplicationController, IPopulatable, 
 				Id = Guid.NewGuid().ToString(),
 				Title = input.Title,
 				Description = input.Description,
+				GuideTeacherOfTheProposal = guideTeacher,
 				StudentOfTheProposal = user,
 				AssistantTeachersOfTheProposal = assistantTeachers!,
 				ProposalStatus = Status.Draft,

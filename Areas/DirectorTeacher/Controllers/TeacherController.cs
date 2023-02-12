@@ -89,7 +89,7 @@ public class TeacherController : ApplicationUserController {
 		if (await base.CheckSession() is null) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
-		var output = await base.EditAsync<ApplicationUserViewModel>(id);
+		var output = await base.EditAsync<EditTeacherViewModel>(id);
 		if (output is null) {
 			this.TempData["ErrorMessage"] = "Error al editar al profesor.";
 			return this.RedirectToAction(nameof(TeacherController.Index), nameof(TeacherController).Replace("Controller", string.Empty), new { area = nameof(DirectorTeacher) });
@@ -102,7 +102,7 @@ public class TeacherController : ApplicationUserController {
 		if (await base.CheckSession() is null) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
-		var output = await base.EditAsync<ApplicationUserViewModel>(input);
+		var output = await base.EditAsync<EditTeacherViewModel>(input);
 		if (output is null) {
 			this.TempData["ErrorMessage"] = "Error al editar al profesor.";
 			return this.RedirectToAction(nameof(TeacherController.Index), nameof(TeacherController).Replace("Controller", string.Empty), new { area = nameof(DirectorTeacher) });

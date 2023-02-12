@@ -38,15 +38,34 @@ public abstract class ApplicationUserController : ApplicationController, ISortab
 		if (await base.CheckApplicationUser(id) is not ApplicationUser user) {
 			return null;
 		}
-		var output = new T {
-			Id = id,
-			FirstName = user.FirstName,
-			LastName = user.LastName,
-			Rut = user.Rut,
-			Email = user.Email,
-			CreatedAt = user.CreatedAt,
-			UpdatedAt = user.UpdatedAt
+		var output = user switch {
+			_ when await base._userManager.IsInRoleAsync(user, nameof(Roles.Student)) => new T {
+				Id = user.Id,
+				FirstName = user.FirstName,
+				LastName = user.LastName,
+				Rut = user.Rut,
+				Email = user.Email,
+				CreatedAt = user.CreatedAt,
+				UpdatedAt = user.UpdatedAt,
+				StudentUniversityId = user.StudentUniversityId
+			},
+			_ when await base._userManager.IsInRoleAsync(user, nameof(Roles.Teacher)) => new T {
+				Id = user.Id,
+				FirstName = user.FirstName,
+				LastName = user.LastName,
+				Rut = user.Rut,
+				Email = user.Email,
+				CreatedAt = user.CreatedAt,
+				UpdatedAt = user.UpdatedAt,
+			},
+			_ => null
 		};
+		if (output is EditTeacherViewModel teacher) {
+			teacher.IsGuideTeacher = await base._userManager.IsInRoleAsync(user, nameof(Roles.GuideTeacher));
+			teacher.IsAssistantTeacher = await base._userManager.IsInRoleAsync(user, nameof(Roles.AssistantTeacher));
+			teacher.IsCourseTeacher = await base._userManager.IsInRoleAsync(user, nameof(Roles.CourseTeacher));
+			teacher.IsCommitteeTeacher = await base._userManager.IsInRoleAsync(user, nameof(Roles.CommitteeTeacher));
+		}
 		return output;
 	}
 
@@ -60,6 +79,9 @@ public abstract class ApplicationUserController : ApplicationController, ISortab
 		user.LastName = input.LastName;
 		user.Rut = input.Rut;
 		user.UpdatedAt = DateTimeOffset.Now;
+		if (await base._userManager.IsInRoleAsync(user, nameof(Roles.Student))) {
+			user.StudentUniversityId = input.StudentUniversityId;
+		}
 		_ = await base._userManager.UpdateAsync(user);
 		if (input is EditTeacherViewModel teacher) {
 			var roles = (await base._userManager.GetRolesAsync(user)).ToList();
