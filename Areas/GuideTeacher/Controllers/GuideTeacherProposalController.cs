@@ -137,8 +137,8 @@ public class GuideTeacherProposalController : ProposalController {
 			this.TempData["ErrorMessage"] = "Error al actualizar tu propuesta.";
 			return this.RedirectToAction(nameof(GuideTeacherProposalController.Index), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(GuideTeacher) });
 		}
-		this.ViewBag.SuccessMessage = "Tu propuesta ha sido actualizada correctamente.";
-		return this.View(output);
+		this.TempData["SuccessMessage"] = "Tu propuesta ha sido actualizada correctamente.";
+		return this.RedirectToAction(nameof(GuideTeacherProposalController.Index), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(GuideTeacher) });
 	}
 
 	public async Task<IActionResult> Delete(string id) {

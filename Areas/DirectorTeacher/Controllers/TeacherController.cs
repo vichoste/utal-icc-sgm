@@ -118,7 +118,7 @@ public class TeacherController : ApplicationUserController {
 		var output = await base.ToggleAsync<ApplicationUserViewModel>(id);
 		if (output is null) {
 			this.TempData["ErrorMessage"] = "Error al cambiar la activación al profesor.";
-			return this.RedirectToAction(nameof(StudentController.Index), nameof(StudentController).Replace("Controller", string.Empty), new { area = nameof(DirectorTeacher) });
+			return this.RedirectToAction(nameof(TeacherController.Index), nameof(TeacherController).Replace("Controller", string.Empty), new { area = nameof(DirectorTeacher) });
 		}
 		return this.View(output);
 	}
@@ -131,10 +131,10 @@ public class TeacherController : ApplicationUserController {
 		var output = await base.ToggleAsync<ApplicationUserViewModel>(input);
 		if (output is null) {
 			this.TempData["ErrorMessage"] = "Error al cambiar la activación al profesor.";
-			return this.RedirectToAction(nameof(StudentController.Index), nameof(StudentController).Replace("Controller", string.Empty), new { area = nameof(DirectorTeacher) });
+			return this.RedirectToAction(nameof(TeacherController.Index), nameof(TeacherController).Replace("Controller", string.Empty), new { area = nameof(DirectorTeacher) });
 		}
 		this.TempData["SuccessMessage"] = "Profesor cambiado correctamente.";
-		return this.RedirectToAction(nameof(StudentController.Index), nameof(StudentController).Replace("Controller", string.Empty), new { area = nameof(DirectorTeacher) });
+		return this.RedirectToAction(nameof(TeacherController.Index), nameof(TeacherController).Replace("Controller", string.Empty), new { area = nameof(DirectorTeacher) });
 	}
 
 	public async Task<IActionResult> Transfer(string currentDirectorTeacherId, string newDirectorTeacherId) {

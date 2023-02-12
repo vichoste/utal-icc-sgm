@@ -151,8 +151,8 @@ public class StudentProposalController : ProposalController {
 		if (await base.CheckSession() is not ApplicationUser user) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
-		if (await this._dbContext.Proposals!
-				.Where(p => p.Id == input.GuideTeacherId)
+		if (await this._dbContext.Proposals!.AsNoTracking()
+				.Where(p => p.Id == input.Id)
 				.Include(p => p.GuideTeacherOfTheProposal)
 				.Select(p => p.GuideTeacherOfTheProposal)
 				.FirstOrDefaultAsync()
@@ -166,8 +166,8 @@ public class StudentProposalController : ProposalController {
 			this.TempData["ErrorMessage"] = "Error al actualizar tu propuesta.";
 			return this.RedirectToAction(nameof(StudentProposalController.Index), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Student) });
 		}
-		this.ViewBag.SuccessMessage = "Tu propuesta ha sido actualizada correctamente.";
-		return this.View(output);
+		this.TempData["SuccessMessage"] = "Tu propuesta ha sido actualizada correctamente.";
+		return this.RedirectToAction(nameof(StudentProposalController.Index), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Student) });
 	}
 
 	public async Task<IActionResult> Delete(string id) {
