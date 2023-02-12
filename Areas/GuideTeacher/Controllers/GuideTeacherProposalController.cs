@@ -204,10 +204,10 @@ public class GuideTeacherProposalController : ProposalController {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
 		if (!await base.PublishAsync<ProposalViewModel>(input, user)) {
-			this.TempData["ErrorMessage"] = base._userManager.IsInRoleAsync(user, nameof(Roles.Student)) ? "Error al enviar tu propuesta." : "Error al publicar tu propuesta.";
+			this.TempData["ErrorMessage"] = await base._userManager.IsInRoleAsync(user, nameof(Roles.Student)) ? "Error al enviar tu propuesta." : "Error al publicar tu propuesta.";
 			return this.RedirectToAction(nameof(GuideTeacherProposalController.Index), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(GuideTeacher) });
 		}
-		this.TempData["SuccessMessage"] = base._userManager.IsInRoleAsync(user, nameof(Roles.Student)) ? "Tu propuesta ha sido enviada correctamente." : "Tu propuesta ha sido publicada correctamente.";
+		this.TempData["SuccessMessage"] = await base._userManager.IsInRoleAsync(user, nameof(Roles.Student)) ? "Tu propuesta ha sido enviada correctamente." : "Tu propuesta ha sido publicada correctamente.";
 		return this.RedirectToAction(nameof(GuideTeacherProposalController.Index), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(GuideTeacher) });
 	}
 

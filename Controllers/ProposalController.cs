@@ -41,7 +41,7 @@ public abstract class ProposalController : ApplicationController, IPopulatable, 
 		}
 		var assistantTeachers = input.AssistantTeachers!.Select(async at => await base.CheckApplicationUser(at!)).Select(at => at.Result).ToList();
 		var proposal = user switch {
-			_ when base._userManager.IsInRoleAsync(user, nameof(Roles.Student)) => new Proposal {
+			_ when await base._userManager.IsInRoleAsync(user, nameof(Roles.Student)) => new Proposal {
 				Id = Guid.NewGuid().ToString(),
 				Title = input.Title,
 				Description = input.Description,
@@ -51,7 +51,7 @@ public abstract class ProposalController : ApplicationController, IPopulatable, 
 				CreatedAt = DateTimeOffset.Now,
 				UpdatedAt = DateTimeOffset.Now
 			},
-			_ when base._userManager.IsInRoleAsync(user, nameof(Roles.GuideTeacher)) => new Proposal {
+			_ when await base._userManager.IsInRoleAsync(user, nameof(Roles.GuideTeacher)) => new Proposal {
 				Id = Guid.NewGuid().ToString(),
 				Title = input.Title,
 				Description = input.Description,
@@ -64,29 +64,30 @@ public abstract class ProposalController : ApplicationController, IPopulatable, 
 			},
 			_ => null
 		};
-		_ = await base._dbContext.Proposals!.AddAsync(proposal);
+		_ = await base._dbContext.Proposals!.AddAsync(proposal!);
 		_ = await base._dbContext.SaveChangesAsync();
 		return proposal;
 	}
 
 	protected async Task<T?> EditAsync<T>(string id, ApplicationUser user) where T : ProposalViewModel, new() {
 		var proposal = user switch {
-			_ when base._userManager.IsInRoleAsync(user, nameof(Roles.Student)) => await base._dbContext.Proposals!.AsNoTracking()
+			_ when await base._userManager.IsInRoleAsync(user, nameof(Roles.Student)) => await base._dbContext.Proposals!.AsNoTracking()
 				.Include(p => p.StudentOfTheProposal).AsNoTracking()
 				.Where(p => p.StudentOfTheProposal == user && p.ProposalStatus == Status.Draft)
 				.Include(p => p.AssistantTeachersOfTheProposal).AsNoTracking()
 				.FirstOrDefaultAsync(p => p.Id == id),
-			_ when base._userManager.IsInRoleAsync(user, nameof(Roles.GuideTeacher)) => await base._dbContext.Proposals!.AsNoTracking()
+			_ when await base._userManager.IsInRoleAsync(user, nameof(Roles.GuideTeacher)) => await base._dbContext.Proposals!.AsNoTracking()
 				.Include(p => p.GuideTeacherOfTheProposal).AsNoTracking()
 				.Where(p => p.GuideTeacherOfTheProposal == user && p.ProposalStatus == Status.Draft)
 				.Include(p => p.AssistantTeachersOfTheProposal).AsNoTracking()
-				.FirstOrDefaultAsync(p => p.Id == id)
+				.FirstOrDefaultAsync(p => p.Id == id),
+			_ => null
 		};
 		if (proposal is null) {
 			return null;
 		}
 		var output = user switch {
-			_ when base._userManager.IsInRoleAsync(user, nameof(Roles.Student)) => new T {
+			_ when await base._userManager.IsInRoleAsync(user, nameof(Roles.Student)) => new T {
 				Id = proposal!.Id,
 				Title = proposal!.Title,
 				Description = proposal.Description,
@@ -96,7 +97,7 @@ public abstract class ProposalController : ApplicationController, IPopulatable, 
 				CreatedAt = proposal.CreatedAt,
 				UpdatedAt = proposal.UpdatedAt
 			},
-			_ when base._userManager.IsInRoleAsync(user, nameof(Roles.GuideTeacher)) => new T {
+			_ when await base._userManager.IsInRoleAsync(user, nameof(Roles.GuideTeacher)) => new T {
 				Id = proposal!.Id,
 				Title = proposal!.Title,
 				Description = proposal.Description,
@@ -105,22 +106,24 @@ public abstract class ProposalController : ApplicationController, IPopulatable, 
 				CreatedAt = proposal.CreatedAt,
 				UpdatedAt = proposal.UpdatedAt
 			},
+			_ => null
 		};
 		return output;
 	}
 
 	protected async Task<T?> EditAsync<T>(T input, ApplicationUser user) where T : ProposalViewModel, new() {
 		var proposal = user switch {
-			_ when base._userManager.IsInRoleAsync(user, nameof(Roles.Student)) => await base._dbContext.Proposals!
+			_ when await base._userManager.IsInRoleAsync(user, nameof(Roles.Student)) => await base._dbContext.Proposals!
 				.Include(p => p.StudentOfTheProposal)
 				.Where(p => p.StudentOfTheProposal == user && p.ProposalStatus == Status.Draft)
 				.Include(p => p.AssistantTeachersOfTheProposal)
 				.FirstOrDefaultAsync(p => p.Id == input.Id),
-			_ when base._userManager.IsInRoleAsync(user, nameof(Roles.GuideTeacher)) => await base._dbContext.Proposals!
+			_ when await base._userManager.IsInRoleAsync(user, nameof(Roles.GuideTeacher)) => await base._dbContext.Proposals!
 				.Include(p => p.GuideTeacherOfTheProposal)
 				.Where(p => p.GuideTeacherOfTheProposal == user && p.ProposalStatus == Status.Draft)
 				.Include(p => p.AssistantTeachersOfTheProposal)
-				.FirstOrDefaultAsync(p => p.Id == input.Id)
+				.FirstOrDefaultAsync(p => p.Id == input.Id),
+			_ => null
 		};
 		if (proposal is null) {
 			return null;
@@ -135,7 +138,7 @@ public abstract class ProposalController : ApplicationController, IPopulatable, 
 		_ = base._dbContext.Proposals!.Update(proposal);
 		_ = await base._dbContext.SaveChangesAsync();
 		var output = user switch {
-			_ when base._userManager.IsInRoleAsync(user, nameof(Roles.Student)) => new T {
+			_ when await base._userManager.IsInRoleAsync(user, nameof(Roles.Student)) => new T {
 				Id = proposal!.Id,
 				Title = proposal!.Title,
 				Description = proposal.Description,
@@ -143,7 +146,7 @@ public abstract class ProposalController : ApplicationController, IPopulatable, 
 				CreatedAt = proposal.CreatedAt,
 				UpdatedAt = proposal.UpdatedAt
 			},
-			_ when base._userManager.IsInRoleAsync(user, nameof(Roles.GuideTeacher)) => new T {
+			_ when await base._userManager.IsInRoleAsync(user, nameof(Roles.GuideTeacher)) => new T {
 				Id = proposal!.Id,
 				Title = proposal!.Title,
 				Description = proposal.Description,
@@ -152,6 +155,7 @@ public abstract class ProposalController : ApplicationController, IPopulatable, 
 				CreatedAt = proposal.CreatedAt,
 				UpdatedAt = proposal.UpdatedAt
 			},
+			_ => null
 		};
 		return output;
 	}
@@ -184,13 +188,13 @@ public abstract class ProposalController : ApplicationController, IPopulatable, 
 
 	protected async Task<T?> GetAsync<T>(string id, ApplicationUser user) where T : ProposalViewModel, new() {
 		var proposal = user switch {
-			_ when base._userManager.IsInRoleAsync(user, nameof(Roles.Student)) => await base._dbContext.Proposals!.AsNoTracking()
+			_ when await base._userManager.IsInRoleAsync(user, nameof(Roles.Student)) => await base._dbContext.Proposals!.AsNoTracking()
 				.Include(p => p.StudentOfTheProposal).AsNoTracking()
 				.Where(p => p.StudentOfTheProposal == user && p.ProposalStatus == Status.Ready)
 				.Include(p => p.GuideTeacherOfTheProposal).AsNoTracking()
 				.Include(p => p.AssistantTeachersOfTheProposal).AsNoTracking()
 				.FirstOrDefaultAsync(p => p.Id == id),
-			_ when base._userManager.IsInRoleAsync(user, nameof(Roles.GuideTeacher)) => await base._dbContext.Proposals!.AsNoTracking()
+			_ when await base._userManager.IsInRoleAsync(user, nameof(Roles.GuideTeacher)) => await base._dbContext.Proposals!.AsNoTracking()
 				.Include(p => p.GuideTeacherOfTheProposal).AsNoTracking()
 				.Where(p => p.GuideTeacherOfTheProposal == user && p.ProposalStatus == Status.Ready)
 				.Include(p => p.StudentOfTheProposal).AsNoTracking()
@@ -209,14 +213,14 @@ public abstract class ProposalController : ApplicationController, IPopulatable, 
 			CreatedAt = proposal.CreatedAt,
 			UpdatedAt = proposal.UpdatedAt
 		};
-		if (base._userManager.IsInRoleAsync(user, nameof(Roles.Student))) {
+		if (await base._userManager.IsInRoleAsync(user, nameof(Roles.Student))) {
 			output.GuideTeacherId = proposal.GuideTeacherOfTheProposal!.Id;
 			output.GuideTeacherName = $"{proposal.GuideTeacherOfTheProposal.FirstName} {proposal.GuideTeacherOfTheProposal.LastName}";
 			output.GuideTeacherEmail = proposal.GuideTeacherOfTheProposal.Email;
 			output.GuideTeacherOffice = proposal.GuideTeacherOfTheProposal.TeacherOffice;
 			output.GuideTeacherSchedule = proposal.GuideTeacherOfTheProposal.TeacherSchedule;
 			output.GuideTeacherSpecialization = proposal.GuideTeacherOfTheProposal.TeacherSpecialization;
-		} else if (base._userManager.IsInRoleAsync(user, nameof(Roles.GuideTeacher))) {
+		} else if (await base._userManager.IsInRoleAsync(user, nameof(Roles.GuideTeacher))) {
 			output.Requirements = proposal.Requirements;
 			output.StudentId = proposal.StudentOfTheProposal!.Id;
 			output.StudentName = $"{proposal.StudentOfTheProposal.FirstName} {proposal.StudentOfTheProposal.LastName}";
@@ -231,11 +235,11 @@ public abstract class ProposalController : ApplicationController, IPopulatable, 
 
 	protected async Task<T?> PublishAsync<T>(string id, ApplicationUser user) where T : ProposalViewModel, new() {
 		var proposal = user switch {
-			_ when base._userManager.IsInRoleAsync(user, nameof(Roles.Student)) => await base._dbContext.Proposals!.AsNoTracking()
+			_ when await base._userManager.IsInRoleAsync(user, nameof(Roles.Student)) => await base._dbContext.Proposals!.AsNoTracking()
 				.Include(p => p.StudentOfTheProposal).AsNoTracking()
 				.Where(p => p.StudentOfTheProposal == user && p.ProposalStatus == Status.Ready)
 				.FirstOrDefaultAsync(p => p.Id == id),
-			_ when base._userManager.IsInRoleAsync(user, nameof(Roles.GuideTeacher)) => await base._dbContext.Proposals!.AsNoTracking()
+			_ when await base._userManager.IsInRoleAsync(user, nameof(Roles.GuideTeacher)) => await base._dbContext.Proposals!.AsNoTracking()
 				.Include(p => p.GuideTeacherOfTheProposal).AsNoTracking()
 				.Where(p => p.GuideTeacherOfTheProposal == user && p.ProposalStatus == Status.Ready)
 				.FirstOrDefaultAsync(p => p.Id == id),
@@ -253,11 +257,11 @@ public abstract class ProposalController : ApplicationController, IPopulatable, 
 
 	protected async Task<bool> PublishAsync<T>(T input, ApplicationUser user) where T : ProposalViewModel, new() {
 		var proposal = user switch {
-			_ when base._userManager.IsInRoleAsync(user, nameof(Roles.Student)) => await base._dbContext.Proposals!
+			_ when await base._userManager.IsInRoleAsync(user, nameof(Roles.Student)) => await base._dbContext.Proposals!
 				.Include(p => p.StudentOfTheProposal)
 				.Where(p => p.StudentOfTheProposal == user && p.ProposalStatus == Status.Ready)
 				.FirstOrDefaultAsync(p => p.Id == input.Id),
-			_ when base._userManager.IsInRoleAsync(user, nameof(Roles.GuideTeacher)) => await base._dbContext.Proposals!
+			_ when await base._userManager.IsInRoleAsync(user, nameof(Roles.GuideTeacher)) => await base._dbContext.Proposals!
 				.Include(p => p.GuideTeacherOfTheProposal)
 				.Where(p => p.GuideTeacherOfTheProposal == user && p.ProposalStatus == Status.Ready)
 				.FirstOrDefaultAsync(p => p.Id == input.Id),
