@@ -1,7 +1,7 @@
 ﻿@using Utal.Icc.Sgm.ViewModels
 @using Utal.Icc.Sgm.Areas.GuideTeacher.Controllers
 
-@model GuideTeacherProposalViewModel
+@model ProposalViewModel
 
 @{
 	this.ViewData["Title"] = "Convertir propuesta a solicitud para el comité";
@@ -50,7 +50,7 @@
 								<div class="form-group mb-3">
 									@this.Html.LabelFor(m => m.StudentIsDoingThePractice, new { @class = "form-label" }):
 									@this.Html.HiddenFor(m => m.StudentIsDoingThePractice)
-									@if (this.Model.StudentIsDoingThePractice) {
+									@if (this.Model.StudentIsDoingThePractice is true) {
 										<b class="text-info">Sí</b>
 									} else {
 										<b>No</b>
@@ -59,7 +59,7 @@
 								<div class="form-group mb-3">
 									@this.Html.LabelFor(m => m.StudentIsWorking, new { @class = "form-label" }):
 									@this.Html.HiddenFor(m => m.StudentIsWorking)
-									@if (this.Model.StudentIsWorking) {
+									@if (this.Model.StudentIsWorking is true) {
 										<b class="text-info">Sí</b>
 									} else {
 										<b>No</b>

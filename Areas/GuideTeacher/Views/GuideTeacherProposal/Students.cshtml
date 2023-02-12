@@ -54,7 +54,7 @@
 								<td>@item.LastName</td>
 								<td>@item.Email</td>
 								<td>
-									@this.Html.ActionLink("Seleccionar", nameof(GuideTeacherProposalController.Select), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.GuideTeacher), proposalId = (this.ViewData["Proposal"] as GuideTeacherProposal)!.Id, studentId = item.Id }, new { @class = "btn btn-primary mb-3"})
+									@this.Html.ActionLink("Seleccionar", nameof(GuideTeacherProposalController.Select), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.GuideTeacher), proposalId = (this.ViewData["Proposal"] as Proposal)!.Id, studentId = item.Id }, new { @class = "btn btn-primary mb-3"})
 								</td>
 							</tr>
 						}
