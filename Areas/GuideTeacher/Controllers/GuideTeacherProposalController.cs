@@ -107,6 +107,7 @@ public class GuideTeacherProposalController : ProposalController {
 		if (await base.CheckSession() is not ApplicationUser user) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
+		await this.PopulateAssistantTeachers(user);
 		var output = base.CreateAsync<ProposalViewModel>(input, user);
 		if (output is null) {
 			this.TempData["ErrorMessage"] = "Error al registrar tu propuesta.";
@@ -120,6 +121,7 @@ public class GuideTeacherProposalController : ProposalController {
 		if (await base.CheckSession() is not ApplicationUser user) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
+		await this.PopulateAssistantTeachers(user);
 		var output = await base.EditAsync<ProposalViewModel>(id, user);
 		return this.View(output);
 	}
@@ -129,6 +131,7 @@ public class GuideTeacherProposalController : ProposalController {
 		if (await base.CheckSession() is not ApplicationUser user) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
+		await this.PopulateAssistantTeachers(user);
 		var output = await base.EditAsync<ProposalViewModel>(input, user);
 		if (output is null) {
 			this.TempData["ErrorMessage"] = "Error al actualizar tu propuesta.";
