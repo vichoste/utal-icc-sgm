@@ -98,7 +98,7 @@ public class GuideTeacherProposalController : ProposalController {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
 		await this.PopulateAssistantTeachers(user);
-		var output = base.Create<ProposalViewModel>();
+		var output = await base.CreateAsync<ProposalViewModel>(await base._userManager.GetUserIdAsync(user));
 		return this.View(output);
 	}
 
@@ -166,7 +166,7 @@ public class GuideTeacherProposalController : ProposalController {
 		if (await base.CheckSession() is not ApplicationUser user) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
-		var output = await base.GetAsync<ProposalViewModel>(id, user);
+		var output = await base.SummaryAsync<ProposalViewModel>(id, user);
 		if (output is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
 			return this.RedirectToAction(nameof(GuideTeacherProposalController.Index), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(GuideTeacher) });
@@ -178,7 +178,7 @@ public class GuideTeacherProposalController : ProposalController {
 		if (await base.CheckSession() is not ApplicationUser user) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
-		var output = await base.GetAsync<ProposalViewModel>(id, user);
+		var output = await base.ViewAsync<ProposalViewModel>(id, user);
 		if (output is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
 			return this.RedirectToAction(nameof(GuideTeacherProposalController.Index), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(GuideTeacher) });
