@@ -53,7 +53,7 @@ public class GuideTeacherProposalController : ProposalController {
 		}
 		this.ViewData["CurrentFilter"] = searchString;
 		return this.View(base.GetPaginatedViewModels<ApplicationUserViewModel>(sortOrder, currentFilter, searchString, pageNumber, parameters,
-			() => (this._dbContext.Proposals!
+			() => this._dbContext.Proposals!
 				.Where(p => p.GuideTeacherOfTheProposal == user && p.Id == id)
 				.Include(p => p.StudentsWhoAreInterestedInThisProposal)
 				.SelectMany(p => p.StudentsWhoAreInterestedInThisProposal!.Select(
@@ -66,8 +66,7 @@ public class GuideTeacherProposalController : ProposalController {
 						Email = u.Email,
 						IsDeactivated = u.IsDeactivated
 					}
-				)).AsEnumerable()
-			)
+			)).AsEnumerable()
 		));
 	}
 
@@ -84,14 +83,13 @@ public class GuideTeacherProposalController : ProposalController {
 		}
 		this.ViewData["CurrentFilter"] = searchString;
 		return this.View(base.GetPaginatedViewModels<ProposalViewModel>(sortOrder, currentFilter, searchString, pageNumber, parameters,
-			() => (this._dbContext.Proposals!.AsNoTracking()
+			() => this._dbContext.Proposals!.AsNoTracking()
 				.Where(p => p.GuideTeacherOfTheProposal == user)
 				.Select(p => new ProposalViewModel {
 					Id = p.Id,
 					Title = p.Title,
 					ProposalStatus = p.ProposalStatus.ToString(),
-				}).AsEnumerable()
-			)
+			}).AsEnumerable()
 		));
 	}
 

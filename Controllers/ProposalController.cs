@@ -20,19 +20,49 @@ public abstract class ProposalController : ApplicationController, IPopulatable, 
 	public abstract Task PopulateAssistantTeachers(ApplicationUser guideTeacher);
 
 	protected T Create<T>() where T : ProposalViewModel, new() => new T();
+	protected async Task<T?> CreateAsync<T>(string id) where T : ProposalViewModel, new() {
+		if (await base.CheckApplicationUser(id) is not ApplicationUser guideTeacher) {
+			return null;
+		}
+		var output = new T {
+			GuideTeacherId = guideTeacher.Id,
+			GuideTeacherName = $"{guideTeacher.FirstName} {guideTeacher.LastName}",
+			GuideTeacherEmail = guideTeacher.Email,
+			GuideTeacherOffice = guideTeacher.TeacherOffice,
+			GuideTeacherSchedule = guideTeacher.TeacherSchedule,
+			GuideTeacherSpecialization = guideTeacher.TeacherSpecialization,
+		};
+		return output;
+	}
 
 	protected async Task<Proposal?> CreateAsync<T>(T input, ApplicationUser user) where T : ProposalViewModel {
+		if (await base.CheckApplicationUser(input.GuideTeacherId!) is null || await base.CheckApplicationUser(input.StudentId!) is null) {
+			return null;
+		}
 		var assistantTeachers = input.AssistantTeachers!.Select(async at => await base.CheckApplicationUser(at!)).Select(at => at.Result).ToList();
-		var proposal = new Proposal {
-			Id = Guid.NewGuid().ToString(),
-			Title = input.Title,
-			Description = input.Description,
-			Requirements = input.Requirements,
-			GuideTeacherOfTheProposal = user,
-			AssistantTeachersOfTheProposal = assistantTeachers!,
-			ProposalStatus = Status.Draft,
-			CreatedAt = DateTimeOffset.Now,
-			UpdatedAt = DateTimeOffset.Now
+		var proposal = user switch {
+			_ when base._userManager.IsInRoleAsync(user, nameof(Roles.Student)) => new Proposal {
+				Id = Guid.NewGuid().ToString(),
+				Title = input.Title,
+				Description = input.Description,
+				StudentOfTheProposal = user,
+				AssistantTeachersOfTheProposal = assistantTeachers!,
+				ProposalStatus = Status.Draft,
+				CreatedAt = DateTimeOffset.Now,
+				UpdatedAt = DateTimeOffset.Now
+			},
+			_ when base._userManager.IsInRoleAsync(user, nameof(Roles.GuideTeacher)) => new Proposal {
+				Id = Guid.NewGuid().ToString(),
+				Title = input.Title,
+				Description = input.Description,
+				Requirements = input.Requirements,
+				GuideTeacherOfTheProposal = user,
+				AssistantTeachersOfTheProposal = assistantTeachers!,
+				ProposalStatus = Status.Draft,
+				CreatedAt = DateTimeOffset.Now,
+				UpdatedAt = DateTimeOffset.Now
+			},
+			_ => null
 		};
 		_ = await base._dbContext.Proposals!.AddAsync(proposal);
 		_ = await base._dbContext.SaveChangesAsync();
