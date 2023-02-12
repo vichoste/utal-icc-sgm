@@ -52,6 +52,7 @@ public class GuideTeacherProposalController : ProposalController {
 			searchString = currentFilter;
 		}
 		this.ViewData["CurrentFilter"] = searchString;
+		this.ViewData["Proposal"] = this._dbContext.Proposals!.AsNoTracking().FirstOrDefault(p => p.Id == id);
 		return this.View(PaginatedList<ApplicationUserViewModel>.Create((base.GetPaginatedViewModels<ApplicationUserViewModel>(sortOrder, currentFilter, searchString, pageNumber, parameters,
 			() => this._dbContext.Proposals!
 				.Where(p => p.GuideTeacherOfTheProposal == user && p.Id == id && p.WasMadeByGuideTeacher)
@@ -233,6 +234,7 @@ public class GuideTeacherProposalController : ProposalController {
 			StudentName = $"{student.FirstName} {student.LastName}",
 			StudentId = studentId,
 			StudentEmail = student.Email,
+			StudentUniversityId = student.StudentUniversityId,
 			StudentRemainingCourses = student.StudentRemainingCourses,
 			StudentIsDoingThePractice = student.StudentIsDoingThePractice,
 			StudentIsWorking = student.StudentIsWorking

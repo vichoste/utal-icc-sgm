@@ -56,7 +56,7 @@
 											<span class="badge bg-primary">Postulado</span>
 											break;
 										case nameof(Status.Ready):
-											if (item.StudentId == await this._userManager.GetUserIdAsync((await this._userManager.GetUserAsync(this.User))!)) {
+											if (item.StudentId != await this._userManager.GetUserIdAsync((await this._userManager.GetUserAsync(this.User))!)) {
 												<span class="badge bg-danger">Rechazado</span>
 											} else {
 												<span class="badge bg-success">Aceptado</span>
