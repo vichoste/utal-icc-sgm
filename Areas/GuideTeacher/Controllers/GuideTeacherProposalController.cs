@@ -11,6 +11,7 @@ using Utal.Icc.Sgm.Models;
 using Utal.Icc.Sgm.ViewModels;
 
 using static Utal.Icc.Sgm.Models.ApplicationUser;
+using static Utal.Icc.Sgm.Models.Proposal;
 
 namespace Utal.Icc.Sgm.Areas.GuideTeacher.Controllers;
 
@@ -217,16 +218,16 @@ public class GuideTeacherProposalController : ProposalController {
 			this.TempData["ErrorMessage"] = "Error al obtener el estudiante.";
 			return this.RedirectToAction(nameof(GuideTeacherProposalController.Index), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(GuideTeacher) });
 		}
-		var proposal = await this._dbContext.GuideTeacherProposals!.AsNoTracking()
-			.Where(p => p.GuideTeacherOwnerOfTheGuideTeacherProposal == user && p.ProposalStatus == GuideTeacherProposal.Status.Published)
-			.Include(p => p.StudentsWhoAreInterestedInThisGuideTeacherProposal).AsNoTracking()
-			.Where(p => p.StudentsWhoAreInterestedInThisGuideTeacherProposal!.Any(s => s!.Id == studentId))
+		var proposal = await this._dbContext.Proposals!.AsNoTracking()
+			.Where(p => p.GuideTeacherOfTheProposal == user && p.ProposalStatus == Status.Published)
+			.Include(p => p.StudentsWhoAreInterestedInThisProposal).AsNoTracking()
+			.Where(p => p.StudentsWhoAreInterestedInThisProposal!.Any(s => s!.Id == studentId))
 			.FirstOrDefaultAsync(p => p.Id == proposalId);
 		if (proposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
 			return this.RedirectToAction(nameof(GuideTeacherProposalController.Index), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(GuideTeacher) });
 		}
-		var output = new GuideTeacherProposalViewModel {
+		var output = new ProposalViewModel {
 			Id = proposalId,
 			StudentName = $"{student.FirstName} {student.LastName}",
 			StudentId = studentId,
@@ -239,7 +240,7 @@ public class GuideTeacherProposalController : ProposalController {
 	}
 
 	[HttpPost, ValidateAntiForgeryToken]
-	public async Task<IActionResult> Select([FromForm] GuideTeacherProposalViewModel input) {
+	public async Task<IActionResult> Select([FromForm] ProposalViewModel input) {
 		if (await base.CheckSession() is not ApplicationUser user) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
@@ -247,22 +248,22 @@ public class GuideTeacherProposalController : ProposalController {
 			this.TempData["ErrorMessage"] = "Error al obtener el estudiante.";
 			return this.RedirectToAction(nameof(GuideTeacherProposalController.Index), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(GuideTeacher) });
 		}
-		var proposal = await this._dbContext.GuideTeacherProposals!
-			.Where(p => p.GuideTeacherOwnerOfTheGuideTeacherProposal == user && p.ProposalStatus == GuideTeacherProposal.Status.Published)
-			.Include(p => p.StudentsWhoAreInterestedInThisGuideTeacherProposal)
-			.Where(p => p.StudentsWhoAreInterestedInThisGuideTeacherProposal!.Any(s => s!.Id == input.StudentId!))
+		var proposal = await this._dbContext.Proposals!
+			.Where(p => p.GuideTeacherOfTheProposal == user && p.ProposalStatus == Status.Published)
+			.Include(p => p.StudentsWhoAreInterestedInThisProposal)
+			.Where(p => p.StudentsWhoAreInterestedInThisProposal!.Any(s => s!.Id == input.StudentId!))
 			.FirstOrDefaultAsync(p => p.Id == input.Id);
 		if (proposal is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
 			return this.RedirectToAction(nameof(GuideTeacherProposalController.Index), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(GuideTeacher) });
 		}
-		if (proposal.StudentsWhoAreInterestedInThisGuideTeacherProposal!.Any(s => s!.Id == student.Id)) {
-			_ = proposal.StudentsWhoAreInterestedInThisGuideTeacherProposal!.Remove(student);
+		if (proposal.StudentsWhoAreInterestedInThisProposal!.Any(s => s!.Id == student.Id)) {
+			_ = proposal.StudentsWhoAreInterestedInThisProposal!.Remove(student);
 		}
-		proposal.ProposalStatus = GuideTeacherProposal.Status.Ready;
-		proposal.StudentWhoIsAssignedToThisGuideTeacherProposal = student;
+		proposal.ProposalStatus = Status.Ready;
+		proposal.StudentOfTheProposal = student;
 		proposal.UpdatedAt = DateTimeOffset.Now;
-		_ = this._dbContext.GuideTeacherProposals!.Update(proposal);
+		_ = this._dbContext.Proposals!.Update(proposal);
 		_ = await this._dbContext.SaveChangesAsync();
 		this.TempData["SuccessMessage"] = "El estudiante ha sido seleccionado a la propuesta correctamente.";
 		return this.RedirectToAction(nameof(GuideTeacherProposalController.Index), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(GuideTeacher) });

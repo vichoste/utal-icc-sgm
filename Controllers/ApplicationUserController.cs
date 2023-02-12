@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 
 using Utal.Icc.Sgm.Areas.DirectorTeacher.ViewModels.Teacher;
 using Utal.Icc.Sgm.Data;
