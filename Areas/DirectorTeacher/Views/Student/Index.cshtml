@@ -66,7 +66,7 @@
 									<td class="text-muted">@item.Rut</td>
 									<td class="text-muted">@item.Email</td>
 									<td>
-										@this.Html.ActionLink("Activar", nameof(StudentController.ToggleActivation), nameof(StudentController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.DirectorTeacher), id = item.Id }, new { @class = "btn btn-success mb-3" })
+										@this.Html.ActionLink("Activar", nameof(StudentController.Toggle), nameof(StudentController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.DirectorTeacher), id = item.Id }, new { @class = "btn btn-success mb-3" })
 									</td>
 								} else {
 									<td>@item.FirstName</td>
@@ -76,7 +76,7 @@
 									<td>@item.Email</td>
 									<td>
 										@this.Html.ActionLink("Editar", nameof(StudentController.Edit), nameof(StudentController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.DirectorTeacher), id = item.Id }, new { @class = "btn btn-yellow mb-3" })
-										@this.Html.ActionLink("Desactivar", nameof(StudentController.ToggleActivation), nameof(StudentController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.DirectorTeacher), id = item.Id }, new { @class = "btn btn-danger mb-3" })
+										@this.Html.ActionLink("Desactivar", nameof(StudentController.Toggle), nameof(StudentController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.DirectorTeacher), id = item.Id }, new { @class = "btn btn-danger mb-3" })
 									</td>
 								}
 							</tr>

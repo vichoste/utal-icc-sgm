@@ -103,7 +103,7 @@ public abstract class ApplicationUserController : ApplicationController, ISortab
 		return output;
 	}
 
-	protected async Task<T?> ToggleActivationAsync<T>(string id) where T : ApplicationUserViewModel, new() {
+	protected async Task<T?> ToggleAsync<T>(string id) where T : ApplicationUserViewModel, new() {
 		var user = await base._userManager.FindByIdAsync(id);
 		if (user is null || user.Id == base._userManager.GetUserId(base.User) || (await base._userManager.GetRolesAsync(user)).Contains(nameof(Roles.DirectorTeacher))) {
 			return null;
@@ -116,7 +116,7 @@ public abstract class ApplicationUserController : ApplicationController, ISortab
 		return output;
 	}
 
-	protected async Task<ApplicationUser?> ToggleActivationAsync<T>(T input) where T : ApplicationUserViewModel, new() {
+	protected async Task<ApplicationUser?> ToggleAsync<T>(T input) where T : ApplicationUserViewModel, new() {
 		var user = await base._userManager.FindByIdAsync(input.Id!);
 		if (user is null || user.Id == base._userManager.GetUserId(base.User) || (await base._userManager.GetRolesAsync(user)).Contains(nameof(Roles.DirectorTeacher))) {
 			return null;

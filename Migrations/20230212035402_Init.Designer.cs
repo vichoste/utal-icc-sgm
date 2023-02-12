@@ -12,7 +12,7 @@ using Utal.Icc.Sgm.Data;
 namespace Utal.Icc.Sgm.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230212033023_Init")]
+    [Migration("20230212035402_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -248,10 +248,10 @@ namespace Utal.Icc.Sgm.Migrations
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool?>("StudentIsDoingThePractice")
+                    b.Property<bool>("StudentIsDoingThePractice")
                         .HasColumnType("bit");
 
-                    b.Property<bool?>("StudentIsWorking")
+                    b.Property<bool>("StudentIsWorking")
                         .HasColumnType("bit");
 
                     b.Property<string>("StudentRemainingCourses")

@@ -10,5 +10,5 @@ public partial class ApplicationUserViewModel {
 	[Display(Name = "Especialización")]
 	public string? TeacherSpecialization { get; set; }
 	[Display(Name = "¿Es director de carrera?")]
-	public bool? IsDirectorTeacher { get; set; }
+	public bool IsDirectorTeacher { get; set; }
 }

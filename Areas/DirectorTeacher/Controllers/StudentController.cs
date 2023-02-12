@@ -131,25 +131,24 @@ public class StudentController : ApplicationUserController {
 		return this.View(output);
 	}
 
-	public async Task<IActionResult> ToggleActivation(string id) {
+	public async Task<IActionResult> Toggle(string id) {
 		if (await base.CheckSession() is null) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
-		var output = await base.ToggleActivationAsync<ApplicationUserViewModel>(id);
+		var output = await base.ToggleAsync<ApplicationUserViewModel>(id);
 		if (output is null) {
 			this.TempData["ErrorMessage"] = "Error al cambiar la activación al estudiante.";
 			return this.RedirectToAction(nameof(StudentController.Index), nameof(StudentController).Replace("Controller", string.Empty), new { area = nameof(DirectorTeacher) });
 		}
-		this.TempData["SuccessMessage"] = "Estudiante cambiado correctamente.";
-		return this.RedirectToAction(nameof(StudentController.Index), nameof(StudentController).Replace("Controller", string.Empty), new { area = nameof(DirectorTeacher) });
+		return this.View(output);
 	}
 
 	[HttpPost, ValidateAntiForgeryToken]
-	public async Task<IActionResult> ToggleActivation([FromForm] ApplicationUserViewModel input) {
+	public async Task<IActionResult> Toggle([FromForm] ApplicationUserViewModel input) {
 		if (await base.CheckSession() is null) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
-		var output = await base.ToggleActivationAsync<ApplicationUserViewModel>(input);
+		var output = await base.ToggleAsync<ApplicationUserViewModel>(input);
 		if (output is null) {
 			this.TempData["ErrorMessage"] = "Error al cambiar la activación al estudiante.";
 			return this.RedirectToAction(nameof(StudentController.Index), nameof(StudentController).Replace("Controller", string.Empty), new { area = nameof(DirectorTeacher) });

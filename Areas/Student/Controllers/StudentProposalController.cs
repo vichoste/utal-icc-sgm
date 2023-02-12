@@ -79,7 +79,7 @@ public class StudentProposalController : ProposalController {
 			searchString = currentFilter;
 		}
 		this.ViewData["CurrentFilter"] = searchString;
-		return this.View(base.GetPaginatedViewModels<ProposalViewModel>(sortOrder, currentFilter, searchString, pageNumber, parameters,
+		return this.View(PaginatedList<ProposalViewModel>.Create(base.GetPaginatedViewModels<ProposalViewModel>(sortOrder, currentFilter, searchString, pageNumber, parameters,
 			() => this._dbContext.Proposals!.AsNoTracking()
 				.Where(p => p.StudentOfTheProposal == user)
 				.Include(p => p.GuideTeacherOfTheProposal).AsNoTracking()
@@ -89,7 +89,7 @@ public class StudentProposalController : ProposalController {
 					GuideTeacherName = $"{p.GuideTeacherOfTheProposal!.FirstName} {p.GuideTeacherOfTheProposal!.LastName}",
 					ProposalStatus = p.ProposalStatus.ToString(),
 			}).AsEnumerable()
-		));
+		), pageNumber ?? 1, 6));
 	}
 
 	public async Task<IActionResult> Create(string id) {

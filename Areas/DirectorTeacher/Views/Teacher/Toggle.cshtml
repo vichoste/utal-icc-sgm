@@ -12,7 +12,7 @@
 	<div class="card">
 		<div class="card-header text-center">@this.ViewData["Title"]</div>
 		<div class="card-body text-center">
-			@using (this.Html.BeginForm(nameof(TeacherController.ToggleActivation), nameof(TeacherController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.DirectorTeacher) })) {
+			@using (this.Html.BeginForm(nameof(TeacherController.Toggle), nameof(TeacherController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.DirectorTeacher) })) {
 				@this.Html.AntiForgeryToken()
 				@this.Html.HiddenFor(m => m.Id)
 				@if (this.Model.IsDeactivated is false) {

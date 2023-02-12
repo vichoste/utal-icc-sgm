@@ -27,12 +27,12 @@
 									@this.Html.TextBoxFor(m => m.StudentRemainingCourses, new { @class = "form-control" })
 								</div>
 								<div class="form-check mb-3">
-									@this.Html.LabelFor(m => (bool)m.StudentIsDoingThePractice!, new { @class = "form-check-label" })
-									@this.Html.CheckBoxFor(m => (bool)m.StudentIsDoingThePractice!, new { @class = "form-check-input" })
+									@this.Html.LabelFor(m => m.StudentIsDoingThePractice, new { @class = "form-check-label" })
+									@this.Html.CheckBoxFor(m => m.StudentIsDoingThePractice, new { @class = "form-check-input" })
 								</div>
 								<div class="form-check mb-3">
-									@this.Html.LabelFor(m => (bool)m.StudentIsWorking!, new { @class = "form-check-label" })
-									@this.Html.CheckBoxFor(m => (bool)m.StudentIsWorking!, new { @class = "form-check-input" })
+									@this.Html.LabelFor(m => m.StudentIsWorking, new { @class = "form-check-label" })
+									@this.Html.CheckBoxFor(m => m.StudentIsWorking, new { @class = "form-check-input" })
 								</div>
 							</div>
 						</div>

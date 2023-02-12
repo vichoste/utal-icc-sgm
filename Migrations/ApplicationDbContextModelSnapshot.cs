@@ -245,10 +245,10 @@ namespace Utal.Icc.Sgm.Migrations
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool?>("StudentIsDoingThePractice")
+                    b.Property<bool>("StudentIsDoingThePractice")
                         .HasColumnType("bit");
 
-                    b.Property<bool?>("StudentIsWorking")
+                    b.Property<bool>("StudentIsWorking")
                         .HasColumnType("bit");
 
                     b.Property<string>("StudentRemainingCourses")

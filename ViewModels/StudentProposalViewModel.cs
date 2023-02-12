@@ -14,9 +14,9 @@ public partial class ProposalViewModel {
 	[Display(Name = "Cursos restantes")]
 	public string? StudentRemainingCourses { get; set; }
 	[Display(Name = "¿Está realizando práctica?")]
-	public bool? StudentIsDoingThePractice { get; set; }
+	public bool StudentIsDoingThePractice { get; set; }
 	[Display(Name = "¿Está trabajando?")]
-	public bool? StudentIsWorking { get; set; }
+	public bool StudentIsWorking { get; set; }
 	[Display(Name = "¿Quién la rechazó?")]
 	public string? WhoRejected { get; set; }
 	[Display(Name = "Justificación")]

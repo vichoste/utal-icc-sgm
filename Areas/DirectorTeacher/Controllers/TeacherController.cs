@@ -35,7 +35,7 @@ public class TeacherController : ApplicationUserController {
 		}
 		this.ViewData["CurrentFilter"] = searchString;
 		return this.View(PaginatedList<ApplicationUserViewModel>.Create((await base.GetPaginatedViewModelsAsync<ApplicationUserViewModel>(sortOrder, currentFilter, searchString, pageNumber, parameters,
-			async () => (await this._userManager.GetUsersInRoleAsync(nameof(Roles.Student))).Select(
+			async () => (await this._userManager.GetUsersInRoleAsync(nameof(Roles.Teacher))).Select(
 				async u => new ApplicationUserViewModel {
 					Id = u.Id,
 					FirstName = u.FirstName,
@@ -111,25 +111,24 @@ public class TeacherController : ApplicationUserController {
 		return this.RedirectToAction(nameof(TeacherController.Index), nameof(TeacherController).Replace("Controller", string.Empty), new { area = nameof(DirectorTeacher) });
 	}
 
-	public async Task<IActionResult> ToggleActivation(string id) {
+	public async Task<IActionResult> Toggle(string id) {
 		if (await base.CheckSession() is null) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
-		var output = await base.ToggleActivationAsync<ApplicationUserViewModel>(id);
+		var output = await base.ToggleAsync<ApplicationUserViewModel>(id);
 		if (output is null) {
 			this.TempData["ErrorMessage"] = "Error al cambiar la activación al profesor.";
 			return this.RedirectToAction(nameof(StudentController.Index), nameof(StudentController).Replace("Controller", string.Empty), new { area = nameof(DirectorTeacher) });
 		}
-		this.TempData["SuccessMessage"] = "Profesor cambiado correctamente.";
-		return this.RedirectToAction(nameof(StudentController.Index), nameof(StudentController).Replace("Controller", string.Empty), new { area = nameof(DirectorTeacher) });
+		return this.View(output);
 	}
 
 	[HttpPost, ValidateAntiForgeryToken]
-	public async Task<IActionResult> ToggleActivation([FromForm] ApplicationUserViewModel input) {
+	public async Task<IActionResult> Toggle([FromForm] ApplicationUserViewModel input) {
 		if (await base.CheckSession() is null) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
 		}
-		var output = await base.ToggleActivationAsync<ApplicationUserViewModel>(input);
+		var output = await base.ToggleAsync<ApplicationUserViewModel>(input);
 		if (output is null) {
 			this.TempData["ErrorMessage"] = "Error al cambiar la activación al profesor.";
 			return this.RedirectToAction(nameof(StudentController.Index), nameof(StudentController).Replace("Controller", string.Empty), new { area = nameof(DirectorTeacher) });
