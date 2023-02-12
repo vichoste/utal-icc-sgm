@@ -1,10 +1,10 @@
 ﻿@using Utal.Icc.Sgm
-@using Utal.Icc.Sgm.Models
 @using Utal.Icc.Sgm.ViewModels
 @using Utal.Icc.Sgm.Views.Shared
 @using Utal.Icc.Sgm.Areas.GuideTeacher.Controllers
+@using static Utal.Icc.Sgm.Models.Proposal
 
-@model PaginatedList<StudentProposalViewModel>
+@model PaginatedList<ProposalViewModel>
 
 @{
 	this.ViewData["Title"] = "Propuestas de estudiantes";
@@ -27,12 +27,12 @@
 					<thead class="table-dark">
 						<tr>
 							<th>
-								<a asp-action="@nameof(StudentProposalController.Index)" asp-route-sortOrder="@this.ViewData[$"{nameof(StudentProposalViewModel.Title)}SortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+								<a asp-action="@nameof(StudentProposalController.Index)" asp-route-sortOrder="@this.ViewData[$"{nameof(ProposalViewModel.Title)}SortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
 									Título
 								</a>
 							</th>
 							<th>
-								<a asp-action="@nameof(StudentProposalController.Index)" asp-route-sortOrder="@this.ViewData[$"{nameof(StudentProposalViewModel.StudentName)}SortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+								<a asp-action="@nameof(StudentProposalController.Index)" asp-route-sortOrder="@this.ViewData[$"{nameof(ProposalViewModel.StudentName)}SortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
 									Estudiante
 								</a>
 							</th>
@@ -47,18 +47,18 @@
 								<td>@item.StudentName</td>
 								<td>
 									@switch (item.ProposalStatus) {
-										case nameof(StudentProposal.Status.SentToGuideTeacher):
+										case nameof(Status.Published):
 											<span class="badge bg-yellow">Pendiente de revisión</span>
 											break;
-										case nameof(StudentProposal.Status.ApprovedByGuideTeacher):
+										case nameof(Status.Ready):
 											<span class="badge bg-success">Aceptada</span>
 											break;
 									}
 								</td>
 								<td>
-									@if (item.ProposalStatus == nameof(StudentProposal.Status.SentToGuideTeacher)) {
+									@if (item.ProposalStatus == nameof(Status.Published)) {
 										@this.Html.ActionLink("Ver", nameof(StudentProposalController.View), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.GuideTeacher), id = item.Id }, new { @class = "btn btn-yellow mb-3"})
-									} else if (item.ProposalStatus == nameof(StudentProposal.Status.ApprovedByGuideTeacher)) {
+									} else if (item.ProposalStatus == nameof(Status.Ready)) {
 										<p class="text-muted">El estudiante debe enviar esta propuesta al comité.</p>
 									}
 								</td>

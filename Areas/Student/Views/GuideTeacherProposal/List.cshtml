@@ -1,10 +1,15 @@
-﻿@using Utal.Icc.Sgm
+﻿@using Microsoft.AspNetCore.Identity
+
+@using Utal.Icc.Sgm
 @using Utal.Icc.Sgm.Models
 @using Utal.Icc.Sgm.ViewModels
 @using Utal.Icc.Sgm.Views.Shared
 @using Utal.Icc.Sgm.Areas.Student.Controllers
+@using static Utal.Icc.Sgm.Models.Proposal
 
-@model PaginatedList<GuideTeacherProposalViewModel>
+@model PaginatedList<ProposalViewModel>
+
+@inject UserManager<ApplicationUser> _userManager
 
 @{
 	this.ViewData["Title"] = "Mis postulaciones";
@@ -27,12 +32,12 @@
 					<thead class="table-dark">
 						<tr>
 							<th>
-								<a asp-action="@nameof(GuideTeacherProposalController.List)" asp-route-sortOrder="@this.ViewData[$"{nameof(GuideTeacherProposalViewModel.Title)}SortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+								<a asp-action="@nameof(GuideTeacherProposalController.List)" asp-route-sortOrder="@this.ViewData[$"{nameof(ProposalViewModel.Title)}SortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
 									Título
 								</a>
 							</th>
 							<th>
-								<a asp-action="@nameof(GuideTeacherProposalController.List)" asp-route-sortOrder="@this.ViewData[$"{nameof(GuideTeacherProposalViewModel.GuideTeacherName)}SortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+								<a asp-action="@nameof(GuideTeacherProposalController.List)" asp-route-sortOrder="@this.ViewData[$"{nameof(ProposalViewModel.GuideTeacherName)}SortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
 									Profesor Guía
 								</a>
 							</th>
@@ -47,11 +52,11 @@
 								<td>@item.GuideTeacherName</td>
 								<td>
 									@switch (item.ProposalStatus) {
-										case nameof(GuideTeacherProposal.Status.Published):
+										case nameof(Status.Published):
 											<span class="badge bg-primary">Postulado</span>
 											break;
-										case nameof(GuideTeacherProposal.Status.Ready):
-											if (!item.StudentIsAccepted) {
+										case nameof(Status.Ready):
+											if (item.StudentId == await this._userManager.GetUserIdAsync((await this._userManager.GetUserAsync(this.User))!)) {
 												<span class="badge bg-danger">Rechazado</span>
 											} else {
 												<span class="badge bg-success">Aceptado</span>

@@ -1,7 +1,7 @@
 ﻿@using Utal.Icc.Sgm.ViewModels
 @using Utal.Icc.Sgm.Areas.GuideTeacher.Controllers
 
-@model StudentProposalViewModel
+@model ProposalViewModel
 
 @{
 	this.ViewData["Title"] = "Rechazar propuesta";
@@ -22,8 +22,8 @@
 						<div class="row text-center">
 							<div class="col">
 								<div class="form-group mb-3">
-									@this.Html.LabelFor(m => m.RejectionReason, new { @class = "form-label" })
-									@this.Html.TextBoxFor(m => m.RejectionReason, new { @class = "form-control" })
+									@this.Html.LabelFor(m => m.Reason, new { @class = "form-label" })
+									@this.Html.TextBoxFor(m => m.Reason, new { @class = "form-control" })
 								</div>
 								<div class="btn-group">
 									@this.Html.ActionLink("No", nameof(StudentProposalController.View), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.GuideTeacher), id = this.Model.Id }, new { @class = "btn btn-secondary" })
