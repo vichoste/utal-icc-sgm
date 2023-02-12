@@ -65,7 +65,11 @@
 									}
 								</td>
 								<td>
-									@this.Html.ActionLink("Ver", nameof(GuideTeacherProposalController.Summary), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.Student), id = item.Id }, new { @class = "btn btn-yellow mb-3"})
+									@if (item.StudentId != await this._userManager.GetUserIdAsync((await this._userManager.GetUserAsync(this.User))!)) {
+										@this.Html.ActionLink("Ver", nameof(GuideTeacherProposalController.Summary), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.Student), id = item.Id }, new { @class = "btn btn-danger mb-3"})
+									} else {
+										@this.Html.ActionLink("Ver", nameof(GuideTeacherProposalController.Summary), nameof(GuideTeacherProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.Student), id = item.Id }, new { @class = "btn btn-success mb-3"})
+									}
 								</td>
 							</tr>
 						}

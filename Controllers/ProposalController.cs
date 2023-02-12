@@ -319,6 +319,7 @@ public abstract class ProposalController : ApplicationController, IPopulatable, 
 			UpdatedAt = proposal.UpdatedAt
 		};
 		if (await base._userManager.IsInRoleAsync(user, nameof(Roles.Student))) {
+			output.StudentId = proposal.StudentOfTheProposal!.Id;
 			output.Requirements = proposal.Requirements;
 			output.GuideTeacherId = proposal.GuideTeacherOfTheProposal!.Id;
 			output.GuideTeacherName = $"{proposal.GuideTeacherOfTheProposal.FirstName} {proposal.GuideTeacherOfTheProposal.LastName}";
