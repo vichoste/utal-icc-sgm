@@ -23,6 +23,6 @@ public partial class ApplicationUser : IdentityUser {
 	public DateTimeOffset CreatedAt { get; set; }
 	public DateTimeOffset? UpdatedAt { get; set; }
 	public bool IsDeactivated { get; set; }
-	[InverseProperty(nameof(Proposal.WhoRejectedThisProposal))]
+	[InverseProperty(nameof(Proposal.WhoRejected))]
 	public virtual ICollection<Proposal?>? IRejectedTheseStudentProposals { get; set; } = new HashSet<Proposal?>();
 }

@@ -239,4 +239,28 @@ public class StudentProposalController : ProposalController {
 		this.TempData["SuccessMessage"] = base._userManager.IsInRoleAsync(user, nameof(Roles.Student)) ? "Tu propuesta ha sido enviada correctamente." : "Tu propuesta ha sido publicada correctamente.";
 		return this.RedirectToAction(nameof(StudentProposalController.Index), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Student) });
 	}
+
+	public async Task<IActionResult> Rejection(string id) {
+		if (await base.CheckSession() is not ApplicationUser user) {
+			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
+		}
+		var proposal = await this._dbContext.Proposals!.AsNoTracking()
+			.Where(p => p.StudentOfTheProposal == user && p.ProposalStatus == Status.Rejected)
+			.Include(p => p.WhoRejected)
+			.FirstOrDefaultAsync(p => p.Id == id);
+		if (proposal is null) {
+			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
+			return this.RedirectToAction(nameof(StudentProposalController.Index), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Student) });
+		}
+		var output = new ProposalViewModel {
+			Id = id,
+			Title = proposal.Title,
+			Description = proposal.Description,
+			WhoRejected = $"{proposal.WhoRejected!.FirstName} {proposal.WhoRejected!.LastName}",
+			Reason = proposal.Reason,
+			CreatedAt = proposal.CreatedAt,
+			UpdatedAt = proposal.UpdatedAt
+		};
+		return this.View(output);
+	}
 }

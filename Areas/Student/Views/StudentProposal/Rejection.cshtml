@@ -1,7 +1,7 @@
 @using Utal.Icc.Sgm.ViewModels
 @using Utal.Icc.Sgm.Areas.GuideTeacher.Controllers
 
-@model StudentProposalViewModel
+@model ProposalViewModel
 
 @{
 	this.ViewData["Title"] = "Ver rechazo de la propuesta";
@@ -30,8 +30,8 @@
 									@this.Html.DisplayFor(m => m.WhoRejected, new { @class = "form-control" })
 								</div>
 								<div class="form-group mb-3">
-									@this.Html.LabelFor(m => m.RejectionReason, new { @class = "form-label" }):
-									@this.Html.DisplayFor(m => m.RejectionReason, new { @class = "form-control" })
+									@this.Html.LabelFor(m => m.Reason, new { @class = "form-label" }):
+									@this.Html.DisplayFor(m => m.Reason, new { @class = "form-control" })
 								</div>
 								<hr />
 								<div class="form-group mb-3 text-muted">
