@@ -1,0 +1,95 @@
+@using Microsoft.AspNetCore.Identity
+
+@using Utal.Icc.Sgm
+@using Utal.Icc.Sgm.Models
+@using Utal.Icc.Sgm.ViewModels
+@using Utal.Icc.Sgm.Areas.School.Controllers
+
+@model ApplicationUserViewModel
+
+@{
+	this.ViewData["Title"] = "Editar profesor";
+}
+
+@inject UserManager<ApplicationUser> _userManager
+
+<div class="container">
+	<partial name="_Alerts" />
+	<div class="row justify-content-center">
+		<div class="col-10">
+			<div class="card">
+				<div class="card-header text-center">@this.ViewData["Title"]</div>
+				<div class="card-body">
+					@using (this.Html.BeginForm(nameof(UserController.Edit), nameof(UserController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.School) })) {
+						@this.Html.AntiForgeryToken()
+						@this.Html.HiddenFor(m => m.Id)
+						<div class="row">
+							<div class="col">
+								<div class="form-group mb-3">
+									@this.Html.LabelFor(m => m.FirstName, new { @class = "form-label" })
+									@this.Html.TextBoxFor(m => m.FirstName, new { @class = "form-control" })
+								</div>
+								<div class="form-group mb-3">
+									@this.Html.LabelFor(m => m.LastName, new { @class = "form-label" })
+									@this.Html.TextBoxFor(m => m.LastName, new { @class = "form-control" })
+								</div>
+								@if (await this._userManager.IsInRoleAsync((await this._userManager.FindByIdAsync(this.Model.Id!))!, nameof(Role.Student))) {
+									<div class="form-group mb-3">
+										@this.Html.LabelFor(m => m.StudentUniversityId, new { @class = "form-label" })
+										@this.Html.TextBoxFor(m => m.StudentUniversityId, new { @class = "form-control" })
+									</div>
+								}
+								<div class="form-group mb-3">
+									@this.Html.LabelFor(m => m.Rut, new { @class = "form-label" })
+									@this.Html.TextBoxFor(m => m.Rut, new { @class = "form-control" })
+								</div>
+								<div class="form-group mb-3">
+									@this.Html.LabelFor(m => m.Email, new { @class = "form-label" })
+									@this.Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+								</div>
+								@if (await this._userManager.IsInRoleAsync((await this._userManager.FindByIdAsync(this.Model.Id!))!, nameof(Role.Teacher))) {
+									<p><strong>Roles</strong></p>
+									<div class="form-check mb-3">
+										@this.Html.LabelFor(m => m.IsGuide, new { @class = "form-check-label" })
+										@this.Html.CheckBoxFor(m => m.IsGuide, new { @class = "form-check-input" })
+									</div>
+									<div class="form-check mb-3">
+										@this.Html.LabelFor(m => m.IsAssistant, new { @class = "form-check-label" })
+										@this.Html.CheckBoxFor(m => m.IsAssistant, new { @class = "form-check-input" })
+									</div>
+									<div class="form-check mb-3">
+										@this.Html.LabelFor(m => m.IsCourse, new { @class = "form-check-label" })
+										@this.Html.CheckBoxFor(m => m.IsCourse, new { @class = "form-check-input" })
+									</div>
+									<div class="form-check mb-3">
+										@this.Html.LabelFor(m => m.IsCommittee, new { @class = "form-check-label" })
+										@this.Html.CheckBoxFor(m => m.IsCommittee, new { @class = "form-check-input" })
+									</div>
+								}
+								<hr />
+								<div class="form-group mb-3 text-muted">
+									@this.Html.LabelFor(m => m.CreatedAt, new { @class = "form-label" }):
+									@this.Html.HiddenFor(m => m.CreatedAt)
+									@this.Html.DisplayFor(m => m.CreatedAt, new { @class = "form-control" })
+								</div>
+								<div class="form-group mb-3 text-muted">
+									@this.Html.LabelFor(m => m.UpdatedAt, new { @class = "form-label" }):
+									@this.Html.HiddenFor(m => m.UpdatedAt)
+									@this.Html.DisplayFor(m => m.UpdatedAt, new { @class = "form-control" })
+								</div>
+							</div>
+						</div>
+						<div class="row text-center">
+							<div class="col">
+								<div class="btn-group">
+									@this.Html.ActionLink("Cancelar", nameof(UserController.Users), nameof(UserController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.School) }, new { @class = "btn btn-secondary" })
+									<button type="submit" class="btn btn-yellow">Editar</button>
+								</div>
+							</div>
+						</div>
+					}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

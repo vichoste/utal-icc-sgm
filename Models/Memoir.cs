@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Utal.Icc.Sgm.Models;
 
-public class Qualification {
+public class Memoir {
 	#region Common
 	[Key]
 	public string? Id { get; set; }

@@ -37,14 +37,14 @@ public class ApplicationUserViewModel : ApplicationViewModel {
 	[Display(Name = "Especialización")]
 	public string? TeacherSpecialization { get; set; }
 	[Display(Name = "Profesor guía")]
-	public bool IsGuideTeacher { get; set; }
+	public bool IsGuide { get; set; }
 	[Display(Name = "Profesor co-guía")]
-	public bool IsAssistantTeacher { get; set; }
+	public bool IsAssistant { get; set; }
 	[Display(Name = "Profesor de curso")]
-	public bool IsCourseTeacher { get; set; }
+	public bool IsCourse { get; set; }
 	[Display(Name = "Profesor de comité")]
-	public bool IsCommitteeTeacher { get; set; }
+	public bool IsCommittee { get; set; }
 	[Display(Name = "Director de carrera")]
-	public bool IsDirectorTeacher { get; set; }
+	public bool IsDirector { get; set; }
 	#endregion
 }

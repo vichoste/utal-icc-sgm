@@ -45,7 +45,7 @@ _ = app.MapAreaControllerRoute(
 _ = app.MapAreaControllerRoute(
 	name: nameof(Utal.Icc.Sgm.Areas.School),
 	areaName: nameof(Utal.Icc.Sgm.Areas.School),
-	pattern: $"{nameof(Utal.Icc.Sgm.Areas.School)}/{{controller={nameof(Utal.Icc.Sgm.Areas.School.Controllers.UserController).Replace("Controller", string.Empty)}}}/{{action={nameof(Utal.Icc.Sgm.Areas.School.Controllers.UserController.Index)}}}/{{id?}}"
+	pattern: $"{nameof(Utal.Icc.Sgm.Areas.School)}/{{controller={nameof(Utal.Icc.Sgm.Areas.School.Controllers.UserController).Replace("Controller", string.Empty)}}}/{{action={nameof(Utal.Icc.Sgm.Areas.School.Controllers.UserController.Users)}}}/{{id?}}"
 );
 _ = app.MapControllerRoute(
 	name: "default",

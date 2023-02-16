@@ -10,8 +10,8 @@ public class ApplicationUser : IdentityUser {
 	public string? LastName { get; set; }
 	public string? Rut { get; set; }
 	public bool IsDeactivated { get; set; }
-	[InverseProperty(nameof(Qualification.Owners))]
-	public virtual ICollection<Qualification?>? Qualifications { get; set; } = new HashSet<Qualification?>();
+	[InverseProperty(nameof(Memoir.Owners))]
+	public virtual ICollection<Memoir?>? Memoirs { get; set; } = new HashSet<Memoir?>();
 	public DateTimeOffset CreatedAt { get; set; }
 	public DateTimeOffset? UpdatedAt { get; set; }
 	#endregion
@@ -20,8 +20,8 @@ public class ApplicationUser : IdentityUser {
 	public string? StudentRemainingCourses { get; set; }
 	public bool StudentIsDoingThePractice { get; set; }
 	public bool StudentIsWorking { get; set; }
-	[InverseProperty(nameof(Qualification.Candidates))]
-	public virtual ICollection<Qualification?>? StudentCandidatures { get; set; } = new HashSet<Qualification?>();
+	[InverseProperty(nameof(Memoir.Candidates))]
+	public virtual ICollection<Memoir?>? StudentCandidatures { get; set; } = new HashSet<Memoir?>();
 	#endregion
 	#region Teacher
 	public string? TeacherOffice { get; set; }
@@ -29,7 +29,7 @@ public class ApplicationUser : IdentityUser {
 	public string? TeacherSpecialization { get; set; }
 	#endregion
 	#region Rejection
-	[InverseProperty(nameof(Qualification.WhoRejected))]
-	public virtual ICollection<Qualification?>? RejectedQualifications { get; set; } = new HashSet<Qualification?>();
+	[InverseProperty(nameof(Memoir.WhoRejected))]
+	public virtual ICollection<Memoir?>? RejectedMemoirs { get; set; } = new HashSet<Memoir?>();
 	#endregion
 }

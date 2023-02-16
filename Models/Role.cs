@@ -1,14 +1,15 @@
 namespace Utal.Icc.Sgm.Models;
 
 public enum Role {
-	DirectorTeacher,
-	CommitteeTeacher,
-	CourseTeacher,
-	GuideTeacher,
-	AssistantTeacher,
+	Director,
+	Committee,
+	Course,
+	Guide,
+	Assistant,
 	Teacher,
-	EngineerStudent,
-	CompletedStudent,
-	ThesisStudent,
+	Engineer,
+	Completed,
+	Memoir,
+	Candidate,
 	Student
 }
