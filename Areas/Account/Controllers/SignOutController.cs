@@ -7,7 +7,7 @@ using Utal.Icc.Sgm.Models;
 
 namespace Utal.Icc.Sgm.Areas.Account.Controllers;
 
-[Area(nameof(Account))]
+[Area("Account")]
 public class SignOutController : Controller {
 	private readonly SignInManager<ApplicationUser> _signInManager;
 
@@ -18,6 +18,6 @@ public class SignOutController : Controller {
 			await this._signInManager.SignOutAsync();
 			this.TempData["SuccessMessage"] = "Se ha cerrado tu sesión correctamente.";
 		}
-		return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
+		return this.RedirectToAction("Index", "Home", new { area = string.Empty });
 	}
 }

@@ -14,7 +14,7 @@
 			<div class="card">
 				<div class="card-header text-center">@this.ViewData["Title"]</div>
 				<div class="card-body">
-					@using (this.Html.BeginForm(nameof(ProfileController.Student), nameof(ProfileController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.Account) })) {
+					@using (this.Html.BeginForm("Student", "Profile", new { area = "Account" })) {
 						@this.Html.AntiForgeryToken()
 						<div class="row">
 							<div class="col">
@@ -39,7 +39,7 @@
 						<div class="row text-center">
 							<div class="col">
 								<div class="btn-group">
-									@this.Html.ActionLink("Cancelar", nameof(ProfileController.Index), nameof(ProfileController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.Account) }, new { @class = "btn btn-secondary" })
+									@this.Html.ActionLink("Cancelar", "Index", "Profile", new { area = "Account" }, new { @class = "btn btn-secondary" })
 									<button type="submit" class="btn btn-primary">Actualizar perfil</button>
 								</div>
 							</div>

@@ -22,7 +22,7 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment()) {
 	_ = app.UseMigrationsEndPoint();
 } else {
-	_ = app.UseExceptionHandler($"/{nameof(Utal.Icc.Sgm.Controllers.HomeController).Replace("Controller", string.Empty)}/{nameof(Utal.Icc.Sgm.Controllers.HomeController.Error)}");
+	_ = app.UseExceptionHandler($"/Home/Error");
 }
 using var scope = app.Services.CreateScope();
 var services = scope.ServiceProvider;
@@ -38,18 +38,18 @@ _ = app.UseRouting();
 _ = app.UseAuthentication();
 _ = app.UseAuthorization();
 _ = app.MapAreaControllerRoute(
-	name: nameof(Utal.Icc.Sgm.Areas.Account),
-	areaName: nameof(Utal.Icc.Sgm.Areas.Account),
-	pattern: $"{nameof(Utal.Icc.Sgm.Areas.Account)}/{{controller={nameof(Utal.Icc.Sgm.Areas.Account.Controllers.SignInController).Replace("Controller", string.Empty)}}}/{{action={nameof(Utal.Icc.Sgm.Areas.Account.Controllers.SignInController.Index)}}}/{{id?}}"
+	name: "Account",
+	areaName: "Account",
+	pattern: "{Account}/{controller=SignIn}/{action=Index}/{id?}"
 );
 _ = app.MapAreaControllerRoute(
-	name: nameof(Utal.Icc.Sgm.Areas.School),
-	areaName: nameof(Utal.Icc.Sgm.Areas.School),
-	pattern: $"{nameof(Utal.Icc.Sgm.Areas.School)}/{{controller={nameof(Utal.Icc.Sgm.Areas.School.Controllers.UserController).Replace("Controller", string.Empty)}}}/{{action={nameof(Utal.Icc.Sgm.Areas.School.Controllers.UserController.Users)}}}/{{id?}}"
+	name: "School",
+	areaName: "School",
+	pattern: "{School}/{controller=Memoir}/{action=Index}/{id?}"
 );
 _ = app.MapControllerRoute(
 	name: "default",
-	pattern: $"{{controller={nameof(Utal.Icc.Sgm.Controllers.HomeController).Replace("Controller", string.Empty)}}}/{{action={nameof(Utal.Icc.Sgm.Controllers.HomeController.Index)}}}/{{id?}}"
+	pattern: "{controller=Home}/{action=Index}/{id?}"
 );
 _ = app.MapRazorPages();
 app.Run();

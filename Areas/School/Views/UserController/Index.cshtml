@@ -21,13 +21,13 @@
 			<h2>@this.ViewData["Title"]</h2>
 		</div>
 		<div class="col-12 col-md-2 mb-3">
-			@this.Html.ActionLink("Importar estudiantes desde CSV", nameof(UserController.BatchCreateStudents), nameof(UserController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.School) }, new { @class = "btn btn-teal"})
+			@this.Html.ActionLink("Importar estudiantes desde CSV", "BatchCreateStudents", "User", new { area = "School" }, new { @class = "btn btn-teal"})
 		</div>
 		<div class="col-12 col-md-2 mb-3">
-			@this.Html.ActionLink("Crear profesor", nameof(UserController.CreateTeacher), nameof(UserController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.School) }, new { @class = "btn btn-success"})
+			@this.Html.ActionLink("Crear profesor", "CreateTeacher", "User", new { area = "School" }, new { @class = "btn btn-success"})
 		</div>
 		<div class="col-12 mb-3">
-			<partial name="_Filter", model=@(new FilterPartialViewModel(nameof(UserController.Users), nameof(UserController).Replace("Controller", string.Empty), nameof(Utal.Icc.Sgm.Areas.School))) />
+			<partial name="_Filter", model=@(new FilterPartialViewModel("List", "User", "School")) />
 		</div>
 	</div>
 	<div class="row justify-content-center">
@@ -37,27 +37,27 @@
 					<thead class="table-dark">
 						<tr>
 							<th>
-								<a asp-action="@nameof(UserController.Users)" asp-route-sortOrder="@this.ViewData[$"{nameof(ApplicationUserViewModel.FirstName)}SortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+								<a asp-action="List" asp-route-sortOrder="@this.ViewData["FirstNameSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
 									Nombre
 								</a>
 							</th>
 							<th>
-								<a asp-action="@nameof(UserController.Users)" asp-route-sortOrder="@this.ViewData[$"{nameof(ApplicationUserViewModel.LastName)}SortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+								<a asp-action="List" asp-route-sortOrder="@this.ViewData["LastNameSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
 									Apellido
 								</a>
 							</th>
 							<th>
-								<a asp-action="@nameof(UserController.Users)" asp-route-sortOrder="@this.ViewData[$"{nameof(ApplicationUserViewModel.StudentUniversityId)}SortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+								<a asp-action="List" asp-route-sortOrder="@this.ViewData["StudentUniversityIdSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
 									Número de matrícula
 								</a>
 							</th>
 							<th>
-								<a asp-action="@nameof(UserController.Users)" asp-route-sortOrder="@this.ViewData[$"{nameof(ApplicationUserViewModel.Rut)}SortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+								<a asp-action="List" asp-route-sortOrder="@this.ViewData["RutSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
 									RUT
 								</a>
 							</th>
 							<th>
-								<a asp-action="@nameof(UserController.Users)" asp-route-sortOrder="@this.ViewData[$"{nameof(ApplicationUserViewModel.Email)}SortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+								<a asp-action="List" asp-route-sortOrder="@this.ViewData["EmailSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
 									E-mail
 								</a>
 							</th>
@@ -74,7 +74,7 @@
 									<td class="text-muted">@item.Rut</td>
 									<td class="text-muted">@item.Email</td>
 									<td>
-										@this.Html.ActionLink("Activar", nameof(UserController.Toggle), nameof(UserController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.School), id = item.Id }, new { @class = "btn btn-success mb-3" })
+										@this.Html.ActionLink("Activar", "Toggle", "User", new { area = "School", id = item.Id }, new { @class = "btn btn-success mb-3" })
 									</td>
 								} else {
 									<td>@item.FirstName</td>
@@ -83,13 +83,13 @@
 									<td>@item.Rut</td>
 									<td>@item.Email</td>
 									<td>
-										@this.Html.ActionLink("Editar", nameof(UserController.Edit), nameof(UserController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.School), id = item.Id }, new { @class = "btn btn-yellow mb-3" })
-										@this.Html.ActionLink("Desactivar", nameof(UserController.Toggle), nameof(UserController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.School), id = item.Id }, new { @class = "btn btn-danger mb-3" })
-										@if (await this._userManager.IsInRoleAsync((await this._userManager.FindByIdAsync(item.Id!))!, nameof(Role.Teacher))
-											&& await this._userManager.IsInRoleAsync((await this._userManager.FindByIdAsync(item.Id!))!, nameof(Role.Director))) {
-											<a asp-action=@nameof(UserController.Users) asp-route-sortOrder="@this.ViewData["CurrentSort"]" asp-route-pageNumber="@(this.Model.PageIndex)" asp-route-currentFilter="@this.ViewData["CurrentFilter"]" class="btn btn-info mb-3">Es director de carrera</a>
-										} else if (await this._userManager.IsInRoleAsync((await this._userManager.FindByIdAsync(item.Id!))!, nameof(Role.Teacher))) {
-											@this.Html.ActionLink("No es director de carrera", nameof(UserController.Transfer), nameof(UserController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.School), currentDirectorTeacherId = this._userManager.GetUserId(this.User), newDirectorTeacherId = item.Id }, new { @class = "btn btn-default mb-3" })
+										@this.Html.ActionLink("Editar", "Edit", "User", new { area = "School", id = item.Id }, new { @class = "btn btn-yellow mb-3" })
+										@this.Html.ActionLink("Desactivar", "Toggle", "User", new { area = "School", id = item.Id }, new { @class = "btn btn-danger mb-3" })
+										@if (await this._userManager.IsInRoleAsync((await this._userManager.FindByIdAsync(item.Id!))!, "Teacher")
+											&& await this._userManager.IsInRoleAsync((await this._userManager.FindByIdAsync(item.Id!))!, "Director")) {
+											<a asp-action="List" asp-route-sortOrder="@this.ViewData["CurrentSort"]" asp-route-pageNumber="@(this.Model.PageIndex)" asp-route-currentFilter="@this.ViewData["CurrentFilter"]" class="btn btn-info mb-3">Es director de carrera</a>
+										} else if (await this._userManager.IsInRoleAsync((await this._userManager.FindByIdAsync(item.Id!))!, "Teacher")) {
+											@this.Html.ActionLink("No es director de carrera", "Transfer", "User", new { area = "School", currentDirectorTeacherId = this._userManager.GetUserId(this.User), newDirectorTeacherId = item.Id }, new { @class = "btn btn-default mb-3" })
 										}
 									</td>
 								}
@@ -103,19 +103,19 @@
 				}
 				<ul class="pagination mb-0">
 					<li class="page-item @prevDisabled">
-						<a asp-action="@nameof(UserController.Users)" asp-route-sortOrder="@this.ViewData["CurrentSort"]" asp-route-pageNumber="@(this.Model.PageIndex - 1)" asp-route-currentFilter="@this.ViewData["CurrentFilter"]" class="page-link">
+						<a asp-action="List" asp-route-sortOrder="@this.ViewData["CurrentSort"]" asp-route-pageNumber="@(this.Model.PageIndex - 1)" asp-route-currentFilter="@this.ViewData["CurrentFilter"]" class="page-link">
 							Anterior página
 						</a>
 					</li>
 					@for (var i = 0; i < this.Model.TotalPages; i++) {
 						<li class="page-item @(i + 1 == this.Model.PageIndex ? " active" : "")">
-							<a asp-action="@nameof(UserController.Users)" asp-route-sortOrder="@this.ViewData["CurrentSort"]" asp-route-pageNumber="@(i + 1)" asp-route-currentFilter="@this.ViewData["CurrentFilter"]" class="page-link">
+							<a asp-action="List" asp-route-sortOrder="@this.ViewData["CurrentSort"]" asp-route-pageNumber="@(i + 1)" asp-route-currentFilter="@this.ViewData["CurrentFilter"]" class="page-link">
 								@(i + 1)
 							</a>
 						</li>
 					}
 					<li class="page-item @nextDisabled">
-						<a asp-action="@nameof(UserController.Users)" asp-route-sortOrder="@this.ViewData["CurrentSort"]" asp-route-pageNumber="@(this.Model.PageIndex + 1)" asp-route-currentFilter="@this.ViewData["CurrentFilter"]" class="page-link">
+						<a asp-action="List" asp-route-sortOrder="@this.ViewData["CurrentSort"]" asp-route-pageNumber="@(this.Model.PageIndex + 1)" asp-route-currentFilter="@this.ViewData["CurrentFilter"]" class="page-link">
 							Siguiente página
 						</a>
 					</li>

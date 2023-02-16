@@ -10,7 +10,7 @@ public class ApplicationUser : IdentityUser {
 	public string? LastName { get; set; }
 	public string? Rut { get; set; }
 	public bool IsDeactivated { get; set; }
-	[InverseProperty(nameof(Memoir.Owners))]
+	[InverseProperty("Owners")]
 	public virtual ICollection<Memoir?>? Memoirs { get; set; } = new HashSet<Memoir?>();
 	public DateTimeOffset CreatedAt { get; set; }
 	public DateTimeOffset? UpdatedAt { get; set; }
@@ -20,7 +20,7 @@ public class ApplicationUser : IdentityUser {
 	public string? StudentRemainingCourses { get; set; }
 	public bool StudentIsDoingThePractice { get; set; }
 	public bool StudentIsWorking { get; set; }
-	[InverseProperty(nameof(Memoir.Candidates))]
+	[InverseProperty("Candidates")]
 	public virtual ICollection<Memoir?>? StudentCandidatures { get; set; } = new HashSet<Memoir?>();
 	#endregion
 	#region Teacher
@@ -29,7 +29,7 @@ public class ApplicationUser : IdentityUser {
 	public string? TeacherSpecialization { get; set; }
 	#endregion
 	#region Rejection
-	[InverseProperty(nameof(Memoir.WhoRejected))]
+	[InverseProperty("WhoRejected")]
 	public virtual ICollection<Memoir?>? RejectedMemoirs { get; set; } = new HashSet<Memoir?>();
 	#endregion
 }

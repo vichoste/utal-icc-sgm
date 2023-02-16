@@ -9,7 +9,7 @@ using Utal.Icc.Sgm.ViewModels;
 
 namespace Utal.Icc.Sgm.Areas.Account.Controllers;
 
-[Area(nameof(Account))]
+[Area("Account")]
 public class ProfileController : Controller {
 	private readonly UserManager<ApplicationUser> _userManager;
 	private readonly IUserStore<ApplicationUser> _userStore;
@@ -23,7 +23,7 @@ public class ProfileController : Controller {
 
 	public async Task<IActionResult> Index() {
 		if (await this._userManager.GetUserAsync(this.User) is not ApplicationUser user) {
-			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
+			return this.RedirectToAction("Index", "Home", new { area = string.Empty });
 		}
 		var output = new ApplicationUserViewModel {
 			FirstName = user!.FirstName,
@@ -43,7 +43,7 @@ public class ProfileController : Controller {
 	public async Task<IActionResult> ChangePassword([FromForm] ChangePasswordViewModel input) {
 		var user = await this._userManager.GetUserAsync(this.User);
 		if (user!.IsDeactivated) {
-			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
+			return this.RedirectToAction("Index", "Home", new { area = string.Empty });
 		}
 		var result = await this._userManager.ChangePasswordAsync(user!, input.CurrentPassword!, input.NewPassword!);
 		if (!result.Succeeded) {
@@ -54,14 +54,14 @@ public class ProfileController : Controller {
 		user.UpdatedAt = DateTimeOffset.Now;
 		_ = await this._userManager.UpdateAsync(user);
 		this.TempData["SuccessMessage"] = "Has cambiado tu contraseña correctamente.";
-		return this.RedirectToAction(nameof(ProfileController.Index), nameof(ProfileController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.Account) });
+		return this.RedirectToAction("Index", "Profile", new { area = "Account" });
 	}
 
-	[Authorize(Roles = nameof(Role.Student))]
+	[Authorize(Roles = "Student")]
 	public async Task<IActionResult> Student() {
 		var user = await this._userManager.GetUserAsync(this.User);
 		if (user!.IsDeactivated) {
-			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
+			return this.RedirectToAction("Index", "Home", new { area = string.Empty });
 		}
 		var output = new ApplicationUserViewModel {
 			StudentUniversityId = user.StudentUniversityId,
@@ -72,11 +72,11 @@ public class ProfileController : Controller {
 		return this.View(output);
 	}
 
-	[Authorize(Roles = nameof(Role.Student)), HttpPost, ValidateAntiForgeryToken]
+	[Authorize(Roles = "Student"), HttpPost, ValidateAntiForgeryToken]
 	public async Task<IActionResult> Student([FromForm] ApplicationUserViewModel input) {
 		var user = await this._userManager.GetUserAsync(this.User);
 		if (user!.IsDeactivated) {
-			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
+			return this.RedirectToAction("Index", "Home", new { area = string.Empty });
 		}
 		user.StudentRemainingCourses = input.StudentRemainingCourses;
 		user.StudentIsDoingThePractice = input.StudentIsDoingThePractice;
@@ -93,11 +93,11 @@ public class ProfileController : Controller {
 		return this.View(output);
 	}
 
-	[Authorize(Roles = nameof(Role.Teacher))]
+	[Authorize(Roles = "Teacher")]
 	public async Task<IActionResult> Teacher() {
 		var user = await this._userManager.GetUserAsync(this.User);
 		if (user!.IsDeactivated) {
-			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
+			return this.RedirectToAction("Index", "Home", new { area = string.Empty });
 		}
 		var output = new ApplicationUserViewModel {
 			TeacherOffice = user.TeacherOffice,
@@ -107,11 +107,11 @@ public class ProfileController : Controller {
 		return this.View(output);
 	}
 
-	[Authorize(Roles = nameof(Role.Teacher)), HttpPost, ValidateAntiForgeryToken]
+	[Authorize(Roles = "Teacher"), HttpPost, ValidateAntiForgeryToken]
 	public async Task<IActionResult> Teacher([FromForm] ApplicationUserViewModel input) {
 		var user = await this._userManager.GetUserAsync(this.User);
 		if (user!.IsDeactivated) {
-			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
+			return this.RedirectToAction("Index", "Home", new { area = string.Empty });
 		}
 		user.TeacherOffice = input.TeacherOffice;
 		user.TeacherSchedule = input.TeacherSchedule;

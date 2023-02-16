@@ -6,38 +6,38 @@ namespace Utal.Icc.Sgm.Seeders;
 
 public static class StartupSeeder {
 	public static async Task SeedRolesAsync(RoleManager<IdentityRole> roleManager) {
-		if (!await roleManager.RoleExistsAsync(nameof(Role.Director))) {
-			_ = await roleManager.CreateAsync(new IdentityRole(nameof(Role.Director)));
+		if (!await roleManager.RoleExistsAsync("Director")) {
+			_ = await roleManager.CreateAsync(new IdentityRole("Director"));
 		}
-		if (!await roleManager.RoleExistsAsync(nameof(Role.Committee))) {
-			_ = await roleManager.CreateAsync(new IdentityRole(nameof(Role.Committee)));
+		if (!await roleManager.RoleExistsAsync("Committee")) {
+			_ = await roleManager.CreateAsync(new IdentityRole("Committee"));
 		}
-		if (!await roleManager.RoleExistsAsync(nameof(Role.Course))) {
-			_ = await roleManager.CreateAsync(new IdentityRole(nameof(Role.Course)));
+		if (!await roleManager.RoleExistsAsync("Course")) {
+			_ = await roleManager.CreateAsync(new IdentityRole("Course"));
 		}
-		if (!await roleManager.RoleExistsAsync(nameof(Role.Guide))) {
-			_ = await roleManager.CreateAsync(new IdentityRole(nameof(Role.Guide)));
+		if (!await roleManager.RoleExistsAsync("Guide")) {
+			_ = await roleManager.CreateAsync(new IdentityRole("Guide"));
 		}
-		if (!await roleManager.RoleExistsAsync(nameof(Role.Assistant))) {
-			_ = await roleManager.CreateAsync(new IdentityRole(nameof(Role.Assistant)));
+		if (!await roleManager.RoleExistsAsync("Assistant")) {
+			_ = await roleManager.CreateAsync(new IdentityRole("Assistant"));
 		}
-		if (!await roleManager.RoleExistsAsync(nameof(Role.Teacher))) {
-			_ = await roleManager.CreateAsync(new IdentityRole(nameof(Role.Teacher)));
+		if (!await roleManager.RoleExistsAsync("Teacher")) {
+			_ = await roleManager.CreateAsync(new IdentityRole("Teacher"));
 		}
-		if (!await roleManager.RoleExistsAsync(nameof(Role.Engineer))) {
-			_ = await roleManager.CreateAsync(new IdentityRole(nameof(Role.Engineer)));
+		if (!await roleManager.RoleExistsAsync("Engineer")) {
+			_ = await roleManager.CreateAsync(new IdentityRole("Engineer"));
 		}
-		if (!await roleManager.RoleExistsAsync(nameof(Role.Completed))) {
-			_ = await roleManager.CreateAsync(new IdentityRole(nameof(Role.Completed)));
+		if (!await roleManager.RoleExistsAsync("Completed")) {
+			_ = await roleManager.CreateAsync(new IdentityRole("Completed"));
 		}
-		if (!await roleManager.RoleExistsAsync(nameof(Role.Qualification))) {
-			_ = await roleManager.CreateAsync(new IdentityRole(nameof(Role.Qualification)));
+		if (!await roleManager.RoleExistsAsync("Memoir")) {
+			_ = await roleManager.CreateAsync(new IdentityRole("Memoir"));
 		}
-		if (!await roleManager.RoleExistsAsync(nameof(Role.Candidate))) {
-			_ = await roleManager.CreateAsync(new IdentityRole(nameof(Role.Candidate)));
+		if (!await roleManager.RoleExistsAsync("Candidate")) {
+			_ = await roleManager.CreateAsync(new IdentityRole("Candidate"));
 		}
-		if (!await roleManager.RoleExistsAsync(nameof(Role.Student))) {
-			_ = await roleManager.CreateAsync(new IdentityRole(nameof(Role.Student)));
+		if (!await roleManager.RoleExistsAsync("Student")) {
+			_ = await roleManager.CreateAsync(new IdentityRole("Student"));
 		}
 	}
 
@@ -55,7 +55,7 @@ public static class StartupSeeder {
 			await userStore.SetUserNameAsync(directorTeacher, email, CancellationToken.None);
 			await emailStore.SetEmailAsync(directorTeacher, email, CancellationToken.None);
 			_ = await userManager.CreateAsync(directorTeacher, password);
-			_ = await userManager.AddToRolesAsync(directorTeacher, new List<string> { nameof(Role.Teacher), nameof(Role.Director) }.AsEnumerable());
+			_ = await userManager.AddToRolesAsync(directorTeacher, new List<string> { "Teacher", "Director" }.AsEnumerable());
 		}
 	}
 }

@@ -26,7 +26,7 @@ public static class TestApplicationUserSeeder {
 				await userStore.SetUserNameAsync(user, email, CancellationToken.None);
 				await emailStore.SetEmailAsync(user, email, CancellationToken.None);
 				_ = await userManager.CreateAsync(user, "Abc_123");
-				_ = await userManager.AddToRolesAsync(user, new List<string> { nameof(Role.Student) }.AsEnumerable());
+				_ = await userManager.AddToRolesAsync(user, new List<string> { "Student" }.AsEnumerable());
 			}
 		}
 	}
@@ -52,10 +52,10 @@ public static class TestApplicationUserSeeder {
 				await emailStore.SetEmailAsync(user, email, CancellationToken.None);
 				_ = await userManager.CreateAsync(user, "Abc_123");
 				var roles = random.Next(4) switch {
-					1 => new List<string> { nameof(Role.Teacher), nameof(Role.Guide) },
-					2 => new List<string> { nameof(Role.Teacher), nameof(Role.Guide), nameof(Role.Assistant) },
-					3 => new List<string> { nameof(Role.Teacher), nameof(Role.Assistant) },
-					_ => new List<string> { nameof(Role.Teacher) },
+					1 => new List<string> { "Teacher", "Guide" },
+					2 => new List<string> { "Teacher", "Guide", "Assistant" },
+					3 => new List<string> { "Teacher", "Assistant" },
+					_ => new List<string> { "Teacher" },
 				};
 				_ = await userManager.AddToRolesAsync(user, roles.AsEnumerable());
 			}
