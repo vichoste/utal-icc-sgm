@@ -12,9 +12,9 @@ namespace Utal.Icc.Sgm.Areas.Account.Controllers;
 
 [Area(nameof(Account))]
 public class ProfileController : Controller {
-	protected readonly UserManager<ApplicationUser> _userManager;
-	protected readonly IUserStore<ApplicationUser> _userStore;
-	protected readonly IUserEmailStore<ApplicationUser> _emailStore;
+	private readonly UserManager<ApplicationUser> _userManager;
+	private readonly IUserStore<ApplicationUser> _userStore;
+	private readonly IUserEmailStore<ApplicationUser> _emailStore;
 
 	public ProfileController(UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore) {
 		this._userManager = userManager;

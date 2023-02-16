@@ -9,7 +9,7 @@ namespace Utal.Icc.Sgm.Areas.Account.Controllers;
 
 [Area(nameof(Account))]
 public class SignOutController : Controller {
-	protected readonly SignInManager<ApplicationUser> _signInManager;
+	private readonly SignInManager<ApplicationUser> _signInManager;
 
 	public SignOutController(SignInManager<ApplicationUser> signInManager) => this._signInManager = signInManager;
 

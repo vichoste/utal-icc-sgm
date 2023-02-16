@@ -10,7 +10,7 @@ namespace Utal.Icc.Sgm.Areas.Account.Controllers;
 
 [Area(nameof(Account))]
 public class SignInController : Controller {
-	protected readonly SignInManager<ApplicationUser> _signInManager;
+	private readonly SignInManager<ApplicationUser> _signInManager;
 
 	public SignInController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, SignInManager<ApplicationUser> signInManager) => this._signInManager = signInManager;
 

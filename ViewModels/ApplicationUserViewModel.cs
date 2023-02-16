@@ -36,5 +36,13 @@ public class ApplicationUserViewModel : ApplicationViewModel {
 	public string? TeacherSchedule { get; set; }
 	[Display(Name = "Especialización")]
 	public string? TeacherSpecialization { get; set; }
+	[Display(Name = "Profesor guía")]
+	public bool IsGuideTeacher { get; set; }
+	[Display(Name = "Profesor co-guía")]
+	public bool IsAssistantTeacher { get; set; }
+	[Display(Name = "Profesor de curso")]
+	public bool IsCourseTeacher { get; set; }
+	[Display(Name = "Profesor de comité")]
+	public bool IsCommitteeTeacher { get; set; }
 	#endregion
 }

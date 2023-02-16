@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Utal.Icc.Sgm.ViewModels;
 
-public partial class QualificationViewModel : ApplicationUserViewModel {
+public class QualificationViewModel : ApplicationUserViewModel {
 	#region Common
 	[Display(Name = "Título")]
 	public string? Title { get; set; }
