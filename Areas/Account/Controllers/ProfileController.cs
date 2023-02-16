@@ -8,8 +8,6 @@ using Utal.Icc.Sgm.Data;
 using Utal.Icc.Sgm.Models;
 using Utal.Icc.Sgm.ViewModels;
 
-using static Utal.Icc.Sgm.Models.ApplicationUser;
-
 namespace Utal.Icc.Sgm.Areas.Account.Controllers;
 
 [Area(nameof(Account))]
@@ -50,7 +48,7 @@ public class ProfileController : ApplicationController {
 		return this.RedirectToAction(nameof(ProfileController.Index), nameof(ProfileController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.Account) });
 	}
 
-	[Authorize(Roles = nameof(Roles.Student))]
+	[Authorize(Roles = nameof(Role.Student))]
 	public async Task<IActionResult> Student() {
 		if (await base.CheckSession() is not ApplicationUser user) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
@@ -64,7 +62,7 @@ public class ProfileController : ApplicationController {
 		return this.View(output);
 	}
 
-	[Authorize(Roles = nameof(Roles.Student)), HttpPost, ValidateAntiForgeryToken]
+	[Authorize(Roles = nameof(Role.Student)), HttpPost, ValidateAntiForgeryToken]
 	public async Task<IActionResult> Student([FromForm] ApplicationUserViewModel input) {
 		if (await base.CheckSession() is not ApplicationUser user) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
@@ -84,7 +82,7 @@ public class ProfileController : ApplicationController {
 		return this.View(output);
 	}
 
-	[Authorize(Roles = nameof(Roles.Teacher))]
+	[Authorize(Roles = nameof(Role.Teacher))]
 	public async Task<IActionResult> Teacher() {
 		if (await base.CheckSession() is not ApplicationUser user) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });
@@ -97,7 +95,7 @@ public class ProfileController : ApplicationController {
 		return this.View(output);
 	}
 
-	[Authorize(Roles = nameof(Roles.Teacher)), HttpPost, ValidateAntiForgeryToken]
+	[Authorize(Roles = nameof(Role.Teacher)), HttpPost, ValidateAntiForgeryToken]
 	public async Task<IActionResult> Teacher([FromForm] ApplicationUserViewModel input) {
 		if (await base.CheckSession() is not ApplicationUser user) {
 			return this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty });

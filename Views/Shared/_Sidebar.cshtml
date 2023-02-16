@@ -1,4 +1,4 @@
-﻿@using static Utal.Icc.Sgm.Models.ApplicationUser
+﻿@using Utal.Icc.Sgm.Models
 
 <div id="sidebar" class="app-sidebar">
 	<div class="app-sidebar-content" data-scrollbar="true" data-height="100%">
@@ -12,7 +12,7 @@
 					Debes iniciar sesión para visualizar tus roles y herramientas
 				</div>
 			}
-			@if (this.User.IsInRole(nameof(Roles.DirectorTeacher))) {
+			@if (this.User.IsInRole(nameof(Role.DirectorTeacher))) {
 				<div class="menu-item has-sub">
 					<a href="#" class="menu-link">
 						<span class="menu-icon"><i class="fa fa-school"></i></span>
@@ -38,7 +38,7 @@
 					</div>
 				</div>
 			}
-			@if (this.User.IsInRole(nameof(Roles.CommitteeTeacher))) {
+			@if (this.User.IsInRole(nameof(Role.CommitteeTeacher))) {
 				<div class="menu-item has-sub">
 					<a href="#" class="menu-link">
 						<span class="menu-icon"><i class="fa fa-people-line"></i></span>
@@ -47,19 +47,19 @@
 					</a>
 					<div class="menu-submenu">
 						<div class="menu-item">
-							<a href="@this.Url.Action("Index", "Request", new { area = nameof(Roles.CommitteeTeacher) })" class="menu-link">
+							<a href="@this.Url.Action("Index", "Request", new { area = nameof(Role.CommitteeTeacher) })" class="menu-link">
 								<span class="menu-text">Solicitudes</span>
 							</a>
 						</div>
 						<div class="menu-item">
-							<a href="@this.Url.Action("Index", nameof(Roles.Teacher), new { area = nameof(Roles.CommitteeTeacher) })" class="menu-link">
+							<a href="@this.Url.Action("Index", nameof(Role.Teacher), new { area = nameof(Role.CommitteeTeacher) })" class="menu-link">
 								<span class="menu-text">Profesores</span>
 							</a>
 						</div>
 					</div>
 				</div>
 			}
-			@if (this.User.IsInRole(nameof(Roles.CourseTeacher))) {
+			@if (this.User.IsInRole(nameof(Role.CourseTeacher))) {
 				<div class="menu-item has-sub">
 					<a href="#" class="menu-link">
 						<span class="menu-icon"><i class="fa fa-person-chalkboard"></i></span>
@@ -68,14 +68,14 @@
 					</a>
 					<div class="menu-submenu">
 						<div class="menu-item">
-							<a href="@this.Url.Action("Index", "Course", new { area = nameof(Roles.CourseTeacher) })" class="menu-link">
+							<a href="@this.Url.Action("Index", "Course", new { area = nameof(Role.CourseTeacher) })" class="menu-link">
 								<span class="menu-text">Mis cursos</span>
 							</a>
 						</div>
 					</div>
 				</div>
 			}
-			@if (this.User.IsInRole(nameof(Roles.GuideTeacher))) {
+			@if (this.User.IsInRole(nameof(Role.GuideTeacher))) {
 				<div class="menu-item has-sub">
 					<a href="#" class="menu-link">
 						<span class="menu-icon"><i class="fa fa-user-tie"></i></span>
@@ -99,14 +99,14 @@
 							</a>
 						</div>
 						<div class="menu-item">
-							<a href="@this.Url.Action("Index", nameof(Roles.ThesisStudent), new { area = nameof(Utal.Icc.Sgm.Areas.DirectorTeacher) })" class="menu-link">
+							<a href="@this.Url.Action("Index", nameof(Role.ThesisStudent), new { area = nameof(Utal.Icc.Sgm.Areas.DirectorTeacher) })" class="menu-link">
 								<span class="menu-text">Mis memoristas</span>
 							</a>
 						</div>
 					</div>
 				</div>
 			}
-			@if (this.User.IsInRole(nameof(Roles.AssistantTeacher))) {
+			@if (this.User.IsInRole(nameof(Role.AssistantTeacher))) {
 				<div class="menu-item has-sub">
 					<a href="#" class="menu-link">
 						<span class="menu-icon"><i class="fa fa-user-tie"></i></span>
@@ -115,14 +115,14 @@
 					</a>
 					<div class="menu-submenu">
 						<div class="menu-item">
-							<a href="@this.Url.Action("Index", nameof(Roles.ThesisStudent), new { area = nameof(Roles.AssistantTeacher) })" class="menu-link">
+							<a href="@this.Url.Action("Index", nameof(Role.ThesisStudent), new { area = nameof(Role.AssistantTeacher) })" class="menu-link">
 								<span class="menu-text">Mis memoristas</span>
 							</a>
 						</div>
 					</div>
 				</div>
 			}
-			@if (this.User.IsInRole(nameof(Roles.EngineerStudent))) {
+			@if (this.User.IsInRole(nameof(Role.EngineerStudent))) {
 				<div class="menu-item">
 					<a href="#" class="menu-link">
 						<span class="menu-icon"><i class="fa fa-user-graduate"></i></span>
@@ -130,7 +130,7 @@
 					</a>
 				</div>
 			}
-			@if (this.User.IsInRole(nameof(Roles.CompletedStudent))) {
+			@if (this.User.IsInRole(nameof(Role.CompletedStudent))) {
 				<div class="menu-item">
 					<a href="#" class="menu-link">
 						<span class="menu-icon"><i class="fa fa-user-graduate"></i></span>
@@ -138,7 +138,7 @@
 					</a>
 				</div>
 			}
-			@if (this.User.IsInRole(nameof(Roles.ThesisStudent))) {
+			@if (this.User.IsInRole(nameof(Role.ThesisStudent))) {
 				<div class="menu-item has-sub">
 					<a href="#" class="menu-link">
 						<span class="menu-icon"><i class="fa fa-user-graduate"></i></span>
@@ -147,19 +147,19 @@
 					</a>
 					<div class="menu-submenu">
 						<div class="menu-item">
-							<a href="@this.Url.Action("Index", "Thesis", new { area = nameof(Roles.ThesisStudent) })" class="menu-link">
+							<a href="@this.Url.Action("Index", "Thesis", new { area = nameof(Role.ThesisStudent) })" class="menu-link">
 								<span class="menu-text">Mi memoria de título</span>
 							</a>
 						</div>
 						<div class="menu-item">
-							<a href="@this.Url.Action("Index", "Course", new { area = nameof(Roles.ThesisStudent) })" class="menu-link">
+							<a href="@this.Url.Action("Index", "Course", new { area = nameof(Role.ThesisStudent) })" class="menu-link">
 								<span class="menu-text">Mi curso</span>
 							</a>
 						</div>
 					</div>
 				</div>
 			}
-			@if (this.User.IsInRole(nameof(Roles.Student))) {
+			@if (this.User.IsInRole(nameof(Role.Student))) {
 				<div class="menu-item has-sub">
 					<a href="#" class="menu-link">
 						<span class="menu-icon"><i class="fa fa-user-graduate"></i></span>

@@ -1,7 +1,6 @@
 ﻿@using Microsoft.AspNetCore.Identity
 
 @using Utal.Icc.Sgm.Models
-@using static Utal.Icc.Sgm.Models.ApplicationUser
 @using Utal.Icc.Sgm.Controllers
 @using Utal.Icc.Sgm.Areas.Account.Controllers
 
@@ -29,9 +28,9 @@
 			<a href="#" data-bs-toggle="dropdown" data-bs-display="static" class="menu-link">
 				@if (this._signInManager.IsSignedIn(this.User)) {
 					<div class="menu-img">
-						@if (this.User.IsInRole(nameof(Roles.Teacher))) {
+						@if (this.User.IsInRole(nameof(Role.Teacher))) {
 							<i class="fa-solid fa-user-tie"></i>
-						} else if (this.User.IsInRole(nameof(Roles.Student))) {
+						} else if (this.User.IsInRole(nameof(Role.Student))) {
 							<i class="fa-solid fa fa-user-graduate"></i>
 						}
 					</div>
@@ -46,10 +45,10 @@
 			<div class="dropdown-menu dropdown-menu-end me-lg-3">
 				@if (this._signInManager.IsSignedIn(this.User)) {
 					<a class="dropdown-item d-flex align-items-center" href="@this.Url.Action(nameof(ProfileController.Index), nameof(ProfileController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.Account) })">Mi información <i class="fa fa-user-circle fa-fw ms-auto text-gray-400 f-s-16"></i></a>
-					@if (this.User.IsInRole(nameof(Roles.Teacher))) {
+					@if (this.User.IsInRole(nameof(Role.Teacher))) {
 						<a class="dropdown-item d-flex align-items-center" href="@this.Url.Action(nameof(ProfileController.Teacher), nameof(ProfileController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.Account) })">Mi perfil<i class="fa fa-user-tie fa-fw ms-auto text-gray-400 f-s-16"></i></a>
 					}
-					@if (this.User.IsInRole(nameof(Roles.Student))) {
+					@if (this.User.IsInRole(nameof(Role.Student))) {
 						<a class="dropdown-item d-flex align-items-center" href="@this.Url.Action(nameof(ProfileController.Student), nameof(ProfileController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.Account) })">Mi perfil <i class="fa fa-user-graduate fa-fw ms-auto text-gray-400 f-s-16"></i></a>
 					}
 					<a class="dropdown-item d-flex align-items-center" href="@this.Url.Action(nameof(ProfileController.ChangePassword), nameof(ProfileController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.Account) })">Contraseña <i class="fa fa-key fa-fw ms-auto text-gray-400 f-s-16"></i></a>

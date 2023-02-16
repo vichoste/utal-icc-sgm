@@ -45,19 +45,19 @@ _ = app.MapAreaControllerRoute(
 	pattern: $"{nameof(Utal.Icc.Sgm.Areas.Account)}/{{controller={nameof(Utal.Icc.Sgm.Areas.Account.Controllers.SignInController).Replace("Controller", string.Empty)}}}/{{action={nameof(Utal.Icc.Sgm.Areas.Account.Controllers.SignInController.Index)}}}/{{id?}}"
 );
 _ = app.MapAreaControllerRoute(
-	name: nameof(Roles.DirectorTeacher),
-	areaName: nameof(Roles.DirectorTeacher),
-	pattern: $"{nameof(Roles.DirectorTeacher)}/{{controller={nameof(Utal.Icc.Sgm.Areas.DirectorTeacher.Controllers.StudentController).Replace("Controller", string.Empty)}}}/{{action={nameof(Utal.Icc.Sgm.Areas.DirectorTeacher.Controllers.StudentController.Index)}}}/{{id?}}"
+	name: nameof(Role.DirectorTeacher),
+	areaName: nameof(Role.DirectorTeacher),
+	pattern: $"{nameof(Role.DirectorTeacher)}/{{controller={nameof(Utal.Icc.Sgm.Areas.DirectorTeacher.Controllers.StudentController).Replace("Controller", string.Empty)}}}/{{action={nameof(Utal.Icc.Sgm.Areas.DirectorTeacher.Controllers.StudentController.Index)}}}/{{id?}}"
 );
 _ = app.MapAreaControllerRoute(
-	name: nameof(Roles.GuideTeacher),
-	areaName: nameof(Roles.GuideTeacher),
-	pattern: $"{nameof(Roles.GuideTeacher)}/{{controller={nameof(Utal.Icc.Sgm.Areas.GuideTeacher.Controllers.GuideTeacherProposalController).Replace("Controller", string.Empty)}}}/{{action={nameof(Utal.Icc.Sgm.Areas.GuideTeacher.Controllers.StudentProposalController.Index)}}}/{{id?}}"
+	name: nameof(Role.GuideTeacher),
+	areaName: nameof(Role.GuideTeacher),
+	pattern: $"{nameof(Role.GuideTeacher)}/{{controller={nameof(Utal.Icc.Sgm.Areas.GuideTeacher.Controllers.GuideTeacherProposalController).Replace("Controller", string.Empty)}}}/{{action={nameof(Utal.Icc.Sgm.Areas.GuideTeacher.Controllers.StudentProposalController.Index)}}}/{{id?}}"
 );
 _ = app.MapAreaControllerRoute(
-	name: nameof(Roles.Student),
-	areaName: nameof(Roles.Student),
-	pattern: $"{nameof(Roles.Student)}/{{controller={nameof(Utal.Icc.Sgm.Areas.Student.Controllers.StudentProposalController).Replace("Controller", string.Empty)}}}/{{action={nameof(Utal.Icc.Sgm.Areas.Student.Controllers.StudentProposalController.Index)}}}/{{id?}}"
+	name: nameof(Role.Student),
+	areaName: nameof(Role.Student),
+	pattern: $"{nameof(Role.Student)}/{{controller={nameof(Utal.Icc.Sgm.Areas.Student.Controllers.StudentProposalController).Replace("Controller", string.Empty)}}}/{{action={nameof(Utal.Icc.Sgm.Areas.Student.Controllers.StudentProposalController.Index)}}}/{{id?}}"
 );
 _ = app.MapControllerRoute(
 	name: "default",
