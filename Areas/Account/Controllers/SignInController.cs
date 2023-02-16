@@ -9,8 +9,10 @@ using Utal.Icc.Sgm.Models;
 namespace Utal.Icc.Sgm.Areas.Account.Controllers;
 
 [Area(nameof(Account))]
-public class SignInController : ApplicationController {
-	public SignInController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, SignInManager<ApplicationUser> signInManager) : base(dbContext, userManager, userStore, signInManager) { }
+public class SignInController : Controller {
+	protected readonly SignInManager<ApplicationUser> _signInManager;
+
+	public SignInController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, SignInManager<ApplicationUser> signInManager) => this._signInManager = signInManager;
 
 	public IActionResult Index() => this.User.Identity!.IsAuthenticated ? this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty }) : this.View();
 

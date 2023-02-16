@@ -8,8 +8,10 @@ using Utal.Icc.Sgm.Models;
 namespace Utal.Icc.Sgm.Areas.Account.Controllers;
 
 [Area(nameof(Account))]
-public class SignOutController : ApplicationController {
-	public SignOutController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, SignInManager<ApplicationUser> signInManager) : base(dbContext, userManager, userStore, signInManager) { }
+public class SignOutController : Controller {
+	protected readonly SignInManager<ApplicationUser> _signInManager;
+
+	public SignOutController(SignInManager<ApplicationUser> signInManager) => this._signInManager = signInManager;
 
 	public async Task<IActionResult> Index() {
 		if (this.User.Identity!.IsAuthenticated) {

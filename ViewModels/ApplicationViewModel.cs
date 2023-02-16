@@ -9,6 +9,4 @@ public abstract class ApplicationViewModel {
 	public DateTimeOffset? CreatedAt { get; set; }
 	[Display(Name = "Fecha de actualización")]
 	public DateTimeOffset? UpdatedAt { get; set; }
-	[Display(Name = "¿Quién rechazó la propuesta?")]
-	public string? IRejectedTheseStudentProposals { get; set; }
 }
