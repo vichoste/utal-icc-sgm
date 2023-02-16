@@ -44,5 +44,7 @@ public class ApplicationUserViewModel : ApplicationViewModel {
 	public bool IsCourseTeacher { get; set; }
 	[Display(Name = "Profesor de comité")]
 	public bool IsCommitteeTeacher { get; set; }
+	[Display(Name = "Director de carrera")]
+	public bool IsDirectorTeacher { get; set; }
 	#endregion
 }

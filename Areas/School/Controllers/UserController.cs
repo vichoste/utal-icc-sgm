@@ -51,15 +51,16 @@ public class UserController : Controller, ISortable {
 		}
 		this.ViewData["CurrentFilter"] = searchString;
 		var users = await this._userManager.Users.ToListAsync();
-		var paginator = Paginator<ApplicationViewModel>.Create(users.Select(u => new ApplicationUserViewModel {
+		var paginator = Paginator<ApplicationViewModel>.Create(users.Select(async u => new ApplicationUserViewModel {
 			Id = u.Id,
 			FirstName = u.FirstName,
 			LastName = u.LastName,
 			StudentUniversityId = u.StudentUniversityId,
 			Rut = u.Rut,
 			Email = u.Email,
-			IsDeactivated = u.IsDeactivated
-		}).AsQueryable(), pageNumber ?? 1, 10);
+			IsDeactivated = u.IsDeactivated,
+			IsDirectorTeacher = await this._userManager.IsInRoleAsync(u, nameof(Role.DirectorTeacher)),
+		}).Select(u => u.Result).AsQueryable(), pageNumber ?? 1, 10);
 		if (!string.IsNullOrEmpty(sortOrder)) {
 			paginator.Sort(sortOrder);
 		}
@@ -109,6 +110,39 @@ public class UserController : Controller, ISortable {
 			this.TempData["ErrorMessage"] = "Error al importar el archivo CSV.";
 			return this.RedirectToAction(nameof(UserController.Index), nameof(UserController).Replace("Controller", string.Empty), new { area = nameof(School) });
 		}
+	}
+
+	public IActionResult CreateTeacher() => this.View(new ApplicationUserViewModel());
+
+	[HttpPost, ValidateAntiForgeryToken]
+	public async Task<IActionResult> CreateTeacher([FromForm] ApplicationUserViewModel input) {
+		var roles = new List<string>();
+		if (input.IsGuideTeacher) {
+			roles.Add(nameof(Role.GuideTeacher));
+		}
+		if (input.IsAssistantTeacher) {
+			roles.Add(nameof(Role.AssistantTeacher));
+		}
+		if (input.IsCourseTeacher) {
+			roles.Add(nameof(Role.CourseTeacher));
+		}
+		if (input.IsCommitteeTeacher) {
+			roles.Add(nameof(Role.CommitteeTeacher));
+		}
+		var user = new ApplicationUser {
+			FirstName = input.FirstName,
+			LastName = input.LastName,
+			Rut = input.Rut,
+			CreatedAt = DateTimeOffset.Now,
+			UpdatedAt = DateTimeOffset.Now
+		};
+		await this._userStore.SetUserNameAsync(user, input.Email, CancellationToken.None);
+		await this._emailStore.SetEmailAsync(user, input.Email, CancellationToken.None);
+		_ = await this._userManager.CreateAsync(user, input.Password!);
+		_ = await this._userManager.AddToRoleAsync(user, nameof(Role.Teacher));
+		_ = await this._userManager.AddToRolesAsync(user, roles);
+		this.TempData["SuccessMessage"] = "Profesor creado exitosamente.";
+		return this.RedirectToAction(nameof(UserController.Index), nameof(UserController).Replace("Controller", string.Empty), new { area = nameof(School) });
 	}
 
 	public async Task<IActionResult> Edit(string id) {
@@ -254,6 +288,52 @@ public class UserController : Controller, ISortable {
 		user.UpdatedAt = DateTimeOffset.Now;
 		_ = await this._userManager.UpdateAsync(user);
 		this.TempData["SuccessMessage"] = user.IsDeactivated ? "Usuario desactivado correctamente." : "Usuario activado correctamente.";
+		return this.RedirectToAction(nameof(UserController.Index), nameof(UserController).Replace("Controller", string.Empty), new { area = nameof(School) });
+	}
+
+	public async Task<IActionResult> Transfer(string currentId, string @newId) {
+		var current = await this._userManager.FindByIdAsync(currentId);
+		var @new = await this._userManager.FindByIdAsync(@newId);
+		var check = (current, @new) switch {
+			(ApplicationUser, ApplicationUser) => true,
+			(ApplicationUser teacher, _) when teacher.IsDeactivated || (await this._userManager.IsInRoleAsync(teacher, nameof(Role.Teacher)) && await this._userManager.IsInRoleAsync(teacher, nameof(Role.DirectorTeacher))) => false,
+			(_, ApplicationUser teacher) when teacher.IsDeactivated || await this._userManager.IsInRoleAsync(teacher, nameof(Role.Teacher)) => false,
+			_ => false
+		};
+		check = check && (current!.Id != @new!.Id);
+		if (!check) {
+			this.TempData["ErrorMessage"] = "Revisa los profesores fuente y objetivo antes de hacer la transferencia.";
+			return this.RedirectToAction(nameof(UserController.Index), nameof(UserController).Replace("Controller", string.Empty), new { area = nameof(School) });
+		}
+		var transferViewModel = new TransferViewModel {
+			CurrentDirectorTeacherId = current!.Id,
+			NewDirectorTeacherId = @new!.Id,
+			NewDirectorTeacherName = $"{@new.FirstName} {@new.LastName}"
+		};
+		return this.View(transferViewModel);
+	}
+
+	[HttpPost, ValidateAntiForgeryToken]
+	public async Task<IActionResult> Transfer([FromForm] TransferViewModel model) {
+		var current = await this._userManager.FindByIdAsync(model.CurrentDirectorTeacherId!);
+		var @new = await this._userManager.FindByIdAsync(model.NewDirectorTeacherId!);
+		var check = (current, @new) switch {
+			(ApplicationUser, ApplicationUser) => true,
+			(ApplicationUser teacher, _) when teacher.IsDeactivated || (await this._userManager.IsInRoleAsync(teacher, nameof(Role.Teacher)) && await this._userManager.IsInRoleAsync(teacher, nameof(Role.DirectorTeacher))) => false,
+			(_, ApplicationUser teacher) when teacher.IsDeactivated || await this._userManager.IsInRoleAsync(teacher, nameof(Role.Teacher)) => false,
+			_ => false
+		};
+		check = check && (current!.Id != @new!.Id);
+		if (!check) {
+			this.TempData["ErrorMessage"] = "Revisa los profesores fuente y objetivo antes de hacer la transferencia.";
+			return this.RedirectToAction(nameof(UserController.Index), nameof(UserController).Replace("Controller", string.Empty), new { area = nameof(School) });
+		}
+		_ = await this._userManager.RemoveFromRoleAsync(current!, nameof(Role.DirectorTeacher));
+		_ = await this._userManager.AddToRoleAsync(@new!, nameof(Role.DirectorTeacher));
+		current!.UpdatedAt = DateTimeOffset.Now;
+		@new!.UpdatedAt = DateTimeOffset.Now;
+		_ = await this._userManager.UpdateAsync(current);
+		this.TempData["SuccessMessage"] = "Director de carrera transferido correctamente.";
 		return this.RedirectToAction(nameof(UserController.Index), nameof(UserController).Replace("Controller", string.Empty), new { area = nameof(School) });
 	}
 }

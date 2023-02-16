@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 
 using Utal.Icc.Sgm.Areas.Account.ViewModels.Profile;
 using Utal.Icc.Sgm.Controllers;
-using Utal.Icc.Sgm.Data;
 using Utal.Icc.Sgm.Models;
 using Utal.Icc.Sgm.ViewModels;
 

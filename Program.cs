@@ -42,6 +42,11 @@ _ = app.MapAreaControllerRoute(
 	areaName: nameof(Utal.Icc.Sgm.Areas.Account),
 	pattern: $"{nameof(Utal.Icc.Sgm.Areas.Account)}/{{controller={nameof(Utal.Icc.Sgm.Areas.Account.Controllers.SignInController).Replace("Controller", string.Empty)}}}/{{action={nameof(Utal.Icc.Sgm.Areas.Account.Controllers.SignInController.Index)}}}/{{id?}}"
 );
+_ = app.MapAreaControllerRoute(
+	name: nameof(Utal.Icc.Sgm.Areas.School),
+	areaName: nameof(Utal.Icc.Sgm.Areas.School),
+	pattern: $"{nameof(Utal.Icc.Sgm.Areas.School)}/{{controller={nameof(Utal.Icc.Sgm.Areas.School.Controllers.UserController).Replace("Controller", string.Empty)}}}/{{action={nameof(Utal.Icc.Sgm.Areas.School.Controllers.UserController.Index)}}}/{{id?}}"
+);
 _ = app.MapControllerRoute(
 	name: "default",
 	pattern: $"{{controller={nameof(Utal.Icc.Sgm.Controllers.HomeController).Replace("Controller", string.Empty)}}}/{{action={nameof(Utal.Icc.Sgm.Controllers.HomeController.Index)}}}/{{id?}}"

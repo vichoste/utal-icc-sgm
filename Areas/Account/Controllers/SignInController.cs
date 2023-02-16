@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 
 using Utal.Icc.Sgm.Areas.Account.ViewModels.SignIn;
 using Utal.Icc.Sgm.Controllers;
-using Utal.Icc.Sgm.Data;
 using Utal.Icc.Sgm.Models;
 
 namespace Utal.Icc.Sgm.Areas.Account.Controllers;
@@ -12,7 +11,7 @@ namespace Utal.Icc.Sgm.Areas.Account.Controllers;
 public class SignInController : Controller {
 	private readonly SignInManager<ApplicationUser> _signInManager;
 
-	public SignInController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, SignInManager<ApplicationUser> signInManager) => this._signInManager = signInManager;
+	public SignInController(SignInManager<ApplicationUser> signInManager) => this._signInManager = signInManager;
 
 	public IActionResult Index() => this.User.Identity!.IsAuthenticated ? this.RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", string.Empty), new { area = string.Empty }) : this.View();
 
