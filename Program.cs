@@ -43,9 +43,9 @@ _ = app.MapAreaControllerRoute(
 	pattern: "{Account}/{controller=SignIn}/{action=Index}/{id?}"
 );
 _ = app.MapAreaControllerRoute(
-	name: "School",
-	areaName: "School",
-	pattern: "{School}/{controller=Memoir}/{action=Index}/{id?}"
+	name: "University",
+	areaName: "University",
+	pattern: "{University}/{controller=Memoir}/{action=Index}/{id?}"
 );
 _ = app.MapControllerRoute(
 	name: "default",

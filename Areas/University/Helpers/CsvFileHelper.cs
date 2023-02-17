@@ -1,6 +1,6 @@
 using CsvHelper.Configuration.Attributes;
 
-namespace Utal.Icc.Sgm.Areas.School.Helpers;
+namespace Utal.Icc.Sgm.Areas.University.Helpers;
 
 public class CsvFileHelper {
 	[Index(0)]

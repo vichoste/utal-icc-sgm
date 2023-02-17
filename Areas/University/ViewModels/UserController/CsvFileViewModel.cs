@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Utal.Icc.Sgm.Areas.School.ViewModels.UserController;
+namespace Utal.Icc.Sgm.Areas.University.ViewModels.UserController;
 
 public class CsvFileViewModel {
 	[Display(Name = "Archivo CSV")]
