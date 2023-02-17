@@ -54,8 +54,9 @@ public class MemoirController : Controller {
 		return this.View(paginator);
 	}
 
+	#region Student proposal
 	[Authorize(Roles = "Candidate,Guide")]
-	public async Task<IActionResult> CandidateProposal(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
+	public IActionResult StudentProposal(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
 		var parameters = new[] { "Title", "FirstName", "LastName" };
 		foreach (var parameter in parameters) {
 			this.ViewData[$"{parameter}SortParam"] = sortOrder == parameter ? $"{parameter}Desc" : parameter;
@@ -67,18 +68,31 @@ public class MemoirController : Controller {
 			searchString = currentFilter;
 		}
 		this.ViewData["CurrentFilter"] = searchString;
-		if (this.User.IsInRole("Memorist"))
-			var memoirs = this._dbContext.Memoirs!.AsNoTracking()
-				.Include(m => m.Owners).AsNoTracking()
-				.Where(m => m.Owners.Any(o => o!.Id == this._userManager.GetUserId(this.User))
-							&& m.Phase == Phase.SentToGuide);
-		var paginator = Paginator<ApplicationViewModel>.Create(memoirs.Select(m => new MemoirViewModel {
-			Id = m.Id,
-			Title = m.Title,
-			FirstName = m.Owners.First()!.FirstName,
-			LastName = m.Owners.First()!.LastName,
-			Phase = m.Phase.ToString(),
-		}).AsQueryable(), pageNumber ?? 1, 10);
+		IQueryable<MemoirViewModel> memoirs = null!;
+		if (this.User.IsInRole("Student")) {
+			memoirs = this._dbContext.Memoirs!
+				.Include(m => m.Memorist)
+				.Where(m => m.Memorist!.Id == this._userManager.GetUserId(this.User))
+				.Include(m => m.Guide).AsNoTracking()
+				.Select(m => new MemoirViewModel {
+					Id = m.Id,
+					Title = m.Title,
+					Phase = m.Phase.ToString(),
+					GuideName = $"{m.Guide!.FirstName} {m.Guide!.LastName}"
+				});
+		} else if (this.User.IsInRole("Guide")) {
+			memoirs = this._dbContext.Memoirs!
+				.Include(m => m.Guide)
+				.Where(m => m.Guide!.Id == this._userManager.GetUserId(this.User))
+				.Include(m => m.Memorist).AsNoTracking()
+				.Select(m => new MemoirViewModel {
+					Id = m.Id,
+					Title = m.Title,
+					Phase = m.Phase.ToString(),
+					MemoristName = $"{m.Memorist!.FirstName} {m.Memorist!.LastName}"
+				});
+		}
+		var paginator = Paginator<MemoirViewModel>.Create(memoirs, pageNumber ?? 1, 6);
 		if (!string.IsNullOrEmpty(sortOrder)) {
 			paginator.Sort(sortOrder);
 		}
@@ -87,4 +101,5 @@ public class MemoirController : Controller {
 		}
 		return this.View(paginator);
 	}
+	#endregion
 }
