@@ -28,7 +28,7 @@ public class UserController : Controller {
 
 	[Authorize(Roles = "Director")]
 	public async Task<IActionResult> List(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
-		var parameters = new[] { "FirstName", "LastName", "StudentUniversityId", "Rut", "Email" };
+		var parameters = new[] { "FirstName", "LastName", "UniversityId", "Rut", "Email" };
 		foreach (var parameter in parameters) {
 			this.ViewData[$"{parameter}SortParam"] = sortOrder == parameter ? $"{parameter}Desc" : parameter;
 		}

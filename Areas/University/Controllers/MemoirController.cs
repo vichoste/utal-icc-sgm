@@ -25,7 +25,7 @@ public class MemoirController : Controller {
 
 	[Authorize(Roles = "Memorist")]
 	public async Task<IActionResult> Guide(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
-		var parameters = new[] { "FirstName", "LastName", "Email", "TeacherSpecialization" };
+		var parameters = new[] { "FirstName", "LastName", "Email", "Specialization" };
 		foreach (var parameter in parameters) {
 			this.ViewData[$"{parameter}SortParam"] = sortOrder == parameter ? $"{parameter}Desc" : parameter;
 		}

@@ -10,18 +10,18 @@ namespace Utal.Icc.Sgm.Areas.Account.Controllers;
 
 [Area("Account")]
 public class ProfileController : Controller {
-	private readonly UserManager<ApplicationUser> userManager;
+	private readonly UserManager<ApplicationUser> _userManager;
 	private readonly IUserStore<ApplicationUser> _userStore;
 	private readonly IUserEmailStore<ApplicationUser> _emailStore;
 
 	public ProfileController(UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore) {
-		this.userManager = userManager;
+		this._userManager = userManager;
 		this._userStore = userStore;
 		this._emailStore = (IUserEmailStore<ApplicationUser>)this._userStore;
 	}
 
 	public async Task<IActionResult> Index() {
-		if (await this.userManager.GetUserAsync(this.User) is not ApplicationUser user) {
+		if (await this._userManager.GetUserAsync(this.User) is not ApplicationUser user) {
 			return this.RedirectToAction("Index", "Home", new { area = string.Empty });
 		}
 		var output = new ApplicationUserViewModel {
@@ -40,53 +40,53 @@ public class ProfileController : Controller {
 
 	[Authorize, HttpPost, ValidateAntiForgeryToken]
 	public async Task<IActionResult> ChangePassword([FromForm] ChangePasswordViewModel input) {
-		var user = await this.userManager.GetUserAsync(this.User);
+		var user = await this._userManager.GetUserAsync(this.User);
 		if (user!.IsDeactivated) {
 			return this.RedirectToAction("Index", "Home", new { area = string.Empty });
 		}
-		var result = await this.userManager.ChangePasswordAsync(user!, input.CurrentPassword!, input.NewPassword!);
+		var result = await this._userManager.ChangePasswordAsync(user!, input.CurrentPassword!, input.NewPassword!);
 		if (!result.Succeeded) {
 			this.ViewBag.ErrorMessage = "Contraseña incorrecta.";
 			this.ViewBag.ErrorMessages = result.Errors.Select(e => e.Description).ToList();
 			return this.View(input);
 		}
 		user.UpdatedAt = DateTimeOffset.Now;
-		_ = await this.userManager.UpdateAsync(user);
+		_ = await this._userManager.UpdateAsync(user);
 		this.TempData["SuccessMessage"] = "Has cambiado tu contraseña correctamente.";
 		return this.RedirectToAction("Index", "Profile", new { area = "Account" });
 	}
 
 	[Authorize(Roles = "Student")]
 	public async Task<IActionResult> Student() {
-		var user = await this.userManager.GetUserAsync(this.User);
+		var user = await this._userManager.GetUserAsync(this.User);
 		if (user!.IsDeactivated) {
 			return this.RedirectToAction("Index", "Home", new { area = string.Empty });
 		}
 		var output = new ApplicationUserViewModel {
-			StudentUniversityId = user.StudentUniversityId,
-			StudentRemainingCourses = user.StudentRemainingCourses,
-			StudentIsDoingThePractice = user.StudentIsDoingThePractice,
-			StudentIsWorking = user.StudentIsWorking
+			UniversityId = user.UniversityId,
+			RemainingCourses = user.RemainingCourses,
+			IsDoingThePractice = user.IsDoingThePractice,
+			IsWorking = user.IsWorking
 		};
 		return this.View(output);
 	}
 
 	[Authorize(Roles = "Student"), HttpPost, ValidateAntiForgeryToken]
 	public async Task<IActionResult> Student([FromForm] ApplicationUserViewModel input) {
-		var user = await this.userManager.GetUserAsync(this.User);
+		var user = await this._userManager.GetUserAsync(this.User);
 		if (user!.IsDeactivated) {
 			return this.RedirectToAction("Index", "Home", new { area = string.Empty });
 		}
-		user.StudentRemainingCourses = input.StudentRemainingCourses;
-		user.StudentIsDoingThePractice = input.StudentIsDoingThePractice;
-		user.StudentIsWorking = input.StudentIsWorking;
+		user.RemainingCourses = input.RemainingCourses;
+		user.IsDoingThePractice = input.IsDoingThePractice;
+		user.IsWorking = input.IsWorking;
 		user.UpdatedAt = DateTimeOffset.Now;
-		_ = await this.userManager.UpdateAsync(user);
+		_ = await this._userManager.UpdateAsync(user);
 		var output = new ApplicationUserViewModel {
-			StudentUniversityId = user.StudentUniversityId,
-			StudentRemainingCourses = user.StudentRemainingCourses,
-			StudentIsDoingThePractice = user.StudentIsDoingThePractice,
-			StudentIsWorking = user.StudentIsWorking
+			UniversityId = user.UniversityId,
+			RemainingCourses = user.RemainingCourses,
+			IsDoingThePractice = user.IsDoingThePractice,
+			IsWorking = user.IsWorking
 		};
 		this.ViewBag.SuccessMessage = "Has actualizado tu perfil correctamente.";
 		return this.View(output);
@@ -94,33 +94,33 @@ public class ProfileController : Controller {
 
 	[Authorize(Roles = "Teacher")]
 	public async Task<IActionResult> Teacher() {
-		var user = await this.userManager.GetUserAsync(this.User);
+		var user = await this._userManager.GetUserAsync(this.User);
 		if (user!.IsDeactivated) {
 			return this.RedirectToAction("Index", "Home", new { area = string.Empty });
 		}
 		var output = new ApplicationUserViewModel {
-			TeacherOffice = user.TeacherOffice,
-			TeacherSchedule = user.TeacherSchedule,
-			TeacherSpecialization = user.TeacherSpecialization
+			Office = user.Office,
+			Schedule = user.Schedule,
+			Specialization = user.Specialization
 		};
 		return this.View(output);
 	}
 
 	[Authorize(Roles = "Teacher"), HttpPost, ValidateAntiForgeryToken]
 	public async Task<IActionResult> Teacher([FromForm] ApplicationUserViewModel input) {
-		var user = await this.userManager.GetUserAsync(this.User);
+		var user = await this._userManager.GetUserAsync(this.User);
 		if (user!.IsDeactivated) {
 			return this.RedirectToAction("Index", "Home", new { area = string.Empty });
 		}
-		user.TeacherOffice = input.TeacherOffice;
-		user.TeacherSchedule = input.TeacherSchedule;
-		user.TeacherSpecialization = input.TeacherSpecialization;
+		user.Office = input.Office;
+		user.Schedule = input.Schedule;
+		user.Specialization = input.Specialization;
 		user.UpdatedAt = DateTimeOffset.Now;
-		_ = await this.userManager.UpdateAsync(user);
+		_ = await this._userManager.UpdateAsync(user);
 		var output = new ApplicationUserViewModel {
-			TeacherOffice = input.TeacherOffice,
-			TeacherSchedule = input.TeacherSchedule,
-			TeacherSpecialization = input.TeacherSpecialization
+			Office = input.Office,
+			Schedule = input.Schedule,
+			Specialization = input.Specialization
 		};
 		this.ViewBag.SuccessMessage = "Has actualizado tu perfil correctamente.";
 		return this.View(output);

@@ -51,8 +51,7 @@
 								</a>
 							</th>
 							<th>
-								<a asp-action="List"
-									asp-route-sortOrder="@this.ViewData["StudentUniversityIdSortParam"]"
+								<a asp-action="List" asp-route-sortOrder="@this.ViewData["UniversityIdSortParam"]"
 									asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
 									Número de matrícula
 								</a>
@@ -80,7 +79,7 @@
 								{
 									<td class="text-muted">@item.FirstName</td>
 									<td class="text-muted">@item.LastName</td>
-									<td class="text-muted">@item.StudentUniversityId</td>
+									<td class="text-muted">@item.UniversityId</td>
 									<td class="text-muted">@item.Rut</td>
 									<td class="text-muted">@item.Email</td>
 									<td>
@@ -93,7 +92,7 @@
 								{
 									<td>@item.FirstName</td>
 									<td>@item.LastName</td>
-									<td>@item.StudentUniversityId</td>
+									<td>@item.UniversityId</td>
 									<td>@item.Rut</td>
 									<td>@item.Email</td>
 									<td>
@@ -102,18 +101,14 @@
 								new { @class = "btn btn-yellow mb-3" })
 										@this.Html.ActionLink("Desactivar", "Toggle", "User", new { area = "University", id =
 								item.Id }, new { @class = "btn btn-danger mb-3" })
-										@if (await this.userManager.IsInRoleAsync((await
-												this.userManager.FindByIdAsync(item.Id!))!, "Teacher")
-												&& await this.userManager.IsInRoleAsync((await
-												this.userManager.FindByIdAsync(item.Id!))!, "Director"))
+										@if (this.User.IsInRole("Teacher") && this.User.IsInRole("Director"))
 										{
 											<a asp-action="List" asp-route-sortOrder="@this.ViewData["CurrentSort"]"
-												asp-route-pageNumber="@(this.Model.PageIndex)"
-												asp-route-currentFilter="@this.ViewData["CurrentFilter"]"
-												class="btn btn-info mb-3">Es director de carrera</a>
+									asp-route-pageNumber="@(this.Model.PageIndex)"
+									asp-route-currentFilter="@this.ViewData["CurrentFilter"]"
+					 class="btn btn-info mb-3">Es director de carrera</a>
 										}
-										else if (await this.userManager.IsInRoleAsync((await
-										this.userManager.FindByIdAsync(item.Id!))!, "Teacher"))
+										else if (this.User.IsInRole("Teacher"))
 										{
 											@this.Html.ActionLink("No es director de carrera", "Transfer", "User", new { area =
 								"University", currentDirectorTeacherId = this.userManager.GetUserId(this.User),
@@ -141,8 +136,8 @@
 					{
 						<li class="page-item @(i + 1 == this.Model.PageIndex ? " active" : "")">
 							<a asp-action="List" asp-route-sortOrder="@this.ViewData["CurrentSort"]"
-								asp-route-pageNumber="@(i + 1)" asp-route-currentFilter="@this.ViewData["CurrentFilter"]"
-								class="page-link">
+							asp-route-pageNumber="@(i + 1)" asp-route-currentFilter="@this.ViewData["CurrentFilter"]"
+		   class="page-link">
 								@(i + 1)
 							</a>
 						</li>

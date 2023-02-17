@@ -15,10 +15,10 @@ public static class TestApplicationUserSeeder {
 				Rut = $"Rut {i}",
 				CreatedAt = DateTimeOffset.Now,
 				UpdatedAt = DateTimeOffset.Now,
-				StudentUniversityId = $"N° de Matrícula {i}",
-				StudentRemainingCourses = $"Cursos restantes {i}",
-				StudentIsDoingThePractice = random.Next(2) == 1,
-				StudentIsWorking = random.Next(2) == 1,
+				UniversityId = $"N° de Matrícula {i}",
+				RemainingCourses = $"Cursos restantes {i}",
+				IsDoingThePractice = random.Next(2) == 1,
+				IsWorking = random.Next(2) == 1,
 			};
 			var email = $"estudiante{i}@sgm.utalca.cl";
 			var check = await userManager.FindByIdAsync(email);
@@ -41,9 +41,9 @@ public static class TestApplicationUserSeeder {
 				Rut = $"Rut {i}",
 				CreatedAt = DateTimeOffset.Now,
 				UpdatedAt = DateTimeOffset.Now,
-				TeacherOffice = $"Oficina {i}",
-				TeacherSchedule = $"Horario {i}",
-				TeacherSpecialization = $"Especialización {i}",
+				Office = $"Oficina {i}",
+				Schedule = $"Horario {i}",
+				Specialization = $"Especialización {i}",
 			};
 			var email = $"profesor{i}@sgm.utalca.cl";
 			var check = await userManager.FindByIdAsync(email);
