@@ -9,7 +9,7 @@ public class MemoirViewModel : ApplicationUserViewModel {
 	[Display(Name = "Descripción")]
 	public string? Description { get; set; }
 	[Display(Name = "Estado")]
-	public string? ProposalStatus { get; set; }
+	public string? Phase { get; set; }
 	#endregion
 	#region ApplicationUsers
 	[Display(Name = "Candidatos")]
