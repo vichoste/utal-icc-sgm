@@ -6,8 +6,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
-using Utal.Icc.Sgm.Controllers;
-using Utal.Icc.Sgm.Data;
 using Utal.Icc.Sgm.Models;
 using Utal.Icc.Sgm.ViewModels;
 using Utal.Icc.Sgm.Areas.School.Helpers;
@@ -18,18 +16,14 @@ namespace Utal.Icc.Sgm.Areas.School.Controllers;
 
 [Area("School"), Authorize]
 public class UserController : Controller {
-	private readonly ApplicationDbContext _dbContext;
 	private readonly UserManager<ApplicationUser> _userManager;
 	private readonly IUserStore<ApplicationUser> _userStore;
 	private readonly IUserEmailStore<ApplicationUser> _emailStore;
-	private readonly SignInManager<ApplicationUser> _signInManager;
 
-	public UserController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, SignInManager<ApplicationUser> signInManager) {
-		this._dbContext = dbContext;
+	public UserController(UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore) {
 		this._userManager = userManager;
 		this._userStore = userStore;
 		this._emailStore = (IUserEmailStore<ApplicationUser>)this._userStore;
-		this._signInManager = signInManager;
 	}
 
 	[Authorize(Roles = "Director")]
@@ -208,7 +202,6 @@ public class UserController : Controller {
 			if (roles.Contains("Director")) {
 				_ = roles.Remove("Director");
 			}
-			var removeRankRolesResult = await this._userManager.RemoveFromRolesAsync(user, roles);
 			var rankRoles = new List<string>();
 			if (input.IsGuide) {
 				rankRoles.Add("Guide");

@@ -1,4 +1,4 @@
-namespace Utal.Icc.Sgm.Views.Shared;
+namespace Utal.Icc.Sgm.ViewModels.Shared;
 
 public class ErrorViewModel {
 	public string? RequestId { get; set; }

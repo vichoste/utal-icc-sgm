@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 using Utal.Icc.Sgm.Areas.Account.ViewModels.Profile;
-using Utal.Icc.Sgm.Controllers;
 using Utal.Icc.Sgm.Models;
 using Utal.Icc.Sgm.ViewModels;
 
@@ -35,7 +34,7 @@ public class ProfileController : Controller {
 		};
 		return this.View(output);
 	}
-	
+
 	[Authorize]
 	public IActionResult ChangePassword() => this.View();
 

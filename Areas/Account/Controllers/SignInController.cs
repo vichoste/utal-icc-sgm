@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 
 using Utal.Icc.Sgm.Areas.Account.ViewModels.SignIn;
-using Utal.Icc.Sgm.Controllers;
 using Utal.Icc.Sgm.Models;
 
 namespace Utal.Icc.Sgm.Areas.Account.Controllers;

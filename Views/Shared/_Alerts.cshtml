@@ -1,12 +1,15 @@
-﻿@if (this.TempData["SuccessMessage"] is not null) {
+﻿@if (this.TempData["SuccessMessage"] is not null)
+{
 	<div class="row justify-content-center">
 		<div class="alert alert-success" role="alert">
 			@this.TempData["SuccessMessage"]
 		</div>
 	</div>
 }
-@if (this.TempData["SuccessMessages"] is not null) {
-	@foreach (var success in (IEnumerable<string>)this.TempData["SuccessMessages"]!) {
+@if (this.TempData["SuccessMessages"] is not null)
+{
+	@foreach (var success in (IEnumerable<string>)this.TempData["SuccessMessages"]!)
+	{
 		<div class="row justify-content-center">
 			<div class="alert alert-success" role="alert">
 				@success
@@ -14,15 +17,18 @@
 		</div>
 	}
 }
-@if (this.TempData["WarningMessage"] is not null) {
+@if (this.TempData["WarningMessage"] is not null)
+{
 	<div class="row justify-content-center">
 		<div class="alert alert-warning" role="alert">
 			@this.TempData["WarningMessage"]
 		</div>
 	</div>
 }
-@if (this.TempData["WarningMessages"] is not null) {
-	@foreach (var warning in (IEnumerable<string>)this.TempData["WarningMessages"]!) {
+@if (this.TempData["WarningMessages"] is not null)
+{
+	@foreach (var warning in (IEnumerable<string>)this.TempData["WarningMessages"]!)
+	{
 		<div class="row justify-content-center">
 			<div class="alert alert-warning" role="alert">
 				@warning
@@ -30,15 +36,18 @@
 		</div>
 	}
 }
-@if (this.TempData["ErrorMessage"] is not null) {
+@if (this.TempData["ErrorMessage"] is not null)
+{
 	<div class="row justify-content-center">
 		<div class="alert alert-danger" role="alert">
 			@this.TempData["ErrorMessage"]
 		</div>
 	</div>
 }
-@if (this.TempData["ErrorMessages"] is not null) {
-	@foreach (var error in (IEnumerable<string>)this.TempData["ErrorMessages"]!) {
+@if (this.TempData["ErrorMessages"] is not null)
+{
+	@foreach (var error in (IEnumerable<string>)this.TempData["ErrorMessages"]!)
+	{
 		<div class="row justify-content-center">
 			<div class="alert alert-danger" role="alert">
 				@error
@@ -46,21 +55,24 @@
 		</div>
 	}
 }
-@if (this.ViewBag.SuccessMessage is not null) {
+@if (this.ViewBag.SuccessMessage is not null)
+{
 	<div class="row justify-content-center">
 		<div class="alert alert-success" role="alert">
 			@this.ViewBag.SuccessMessage
 		</div>
 	</div>
 }
-@if (this.ViewBag.WarningMessage is not null) {
+@if (this.ViewBag.WarningMessage is not null)
+{
 	<div class="row justify-content-center">
 		<div class="alert alert-warning" role="alert">
 			@this.ViewBag.WarningMessage
 		</div>
 	</div>
 }
-@if (this.ViewBag.ErrorMessage is not null) {
+@if (this.ViewBag.ErrorMessage is not null)
+{
 	<div class="row justify-content-center">
 		<div class="alert alert-danger" role="alert">
 			@this.ViewBag.ErrorMessage

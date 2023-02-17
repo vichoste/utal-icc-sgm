@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Utal.Icc.Sgm.Views.Shared;
+namespace Utal.Icc.Sgm.ViewModels.Shared;
 
 public class FilterPartialViewModel {
 	[Display(Name = "Acción")]

@@ -1,9 +1,7 @@
 @using Microsoft.AspNetCore.Identity
 
-@using Utal.Icc.Sgm
 @using Utal.Icc.Sgm.Models
 @using Utal.Icc.Sgm.ViewModels
-@using Utal.Icc.Sgm.Areas.School.Controllers
 
 @model ApplicationUserViewModel
 
@@ -20,7 +18,8 @@
 			<div class="card">
 				<div class="card-header text-center">@this.ViewData["Title"]</div>
 				<div class="card-body">
-					@using (this.Html.BeginForm("Edit", "User", new { area = "School" })) {
+					@using (this.Html.BeginForm("Edit", "User", new { area = "School" }))
+					{
 						@this.Html.AntiForgeryToken()
 						@this.Html.HiddenFor(m => m.Id)
 						<div class="row">
@@ -33,7 +32,9 @@
 									@this.Html.LabelFor(m => m.LastName, new { @class = "form-label" })
 									@this.Html.TextBoxFor(m => m.LastName, new { @class = "form-control" })
 								</div>
-								@if (await this._userManager.IsInRoleAsync((await this._userManager.FindByIdAsync(this.Model.Id!))!, "Student")) {
+								@if (await this._userManager.IsInRoleAsync((await
+										this._userManager.FindByIdAsync(this.Model.Id!))!, "Student"))
+								{
 									<div class="form-group mb-3">
 										@this.Html.LabelFor(m => m.StudentUniversityId, new { @class = "form-label" })
 										@this.Html.TextBoxFor(m => m.StudentUniversityId, new { @class = "form-control" })
@@ -47,7 +48,9 @@
 									@this.Html.LabelFor(m => m.Email, new { @class = "form-label" })
 									@this.Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
 								</div>
-								@if (await this._userManager.IsInRoleAsync((await this._userManager.FindByIdAsync(this.Model.Id!))!, "Teacher")) {
+								@if (await this._userManager.IsInRoleAsync((await
+										this._userManager.FindByIdAsync(this.Model.Id!))!, "Teacher"))
+								{
 									<p><strong>Roles</strong></p>
 									<div class="form-check mb-3">
 										@this.Html.LabelFor(m => m.IsGuide, new { @class = "form-check-label" })
@@ -82,7 +85,8 @@
 						<div class="row text-center">
 							<div class="col">
 								<div class="btn-group">
-									@this.Html.ActionLink("Cancelar", "List", "User", new { area = "School" }, new { @class = "btn btn-secondary" })
+									@this.Html.ActionLink("Cancelar", "List", "User", new { area = "School" }, new { @class
+								= "btn btn-secondary" })
 									<button type="submit" class="btn btn-yellow">Editar</button>
 								</div>
 							</div>

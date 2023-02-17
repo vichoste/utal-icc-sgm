@@ -1,5 +1,4 @@
 @using Utal.Icc.Sgm.ViewModels
-@using Utal.Icc.Sgm.Areas.School.Controllers
 
 @model ApplicationUserViewModel
 
@@ -14,7 +13,7 @@
 			<div class="card">
 				<div class="card-header text-center">@this.ViewData["Title"]</div>
 				<div class="card-body">
-					@using (this.Html.BeginForm("CreateTeacher", "User", new { area = "School" })) {
+					@using (this.Html.BeginForm("CreateTeacher", "User", new { area = "School" }))  {
 						@this.Html.AntiForgeryToken()
 						<div class="row">
 							<div class="col">

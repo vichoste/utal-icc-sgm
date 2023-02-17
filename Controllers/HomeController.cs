@@ -2,7 +2,7 @@
 
 using Microsoft.AspNetCore.Mvc;
 
-using Utal.Icc.Sgm.Views.Shared;
+using Utal.Icc.Sgm.ViewModels.Shared;
 
 namespace Utal.Icc.Sgm.Controllers;
 
