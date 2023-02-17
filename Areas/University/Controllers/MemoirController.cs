@@ -5,11 +5,11 @@ using CsvHelper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 using Utal.Icc.Sgm.Data;
 using Utal.Icc.Sgm.Models;
 using Utal.Icc.Sgm.ViewModels;
-using Utal.Icc.Sgm.Areas.University.Helpers;
 using Microsoft.EntityFrameworkCore;
 
 namespace Utal.Icc.Sgm.Areas.University.Controllers;
@@ -21,6 +21,18 @@ public class MemoirController : Controller {
 	public MemoirController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager) {
 		this._dbContext = dbContext;
 		this._userManager = userManager;
+	}
+
+	private async Task PopulateAssistantTeachers(ApplicationUser guideTeacher) {
+		var assistantTeachers = (
+			await this._userManager.GetUsersInRoleAsync(nameof(Role.Assistant)))
+				.Where(at => at != guideTeacher && !at.IsDeactivated)
+				.OrderBy(at => at.LastName)
+				.ToList();
+		this.ViewData[$"{nameof(Role.Assistant)}s"] = assistantTeachers.Select(at => new SelectListItem {
+			Text = $"{at.FirstName} {at.LastName}",
+			Value = at.Id
+		});
 	}
 
 	[Authorize(Roles = "Memorist")]
@@ -55,7 +67,7 @@ public class MemoirController : Controller {
 	}
 
 	#region Student proposal
-	[Authorize(Roles = "Candidate,Guide")]
+	[Authorize(Roles = "Memorist,Guide")]
 	public IActionResult StudentProposal(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
 		var parameters = new[] { "Title", "FirstName", "LastName" };
 		foreach (var parameter in parameters) {
