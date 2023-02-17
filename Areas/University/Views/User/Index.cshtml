@@ -7,7 +7,7 @@
 
 @model Paginator<ApplicationUserViewModel>
 
-@inject UserManager<ApplicationUser> _userManager
+@inject UserManager<ApplicationUser> userManager
 
 @{
 	this.ViewData["Title"] = "Usuarios";
@@ -102,21 +102,21 @@
 								new { @class = "btn btn-yellow mb-3" })
 										@this.Html.ActionLink("Desactivar", "Toggle", "User", new { area = "University", id =
 								item.Id }, new { @class = "btn btn-danger mb-3" })
-										@if (await this._userManager.IsInRoleAsync((await
-												this._userManager.FindByIdAsync(item.Id!))!, "Teacher")
-												&& await this._userManager.IsInRoleAsync((await
-												this._userManager.FindByIdAsync(item.Id!))!, "Director"))
+										@if (await this.userManager.IsInRoleAsync((await
+												this.userManager.FindByIdAsync(item.Id!))!, "Teacher")
+												&& await this.userManager.IsInRoleAsync((await
+												this.userManager.FindByIdAsync(item.Id!))!, "Director"))
 										{
 											<a asp-action="List" asp-route-sortOrder="@this.ViewData["CurrentSort"]"
-									asp-route-pageNumber="@(this.Model.PageIndex)"
-									asp-route-currentFilter="@this.ViewData["CurrentFilter"]"
-					 class="btn btn-info mb-3">Es director de carrera</a>
+												asp-route-pageNumber="@(this.Model.PageIndex)"
+												asp-route-currentFilter="@this.ViewData["CurrentFilter"]"
+												class="btn btn-info mb-3">Es director de carrera</a>
 										}
-										else if (await this._userManager.IsInRoleAsync((await
-										this._userManager.FindByIdAsync(item.Id!))!, "Teacher"))
+										else if (await this.userManager.IsInRoleAsync((await
+										this.userManager.FindByIdAsync(item.Id!))!, "Teacher"))
 										{
 											@this.Html.ActionLink("No es director de carrera", "Transfer", "User", new { area =
-								"University", currentDirectorTeacherId = this._userManager.GetUserId(this.User),
+								"University", currentDirectorTeacherId = this.userManager.GetUserId(this.User),
 								newDirectorTeacherId = item.Id }, new { @class = "btn btn-default mb-3" })
 										}
 									</td>
@@ -141,8 +141,8 @@
 					{
 						<li class="page-item @(i + 1 == this.Model.PageIndex ? " active" : "")">
 							<a asp-action="List" asp-route-sortOrder="@this.ViewData["CurrentSort"]"
-							asp-route-pageNumber="@(i + 1)" asp-route-currentFilter="@this.ViewData["CurrentFilter"]"
-		   class="page-link">
+								asp-route-pageNumber="@(i + 1)" asp-route-currentFilter="@this.ViewData["CurrentFilter"]"
+								class="page-link">
 								@(i + 1)
 							</a>
 						</li>

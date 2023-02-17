@@ -9,7 +9,7 @@
 	this.ViewData["Title"] = "Editar profesor";
 }
 
-@inject UserManager<ApplicationUser> _userManager
+@inject UserManager<ApplicationUser> userManager
 
 <div class="container">
 	<partial name="_Alerts" />
@@ -32,8 +32,8 @@
 									@this.Html.LabelFor(m => m.LastName, new { @class = "form-label" })
 									@this.Html.TextBoxFor(m => m.LastName, new { @class = "form-control" })
 								</div>
-								@if (await this._userManager.IsInRoleAsync((await
-										this._userManager.FindByIdAsync(this.Model.Id!))!, "Student"))
+								@if (await this.userManager.IsInRoleAsync((await
+										this.userManager.FindByIdAsync(this.Model.Id!))!, "Student"))
 								{
 									<div class="form-group mb-3">
 										@this.Html.LabelFor(m => m.StudentUniversityId, new { @class = "form-label" })
@@ -48,8 +48,8 @@
 									@this.Html.LabelFor(m => m.Email, new { @class = "form-label" })
 									@this.Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
 								</div>
-								@if (await this._userManager.IsInRoleAsync((await
-										this._userManager.FindByIdAsync(this.Model.Id!))!, "Teacher"))
+								@if (await this.userManager.IsInRoleAsync((await
+										this.userManager.FindByIdAsync(this.Model.Id!))!, "Teacher"))
 								{
 									<p><strong>Roles</strong></p>
 									<div class="form-check mb-3">

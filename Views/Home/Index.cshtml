@@ -2,11 +2,11 @@
 
 @using Utal.Icc.Sgm.Models
 
-@inject UserManager<ApplicationUser> _userManager
+@inject UserManager<ApplicationUser> userManager
 
 @{
 	this.ViewData["Title"] = "Inicio";
-	var userSession = await this._userManager.GetUserAsync(this.User);
+	var userSession = await this.userManager.GetUserAsync(this.User);
 }
 
 <div class="container">

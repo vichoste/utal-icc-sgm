@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Utal.Icc.Sgm.Models;
 using Utal.Icc.Sgm.ViewModels;
 using Utal.Icc.Sgm.Areas.University.Helpers;
-using Utal.Icc.Sgm.Areas.University.ViewModels.UserController;
+using Utal.Icc.Sgm.Areas.University.ViewModels.User;
 using Microsoft.EntityFrameworkCore;
 
 namespace Utal.Icc.Sgm.Areas.University.Controllers;
