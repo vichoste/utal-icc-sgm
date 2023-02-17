@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Utal.Icc.Sgm.ViewModels;
 
-public class MemoirViewModel : ApplicationUserViewModel {
+public class MemoirViewModel : ApplicationViewModel {
 	#region Common
 	[Display(Name = "Título")]
 	public string? Title { get; set; }
@@ -11,15 +11,17 @@ public class MemoirViewModel : ApplicationUserViewModel {
 	[Display(Name = "Estado")]
 	public string? Phase { get; set; }
 	#endregion
-	#region ApplicationUsers
-	[Display(Name = "Candidatos")]
-	public IEnumerable<string?>? Candidates { get; set; } = new HashSet<string?>();
-	[Display(Name = "Estudiantes")]
-	public IEnumerable<string?>? Students { get; set; } = new HashSet<string?>();
-	[Display(Name = "Profesores co-guía")]
-	public IEnumerable<string?>? AssistantTeachers { get; set; } = new HashSet<string?>();
-	[Display(Name = "Profesores guía")]
-	public IEnumerable<string?>? GuideTeachers { get; set; } = new HashSet<string?>();
+	#region Student
+	[Display(Name = "Memorista")]
+	public string? Memorist { get; set; }
+	[Display(Name = "Número de matrícula")]
+	public string? UniversityId { get; set; }
+	[Display(Name = "Cursos restantes")]
+	public string? RemainingCourses { get; set; }
+	[Display(Name = "¿Está realizando práctica?")]
+	public bool IsDoingThePractice { get; set; }
+	[Display(Name = "¿Está trabajando?")]
+	public bool IsWorking { get; set; }
 	#endregion
 	[Display(Name = "¿Quién rechazó la propuesta?")]
 	public string? WhoRejected { get; set; }

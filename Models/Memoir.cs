@@ -9,16 +9,17 @@ public class Memoir {
 	public string? Title { get; set; }
 	public string? Description { get; set; }
 	public Phase? Phase { get; set; }
-	public virtual ICollection<ApplicationUser?> Owners { get; set; } = new HashSet<ApplicationUser?>();
 	public DateTimeOffset? CreatedAt { get; set; }
 	public DateTimeOffset? UpdatedAt { get; set; }
 	[Timestamp]
 	public byte[]? RowVersion { get; set; }
 	#endregion
 	#region Student
+	public virtual ApplicationUser? Memorist { get; set; }
 	public virtual ICollection<ApplicationUser?>? Candidates { get; set; } = new HashSet<ApplicationUser?>();
 	#endregion
 	#region GuideTeacher
+	public virtual ApplicationUser? Guide { get; set; }
 	public string? Requirements { get; set; }
 	#endregion
 	#region Rejection

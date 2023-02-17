@@ -40,11 +40,11 @@ public class UserController : Controller {
 		}
 		this.ViewData["CurrentFilter"] = searchString;
 		var users = await this._userManager.Users.ToListAsync();
-		var paginator = Paginator<ApplicationViewModel>.Create(users.Select(u => new ApplicationUserViewModel {
+		var paginator = Paginator<ApplicationUserViewModel>.Create(users.Select(u => new ApplicationUserViewModel {
 			Id = u.Id,
 			FirstName = u.FirstName,
 			LastName = u.LastName,
-			StudentUniversityId = u.StudentUniversityId,
+			UniversityId = u.UniversityId,
 			Rut = u.Rut,
 			Email = u.Email,
 			IsDeactivated = u.IsDeactivated,
@@ -73,7 +73,7 @@ public class UserController : Controller {
 				var user = new ApplicationUser {
 					FirstName = record.FirstName,
 					LastName = record.LastName,
-					StudentUniversityId = record.UniversityId,
+					UniversityId = record.UniversityId,
 					Rut = record.Rut,
 					CreatedAt = DateTimeOffset.Now,
 					UpdatedAt = DateTimeOffset.Now
@@ -151,7 +151,7 @@ public class UserController : Controller {
 				Email = user.Email,
 				CreatedAt = user.CreatedAt,
 				UpdatedAt = user.UpdatedAt,
-				StudentUniversityId = user.StudentUniversityId
+				UniversityId = user.UniversityId
 			},
 			_ when await this._userManager.IsInRoleAsync(user, "Teacher") => new ApplicationUserViewModel {
 				Id = user.Id,
@@ -191,7 +191,7 @@ public class UserController : Controller {
 		user.Rut = input.Rut;
 		user.UpdatedAt = DateTimeOffset.Now;
 		if (await this._userManager.IsInRoleAsync(user, "Student")) {
-			user.StudentUniversityId = input.StudentUniversityId;
+			user.UniversityId = input.UniversityId;
 		}
 		_ = await this._userManager.UpdateAsync(user);
 		if (await this._userManager.IsInRoleAsync(user, "Teacher")) {

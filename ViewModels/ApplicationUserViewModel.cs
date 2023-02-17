@@ -10,32 +10,32 @@ public class ApplicationUserViewModel : ApplicationViewModel {
 	public string? LastName { get; set; }
 	[Display(Name = "RUT")]
 	public string? Rut { get; set; }
+	[Display(Name = "Desactivado")]
+	public bool IsDeactivated { get; set; }
 	[DataType(DataType.EmailAddress), Display(Name = "E-mail"), EmailAddress]
 	public string? Email { get; set; }
 	[DataType(DataType.Password), Display(Name = "Contraseña"), StringLength(100, ErrorMessage = "La contraseña debe tener un mínimo de 6 carácteres", MinimumLength = 6)]
 	public string? Password { get; set; }
 	[Compare("Password", ErrorMessage = "Las contraseñas no coinciden"), DataType(DataType.Password), Display(Name = "Confirmar contraseña")]
 	public string? ConfirmPassword { get; set; }
-	[Display(Name = "Desactivado")]
-	public bool IsDeactivated { get; set; }
 	#endregion
 	#region Student
 	[Display(Name = "Número de matrícula")]
-	public string? StudentUniversityId { get; set; }
+	public string? UniversityId { get; set; }
 	[Display(Name = "Cursos restantes")]
-	public string? StudentRemainingCourses { get; set; }
+	public string? RemainingCourses { get; set; }
 	[Display(Name = "¿Está realizando práctica?")]
-	public bool StudentIsDoingThePractice { get; set; }
+	public bool IsDoingThePractice { get; set; }
 	[Display(Name = "¿Está trabajando?")]
-	public bool StudentIsWorking { get; set; }
+	public bool IsWorking { get; set; }
 	#endregion
 	#region Teacher
 	[Display(Name = "Oficina")]
-	public string? TeacherOffice { get; set; }
+	public string? Office { get; set; }
 	[Display(Name = "Horario")]
-	public string? TeacherSchedule { get; set; }
+	public string? Schedule { get; set; }
 	[Display(Name = "Especialización")]
-	public string? TeacherSpecialization { get; set; }
+	public string? Specialization { get; set; }
 	[Display(Name = "Profesor guía")]
 	public bool IsGuide { get; set; }
 	[Display(Name = "Profesor co-guía")]

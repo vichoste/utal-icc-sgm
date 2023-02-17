@@ -23,7 +23,7 @@ public class MemoirController : Controller {
 		this._userManager = userManager;
 	}
 
-	[Authorize(Roles = "Candidate")]
+	[Authorize(Roles = "Memorist")]
 	public async Task<IActionResult> Guide(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
 		var parameters = new[] { "FirstName", "LastName", "Email", "TeacherSpecialization" };
 		foreach (var parameter in parameters) {
@@ -43,7 +43,7 @@ public class MemoirController : Controller {
 			LastName = u.LastName,
 			Rut = u.Rut,
 			Email = u.Email,
-			TeacherSpecialization = u.TeacherSpecialization,
+			Specialization = u.Specialization,
 		}).AsQueryable(), pageNumber ?? 1, 10);
 		if (!string.IsNullOrEmpty(sortOrder)) {
 			paginator.Sort(sortOrder);
@@ -67,10 +67,11 @@ public class MemoirController : Controller {
 			searchString = currentFilter;
 		}
 		this.ViewData["CurrentFilter"] = searchString;
-		var memoirs = this._dbContext.Memoirs!.AsNoTracking()
-			.Include(m => m.Owners).AsNoTracking()
-			.Where(m => m.Owners.Any(o => o!.Id == this._userManager.GetUserId(this.User))
-						&& m.Phase == Phase.SentToGuide);
+		if (this.User.IsInRole("Memorist"))
+			var memoirs = this._dbContext.Memoirs!.AsNoTracking()
+				.Include(m => m.Owners).AsNoTracking()
+				.Where(m => m.Owners.Any(o => o!.Id == this._userManager.GetUserId(this.User))
+							&& m.Phase == Phase.SentToGuide);
 		var paginator = Paginator<ApplicationViewModel>.Create(memoirs.Select(m => new MemoirViewModel {
 			Id = m.Id,
 			Title = m.Title,

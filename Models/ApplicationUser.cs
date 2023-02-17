@@ -10,26 +10,28 @@ public class ApplicationUser : IdentityUser {
 	public string? LastName { get; set; }
 	public string? Rut { get; set; }
 	public bool IsDeactivated { get; set; }
-	[InverseProperty("Owners")]
-	public virtual ICollection<Memoir?>? Memoirs { get; set; } = new HashSet<Memoir?>();
 	public DateTimeOffset CreatedAt { get; set; }
 	public DateTimeOffset? UpdatedAt { get; set; }
 	#endregion
 	#region Student
-	public string? StudentUniversityId { get; set; }
-	public string? StudentRemainingCourses { get; set; }
-	public bool StudentIsDoingThePractice { get; set; }
-	public bool StudentIsWorking { get; set; }
+	public string? UniversityId { get; set; }
+	public string? RemainingCourses { get; set; }
+	public bool IsDoingThePractice { get; set; }
+	public bool IsWorking { get; set; }
+	[InverseProperty("Memorist")]
+	public virtual ICollection<Memoir?>? Doing { get; set; } = new HashSet<Memoir?>();
 	[InverseProperty("Candidates")]
-	public virtual ICollection<Memoir?>? StudentCandidatures { get; set; } = new HashSet<Memoir?>();
+	public virtual ICollection<Memoir?>? Candidatures { get; set; } = new HashSet<Memoir?>();
 	#endregion
 	#region Teacher
-	public string? TeacherOffice { get; set; }
-	public string? TeacherSchedule { get; set; }
-	public string? TeacherSpecialization { get; set; }
+	public string? Office { get; set; }
+	public string? Schedule { get; set; }
+	public string? Specialization { get; set; }
+	[InverseProperty("Guide")]
+	public virtual ICollection<Memoir?>? Guiding { get; set; } = new HashSet<Memoir?>();
 	#endregion
 	#region Rejection
 	[InverseProperty("WhoRejected")]
-	public virtual ICollection<Memoir?>? RejectedMemoirs { get; set; } = new HashSet<Memoir?>();
+	public virtual ICollection<Memoir?>? Rejections { get; set; } = new HashSet<Memoir?>();
 	#endregion
 }

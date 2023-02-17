@@ -9,7 +9,6 @@ public enum Role {
 	Teacher,
 	Engineer,
 	Completed,
-	Memoir,
-	Candidate,
+	Memorist,
 	Student
 }

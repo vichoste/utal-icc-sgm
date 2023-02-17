@@ -30,11 +30,8 @@ public static class StartupSeeder {
 		if (!await roleManager.RoleExistsAsync("Completed")) {
 			_ = await roleManager.CreateAsync(new IdentityRole("Completed"));
 		}
-		if (!await roleManager.RoleExistsAsync("Memoir")) {
-			_ = await roleManager.CreateAsync(new IdentityRole("Memoir"));
-		}
-		if (!await roleManager.RoleExistsAsync("Candidate")) {
-			_ = await roleManager.CreateAsync(new IdentityRole("Candidate"));
+		if (!await roleManager.RoleExistsAsync("Memorist")) {
+			_ = await roleManager.CreateAsync(new IdentityRole("Memorist"));
 		}
 		if (!await roleManager.RoleExistsAsync("Student")) {
 			_ = await roleManager.CreateAsync(new IdentityRole("Student"));
