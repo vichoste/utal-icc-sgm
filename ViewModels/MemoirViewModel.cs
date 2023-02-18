@@ -45,7 +45,7 @@ public class MemoirViewModel : ApplicationViewModel {
 	#endregion
 	#region Assistants
 	[Display(Name = "Profesores co-guía")]
-	public IEnumerable<string?>? AssistantTeachers { get; set; } = new HashSet<string?>();
+	public IEnumerable<string?>? Assistants { get; set; } = new HashSet<string?>();
 	#endregion
 	#region Rejection
 	[Display(Name = "¿Quién rechazó la propuesta?")]

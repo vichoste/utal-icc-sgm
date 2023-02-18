@@ -19,20 +19,20 @@ public class MemoirController : Controller {
 		this._userManager = userManager;
 	}
 
-	private async Task PopulateAssistantTeachers(ApplicationUser guideTeacher) {
-		var assistantTeachers = (
+	private async Task PopulateAssistants(ApplicationUser guideTeacher) {
+		var assistants = (
 			await this._userManager.GetUsersInRoleAsync(nameof(Role.Assistant)))
 				.Where(at => at != guideTeacher && !at.IsDeactivated)
 				.OrderBy(at => at.LastName)
 				.ToList();
-		this.ViewData[$"{nameof(Role.Assistant)}s"] = assistantTeachers.Select(at => new SelectListItem {
+		this.ViewData[$"{nameof(Role.Assistant)}s"] = assistants.Select(at => new SelectListItem {
 			Text = $"{at.FirstName} {at.LastName}",
 			Value = at.Id
 		});
 	}
 
 	[Authorize(Roles = "Student")]
-	public async Task<IActionResult> Guide(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
+	public async Task<IActionResult> GuideMyProposal(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
 		var parameters = new[] { "FirstName", "LastName", "Email", "Specialization" };
 		foreach (var parameter in parameters) {
 			this.ViewData[$"{parameter}SortParam"] = sortOrder == parameter ? $"{parameter}Desc" : parameter;
@@ -118,7 +118,7 @@ public class MemoirController : Controller {
 	[Authorize(Roles = "Guide")]
 	public async Task<IActionResult> CreateMyProposal() {
 		var guideTeacher = await this._userManager.GetUserAsync(this.User);
-		await this.PopulateAssistantTeachers(guideTeacher!);
+		await this.PopulateAssistants(guideTeacher!);
 		return this.View(new MemoirViewModel());
 	}
 
@@ -127,9 +127,9 @@ public class MemoirController : Controller {
 		var guideTeacher = await this._userManager.FindByIdAsync(id);
 		if (guideTeacher is null) {
 			this.TempData["ErrorMessage"] = "Error al registrar tu propuesta.";
-			return this.RedirectToAction("Guide", "MemoirController", new { area = "University" });
+			return this.RedirectToAction("GuideMyProposal", "Memoir", new { area = "University" });
 		}
-		await this.PopulateAssistantTeachers(guideTeacher);
+		await this.PopulateAssistants(guideTeacher);
 		var output = new MemoirViewModel {
 			GuideId = guideTeacher.Id,
 			GuideName = $"{guideTeacher.FirstName} {guideTeacher.LastName}",
@@ -148,19 +148,19 @@ public class MemoirController : Controller {
 			guide = (await this._userManager.FindByIdAsync(input.GuideId!))!;
 			if (guide is null) {
 				this.ViewData["ErrorMessage"] = "Error al registrar tu propuesta.";
-				return this.RedirectToAction("Guide", "MemoirController", new { area = "University" });
+				return this.RedirectToAction("GuideMyProposal", "Memoir", new { area = "University" });
 			}
 		} else if (this.User.IsInRole("Guide")) {
 			guide = (await this._userManager.GetUserAsync(this.User))!;
 		}
-		var assistantTeachers = input.AssistantTeachers!.Select(async at => await this._userManager.FindByIdAsync(at!)).Select(at => at.Result).Where(u => !u!.IsDeactivated).ToList();
+		var assistants = input.Assistants!.Select(async at => await this._userManager.FindByIdAsync(at!)).Select(at => at.Result).Where(u => !u!.IsDeactivated).ToList();
 		var memoir = new Memoir {
 			Id = Guid.NewGuid().ToString(),
 			Title = input.Title,
 			Description = input.Description,
 			Phase = Phase.Draft,
 			Guide = guide,
-			Assistants = assistantTeachers,
+			Assistants = assistants,
 			CreatedAt = DateTimeOffset.Now,
 			UpdatedAt = DateTimeOffset.Now,
 		};
@@ -173,6 +173,123 @@ public class MemoirController : Controller {
 		_ = await this._dbContext.SaveChangesAsync();
 		this.TempData["SuccessMessage"] = "Tu propouesta ha sido registrada correctamente.";
 		return this.RedirectToAction("MyProposal", "Memoir", new { area = "University" });
+	}
+
+	[Authorize(Roles = "Student,Guide")]
+	public async Task<IActionResult> EditMyProposal(string id) {
+		Memoir? memoir = null!;
+		if (this.User.IsInRole("Student")) {
+			memoir = await this._dbContext.Memoirs!
+				.Include(m => m.Memorist)
+				.Where(m => m.Memorist!.Id == this._userManager.GetUserId(this.User))
+				.Include(m => m.Guide)
+				.Include(m => m.Assistants).AsNoTracking()
+				.FirstOrDefaultAsync(m => m.Id == id);
+		} else if (this.User.IsInRole("Guide")) {
+			memoir = await this._dbContext.Memoirs!
+				.Include(m => m.Guide)
+				.Where(m => m.Guide!.Id == this._userManager.GetUserId(this.User))
+				.Include(m => m.Memorist)
+				.Include(m => m.Assistants).AsNoTracking()
+				.FirstOrDefaultAsync(m => m.Id == id);
+		}
+		if (memoir is null) {
+			this.TempData["ErrorMessage"] = "Error al editar tu propuesta.";
+			return this.RedirectToAction("MyProposal", "Memoir", new { area = "University" });
+		}
+		await this.PopulateAssistants(memoir.Guide!);
+		MemoirViewModel? output = null!;
+		if (this.User.IsInRole("Student")) {
+			output = new MemoirViewModel {
+				Id = memoir.Id,
+				Title = memoir.Title,
+				Description = memoir.Description,
+				GuideId = memoir.Guide!.Id,
+				GuideName = $"{memoir.Guide!.FirstName} {memoir.Guide!.LastName}",
+				GuideEmail = memoir.Guide!.Email,
+				Office = memoir.Guide!.Office,
+				Schedule = memoir.Guide!.Schedule,
+				Specialization = memoir.Guide!.Specialization,
+				Assistants = memoir.Assistants!.Select(at => at!.Id).ToList(),
+				CreatedAt = memoir.CreatedAt,
+				UpdatedAt = memoir.UpdatedAt
+			};
+		} else if (this.User.IsInRole("Guide")) {
+			output = new MemoirViewModel {
+				Id = memoir.Id,
+				Title = memoir.Title,
+				Description = memoir.Description,
+				Requirements = memoir.Requirements,
+				Assistants = memoir.Assistants!.Select(at => at!.Id).ToList(),
+				CreatedAt = memoir.CreatedAt,
+				UpdatedAt = memoir.UpdatedAt
+			};
+		}
+		return this.View(output);
+	}
+
+	[Authorize(Roles = "Student,Guide"), HttpPost, ValidateAntiForgeryToken]
+	public async Task<IActionResult> EditMyProposal([FromForm] MemoirViewModel input) {
+		Memoir? memoir = null!;
+		if (this.User.IsInRole("Student")) {
+			memoir = await this._dbContext.Memoirs!
+				.Include(m => m.Memorist)
+				.Where(m => m.Memorist!.Id == this._userManager.GetUserId(this.User))
+				.Include(m => m.Guide)
+				.Include(m => m.Assistants)
+				.FirstOrDefaultAsync(m => m.Id == input.Id);
+		} else if (this.User.IsInRole("Guide")) {
+			memoir = await this._dbContext.Memoirs!
+				.Include(m => m.Guide)
+				.Where(m => m.Guide!.Id == this._userManager.GetUserId(this.User))
+				.Include(m => m.Memorist)
+				.Include(m => m.Assistants)
+				.FirstOrDefaultAsync(m => m.Id == input.Id);
+		}
+		if (memoir is null) {
+			this.TempData["ErrorMessage"] = "Error al editar tu propuesta.";
+			return this.RedirectToAction("MyProposal", "Memoir", new { area = "University" });
+		}
+		var assistants = input.Assistants!.Select(async at => await this._userManager.FindByIdAsync(at!)).Select(at => at.Result).Where(u => !u!.IsDeactivated).ToList();
+		memoir.Title = input.Title;
+		memoir.Description = input.Description;
+		if (this.User.IsInRole("Guide")) {
+			memoir.Requirements = input.Requirements;
+		}
+		memoir.Assistants = assistants;
+		memoir.UpdatedAt = DateTimeOffset.Now;
+		_ = this._dbContext.Memoirs!.Update(memoir);
+		_ = await this._dbContext.SaveChangesAsync();
+		await this.PopulateAssistants(memoir.Guide!);
+		MemoirViewModel? output = null!;
+		if (this.User.IsInRole("Student")) {
+			output = new MemoirViewModel {
+				Id = memoir.Id,
+				Title = memoir.Title,
+				Description = memoir.Description,
+				GuideId = memoir.Guide!.Id,
+				GuideName = $"{memoir.Guide!.FirstName} {memoir.Guide!.LastName}",
+				GuideEmail = memoir.Guide!.Email,
+				Office = memoir.Guide!.Office,
+				Schedule = memoir.Guide!.Schedule,
+				Specialization = memoir.Guide!.Specialization,
+				Assistants = memoir.Assistants!.Select(at => at!.Id).ToList(),
+				CreatedAt = memoir.CreatedAt,
+				UpdatedAt = memoir.UpdatedAt
+			};
+		} else if (this.User.IsInRole("Guide")) {
+			output = new MemoirViewModel {
+				Id = memoir.Id,
+				Title = memoir.Title,
+				Description = memoir.Description,
+				Requirements = memoir.Requirements,
+				Assistants = memoir.Assistants!.Select(at => at!.Id).ToList(),
+				CreatedAt = memoir.CreatedAt,
+				UpdatedAt = memoir.UpdatedAt
+			};
+		}
+		this.ViewBag.SuccessMessage = "Tu propuesta ha sido editada correctamente.";
+		return this.View(output);
 	}
 	#endregion
 }

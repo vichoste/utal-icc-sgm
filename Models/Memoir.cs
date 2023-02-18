@@ -22,7 +22,7 @@ public class Memoir {
 	public virtual ApplicationUser? Guide { get; set; }
 	public string? Requirements { get; set; }
 	#endregion
-	#region AssistantTeachers
+	#region Assistants
 	public virtual ICollection<ApplicationUser?>? Assistants { get; set; } = new HashSet<ApplicationUser?>();
 	#endregion
 	#region Rejection
