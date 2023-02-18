@@ -3,7 +3,7 @@
 @using Utal.Icc.Sgm.Models
 
 @inject SignInManager<ApplicationUser> _signInManager
-@inject UserManager<ApplicationUser> userManager
+@inject UserManager<ApplicationUser> _userManager
 
 <div id="header" class="app-header">
 	<div class="mobile-toggler">
@@ -32,7 +32,7 @@
 							<i class="fa-solid fa fa-user-graduate"></i>
 						}
 					</div>
-					<div class="menu-text">¡Hola @((await this.userManager.GetUserAsync(this.User))?.FirstName)!</div>
+					<div class="menu-text">¡Hola @((await this._userManager.GetUserAsync(this.User))?.FirstName)!</div>
 				} else {
 					<div class="menu-img">
 						<i class="fa-solid fa-fingerprint"></i>

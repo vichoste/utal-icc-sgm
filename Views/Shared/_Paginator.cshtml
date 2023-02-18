@@ -1,0 +1,34 @@
+@using Utal.Icc.Sgm.ViewModels.Shared
+
+@model PaginatorPartialViewModel
+
+@{
+	var prevDisabled = !this.Model.HasPreviousPage ? "disabled" : "";
+	var nextDisabled = !this.Model.HasNextPage ? "disabled" : "";
+}
+
+<ul class="pagination mb-0">
+	<li class="page-item @prevDisabled">
+		<a asp-action=@this.Model.Action asp-route-sortOrder="@this.ViewData["CurrentSort"]"
+			asp-route-pageNumber="@(this.Model.PageIndex - 1)" asp-route-currentFilter="@this.ViewData["CurrentFilter"]"
+   class="page-link">
+			Anterior página
+		</a>
+	</li>
+	@for (var i = 0; i < this.Model.TotalPages; i++)
+	{
+		<li class="page-item @(i + 1 == this.Model.PageIndex ? " active" : "")">
+			<a asp-action=@this.Model.Action asp-route-sortOrder="@this.ViewData["CurrentSort"]"
+			asp-route-pageNumber="@(i + 1)" asp-route-currentFilter="@this.ViewData["CurrentFilter"]" class="page-link">
+				@(i + 1)
+			</a>
+		</li>
+	}
+	<li class="page-item @nextDisabled">
+		<a asp-action=@this.Model.Action asp-route-sortOrder="@this.ViewData["CurrentSort"]"
+			asp-route-pageNumber="@(this.Model.PageIndex + 1)" asp-route-currentFilter="@this.ViewData["CurrentFilter"]"
+   class="page-link">
+			Siguiente página
+		</a>
+	</li>
+</ul>

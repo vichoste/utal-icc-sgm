@@ -31,7 +31,7 @@ public class MemoirController : Controller {
 		});
 	}
 
-	[Authorize(Roles = "Memorist")]
+	[Authorize(Roles = "Student")]
 	public async Task<IActionResult> Guide(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
 		var parameters = new[] { "FirstName", "LastName", "Email", "Specialization" };
 		foreach (var parameter in parameters) {
@@ -63,7 +63,7 @@ public class MemoirController : Controller {
 	}
 
 	#region Student proposal
-	[Authorize(Roles = "Memorist,Guide")]
+	[Authorize(Roles = "Student,Guide")]
 	public IActionResult StudentProposal(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
 		var parameters = new[] { "Title", "FirstName", "LastName" };
 		foreach (var parameter in parameters) {
@@ -108,6 +108,13 @@ public class MemoirController : Controller {
 			paginator.Filter(currentFilter);
 		}
 		return this.View(paginator);
+	}
+
+	[Authorize(Roles = "Student")]
+	public async Task<IActionResult> CreateStudentProposal() {
+		var guideTeacher = await this._userManager.GetUserAsync(this.User);
+		await this.PopulateAssistantTeachers(guideTeacher);
+		return this.View();
 	}
 	#endregion
 }

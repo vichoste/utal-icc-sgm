@@ -7,7 +7,7 @@
 
 @model Paginator<ApplicationUserViewModel>
 
-@inject UserManager<ApplicationUser> userManager
+@inject UserManager<ApplicationUser> _userManager
 
 @{
 	this.ViewData["Title"] = "Profesores";
@@ -98,7 +98,7 @@
 										else if (this.User.IsInRole("Teacher"))
 										{
 											@this.Html.ActionLink("No es director de carrera", "Transfer", "User", new { area =
-								"University", currentDirectorTeacherId = this.userManager.GetUserId(this.User),
+								"University", currentDirectorTeacherId = this._userManager.GetUserId(this.User),
 								newDirectorTeacherId = item.Id }, new { @class = "btn btn-default mb-3" })
 										}
 									</td>
@@ -111,32 +111,8 @@
 					var prevDisabled = !this.Model.HasPreviousPage ? "disabled" : "";
 					var nextDisabled = !this.Model.HasNextPage ? "disabled" : "";
 				}
-				<ul class="pagination mb-0">
-					<li class="page-item @prevDisabled">
-						<a asp-action="Teacher" asp-route-sortOrder="@this.ViewData["CurrentSort"]"
-							asp-route-pageNumber="@(this.Model.PageIndex - 1)"
-							asp-route-currentFilter="@this.ViewData["CurrentFilter"]" class="page-link">
-							Anterior página
-						</a>
-					</li>
-					@for (var i = 0; i < this.Model.TotalPages; i++)
-					{
-						<li class="page-item @(i + 1 == this.Model.PageIndex ? " active" : "")">
-							<a asp-action="Teacher" asp-route-sortOrder="@this.ViewData["CurrentSort"]"
-							asp-route-pageNumber="@(i + 1)" asp-route-currentFilter="@this.ViewData["CurrentFilter"]"
-		   class="page-link">
-								@(i + 1)
-							</a>
-						</li>
-					}
-					<li class="page-item @nextDisabled">
-						<a asp-action="Teacher" asp-route-sortOrder="@this.ViewData["CurrentSort"]"
-							asp-route-pageNumber="@(this.Model.PageIndex + 1)"
-							asp-route-currentFilter="@this.ViewData["CurrentFilter"]" class="page-link">
-							Siguiente página
-						</a>
-					</li>
-				</ul>
+				<partial name="_Paginator" , model=@(new PaginatorPartialViewModel("Teacher", this.Model.PageIndex,
+					this.Model.TotalPages, this.Model.HasPreviousPage, this.Model.HasNextPage)) />
 			</div>
 		</div>
 	</div>

@@ -1,13 +1,8 @@
-@using Microsoft.AspNetCore.Identity
-
 @using Utal.Icc.Sgm
-@using Utal.Icc.Sgm.Models
 @using Utal.Icc.Sgm.ViewModels
 @using Utal.Icc.Sgm.ViewModels.Shared
 
 @model Paginator<ApplicationUserViewModel>
-
-@inject UserManager<ApplicationUser> userManager
 
 @{
 	this.ViewData["Title"] = "Estudiantes";
@@ -75,7 +70,7 @@
 								{
 									<td class="text-muted">@item.FirstName</td>
 									<td class="text-muted">@item.LastName</td>
-									<td class="text-muted">@item.StudentId</td>
+									<td class="text-muted">@item.UniversityId</td>
 									<td class="text-muted">@item.Rut</td>
 									<td class="text-muted">@item.Email</td>
 									<td>
@@ -88,7 +83,7 @@
 								{
 									<td>@item.FirstName</td>
 									<td>@item.LastName</td>
-									<td>@item.StudentId</td>
+									<td>@item.UniversityId</td>
 									<td>@item.Rut</td>
 									<td>@item.Email</td>
 									<td>
@@ -107,32 +102,8 @@
 					var prevDisabled = !this.Model.HasPreviousPage ? "disabled" : "";
 					var nextDisabled = !this.Model.HasNextPage ? "disabled" : "";
 				}
-				<ul class="pagination mb-0">
-					<li class="page-item @prevDisabled">
-						<a asp-action="Student" asp-route-sortOrder="@this.ViewData["CurrentSort"]"
-							asp-route-pageNumber="@(this.Model.PageIndex - 1)"
-							asp-route-currentFilter="@this.ViewData["CurrentFilter"]" class="page-link">
-							Anterior página
-						</a>
-					</li>
-					@for (var i = 0; i < this.Model.TotalPages; i++)
-					{
-						<li class="page-item @(i + 1 == this.Model.PageIndex ? " active" : "")">
-							<a asp-action="Student" asp-route-sortOrder="@this.ViewData["CurrentSort"]"
-							asp-route-pageNumber="@(i + 1)" asp-route-currentFilter="@this.ViewData["CurrentFilter"]"
-		   class="page-link">
-								@(i + 1)
-							</a>
-						</li>
-					}
-					<li class="page-item @nextDisabled">
-						<a asp-action="Student" asp-route-sortOrder="@this.ViewData["CurrentSort"]"
-							asp-route-pageNumber="@(this.Model.PageIndex + 1)"
-							asp-route-currentFilter="@this.ViewData["CurrentFilter"]" class="page-link">
-							Siguiente página
-						</a>
-					</li>
-				</ul>
+				<partial name="_Paginator" , model=@(new PaginatorPartialViewModel("Student", this.Model.PageIndex,
+					this.Model.TotalPages, this.Model.HasPreviousPage, this.Model.HasNextPage)) />
 			</div>
 		</div>
 	</div>
