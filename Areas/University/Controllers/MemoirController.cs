@@ -62,7 +62,7 @@ public class MemoirController : Controller {
 		return this.View(paginator);
 	}
 
-	#region Student proposal
+	#region My proposal
 	[Authorize(Roles = "Student,Guide")]
 	public IActionResult MyProposal(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
 		string[]? parameters = null;
