@@ -27,8 +27,40 @@ public class UserController : Controller {
 	}
 
 	[Authorize(Roles = "Director")]
-	public async Task<IActionResult> List(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
+	public async Task<IActionResult> Student(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
 		var parameters = new[] { "FirstName", "LastName", "UniversityId", "Rut", "Email" };
+		foreach (var parameter in parameters) {
+			this.ViewData[$"{parameter}SortParam"] = sortOrder == parameter ? $"{parameter}Desc" : parameter;
+		}
+		this.ViewData["CurrentSort"] = sortOrder;
+		if (searchString is not null) {
+			pageNumber = 1;
+		} else {
+			searchString = currentFilter;
+		}
+		this.ViewData["CurrentFilter"] = searchString;
+		var users = await this._userManager.GetUsersInRoleAsync("Student");
+		var paginator = Paginator<ApplicationUserViewModel>.Create(users.Select(u => new ApplicationUserViewModel {
+			Id = u.Id,
+			FirstName = u.FirstName,
+			LastName = u.LastName,
+			UniversityId = u.UniversityId,
+			Rut = u.Rut,
+			Email = u.Email,
+			IsDeactivated = u.IsDeactivated,
+		}).AsQueryable(), pageNumber ?? 1, 10);
+		if (!string.IsNullOrEmpty(sortOrder)) {
+			paginator.Sort(sortOrder);
+		}
+		if (!string.IsNullOrEmpty(currentFilter)) {
+			paginator.Filter(currentFilter);
+		}
+		return this.View(paginator);
+	}
+
+	[Authorize(Roles = "Director")]
+	public async Task<IActionResult> Teacher(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
+		var parameters = new[] { "FirstName", "LastName", "Rut", "Email" };
 		foreach (var parameter in parameters) {
 			this.ViewData[$"{parameter}SortParam"] = sortOrder == parameter ? $"{parameter}Desc" : parameter;
 		}
@@ -44,7 +76,6 @@ public class UserController : Controller {
 			Id = u.Id,
 			FirstName = u.FirstName,
 			LastName = u.LastName,
-			UniversityId = u.UniversityId,
 			Rut = u.Rut,
 			Email = u.Email,
 			IsDeactivated = u.IsDeactivated,

@@ -23,8 +23,13 @@
 					</a>
 					<div class="menu-submenu">
 						<div class="menu-item">
-							<a href="@this.Url.Action("List", "User", new { area = "University" })" class="menu-link">
-								<span class="menu-text">Usuarios</span>
+							<a href="@this.Url.Action("Student", "User", new { area = "University" })" class="menu-link">
+								<span class="menu-text">Estudiantes</span>
+							</a>
+						</div>
+						<div class="menu-item">
+							<a href="@this.Url.Action("Teacher", "User", new { area = "University" })" class="menu-link">
+								<span class="menu-text">Profesores</span>
 							</a>
 						</div>
 						<div class="menu-item">
