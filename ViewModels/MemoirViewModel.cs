@@ -16,6 +16,8 @@ public class MemoirViewModel : ApplicationViewModel {
 	public string? MemoristId { get; set; }
 	[Display(Name = "Memorista")]
 	public string? MemoristName { get; set; }
+	[Display(Name = "E-mail")]
+	public string? MemoristEmail { get; set; }
 	[Display(Name = "Número de matrícula")]
 	public string? UniversityId { get; set; }
 	[Display(Name = "Cursos restantes")]
@@ -30,12 +32,16 @@ public class MemoirViewModel : ApplicationViewModel {
 	public string? GuideId { get; set; }
 	[Display(Name = "Profesor guía")]
 	public string? GuideName { get; set; }
+	[Display(Name = "E-mail")]
+	public string? GuideEmail { get; set; }
 	[Display(Name = "Oficina")]
 	public string? Office { get; set; }
 	[Display(Name = "Horario")]
 	public string? Schedule { get; set; }
 	[Display(Name = "Especialización")]
 	public string? Specialization { get; set; }
+	[Display(Name = "Requisitos")]
+	public string? Requirements { get; set; }
 	#endregion
 	#region Assistants
 	[Display(Name = "Profesores co-guía")]

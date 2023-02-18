@@ -29,6 +29,8 @@ public class ApplicationUser : IdentityUser {
 	public string? Specialization { get; set; }
 	[InverseProperty("Guide")]
 	public virtual ICollection<Memoir?>? Guiding { get; set; } = new HashSet<Memoir?>();
+	[InverseProperty("Assistants")]
+	public virtual ICollection<Memoir?>? Assisting { get; set; } = new HashSet<Memoir?>();
 	#endregion
 	#region Rejection
 	[InverseProperty("WhoRejected")]

@@ -197,13 +197,7 @@ public class UserController : Controller {
 		};
 		if (output is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener al usuario.";
-			if (await this._userManager.IsInRoleAsync(user, "Student")) {
-				return this.RedirectToAction("Users", "User", new { area = "University" });
-			}
-			if (await this._userManager.IsInRoleAsync(user, "Teacher")) {
-				return this.RedirectToAction("Users", "User", new { area = "University" });
-			}
-			return this.RedirectToAction("Index", "Home", new { area = string.Empty });
+			return this.RedirectToAction("Users", "User", new { area = "University" });
 		}
 		return this.View(output);
 	}
@@ -276,9 +270,6 @@ public class UserController : Controller {
 		}
 		if (user.Id == this._userManager.GetUserId(this.User) || (await this._userManager.GetRolesAsync(user)).Contains("Director")) {
 			this.TempData["ErrorMessage"] = "Error al cambiar el estado de la activación al usuario.";
-			if (await this._userManager.IsInRoleAsync(user, "Student")) {
-				return this.RedirectToAction("Users", "User", new { area = "University" });
-			}
 			return this.RedirectToAction("Users", "User", new { area = "University" });
 		}
 		var output = new ApplicationUserViewModel {
