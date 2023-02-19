@@ -102,9 +102,9 @@
 										} else if (item.Phase == "SentToGuide") {
 											@this.Html.ActionLink("Ver", "ViewMyProposal", "Memoir", new { area = "University", id = item.Id }, new { @class = "btn btn-primary mb-3"})
 										} else if (item.Phase == "ApprovedByGuide") {
-											@this.Html.ActionLink("Convertir", "ConvertMyProposal", "Memoir", new { area = "University", id = item.Id }, new { @class = "btn btn-success mb-3"})
+											@this.Html.ActionLink("Convertir", "ViewMyProposal", "Memoir", new { area = "University", id = item.Id }, new { @class = "btn btn-success mb-3"})
 										} else if (item.Phase == "RejectedByGuide") {
-											@this.Html.ActionLink("Ver razón", "RejectedMyProposal", "Memoir", new { area = "University", id = item.Id }, new { @class = "btn btn-danger mb-3"})
+											@this.Html.ActionLink("Ver razón", "ViewMyProposal", "Memoir", new { area = "University", id = item.Id }, new { @class = "btn btn-danger mb-3"})
 										}
 									} else if (this.User.IsInRole("Guide")) {
 										@if (item.Phase == "PublishedToStudents") {

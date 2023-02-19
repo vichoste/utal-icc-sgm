@@ -23,12 +23,12 @@ public class MemoirController : Controller {
 	private async Task PopulateAssistants(ApplicationUser guideTeacher) {
 		var assistants = (
 			await this._userManager.GetUsersInRoleAsync("Assistant"))
-				.Where(at => at != guideTeacher && !at.IsDeactivated)
-				.OrderBy(at => at.LastName)
+				.Where(u => u != guideTeacher && !u.IsDeactivated)
+				.OrderBy(u => u.LastName)
 				.ToList();
-		this.ViewData[$"Assistants"] = assistants.Select(at => new SelectListItem {
-			Text = $"{at.FirstName} {at.LastName}",
-			Value = at.Id
+		this.ViewData[$"Assistants"] = assistants.Select(u => new SelectListItem {
+			Text = $"{u.FirstName} {u.LastName}",
+			Value = u.Id
 		});
 	}
 
@@ -154,7 +154,7 @@ public class MemoirController : Controller {
 		} else if (this.User.IsInRole("Guide")) {
 			guide = (await this._userManager.GetUserAsync(this.User))!;
 		}
-		var assistants = input.Assistants!.Select(async at => await this._userManager.FindByIdAsync(at!)).Select(at => at.Result).Where(u => !u!.IsDeactivated).ToList();
+		var assistants = input.Assistants!.Select(async a => await this._userManager.FindByIdAsync(a!)).Select(a => a.Result).Where(u => !u!.IsDeactivated).ToList();
 		var memoir = new Memoir {
 			Id = Guid.NewGuid().ToString(),
 			Title = input.Title,
@@ -185,14 +185,14 @@ public class MemoirController : Controller {
 				.Where(m => m.Memorist!.Id == this._userManager.GetUserId(this.User))
 				.Include(m => m.Guide)
 				.Include(m => m.Assistants).AsNoTracking()
-				.FirstOrDefaultAsync(m => m.Id == id && m.Phase == Phase.Draft);
+				.FirstOrDefaultAsync(m => m.Id == id && (m.Phase == Phase.Draft || m.Phase == Phase.RejectedByGuide || m.Phase == Phase.RejectedByCommittee));
 		} else if (this.User.IsInRole("Guide")) {
 			memoir = await this._dbContext.Memoirs!
 				.Include(m => m.Guide)
 				.Where(m => m.Guide!.Id == this._userManager.GetUserId(this.User))
 				.Include(m => m.Memorist)
 				.Include(m => m.Assistants).AsNoTracking()
-				.FirstOrDefaultAsync(m => m.Id == id && m.Phase == Phase.Draft);
+				.FirstOrDefaultAsync(m => m.Id == id && (m.Phase == Phase.Draft || m.Phase == Phase.RejectedByGuide || m.Phase == Phase.RejectedByCommittee));
 		}
 		if (memoir is null) {
 			this.TempData["ErrorMessage"] = "Error al editar tu propuesta.";
@@ -211,7 +211,7 @@ public class MemoirController : Controller {
 				Office = memoir.Guide!.Office,
 				Schedule = memoir.Guide!.Schedule,
 				Specialization = memoir.Guide!.Specialization,
-				Assistants = memoir.Assistants!.Select(at => at!.Id).ToList(),
+				Assistants = memoir.Assistants!.Select(a => a!.Id).ToList(),
 				CreatedAt = memoir.CreatedAt,
 				UpdatedAt = memoir.UpdatedAt
 			};
@@ -221,7 +221,7 @@ public class MemoirController : Controller {
 				Title = memoir.Title,
 				Description = memoir.Description,
 				Requirements = memoir.Requirements,
-				Assistants = memoir.Assistants!.Select(at => at!.Id).ToList(),
+				Assistants = memoir.Assistants!.Select(a => a!.Id).ToList(),
 				CreatedAt = memoir.CreatedAt,
 				UpdatedAt = memoir.UpdatedAt
 			};
@@ -238,20 +238,20 @@ public class MemoirController : Controller {
 				.Where(m => m.Memorist!.Id == this._userManager.GetUserId(this.User))
 				.Include(m => m.Guide)
 				.Include(m => m.Assistants)
-				.FirstOrDefaultAsync(m => m.Id == input.Id && m.Phase == Phase.Draft);
+				.FirstOrDefaultAsync(m => m.Id == input.Id && (m.Phase == Phase.Draft || m.Phase == Phase.RejectedByGuide || m.Phase == Phase.RejectedByCommittee));
 		} else if (this.User.IsInRole("Guide")) {
 			memoir = await this._dbContext.Memoirs!
 				.Include(m => m.Guide)
 				.Where(m => m.Guide!.Id == this._userManager.GetUserId(this.User))
 				.Include(m => m.Memorist)
 				.Include(m => m.Assistants)
-				.FirstOrDefaultAsync(m => m.Id == input.Id && m.Phase == Phase.Draft);
+				.FirstOrDefaultAsync(m => m.Id == input.Id && (m.Phase == Phase.Draft || m.Phase == Phase.RejectedByGuide || m.Phase == Phase.RejectedByCommittee));
 		}
 		if (memoir is null) {
 			this.TempData["ErrorMessage"] = "Error al editar tu propuesta.";
 			return this.RedirectToAction("MyProposal", "Memoir", new { area = "University" });
 		}
-		var assistants = input.Assistants!.Select(async at => await this._userManager.FindByIdAsync(at!)).Select(at => at.Result).Where(u => !u!.IsDeactivated).ToList();
+		var assistants = input.Assistants!.Select(async a => await this._userManager.FindByIdAsync(a!)).Select(a => a.Result).Where(u => !u!.IsDeactivated).ToList();
 		memoir.Title = input.Title;
 		memoir.Description = input.Description;
 		if (this.User.IsInRole("Guide")) {
@@ -274,7 +274,7 @@ public class MemoirController : Controller {
 				Office = memoir.Guide!.Office,
 				Schedule = memoir.Guide!.Schedule,
 				Specialization = memoir.Guide!.Specialization,
-				Assistants = memoir.Assistants!.Select(at => at!.Id).ToList(),
+				Assistants = memoir.Assistants!.Select(a => a!.Id).ToList(),
 				CreatedAt = memoir.CreatedAt,
 				UpdatedAt = memoir.UpdatedAt
 			};
@@ -284,7 +284,7 @@ public class MemoirController : Controller {
 				Title = memoir.Title,
 				Description = memoir.Description,
 				Requirements = memoir.Requirements,
-				Assistants = memoir.Assistants!.Select(at => at!.Id).ToList(),
+				Assistants = memoir.Assistants!.Select(a => a!.Id).ToList(),
 				CreatedAt = memoir.CreatedAt,
 				UpdatedAt = memoir.UpdatedAt
 			};
@@ -349,13 +349,12 @@ public class MemoirController : Controller {
 			memoir = await this._dbContext.Memoirs!
 				.Include(m => m.Memorist)
 				.Where(m => m.Memorist!.Id == this._userManager.GetUserId(this.User))
-				.Include(m => m.Guide)
+				.Include(m => m.Guide).AsNoTracking()
 				.FirstOrDefaultAsync(m => m.Id == id && m.Phase == Phase.Draft);
 		} else if (this.User.IsInRole("Guide")) {
 			memoir = await this._dbContext.Memoirs!
 				.Include(m => m.Guide)
-				.Where(m => m.Guide!.Id == this._userManager.GetUserId(this.User))
-				.Include(m => m.Memorist)
+				.Where(m => m.Guide!.Id == this._userManager.GetUserId(this.User)).AsNoTracking()
 				.FirstOrDefaultAsync(m => m.Id == id && m.Phase == Phase.Draft);
 		}
 		if (memoir is null) {
@@ -389,15 +388,11 @@ public class MemoirController : Controller {
 			memoir = await this._dbContext.Memoirs!
 				.Include(m => m.Memorist)
 				.Where(m => m.Memorist!.Id == this._userManager.GetUserId(this.User))
-				.Include(m => m.Guide)
-				.Include(m => m.Assistants)
 				.FirstOrDefaultAsync(m => m.Id == input.Id && m.Phase == Phase.Draft);
 		} else if (this.User.IsInRole("Guide")) {
 			memoir = await this._dbContext.Memoirs!
 				.Include(m => m.Guide)
 				.Where(m => m.Guide!.Id == this._userManager.GetUserId(this.User))
-				.Include(m => m.Memorist)
-				.Include(m => m.Assistants)
 				.FirstOrDefaultAsync(m => m.Id == input.Id && m.Phase == Phase.Draft);
 		}
 		if (memoir is null) {
@@ -418,6 +413,69 @@ public class MemoirController : Controller {
 			this.TempData["SuccessMessage"] = "Tu propuesta ha sido publicada correctamente.";
 		}
 		return this.RedirectToAction("MyProposal", "Memoir", new { area = "University" });
+	}
+
+	[Authorize(Roles = "Student,Guide")]
+	public new async Task<IActionResult> View(string id) {
+		Memoir? memoir = null!;
+		if (this.User.IsInRole("Student")) {
+			memoir = await this._dbContext.Memoirs!
+				.Include(m => m.Memorist)
+				.Where(m => m.Memorist!.Id == this._userManager.GetUserId(this.User))
+				.Include(m => m.Guide)
+				.Include(m => m.Assistants).AsNoTracking()
+				.FirstOrDefaultAsync(m => m.Id == id && m.Phase == Phase.SentToGuide);
+		} else if (this.User.IsInRole("Guide")) {
+			memoir = await this._dbContext.Memoirs!
+				.Include(m => m.Guide)
+				.Where(m => m.Guide!.Id == this._userManager.GetUserId(this.User))
+				.Include(m => m.Memorist)
+				.Include(m => m.Assistants).AsNoTracking()
+				.FirstOrDefaultAsync(m => m.Id == id && m.Phase == Phase.PublishedToStudents);
+		}
+		if (memoir is null) {
+			this.TempData["ErrorMessage"] = "Error al ver tu propuesta.";
+			return this.RedirectToAction("MyProposal", "Memoir", new { area = "University" });
+		}
+		MemoirViewModel? output = null!;
+		if (this.User.IsInRole("Student")) {
+			output = new MemoirViewModel {
+				Id = id,
+				Title = memoir.Title,
+				Description = memoir.Description,
+				GuideId = memoir.Guide!.Id,
+				GuideName = $"{memoir.Guide.FirstName} {memoir.Guide.LastName}",
+				GuideEmail = memoir.Guide.Email,
+				Office = memoir.Guide.Office,
+				Schedule = memoir.Guide.Schedule,
+				Specialization = memoir.Guide.Specialization,
+				Assistants = memoir.Assistants!.Select(a => $"{a!.FirstName} {a.LastName}").ToList(),
+				CreatedAt = memoir.CreatedAt,
+				UpdatedAt = memoir.UpdatedAt,
+				WhoRejected = memoir.WhoRejected is null ? "Memoria aún no rechazada" : $"{memoir.WhoRejected.FirstName} {memoir.WhoRejected.LastName}",
+				Reason = memoir.Reason
+			};
+		} else if (this.User.IsInRole("Guide")) {
+			output = new MemoirViewModel {
+				Id = id,
+				Title = memoir.Title,
+				Description = memoir.Description,
+				Requirements = memoir.Requirements,
+				MemoristId = memoir.Memorist is null ? string.Empty : memoir.Memorist.Id,
+				MemoristName = memoir.Memorist is null ? "Sin memorista asignado" : $"{memoir.Memorist.FirstName} {memoir.Memorist.LastName}",
+				MemoristEmail = memoir.Memorist is null ? "Sin memorista asignado" : memoir.Memorist.Email,
+				UniversityId = memoir.Memorist is null ? "Sin memorista asignado" : memoir.Memorist.UniversityId,
+				RemainingCourses = memoir.Memorist is null ? "Sin memorista asignado" : memoir.Memorist.RemainingCourses,
+				IsDoingThePractice = memoir.Memorist is not null && memoir.Memorist.IsDoingThePractice,
+				IsWorking = memoir.Memorist is not null && memoir.Memorist.IsWorking,
+				Assistants = memoir.Assistants!.Select(a => $"{a!.FirstName} {a.LastName}").ToList(),
+				CreatedAt = memoir.CreatedAt,
+				UpdatedAt = memoir.UpdatedAt,
+				WhoRejected = memoir.WhoRejected is null ? "Memoria aún no rechazada" : $"{memoir.WhoRejected.FirstName} {memoir.WhoRejected.LastName}",
+				Reason = memoir.Reason
+			};
+		}
+		return this.View(output);
 	}
 	#endregion
 }

@@ -19,11 +19,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
 
 var app = builder.Build();
-if (app.Environment.IsDevelopment()) {
-	_ = app.UseMigrationsEndPoint();
-} else {
-	_ = app.UseExceptionHandler($"/Home/Error");
-}
+_ = app.Environment.IsDevelopment() ? app.UseMigrationsEndPoint() : app.UseExceptionHandler($"/Home/Error");
 using var scope = app.Services.CreateScope();
 var services = scope.ServiceProvider;
 var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();

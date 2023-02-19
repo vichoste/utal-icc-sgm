@@ -36,17 +36,23 @@ public class Paginator<T> : List<T> where T : ApplicationViewModel {
 				}
 			}
 		}
-		return result.AsEnumerable();
+		this.Clear();
+		this.AddRange(result.AsEnumerable());
 	}
 
-	public IEnumerable<T> Sort(string sortOrder) {
+	public void Sort(string sortOrder) {
 		foreach (var parameter in this.Parameters!) {
 			if (parameter == sortOrder) {
-				return this.OrderBy(vm => vm.GetType().GetProperty(parameter)!.GetValue(vm, null));
+				this.Clear();
+				this.AddRange(this.OrderBy(vm => vm.GetType().GetProperty(parameter)!.GetValue(vm, null)).AsEnumerable());
+				return;
 			} else if ($"{parameter}Desc" == sortOrder) {
-				return this.OrderByDescending(vm => vm.GetType().GetProperty(parameter)!.GetValue(vm, null));
+				this.Clear();
+				this.AddRange(this.OrderByDescending(vm => vm.GetType().GetProperty(parameter)!.GetValue(vm, null)).AsEnumerable());
+				return;
 			}
 		}
-		return this.OrderBy(vm => vm.GetType().GetProperty(this.Parameters[0])).AsEnumerable();
+		this.Clear();
+		this.AddRange(this.OrderBy(vm => vm.GetType().GetProperty(this.Parameters[0])!.GetValue(vm, null)).AsEnumerable());
 	}
 }

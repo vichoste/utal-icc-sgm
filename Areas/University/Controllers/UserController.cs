@@ -304,11 +304,11 @@ public class UserController : Controller {
 		var @new = await this._userManager.FindByIdAsync(@newId);
 		var check = (current, @new) switch {
 			(ApplicationUser, ApplicationUser) => true,
-			(ApplicationUser teacher, _) when teacher.IsDeactivated || (await this._userManager.IsInRoleAsync(teacher, "Teacher") && await this._userManager.IsInRoleAsync(teacher, "Director")) => false,
+			(ApplicationUser teacher, _) when teacher.IsDeactivated || await this._userManager.IsInRoleAsync(teacher, "Teacher") && await this._userManager.IsInRoleAsync(teacher, "Director") => false,
 			(_, ApplicationUser teacher) when teacher.IsDeactivated || await this._userManager.IsInRoleAsync(teacher, "Teacher") => false,
 			_ => false
 		};
-		check = check && (current!.Id != @new!.Id);
+		check = check && current!.Id != @new!.Id;
 		if (!check) {
 			this.TempData["ErrorMessage"] = "Revisa los profesores fuente y objetivo antes de hacer la transferencia.";
 			return this.RedirectToAction("Users", "User", new { area = "University" });
@@ -327,11 +327,11 @@ public class UserController : Controller {
 		var @new = await this._userManager.FindByIdAsync(model.NewDirectorTeacherId!);
 		var check = (current, @new) switch {
 			(ApplicationUser, ApplicationUser) => true,
-			(ApplicationUser teacher, _) when teacher.IsDeactivated || (await this._userManager.IsInRoleAsync(teacher, "Teacher") && await this._userManager.IsInRoleAsync(teacher, "Director")) => false,
+			(ApplicationUser teacher, _) when teacher.IsDeactivated || await this._userManager.IsInRoleAsync(teacher, "Teacher") && await this._userManager.IsInRoleAsync(teacher, "Director") => false,
 			(_, ApplicationUser teacher) when teacher.IsDeactivated || await this._userManager.IsInRoleAsync(teacher, "Teacher") => false,
 			_ => false
 		};
-		check = check && (current!.Id != @new!.Id);
+		check = check && current!.Id != @new!.Id;
 		if (!check) {
 			this.TempData["ErrorMessage"] = "Revisa los profesores fuente y objetivo antes de hacer la transferencia.";
 			return this.RedirectToAction("Users", "User", new { area = "University" });
