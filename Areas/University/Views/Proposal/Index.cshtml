@@ -16,15 +16,15 @@
 		</div>
 		@if (this.User.IsInRole("Student")) {
 			<div class="col-12 col-md-2 mb-3">
-				@this.Html.ActionLink("Crear propuesta", "Guides", "Proposal",new { area = "University" }, new { @class = "btn btn-success"})
+				@this.Html.ActionLink("Crear propuesta", "Guides", "Proposal", new { area = "University" }, new { @class = "btn btn-success"})
 			</div>
 		} else if (this.User.IsInRole("Guide")) {
 			<div class="col-12 col-md-2 mb-3">
-				@this.Html.ActionLink("Crear propuesta", "Create", "Proposal",new { area = "University" }, new { @class = "btn btn-success"})
+				@this.Html.ActionLink("Crear propuesta", "Create", "Proposal", new { area = "University" }, new { @class = "btn btn-success"})
 			</div>
 		}
 		<div class="col-12 mb-3">
-			<partial name="_Filter", model=@(new FilterPartialViewModel("Index", "Proposal","University")) />
+			<partial name="_Filter", model=@(new FilterPartialViewModel("Index", "Proposal", "University")) />
 		</div>
 	</div>
 	<div class="row justify-content-center">
@@ -59,9 +59,9 @@
 							<tr>
 								<td>@item.Title</td>
 								@if (this.User.IsInRole("Student")) {
-									@item.GuideName
+									<td>@item.GuideName</td>
 								} else if (this.User.IsInRole("Guide")) {
-									@item.MemoristName
+									<td>@item.MemoristName</td>
 								}
 								<td>
 									@if (this.User.IsInRole("Student")) {
@@ -119,7 +119,7 @@
 						}
 					</tbody>
 				</table>
-				<partial name="_Paginator" , model=@(new PaginatorPartialViewModel("Index", this.Model.PageIndex, this.Model.TotalPages, this.Model.HasPreviousPage, this.Model.HasNextPage)) />
+				<partial name="_Paginator", model=@(new PaginatorPartialViewModel("Index", this.Model.PageIndex, this.Model.TotalPages, this.Model.HasPreviousPage, this.Model.HasNextPage)) />
 			</div>
 		</div>
 	</div>

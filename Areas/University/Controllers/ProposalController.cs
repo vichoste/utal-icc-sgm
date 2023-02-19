@@ -94,7 +94,6 @@ public class ProposalController : Controller {
 		return this.View(paginator);
 	}
 
-	#region My proposal
 	[Authorize(Roles = "Student,Guide")]
 	public IActionResult Index(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
 		string[]? parameters = null;
@@ -137,6 +136,91 @@ public class ProposalController : Controller {
 					MemoristName = $"{m.Memorist!.FirstName} {m.Memorist!.LastName}"
 				});
 		}
+		var paginator = Paginator<MemoirViewModel>.Create(memoirs, pageNumber ?? 1, 6);
+		if (!string.IsNullOrEmpty(sortOrder)) {
+			paginator.Sort(sortOrder);
+		}
+		if (!string.IsNullOrEmpty(currentFilter)) {
+			paginator.Filter(currentFilter);
+		}
+		return this.View(paginator);
+	}
+
+	[Authorize(Roles = "Student,Guide")]
+	public IActionResult List(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
+		string[]? parameters = null;
+		if (this.User.IsInRole("Student")) {
+			parameters = new[] { "Title", "GuideName" };
+		} else if (this.User.IsInRole("Guide")) {
+			parameters = new[] { "Title", "MemoristName" };
+		}
+		foreach (var parameter in parameters!) {
+			this.ViewData[$"{parameter}SortParam"] = sortOrder == parameter ? $"{parameter}Desc" : parameter;
+		}
+		this.ViewData["CurrentSort"] = sortOrder;
+		if (searchString is not null) {
+			pageNumber = 1;
+		} else {
+			searchString = currentFilter;
+		}
+		this.ViewData["CurrentFilter"] = searchString;
+		IQueryable<MemoirViewModel> memoirs = null!;
+		if (this.User.IsInRole("Student")) {
+			memoirs = this._dbContext.Memoirs!
+				.Where(m => m.Phase == Phase.PublishedByGuide || m.Phase == Phase.ReadyByGuide)
+				.Include(m => m.Guide).AsNoTracking()
+				.Select(m => new MemoirViewModel {
+					Id = m.Id,
+					Title = m.Title,
+					Phase = m.Phase.ToString(),
+					GuideName = $"{m.Guide!.FirstName} {m.Guide!.LastName}"
+				});
+		} else if (this.User.IsInRole("Guide")) {
+			memoirs = this._dbContext.Memoirs!
+				.Where(m => m.Phase == Phase.SentToGuide || m.Phase == Phase.ApprovedByGuide)
+				.Include(m => m.Memorist).AsNoTracking()
+				.Select(m => new MemoirViewModel {
+					Id = m.Id,
+					Title = m.Title,
+					Phase = m.Phase.ToString(),
+					MemoristName = $"{m.Memorist!.FirstName} {m.Memorist!.LastName}"
+				});
+		}
+		var paginator = Paginator<MemoirViewModel>.Create(memoirs, pageNumber ?? 1, 6);
+		if (!string.IsNullOrEmpty(sortOrder)) {
+			paginator.Sort(sortOrder);
+		}
+		if (!string.IsNullOrEmpty(currentFilter)) {
+			paginator.Filter(currentFilter);
+		}
+		return this.View(paginator);
+	}
+
+	[Authorize(Roles = "Student")]
+	public async Task<IActionResult> Applications(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
+		var parameters = new[] { "Title", "GuideName" };
+		foreach (var parameter in parameters!) {
+			this.ViewData[$"{parameter}SortParam"] = sortOrder == parameter ? $"{parameter}Desc" : parameter;
+		}
+		this.ViewData["CurrentSort"] = sortOrder;
+		if (searchString is not null) {
+			pageNumber = 1;
+		} else {
+			searchString = currentFilter;
+		}
+		this.ViewData["CurrentFilter"] = searchString;
+		var user = await this._userManager.GetUserAsync(this.User);
+		var memoirs = this._dbContext.Memoirs!
+			.Include(m => m.Memorist)
+			.Where(m => m!.Candidates!.Contains(user) || m.Memorist == user)
+			.Include(m => m.Guide).AsNoTracking()
+			.Select(m => new MemoirViewModel {
+				Id = m.Id,
+				Title = m.Title,
+				Phase = m.Phase.ToString(),
+				GuideName = $"{m.Guide!.FirstName} {m.Guide!.LastName}"
+			}
+		);
 		var paginator = Paginator<MemoirViewModel>.Create(memoirs, pageNumber ?? 1, 6);
 		if (!string.IsNullOrEmpty(sortOrder)) {
 			paginator.Sort(sortOrder);
@@ -539,5 +623,4 @@ public class ProposalController : Controller {
 		}
 		return this.View(output);
 	}
-	#endregion
 }

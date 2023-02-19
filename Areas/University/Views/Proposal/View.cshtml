@@ -121,6 +121,9 @@
 								<div class="btn-group">
 									@this.Html.ActionLink("Volver", "Index", "Proposal", new { area = "University" }, new { @class = "btn btn-secondary" })
 									@if (this.User.IsInRole("Student")) {
+										@if (this.Model.Phase == "PublishedByGuide") {
+											@this.Html.ActionLink("Postular", "Apply", "Proposal", new { area = "University", id = this.Model.Id }, new { @class = "btn btn-primary" })
+										}
 										@if (this.Model.Phase == "ApprovedByGuide") {
 											@this.Html.ActionLink("Convertir", "View", "Proposal", new { area = "University", id = this.Model.Id }, new { @class = "btn btn-success mb-3"})
 										} else if (this.Model.Phase == "RejectedByGuide") {
