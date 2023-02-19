@@ -3,7 +3,7 @@
 @model MemoirViewModel
 
 @{
-	this.ViewData["Title"] = "Crear propuesta";
+	this.ViewData["Title"] = "Editar propuesta";
 }
 
 <div class="container">
@@ -13,8 +13,9 @@
 			<div class="card">
 				<div class="card-header text-center">@this.ViewData["Title"]</div>
 				<div class="card-body">
-					@using (this.Html.BeginForm("CreateMyProposal", "Memoir", new { area = "University" })) {
+					@using (this.Html.BeginForm("Edit", "Proposal",new { area = "University" })) {
 						@this.Html.AntiForgeryToken()
+						@this.Html.HiddenFor(m => m.Id)
 						<div class="row">
 							<div class="col">
 								<div class="form-group mb-3">
@@ -28,7 +29,6 @@
 								@if (this.User.IsInRole("Student")) {
 									<div class="form-group mb-3">
 										@this.Html.LabelFor(m => m.GuideName, new { @class = "form-label" }):
-										@this.Html.HiddenFor(m => m.GuideId)
 										@this.Html.DisplayFor(m => m.GuideName, new { @class = "form-control" })
 									</div>
 									<div class="form-group mb-3">
@@ -50,7 +50,7 @@
 									</div>
 								} else if (this.User.IsInRole("Guide")) {
 									<div class="form-group mb-3">
-										@this.Html.LabelFor(m => m.Requirements, new { @class = "form-label" }):
+										@this.Html.LabelFor(m => m.Requirements, new { @class = "form-label" })
 										@this.Html.TextBoxFor(m => m.Requirements, new { @class = "form-control" })
 									</div>
 								}
@@ -63,12 +63,8 @@
 						<div class="row text-center">
 							<div class="col">
 								<div class="btn-group">
-									@if (this.User.IsInRole("Student")) {
-										@this.Html.ActionLink("Volver", "GuideMyProposal", "Memoir", new { area = "University"}, new { @class = "btn btn-secondary" })
-									} else if (this.User.IsInRole("Guide")) {
-										@this.Html.ActionLink("Volver", "MyProposal", "Memoir", new { area = "University"}, new { @class = "btn btn-secondary" })
-									}
-									<button type="submit" class="btn btn-success">Crear</button>
+									@this.Html.ActionLink("Cancelar", "Index", new { area = "University" }, new { @class = "btn btn-secondary" })
+									<button type="submit" class="btn btn-yellow">Editar</button>
 								</div>
 							</div>
 						</div>

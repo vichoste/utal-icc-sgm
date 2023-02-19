@@ -3,9 +3,10 @@ namespace Utal.Icc.Sgm.Models;
 public enum Phase {
 	Draft,
 	SentToGuide,
-	PublishedToStudents,
+	PublishedByGuide,
 	RejectedByGuide,
 	ApprovedByGuide,
+	ReadyByGuide,
 	SentToCommittee,
 	RejectedByCommittee,
 	AcceptedByCommittee,

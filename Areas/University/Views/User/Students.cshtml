@@ -18,7 +18,7 @@
 			@this.Html.ActionLink("Importar estudiantes desde CSV", "BatchCreateStudents", "User", new { area = "University" }, new { @class = "btn btn-teal"})
 		</div>
 		<div class="col-12 mb-3">
-			<partial name="_Filter" , model=@(new FilterPartialViewModel("Student", "User", "University")) />
+			<partial name="_Filter" , model=@(new FilterPartialViewModel("Students", "User", "University")) />
 		</div>
 	</div>
 	<div class="row justify-content-center">
@@ -28,12 +28,12 @@
 					<thead class="table-dark">
 						<tr>
 							<th>
-								<a asp-action="Student" asp-route-sortOrder="@this.ViewData["FirstNameSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+								<a asp-action="Students" asp-route-sortOrder="@this.ViewData["FirstNameSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
 									Nombre
 								</a>
 							</th>
 							<th>
-								<a asp-action="Student" asp-route-sortOrder="@this.ViewData["LastNameSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+								<a asp-action="Students" asp-route-sortOrder="@this.ViewData["LastNameSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
 									Apellido
 								</a>
 							</th>
@@ -43,12 +43,12 @@
 								</a>
 							</th>
 							<th>
-								<a asp-action="Student" asp-route-sortOrder="@this.ViewData["RutSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+								<a asp-action="Students" asp-route-sortOrder="@this.ViewData["RutSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
 									RUT
 								</a>
 							</th>
 							<th>
-								<a asp-action="Student" asp-route-sortOrder="@this.ViewData["EmailSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+								<a asp-action="Students" asp-route-sortOrder="@this.ViewData["EmailSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
 									E-mail
 								</a>
 							</th>
@@ -84,7 +84,7 @@
 						}
 					</tbody>
 				</table>
-				<partial name="_Paginator" , model=@(new PaginatorPartialViewModel("Student", this.Model.PageIndex, this.Model.TotalPages, this.Model.HasPreviousPage, this.Model.HasNextPage)) />
+				<partial name="_Paginator" , model=@(new PaginatorPartialViewModel("Students", this.Model.PageIndex, this.Model.TotalPages, this.Model.HasPreviousPage, this.Model.HasNextPage)) />
 			</div>
 		</div>
 	</div>

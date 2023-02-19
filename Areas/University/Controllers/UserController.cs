@@ -125,10 +125,10 @@ public class UserController : Controller {
 			if (successMessages.Any()) {
 				this.TempData["SuccessMessages"] = successMessages.AsEnumerable();
 			}
-			return this.RedirectToAction("List", "User", new { area = "University" });
+			return this.RedirectToAction("Students", "User", new { area = "University" });
 		} catch {
 			this.TempData["ErrorMessage"] = "Error al importar el archivo CSV.";
-			return this.RedirectToAction("List", "User", new { area = "University" });
+			return this.RedirectToAction("Students", "User", new { area = "University" });
 		}
 	}
 
@@ -163,7 +163,7 @@ public class UserController : Controller {
 		_ = await this._userManager.AddToRoleAsync(user, "Teacher");
 		_ = await this._userManager.AddToRolesAsync(user, roles);
 		this.TempData["SuccessMessage"] = "Usuario creado exitosamente.";
-		return this.RedirectToAction("Users", "User", new { area = "University" });
+		return this.RedirectToAction("Teachers", "User", new { area = "University" });
 	}
 
 	[Authorize(Roles = "Director")]
@@ -334,7 +334,7 @@ public class UserController : Controller {
 		check = check && current!.Id != @new!.Id;
 		if (!check) {
 			this.TempData["ErrorMessage"] = "Revisa los profesores fuente y objetivo antes de hacer la transferencia.";
-			return this.RedirectToAction("Users", "User", new { area = "University" });
+			return this.RedirectToAction("Teachers", "User", new { area = "University" });
 		}
 		_ = await this._userManager.RemoveFromRoleAsync(current!, "Director");
 		_ = await this._userManager.AddToRoleAsync(@new!, "Director");
@@ -342,6 +342,6 @@ public class UserController : Controller {
 		@new!.UpdatedAt = DateTimeOffset.Now;
 		_ = await this._userManager.UpdateAsync(current);
 		this.TempData["SuccessMessage"] = "Director de carrera transferido correctamente.";
-		return this.RedirectToAction("Users", "User", new { area = "University" });
+		return this.RedirectToAction("Teachers", "User", new { area = "University" });
 	}
 }

@@ -23,7 +23,7 @@
 			@this.Html.ActionLink("Crear profesor", "CreateTeacher", "User", new { area = "University" }, new { @class = "btn btn-success"})
 		</div>
 		<div class="col-12 mb-3">
-			<partial name="_Filter" , model=@(new FilterPartialViewModel("Teacher", "User", "University")) />
+			<partial name="_Filter" , model=@(new FilterPartialViewModel("Teachers", "User", "University")) />
 		</div>
 	</div>
 	<div class="row justify-content-center">
@@ -33,22 +33,22 @@
 					<thead class="table-dark">
 						<tr>
 							<th>
-								<a asp-action="Teacher" asp-route-sortOrder="@this.ViewData["FirstNameSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+								<a asp-action="Teachers" asp-route-sortOrder="@this.ViewData["FirstNameSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
 									Nombre
 								</a>
 							</th>
 							<th>
-								<a asp-action="Teacher" asp-route-sortOrder="@this.ViewData["LastNameSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+								<a asp-action="Teachers" asp-route-sortOrder="@this.ViewData["LastNameSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
 									Apellido
 								</a>
 							</th>
 							<th>
-								<a asp-action="Teacher" asp-route-sortOrder="@this.ViewData["RutSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+								<a asp-action="Teachers" asp-route-sortOrder="@this.ViewData["RutSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
 									RUT
 								</a>
 							</th>
 							<th>
-								<a asp-action="Teacher" asp-route-sortOrder="@this.ViewData["EmailSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+								<a asp-action="Teachers" asp-route-sortOrder="@this.ViewData["EmailSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
 									E-mail
 								</a>
 							</th>
@@ -75,7 +75,7 @@
 										@this.Html.ActionLink("Editar", "Edit", "User", new { area = "University", id = item.Id }, new { @class = "btn btn-yellow mb-3" })
 										@this.Html.ActionLink("Desactivar", "Toggle", "User", new { area = "University", id = item.Id }, new { @class = "btn btn-danger mb-3" })
 										@if (this.User.IsInRole("Teacher") && this.User.IsInRole("Director")) {
-											<a asp-action="Teacher" asp-route-sortOrder="@this.ViewData["CurrentSort"]" asp-route-pageNumber="@(this.Model.PageIndex)" asp-route-currentFilter="@this.ViewData["CurrentFilter"]" class="btn btn-info mb-3">Es director de carrera</a>
+											<a asp-action="Teachers" asp-route-sortOrder="@this.ViewData["CurrentSort"]" asp-route-pageNumber="@(this.Model.PageIndex)" asp-route-currentFilter="@this.ViewData["CurrentFilter"]" class="btn btn-info mb-3">Es director de carrera</a>
 										} else if (this.User.IsInRole("Teacher")) {
 											@this.Html.ActionLink("No es director de carrera", "Transfer", "User", new { area = "University", currentDirectorTeacherId = this._userManager.GetUserId(this.User), newDirectorTeacherId = item.Id }, new { @class = "btn btn-default mb-3" })
 										}
@@ -89,7 +89,7 @@
 					var prevDisabled = !this.Model.HasPreviousPage ? "disabled" : "";
 					var nextDisabled = !this.Model.HasNextPage ? "disabled" : "";
 				}
-				<partial name="_Paginator" , model=@(new PaginatorPartialViewModel("Teacher", this.Model.PageIndex, this.Model.TotalPages, this.Model.HasPreviousPage, this.Model.HasNextPage)) />
+				<partial name="_Paginator" , model=@(new PaginatorPartialViewModel("Teachers", this.Model.PageIndex, this.Model.TotalPages, this.Model.HasPreviousPage, this.Model.HasNextPage)) />
 			</div>
 		</div>
 	</div>

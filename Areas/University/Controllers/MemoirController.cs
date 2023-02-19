@@ -33,7 +33,7 @@ public class MemoirController : Controller {
 	}
 
 	[Authorize(Roles = "Student")]
-	public async Task<IActionResult> GuideMyProposal(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
+	public async Task<IActionResult> Guide(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
 		var parameters = new[] { "FirstName", "LastName", "Email", "Specialization" };
 		foreach (var parameter in parameters) {
 			this.ViewData[$"{parameter}SortParam"] = sortOrder == parameter ? $"{parameter}Desc" : parameter;
@@ -65,7 +65,7 @@ public class MemoirController : Controller {
 
 	#region My proposal
 	[Authorize(Roles = "Student,Guide")]
-	public IActionResult MyProposal(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
+	public IActionResult Index(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
 		string[]? parameters = null;
 		if (this.User.IsInRole("Student")) {
 			parameters = new[] { "Title", "GuideName" };
@@ -117,18 +117,18 @@ public class MemoirController : Controller {
 	}
 
 	[Authorize(Roles = "Guide")]
-	public async Task<IActionResult> CreateMyProposal() {
+	public async Task<IActionResult> Create() {
 		var guideTeacher = await this._userManager.GetUserAsync(this.User);
 		await this.PopulateAssistants(guideTeacher!);
 		return this.View(new MemoirViewModel());
 	}
 
 	[Authorize(Roles = "Student")]
-	public async Task<IActionResult> CreateMyProposal(string id) {
+	public async Task<IActionResult> Create(string id) {
 		var guideTeacher = await this._userManager.FindByIdAsync(id);
 		if (guideTeacher is null) {
 			this.TempData["ErrorMessage"] = "Error al registrar tu propuesta.";
-			return this.RedirectToAction("GuideMyProposal", "Memoir", new { area = "University" });
+			return this.RedirectToAction("Guide", "Proposal", new { area = "University" });
 		}
 		await this.PopulateAssistants(guideTeacher);
 		var output = new MemoirViewModel {
@@ -143,13 +143,13 @@ public class MemoirController : Controller {
 	}
 
 	[Authorize(Roles = "Student,Guide"), HttpPost, ValidateAntiForgeryToken]
-	public async Task<IActionResult> CreateMyProposal([FromForm] MemoirViewModel input) {
+	public async Task<IActionResult> Create([FromForm] MemoirViewModel input) {
 		ApplicationUser? guide = null!;
 		if (this.User.IsInRole("Student")) {
 			guide = (await this._userManager.FindByIdAsync(input.GuideId!))!;
 			if (guide is null) {
 				this.ViewData["ErrorMessage"] = "Error al registrar tu propuesta.";
-				return this.RedirectToAction("GuideMyProposal", "Memoir", new { area = "University" });
+				return this.RedirectToAction("Guide", "Proposal", new { area = "University" });
 			}
 		} else if (this.User.IsInRole("Guide")) {
 			guide = (await this._userManager.GetUserAsync(this.User))!;
@@ -173,11 +173,11 @@ public class MemoirController : Controller {
 		_ = await this._dbContext.Memoirs!.AddAsync(memoir);
 		_ = await this._dbContext.SaveChangesAsync();
 		this.TempData["SuccessMessage"] = "Tu propouesta ha sido registrada correctamente.";
-		return this.RedirectToAction("MyProposal", "Memoir", new { area = "University" });
+		return this.RedirectToAction("Index", "Proposal", new { area = "University" });
 	}
 
 	[Authorize(Roles = "Student,Guide")]
-	public async Task<IActionResult> EditMyProposal(string id) {
+	public async Task<IActionResult> Edit(string id) {
 		Memoir? memoir = null!;
 		if (this.User.IsInRole("Student")) {
 			memoir = await this._dbContext.Memoirs!
@@ -196,7 +196,7 @@ public class MemoirController : Controller {
 		}
 		if (memoir is null) {
 			this.TempData["ErrorMessage"] = "Error al editar tu propuesta.";
-			return this.RedirectToAction("MyProposal", "Memoir", new { area = "University" });
+			return this.RedirectToAction("Index", "Proposal", new { area = "University" });
 		}
 		await this.PopulateAssistants(memoir.Guide!);
 		MemoirViewModel? output = null!;
@@ -230,7 +230,7 @@ public class MemoirController : Controller {
 	}
 
 	[Authorize(Roles = "Student,Guide"), HttpPost, ValidateAntiForgeryToken]
-	public async Task<IActionResult> EditMyProposal([FromForm] MemoirViewModel input) {
+	public async Task<IActionResult> Edit([FromForm] MemoirViewModel input) {
 		Memoir? memoir = null!;
 		if (this.User.IsInRole("Student")) {
 			memoir = await this._dbContext.Memoirs!
@@ -249,7 +249,7 @@ public class MemoirController : Controller {
 		}
 		if (memoir is null) {
 			this.TempData["ErrorMessage"] = "Error al editar tu propuesta.";
-			return this.RedirectToAction("MyProposal", "Memoir", new { area = "University" });
+			return this.RedirectToAction("Index", "Proposal", new { area = "University" });
 		}
 		var assistants = input.Assistants!.Select(async a => await this._userManager.FindByIdAsync(a!)).Select(a => a.Result).Where(u => !u!.IsDeactivated).ToList();
 		memoir.Title = input.Title;
@@ -309,7 +309,7 @@ public class MemoirController : Controller {
 		}
 		if (memoir is null) {
 			this.TempData["ErrorMessage"] = "Error al eliminar tu propuesta.";
-			return this.RedirectToAction("MyProposal", "Memoir", new { area = "University" });
+			return this.RedirectToAction("Index", "Proposal", new { area = "University" });
 		}
 		var output = new MemoirViewModel {
 			Id = id,
@@ -334,12 +334,12 @@ public class MemoirController : Controller {
 		}
 		if (memoir is null) {
 			this.TempData["ErrorMessage"] = "Error al eliminar tu propuesta.";
-			return this.RedirectToAction("MyProposal", "Memoir", new { area = "University" });
+			return this.RedirectToAction("Index", "Proposal", new { area = "University" });
 		}
 		_ = this._dbContext.Memoirs!.Remove(memoir);
 		_ = await this._dbContext.SaveChangesAsync();
 		this.TempData["SuccessMessage"] = "Tu propuesta ha sido eliminada correctamente.";
-		return this.RedirectToAction("MyProposal", "Memoir", new { area = "University" });
+		return this.RedirectToAction("Index", "Proposal", new { area = "University" });
 	}
 
 	[Authorize(Roles = "Student,Guide")]
@@ -363,7 +363,7 @@ public class MemoirController : Controller {
 			} else if (this.User.IsInRole("Guide")) {
 				this.TempData["ErrorMessage"] = "Error al publicar tu propuesta.";
 			}
-			return this.RedirectToAction("MyProposal", "Memoir", new { area = "University" });
+			return this.RedirectToAction("Index", "Proposal", new { area = "University" });
 		}
 		MemoirViewModel? output = null!;
 		if (this.User.IsInRole("Student")) {
@@ -397,12 +397,12 @@ public class MemoirController : Controller {
 		}
 		if (memoir is null) {
 			this.TempData["ErrorMessage"] = "Error al enviar tu propuesta.";
-			return this.RedirectToAction("MyProposal", "Memoir", new { area = "University" });
+			return this.RedirectToAction("Index", "Proposal", new { area = "University" });
 		}
 		if (this.User.IsInRole("Student")) {
 			memoir.Phase = Phase.SentToGuide;
 		} else if (this.User.IsInRole("Guide")) {
-			memoir.Phase = Phase.PublishedToStudents;
+			memoir.Phase = Phase.PublishedByGuide;
 		}
 		memoir.UpdatedAt = DateTimeOffset.Now;
 		_ = this._dbContext.Memoirs!.Update(memoir);
@@ -412,7 +412,7 @@ public class MemoirController : Controller {
 		} else if (this.User.IsInRole("Guide")) {
 			this.TempData["SuccessMessage"] = "Tu propuesta ha sido publicada correctamente.";
 		}
-		return this.RedirectToAction("MyProposal", "Memoir", new { area = "University" });
+		return this.RedirectToAction("Index", "Proposal", new { area = "University" });
 	}
 
 	[Authorize(Roles = "Student,Guide")]
@@ -431,11 +431,11 @@ public class MemoirController : Controller {
 				.Where(m => m.Guide!.Id == this._userManager.GetUserId(this.User))
 				.Include(m => m.Memorist)
 				.Include(m => m.Assistants).AsNoTracking()
-				.FirstOrDefaultAsync(m => m.Id == id && m.Phase == Phase.PublishedToStudents);
+				.FirstOrDefaultAsync(m => m.Id == id && m.Phase == Phase.PublishedByGuide);
 		}
 		if (memoir is null) {
 			this.TempData["ErrorMessage"] = "Error al ver tu propuesta.";
-			return this.RedirectToAction("MyProposal", "Memoir", new { area = "University" });
+			return this.RedirectToAction("Index", "Proposal", new { area = "University" });
 		}
 		MemoirViewModel? output = null!;
 		if (this.User.IsInRole("Student")) {

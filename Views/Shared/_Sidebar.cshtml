@@ -29,7 +29,7 @@
 							</a>
 						</div>
 						<div class="menu-item">
-							<a href="@this.Url.Action("List", "Course", new { area = "University" })" class="menu-link">
+							<a href="@this.Url.Action("Index", "Course", new { area = "University" })" class="menu-link">
 								<span class="menu-text">Cursos</span>
 							</a>
 						</div>
@@ -50,7 +50,7 @@
 							</a>
 						</div>
 						<div class="menu-item">
-							<a href="@this.Url.Action("Teacher", "User", new { area = "University" })" class="menu-link">
+							<a href="@this.Url.Action("Teachers", "User", new { area = "University" })" class="menu-link">
 								<span class="menu-text">Profesores</span>
 							</a>
 						</div>
@@ -82,22 +82,22 @@
 					</a>
 					<div class="menu-submenu">
 						<div class="menu-item">
-							<a href="@this.Url.Action("Proposal", "Memoir", new { area = "University" })" class="menu-link">
-								<span class="menu-text">Propuestas de estudiantes</span>
-							</a>
-						</div>
-						<div class="menu-item">
-							<a href="@this.Url.Action("MyProposal", "Memoir", new { area = "University" })" class="menu-link">
+							<a href="@this.Url.Action("Index", "Memoir", new { area = "University" })" class="menu-link">
 								<span class="menu-text">Mis propuestas</span>
 							</a>
 						</div>
 						<div class="menu-item">
-							<a href="@this.Url.Action("OurRequest", "Memoir", new { area = "University" })" class="menu-link">
+							<a href="@this.Url.Action("List", "Memoir", new { area = "University" })" class="menu-link">
+								<span class="menu-text">Propuestas de estudiantes</span>
+							</a>
+						</div>
+						<div class="menu-item">
+							<a href="@this.Url.Action("Requests", "Memoir", new { area = "University" })" class="menu-link">
 								<span class="menu-text">Nuestras solicitudes</span>
 							</a>
 						</div>
 						<div class="menu-item">
-							<a href="@this.Url.Action("MyStudent", "Memoir", new { area = "University" })" class="menu-link">
+							<a href="@this.Url.Action("Students", "Memoir", new { area = "University" })" class="menu-link">
 								<span class="menu-text">Mis memoristas</span>
 							</a>
 						</div>
@@ -113,7 +113,7 @@
 					</a>
 					<div class="menu-submenu">
 						<div class="menu-item">
-							<a href="@this.Url.Action("Student", "Memoir", new { area = "University" })" class="menu-link">
+							<a href="@this.Url.Action("Students", "Memoir", new { area = "University" })" class="menu-link">
 								<span class="menu-text">Mis memoristas</span>
 							</a>
 						</div>
@@ -166,22 +166,22 @@
 					</a>
 					<div class="menu-submenu">
 						<div class="menu-item">
-							<a href="@this.Url.Action("MyProposal", "Memoir", new { area = "University" }) class=" menu-link">
+							<a href="@this.Url.Action("Index", "Proposal", new { area = "University" }) class=" menu-link">
 								<span class="menu-text">Mis propuestas</span>
 							</a>
 						</div>
 						<div class="menu-item">
-							<a href="@this.Url.Action("Proposal", "Memoir", new { area = "University" })" class="menu-link">
+							<a href="@this.Url.Action("List", "Proposal", new { area = "University" })" class="menu-link">
 								<span class="menu-text">Propuestas de profesores guía</span>
 							</a>
 						</div>
 						<div class="menu-item">
-							<a href="@this.Url.Action("Application", "Memoir", new { area = "University" })" class="menu-link">
+							<a href="@this.Url.Action("Applications", "Proposal", new { area = "University" })" class="menu-link">
 								<span class="menu-text">Mis postulaciones</span>
 							</a>
 						</div>
 						<div class="menu-item">
-							<a href="@this.Url.Action("OurRequest", "Memoir", new { area = "University" })" class="menu-link">
+							<a href="@this.Url.Action("Requests", "Proposal", new { area = "University" })" class="menu-link">
 								<span class="menu-text">Nuestras solicitudes</span>
 							</a>
 						</div>
