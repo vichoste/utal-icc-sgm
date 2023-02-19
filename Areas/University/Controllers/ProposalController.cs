@@ -11,19 +11,19 @@ using Utal.Icc.Sgm.ViewModels;
 namespace Utal.Icc.Sgm.Areas.University.Controllers;
 
 [Area("University"), Authorize]
-public class MemoirController : Controller {
+public class ProposalController : Controller {
 	private readonly ApplicationDbContext _dbContext;
 	private readonly UserManager<ApplicationUser> _userManager;
 
-	public MemoirController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager) {
+	public ProposalController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager) {
 		this._dbContext = dbContext;
 		this._userManager = userManager;
 	}
 
-	private async Task PopulateAssistants(ApplicationUser guideTeacher) {
+	private async Task PopulateAssistants(ApplicationUser guide) {
 		var assistants = (
 			await this._userManager.GetUsersInRoleAsync("Assistant"))
-				.Where(u => u != guideTeacher && !u.IsDeactivated)
+				.Where(u => u != guide && !u.IsDeactivated)
 				.OrderBy(u => u.LastName)
 				.ToList();
 		this.ViewData[$"Assistants"] = assistants.Select(u => new SelectListItem {
@@ -33,7 +33,7 @@ public class MemoirController : Controller {
 	}
 
 	[Authorize(Roles = "Student")]
-	public async Task<IActionResult> Guide(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
+	public async Task<IActionResult> Guides(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
 		var parameters = new[] { "FirstName", "LastName", "Email", "Specialization" };
 		foreach (var parameter in parameters) {
 			this.ViewData[$"{parameter}SortParam"] = sortOrder == parameter ? $"{parameter}Desc" : parameter;
@@ -46,13 +46,44 @@ public class MemoirController : Controller {
 		}
 		this.ViewData["CurrentFilter"] = searchString;
 		var users = await this._userManager.GetUsersInRoleAsync("Guide");
-		var paginator = Paginator<ApplicationViewModel>.Create(users.Select(u => new ApplicationUserViewModel {
+		var paginator = Paginator<ApplicationViewModel>.Create(users.Where(u => !u.IsDeactivated).Select(u => new ApplicationUserViewModel {
 			Id = u.Id,
 			FirstName = u.FirstName,
 			LastName = u.LastName,
 			Rut = u.Rut,
 			Email = u.Email,
 			Specialization = u.Specialization,
+		}).AsQueryable(), pageNumber ?? 1, 10);
+		if (!string.IsNullOrEmpty(sortOrder)) {
+			paginator.Sort(sortOrder);
+		}
+		if (!string.IsNullOrEmpty(currentFilter)) {
+			paginator.Filter(currentFilter);
+		}
+		return this.View(paginator);
+	}
+
+	[Authorize(Roles = "Guide")]
+	public IActionResult Students(string id, string sortOrder, string currentFilter, string searchString, int? pageNumber) {
+		var memoir = this._dbContext.Memoirs!.Include(m => m.Candidates).AsNoTracking().FirstOrDefault(p => p.Id == id && p.Phase == Phase.PublishedByGuide);
+		this.ViewData["Memoir"] = memoir;
+		var parameters = new[] { "FirstName", "LastName", "Email" };
+		foreach (var parameter in parameters) {
+			this.ViewData[$"{parameter}SortParam"] = sortOrder == parameter ? $"{parameter}Desc" : parameter;
+		}
+		this.ViewData["CurrentSort"] = sortOrder;
+		if (searchString is not null) {
+			pageNumber = 1;
+		} else {
+			searchString = currentFilter;
+		}
+		this.ViewData["CurrentFilter"] = searchString;
+		var candidates = memoir!.Candidates!.AsEnumerable();
+		var paginator = Paginator<ApplicationViewModel>.Create(candidates.Where(u => !u!.IsDeactivated).Select(u => new ApplicationUserViewModel {
+			Id = u!.Id,
+			FirstName = u.FirstName,
+			LastName = u.LastName,
+			Email = u.Email,
 		}).AsQueryable(), pageNumber ?? 1, 10);
 		if (!string.IsNullOrEmpty(sortOrder)) {
 			paginator.Sort(sortOrder);
@@ -127,7 +158,11 @@ public class MemoirController : Controller {
 	public async Task<IActionResult> Create(string id) {
 		var guideTeacher = await this._userManager.FindByIdAsync(id);
 		if (guideTeacher is null) {
-			this.TempData["ErrorMessage"] = "Error al registrar tu propuesta.";
+			this.TempData["ErrorMessage"] = "El profesor guía no existe.";
+			return this.RedirectToAction("Guide", "Proposal", new { area = "University" });
+		}
+		if (guideTeacher.IsDeactivated) {
+			this.TempData["ErrorMessage"] = "El profesor guía está desactivado.";
 			return this.RedirectToAction("Guide", "Proposal", new { area = "University" });
 		}
 		await this.PopulateAssistants(guideTeacher);
@@ -148,7 +183,11 @@ public class MemoirController : Controller {
 		if (this.User.IsInRole("Student")) {
 			guide = (await this._userManager.FindByIdAsync(input.GuideId!))!;
 			if (guide is null) {
-				this.ViewData["ErrorMessage"] = "Error al registrar tu propuesta.";
+				this.ViewData["ErrorMessage"] = "El profesor guía no existe.";
+				return this.RedirectToAction("Guide", "Proposal", new { area = "University" });
+			}
+			if (guide.IsDeactivated) {
+				this.ViewData["ErrorMessage"] = "El profesor guía está desactivado.";
 				return this.RedirectToAction("Guide", "Proposal", new { area = "University" });
 			}
 		} else if (this.User.IsInRole("Guide")) {
@@ -190,12 +229,15 @@ public class MemoirController : Controller {
 			memoir = await this._dbContext.Memoirs!
 				.Include(m => m.Guide)
 				.Where(m => m.Guide!.Id == this._userManager.GetUserId(this.User))
-				.Include(m => m.Memorist)
 				.Include(m => m.Assistants).AsNoTracking()
 				.FirstOrDefaultAsync(m => m.Id == id && (m.Phase == Phase.Draft || m.Phase == Phase.RejectedByGuide || m.Phase == Phase.RejectedByCommittee));
 		}
 		if (memoir is null) {
-			this.TempData["ErrorMessage"] = "Error al editar tu propuesta.";
+			this.TempData["ErrorMessage"] = "La propuesta no existe.";
+			return this.RedirectToAction("Index", "Proposal", new { area = "University" });
+		}
+		if (memoir.Guide!.IsDeactivated) {
+			this.TempData["ErrorMessage"] = "El profesor guía está desactivado.";
 			return this.RedirectToAction("Index", "Proposal", new { area = "University" });
 		}
 		await this.PopulateAssistants(memoir.Guide!);
@@ -243,26 +285,39 @@ public class MemoirController : Controller {
 			memoir = await this._dbContext.Memoirs!
 				.Include(m => m.Guide)
 				.Where(m => m.Guide!.Id == this._userManager.GetUserId(this.User))
-				.Include(m => m.Memorist)
 				.Include(m => m.Assistants)
 				.FirstOrDefaultAsync(m => m.Id == input.Id && (m.Phase == Phase.Draft || m.Phase == Phase.RejectedByGuide || m.Phase == Phase.RejectedByCommittee));
 		}
 		if (memoir is null) {
-			this.TempData["ErrorMessage"] = "Error al editar tu propuesta.";
+			this.TempData["ErrorMessage"] = "La propuesta no existe.";
+			return this.RedirectToAction("Index", "Proposal", new { area = "University" });
+		}
+		if (memoir.Guide!.IsDeactivated) {
+			this.TempData["ErrorMessage"] = "El profesor guía está desactivado.";
 			return this.RedirectToAction("Index", "Proposal", new { area = "University" });
 		}
 		var assistants = input.Assistants!.Select(async a => await this._userManager.FindByIdAsync(a!)).Select(a => a.Result).Where(u => !u!.IsDeactivated).ToList();
-		memoir.Title = input.Title;
-		memoir.Description = input.Description;
-		if (this.User.IsInRole("Guide")) {
-			memoir.Requirements = input.Requirements;
-		}
-		memoir.Assistants = assistants;
-		memoir.UpdatedAt = DateTimeOffset.Now;
-		_ = this._dbContext.Memoirs!.Update(memoir);
-		_ = await this._dbContext.SaveChangesAsync();
-		await this.PopulateAssistants(memoir.Guide!);
 		MemoirViewModel? output = null!;
+		var canEdit = true;
+		foreach (var assistant in assistants) {
+			if (assistant!.IsDeactivated) {
+				this.ViewBag.WarningMessage = $"El profesor co-guía {assistant.FirstName} {assistant.LastName} está desactivado.";
+				canEdit = false;
+				break;
+			}
+		}
+		if (canEdit) {
+			memoir.Title = input.Title;
+			memoir.Description = input.Description;
+			if (this.User.IsInRole("Guide")) {
+				memoir.Requirements = input.Requirements;
+			}
+			memoir.Assistants = assistants;
+			memoir.UpdatedAt = DateTimeOffset.Now;
+			_ = this._dbContext.Memoirs!.Update(memoir);
+			_ = await this._dbContext.SaveChangesAsync();
+		}
+		await this.PopulateAssistants(memoir.Guide!);
 		if (this.User.IsInRole("Student")) {
 			output = new MemoirViewModel {
 				Id = memoir.Id,
@@ -308,7 +363,7 @@ public class MemoirController : Controller {
 				.FirstOrDefaultAsync(m => m.Id == id && m.Phase == Phase.Draft);
 		}
 		if (memoir is null) {
-			this.TempData["ErrorMessage"] = "Error al eliminar tu propuesta.";
+			this.TempData["ErrorMessage"] = "La propuesta no existe.";
 			return this.RedirectToAction("Index", "Proposal", new { area = "University" });
 		}
 		var output = new MemoirViewModel {
@@ -333,7 +388,7 @@ public class MemoirController : Controller {
 				.FirstOrDefaultAsync(m => m.Id == input.Id && m.Phase == Phase.Draft);
 		}
 		if (memoir is null) {
-			this.TempData["ErrorMessage"] = "Error al eliminar tu propuesta.";
+			this.TempData["ErrorMessage"] = "La propuesta no existe.";
 			return this.RedirectToAction("Index", "Proposal", new { area = "University" });
 		}
 		_ = this._dbContext.Memoirs!.Remove(memoir);
@@ -358,11 +413,11 @@ public class MemoirController : Controller {
 				.FirstOrDefaultAsync(m => m.Id == id && m.Phase == Phase.Draft);
 		}
 		if (memoir is null) {
-			if (this.User.IsInRole("Student")) {
-				this.TempData["ErrorMessage"] = "Error al enviar tu propuesta.";
-			} else if (this.User.IsInRole("Guide")) {
-				this.TempData["ErrorMessage"] = "Error al publicar tu propuesta.";
-			}
+			this.TempData["ErrorMessage"] = "La propuesta no existe.";
+			return this.RedirectToAction("Index", "Proposal", new { area = "University" });
+		}
+		if (memoir.Guide!.IsDeactivated) {
+			this.TempData["ErrorMessage"] = "El profesor guía está desactivado.";
 			return this.RedirectToAction("Index", "Proposal", new { area = "University" });
 		}
 		MemoirViewModel? output = null!;
@@ -396,7 +451,11 @@ public class MemoirController : Controller {
 				.FirstOrDefaultAsync(m => m.Id == input.Id && m.Phase == Phase.Draft);
 		}
 		if (memoir is null) {
-			this.TempData["ErrorMessage"] = "Error al enviar tu propuesta.";
+			this.TempData["ErrorMessage"] = "La propuesta no existe.";
+			return this.RedirectToAction("Index", "Proposal", new { area = "University" });
+		}
+		if (memoir.Guide!.IsDeactivated) {
+			this.TempData["ErrorMessage"] = "El profesor guía está desactivado.";
 			return this.RedirectToAction("Index", "Proposal", new { area = "University" });
 		}
 		if (this.User.IsInRole("Student")) {
@@ -434,7 +493,7 @@ public class MemoirController : Controller {
 				.FirstOrDefaultAsync(m => m.Id == id && m.Phase == Phase.PublishedByGuide);
 		}
 		if (memoir is null) {
-			this.TempData["ErrorMessage"] = "Error al ver tu propuesta.";
+			this.TempData["ErrorMessage"] = "La propuesta no existe.";
 			return this.RedirectToAction("Index", "Proposal", new { area = "University" });
 		}
 		MemoirViewModel? output = null!;
@@ -476,6 +535,10 @@ public class MemoirController : Controller {
 			};
 		}
 		return this.View(output);
+	}
+
+	public async Task<IActionResult> Select(string proposalId, string studentId) {
+
 	}
 	#endregion
 }

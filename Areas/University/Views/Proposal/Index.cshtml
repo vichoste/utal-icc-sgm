@@ -11,24 +11,21 @@
 <div class="container">
 	<partial name="_Alerts" />
 	<div class="row justify-content-center">
+		<div class="col-12 col-md-10 mb-3">
+			<h2>@this.ViewData["Title"]</h2>
+		</div>
 		@if (this.User.IsInRole("Student")) {
-			<div class="col-12 col-md-10 mb-3">
-				<h2>@this.ViewData["Title"]</h2>
+			<div class="col-12 col-md-2 mb-3">
+				@this.Html.ActionLink("Crear propuesta", "Guides", "Proposal",new { area = "University" }, new { @class = "btn btn-success"})
 			</div>
+		} else if (this.User.IsInRole("Guide")) {
 			<div class="col-12 col-md-2 mb-3">
 				@this.Html.ActionLink("Crear propuesta", "Create", "Proposal",new { area = "University" }, new { @class = "btn btn-success"})
 			</div>
-			<div class="col-12 mb-3">
-				<partial name="_Filter" , model=@(new FilterPartialViewModel("Index", "Proposal","University")) />
-			</div>
-		} else if (this.User.IsInRole("Guide")) {
-			<div class="col-12 mb-3">
-				<h2>@this.ViewData["Title"]</h2>
-			</div>
-			<div class="col-12 mb-3">
-				<partial name="_Filter" , model=@(new FilterPartialViewModel("Index", "Proposal","University")) />
-			</div>
 		}
+		<div class="col-12 mb-3">
+			<partial name="_Filter", model=@(new FilterPartialViewModel("Index", "Proposal","University")) />
+		</div>
 	</div>
 	<div class="row justify-content-center">
 		<div class="col-12">
@@ -116,7 +113,7 @@
 											@this.Html.ActionLink("Publicar", "Send", "Proposal",new { area = "University", id = item.Id }, new { @class = "btn btn-primary mb-3"})
 										} else if (item.Phase == "PublishedByGuide") {
 											@this.Html.ActionLink("Ver", "View", "Proposal",new { area = "University", id = item.Id }, new { @class = "btn btn-yellow mb-3"})
-											@this.Html.ActionLink("Postulaciones", "Student", "Proposal",new { area = "University", id = item.Id }, new { @class = "btn btn-primary mb-3"})
+											@this.Html.ActionLink("Postulaciones", "Students", "Proposal",new { area = "University", id = item.Id }, new { @class = "btn btn-primary mb-3"})
 										} else if (item.Phase == "ReadyByGuide") {
 											@this.Html.ActionLink("Convertir", "View", "Proposal",new { area = "University", id = item.Id }, new { @class = "btn btn-success mb-3"})
 										}

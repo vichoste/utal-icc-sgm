@@ -23,7 +23,7 @@
 			@this.Html.ActionLink("Crear profesor", "CreateTeacher", "User", new { area = "University" }, new { @class = "btn btn-success"})
 		</div>
 		<div class="col-12 mb-3">
-			<partial name="_Filter" , model=@(new FilterPartialViewModel("Teachers", "User", "University")) />
+			<partial name="_Filter", model=@(new FilterPartialViewModel("Teachers", "User", "University")) />
 		</div>
 	</div>
 	<div class="row justify-content-center">
@@ -85,10 +85,6 @@
 						}
 					</tbody>
 				</table>
-				@{
-					var prevDisabled = !this.Model.HasPreviousPage ? "disabled" : "";
-					var nextDisabled = !this.Model.HasNextPage ? "disabled" : "";
-				}
 				<partial name="_Paginator" , model=@(new PaginatorPartialViewModel("Teachers", this.Model.PageIndex, this.Model.TotalPages, this.Model.HasPreviousPage, this.Model.HasNextPage)) />
 			</div>
 		</div>
