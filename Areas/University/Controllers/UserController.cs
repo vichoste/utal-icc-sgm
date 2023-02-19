@@ -5,12 +5,12 @@ using CsvHelper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
-using Utal.Icc.Sgm.Models;
-using Utal.Icc.Sgm.ViewModels;
 using Utal.Icc.Sgm.Areas.University.Helpers;
 using Utal.Icc.Sgm.Areas.University.ViewModels.User;
-using Microsoft.EntityFrameworkCore;
+using Utal.Icc.Sgm.Models;
+using Utal.Icc.Sgm.ViewModels;
 
 namespace Utal.Icc.Sgm.Areas.University.Controllers;
 
@@ -95,7 +95,7 @@ public class UserController : Controller {
 	[Authorize(Roles = "Director"), HttpPost]
 	public async Task<IActionResult> BatchCreateStudents([FromForm] CsvFileViewModel input) {
 		try {
-			var errorMessages = new List<string>(); ;
+			var warningMessages = new List<string>(); ;
 			var successMessages = new List<string>();
 			using var reader = new StreamReader(input.CsvFile!.OpenReadStream());
 			using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
@@ -113,14 +113,14 @@ public class UserController : Controller {
 				await this._emailStore.SetEmailAsync(user, record.Email, CancellationToken.None);
 				var result = await this._userManager.CreateAsync(user, record!.Password!);
 				if (!result.Succeeded) {
-					errorMessages.Add($"Estudiante {record.Email} ya existe");
+					warningMessages.Add($"Usuario {record.Email} ya existe");
 					continue;
 				}
 				_ = await this._userManager.AddToRoleAsync(user, "Student");
-				successMessages.Add($"Estudiante {record.Email} creado correctamente.");
+				successMessages.Add($"Usuario {record.Email} creado correctamente.");
 			}
-			if (errorMessages.Any()) {
-				this.TempData["ErrorMessages"] = errorMessages.AsEnumerable();
+			if (warningMessages.Any()) {
+				this.TempData["WarningMessages"] = warningMessages.AsEnumerable();
 			}
 			if (successMessages.Any()) {
 				this.TempData["SuccessMessages"] = successMessages.AsEnumerable();
@@ -162,7 +162,7 @@ public class UserController : Controller {
 		_ = await this._userManager.CreateAsync(user, input.Password!);
 		_ = await this._userManager.AddToRoleAsync(user, "Teacher");
 		_ = await this._userManager.AddToRolesAsync(user, roles);
-		this.TempData["SuccessMessage"] = "Profesor creado exitosamente.";
+		this.TempData["SuccessMessage"] = "Usuario creado exitosamente.";
 		return this.RedirectToAction("Users", "User", new { area = "University" });
 	}
 

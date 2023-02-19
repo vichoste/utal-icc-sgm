@@ -2,11 +2,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 
 using Utal.Icc.Sgm.Data;
 using Utal.Icc.Sgm.Models;
 using Utal.Icc.Sgm.ViewModels;
-using Microsoft.EntityFrameworkCore;
 
 namespace Utal.Icc.Sgm.Areas.University.Controllers;
 
@@ -339,6 +339,84 @@ public class MemoirController : Controller {
 		_ = this._dbContext.Memoirs!.Remove(memoir);
 		_ = await this._dbContext.SaveChangesAsync();
 		this.TempData["SuccessMessage"] = "Tu propuesta ha sido eliminada correctamente.";
+		return this.RedirectToAction("MyProposal", "Memoir", new { area = "University" });
+	}
+
+	[Authorize(Roles = "Student,Guide")]
+	public async Task<IActionResult> Send(string id) {
+		Memoir? memoir = null!;
+		if (this.User.IsInRole("Student")) {
+			memoir = await this._dbContext.Memoirs!
+				.Include(m => m.Memorist)
+				.Where(m => m.Memorist!.Id == this._userManager.GetUserId(this.User))
+				.Include(m => m.Guide)
+				.FirstOrDefaultAsync(m => m.Id == id && m.Phase == Phase.Draft);
+		} else if (this.User.IsInRole("Guide")) {
+			memoir = await this._dbContext.Memoirs!
+				.Include(m => m.Guide)
+				.Where(m => m.Guide!.Id == this._userManager.GetUserId(this.User))
+				.Include(m => m.Memorist)
+				.FirstOrDefaultAsync(m => m.Id == id && m.Phase == Phase.Draft);
+		}
+		if (memoir is null) {
+			if (this.User.IsInRole("Student")) {
+				this.TempData["ErrorMessage"] = "Error al enviar tu propuesta.";
+			} else if (this.User.IsInRole("Guide")) {
+				this.TempData["ErrorMessage"] = "Error al publicar tu propuesta.";
+			}
+			return this.RedirectToAction("MyProposal", "Memoir", new { area = "University" });
+		}
+		MemoirViewModel? output = null!;
+		if (this.User.IsInRole("Student")) {
+			output = new MemoirViewModel {
+				Id = id,
+				Title = memoir.Title,
+				GuideName = $"{memoir.Guide!.FirstName} {memoir.Guide!.LastName}",
+			};
+		} else if (this.User.IsInRole("Guide")) {
+			output = new MemoirViewModel {
+				Id = id,
+				Title = memoir.Title
+			};
+		}
+		return this.View(output);
+	}
+
+	[Authorize(Roles = "Student,Guide"), HttpPost, ValidateAntiForgeryToken]
+	public async Task<IActionResult> Send([FromForm] MemoirViewModel input) {
+		Memoir? memoir = null!;
+		if (this.User.IsInRole("Student")) {
+			memoir = await this._dbContext.Memoirs!
+				.Include(m => m.Memorist)
+				.Where(m => m.Memorist!.Id == this._userManager.GetUserId(this.User))
+				.Include(m => m.Guide)
+				.Include(m => m.Assistants)
+				.FirstOrDefaultAsync(m => m.Id == input.Id && m.Phase == Phase.Draft);
+		} else if (this.User.IsInRole("Guide")) {
+			memoir = await this._dbContext.Memoirs!
+				.Include(m => m.Guide)
+				.Where(m => m.Guide!.Id == this._userManager.GetUserId(this.User))
+				.Include(m => m.Memorist)
+				.Include(m => m.Assistants)
+				.FirstOrDefaultAsync(m => m.Id == input.Id && m.Phase == Phase.Draft);
+		}
+		if (memoir is null) {
+			this.TempData["ErrorMessage"] = "Error al enviar tu propuesta.";
+			return this.RedirectToAction("MyProposal", "Memoir", new { area = "University" });
+		}
+		if (this.User.IsInRole("Student")) {
+			memoir.Phase = Phase.SentToGuide;
+		} else if (this.User.IsInRole("Guide")) {
+			memoir.Phase = Phase.PublishedToStudents;
+		}
+		memoir.UpdatedAt = DateTimeOffset.Now;
+		_ = this._dbContext.Memoirs!.Update(memoir);
+		_ = await this._dbContext.SaveChangesAsync();
+		if (this.User.IsInRole("Student")) {
+			this.TempData["SuccessMessage"] = "Tu propuesta ha sido enviada correctamente.";
+		} else if (this.User.IsInRole("Guide")) {
+			this.TempData["SuccessMessage"] = "Tu propuesta ha sido publicada correctamente.";
+		}
 		return this.RedirectToAction("MyProposal", "Memoir", new { area = "University" });
 	}
 	#endregion

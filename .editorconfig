@@ -194,6 +194,7 @@ csharp_style_inlined_variable_declaration = true:suggestion
 csharp_style_throw_expression = true:suggestion
 csharp_style_conditional_delegate_call = true:suggestion
 csharp_style_prefer_extended_property_pattern = true:suggestion
+csharp_style_namespace_declarations=file_scoped:suggestion
 
 # Space preferences
 csharp_space_after_cast = false

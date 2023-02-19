@@ -1,0 +1,42 @@
+@using Utal.Icc.Sgm.ViewModels
+
+@model MemoirViewModel
+
+@{
+	@if (this.User.IsInRole("Student")) {
+		this.ViewData["Title"] = "Enviar propuesta";
+	} else if (this.User.IsInRole("Guide")) {
+		this.ViewData["Title"] = "Publicar propuesta";
+	}
+}
+
+<div class="container">
+	<partial name="_Alerts" />
+	<div class="row justify-content-center">
+		<div class="col-10">
+			<div class="card">
+				<div class="card-header text-center">@this.ViewData["Title"]</div>
+				<div class="card-body text-center">
+					@using (this.Html.BeginForm(nameof(StudentProposalController.Publish), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.Student) })) {
+						@this.Html.AntiForgeryToken()
+						@this.Html.HiddenFor(m => m.Id)
+						@if (this.User.IsInRole("Student")) {
+							<h5 class="card-title mb-3">¿Deseas <b class="text-primary">enviar</b> esta propuesta al profesor guía <b>@this.Html.DisplayFor(m => m.GuideTeacherName)</b>?</h5>
+						} else if (this.User.IsInRole("Guide")) {
+							<h5 class="card-title mb-3">¿Deseas <b class="text-primary">publicar</b> esta propuesta a <b>los estudiantes</b>?</h5>
+						}
+						<h6 class="card-subtitle mb-3 text-muted text-center">@this.Html.DisplayFor(m => m.Title)</h6>
+						<div class="row text-center">
+							<div class="col">
+								<div class="btn-group">
+									@this.Html.ActionLink("No", nameof(StudentProposalController.Index), nameof(StudentProposalController).Replace("Controller", string.Empty), new { area = nameof(Utal.Icc.Sgm.Areas.Student) }, new { @class = "btn btn-secondary" })
+									<button type="submit" class="btn btn-primary">Sí</button>
+								</div>
+							</div>
+						</div>
+					}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
