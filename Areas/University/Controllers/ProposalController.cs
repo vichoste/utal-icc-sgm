@@ -529,16 +529,14 @@ public class ProposalController : Controller {
 				IsWorking = memoir.Memorist is not null && memoir.Memorist.IsWorking,
 				Assistants = memoir.Assistants!.Select(a => $"{a!.FirstName} {a.LastName}").ToList(),
 				CreatedAt = memoir.CreatedAt,
-				UpdatedAt = memoir.UpdatedAt,
-				WhoRejected = memoir.WhoRejected is null ? "Memoria aún no rechazada" : $"{memoir.WhoRejected.FirstName} {memoir.WhoRejected.LastName}",
-				Reason = memoir.Reason
+				UpdatedAt = memoir.UpdatedAt
 			};
 		}
 		return this.View(output);
 	}
 
 	public async Task<IActionResult> Select(string proposalId, string studentId) {
-
+		var proposal
 	}
 	#endregion
 }
