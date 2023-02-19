@@ -14,6 +14,7 @@ namespace Utal.Icc.Sgm.Areas.University.Controllers;
 public class MemoirController : Controller {
 	private readonly ApplicationDbContext _dbContext;
 	private readonly UserManager<ApplicationUser> _userManager;
+
 	public MemoirController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager) {
 		this._dbContext = dbContext;
 		this._userManager = userManager;
@@ -21,11 +22,11 @@ public class MemoirController : Controller {
 
 	private async Task PopulateAssistants(ApplicationUser guideTeacher) {
 		var assistants = (
-			await this._userManager.GetUsersInRoleAsync(nameof(Role.Assistant)))
+			await this._userManager.GetUsersInRoleAsync("Assistant"))
 				.Where(at => at != guideTeacher && !at.IsDeactivated)
 				.OrderBy(at => at.LastName)
 				.ToList();
-		this.ViewData[$"{nameof(Role.Assistant)}s"] = assistants.Select(at => new SelectListItem {
+		this.ViewData[$"Assistants"] = assistants.Select(at => new SelectListItem {
 			Text = $"{at.FirstName} {at.LastName}",
 			Value = at.Id
 		});
@@ -184,14 +185,14 @@ public class MemoirController : Controller {
 				.Where(m => m.Memorist!.Id == this._userManager.GetUserId(this.User))
 				.Include(m => m.Guide)
 				.Include(m => m.Assistants).AsNoTracking()
-				.FirstOrDefaultAsync(m => m.Id == id);
+				.FirstOrDefaultAsync(m => m.Id == id && m.Phase == Phase.Draft);
 		} else if (this.User.IsInRole("Guide")) {
 			memoir = await this._dbContext.Memoirs!
 				.Include(m => m.Guide)
 				.Where(m => m.Guide!.Id == this._userManager.GetUserId(this.User))
 				.Include(m => m.Memorist)
 				.Include(m => m.Assistants).AsNoTracking()
-				.FirstOrDefaultAsync(m => m.Id == id);
+				.FirstOrDefaultAsync(m => m.Id == id && m.Phase == Phase.Draft);
 		}
 		if (memoir is null) {
 			this.TempData["ErrorMessage"] = "Error al editar tu propuesta.";
@@ -201,7 +202,7 @@ public class MemoirController : Controller {
 		MemoirViewModel? output = null!;
 		if (this.User.IsInRole("Student")) {
 			output = new MemoirViewModel {
-				Id = memoir.Id,
+				Id = id,
 				Title = memoir.Title,
 				Description = memoir.Description,
 				GuideId = memoir.Guide!.Id,
@@ -216,7 +217,7 @@ public class MemoirController : Controller {
 			};
 		} else if (this.User.IsInRole("Guide")) {
 			output = new MemoirViewModel {
-				Id = memoir.Id,
+				Id = id,
 				Title = memoir.Title,
 				Description = memoir.Description,
 				Requirements = memoir.Requirements,
@@ -237,14 +238,14 @@ public class MemoirController : Controller {
 				.Where(m => m.Memorist!.Id == this._userManager.GetUserId(this.User))
 				.Include(m => m.Guide)
 				.Include(m => m.Assistants)
-				.FirstOrDefaultAsync(m => m.Id == input.Id);
+				.FirstOrDefaultAsync(m => m.Id == input.Id && m.Phase == Phase.Draft);
 		} else if (this.User.IsInRole("Guide")) {
 			memoir = await this._dbContext.Memoirs!
 				.Include(m => m.Guide)
 				.Where(m => m.Guide!.Id == this._userManager.GetUserId(this.User))
 				.Include(m => m.Memorist)
 				.Include(m => m.Assistants)
-				.FirstOrDefaultAsync(m => m.Id == input.Id);
+				.FirstOrDefaultAsync(m => m.Id == input.Id && m.Phase == Phase.Draft);
 		}
 		if (memoir is null) {
 			this.TempData["ErrorMessage"] = "Error al editar tu propuesta.";
@@ -290,6 +291,55 @@ public class MemoirController : Controller {
 		}
 		this.ViewBag.SuccessMessage = "Tu propuesta ha sido editada correctamente.";
 		return this.View(output);
+	}
+
+	[Authorize(Roles = "Student,Guide"), HttpPost, ValidateAntiForgeryToken]
+	public async Task<IActionResult> Delete(string id) {
+		Memoir? memoir = null!;
+		if (this.User.IsInRole("Student")) {
+			memoir = await this._dbContext.Memoirs!
+				.Include(m => m.Memorist)
+				.Where(m => m.Memorist!.Id == this._userManager.GetUserId(this.User)).AsNoTracking()
+				.FirstOrDefaultAsync(m => m.Id == id && m.Phase == Phase.Draft);
+		} else if (this.User.IsInRole("Guide")) {
+			memoir = await this._dbContext.Memoirs!
+				.Include(m => m.Guide)
+				.Where(m => m.Guide!.Id == this._userManager.GetUserId(this.User)).AsNoTracking()
+				.FirstOrDefaultAsync(m => m.Id == id && m.Phase == Phase.Draft);
+		}
+		if (memoir is null) {
+			this.TempData["ErrorMessage"] = "Error al eliminar tu propuesta.";
+			return this.RedirectToAction("MyProposal", "Memoir", new { area = "University" });
+		}
+		var output = new MemoirViewModel {
+			Id = id,
+			Title = memoir.Title,
+		};
+		return this.View(output);
+	}
+
+	[Authorize(Roles = "Student,Guide"), HttpPost, ValidateAntiForgeryToken]
+	public async Task<IActionResult> Delete([FromForm] MemoirViewModel input) {
+		Memoir? memoir = null!;
+		if (this.User.IsInRole("Student")) {
+			memoir = await this._dbContext.Memoirs!
+				.Include(m => m.Memorist)
+				.Where(m => m.Memorist!.Id == this._userManager.GetUserId(this.User))
+				.FirstOrDefaultAsync(m => m.Id == input.Id && m.Phase == Phase.Draft);
+		} else if (this.User.IsInRole("Guide")) {
+			memoir = await this._dbContext.Memoirs!
+				.Include(m => m.Guide)
+				.Where(m => m.Guide!.Id == this._userManager.GetUserId(this.User))
+				.FirstOrDefaultAsync(m => m.Id == input.Id && m.Phase == Phase.Draft);
+		}
+		if (memoir is null) {
+			this.TempData["ErrorMessage"] = "Error al eliminar tu propuesta.";
+			return this.RedirectToAction("MyProposal", "Memoir", new { area = "University" });
+		}
+		_ = this._dbContext.Memoirs!.Remove(memoir);
+		_ = await this._dbContext.SaveChangesAsync();
+		this.TempData["SuccessMessage"] = "Tu propuesta ha sido eliminada correctamente.";
+		return this.RedirectToAction("MyProposal", "Memoir", new { area = "University" });
 	}
 	#endregion
 }

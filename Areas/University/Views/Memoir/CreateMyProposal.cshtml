@@ -13,7 +13,8 @@
 			<div class="card">
 				<div class="card-header text-center">@this.ViewData["Title"]</div>
 				<div class="card-body">
-					@using ("CreateMyProposal", "Memoir", new { area = "University" }) {
+					@using (this.Html.BeginForm("CreateMyProposal", "Memoir", new { area = "University" }))
+					{
 						@this.Html.AntiForgeryToken()
 						<div class="row">
 							<div class="col">
@@ -60,7 +61,7 @@
 								<div class="form-group mb-3">
 									@this.Html.LabelFor(m => m.Assistants, new { @class = "form-label" }):
 									@this.Html.ListBoxFor(m => m.Assistants, new
-								MultiSelectList((IEnumerable<SelectListItem>)this.ViewData[$"{nameof(Roles.AssistantTeacher)}s"]!,
+								MultiSelectList((IEnumerable<SelectListItem>)this.ViewData[$"Assistants"]!,
 								"Value", "Text"), new { @class = "form-select", @multiple = "multiple" })
 								</div>
 							</div>
