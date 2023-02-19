@@ -1,0 +1,145 @@
+﻿@using Utal.Icc.Sgm.ViewModels
+
+@model MemoirViewModel
+
+@{
+	this.ViewData["Title"] = "Ver propuesta";
+}
+
+<div class="container">
+	<partial name="_Alerts" />
+	<div class="row justify-content-center">
+		<div class="col-10">
+			<div class="card">
+				<div class="card-header text-center">@this.ViewData["Title"]</div>
+				<div class="card-body">
+					@using (this.Html.BeginForm()) {
+						@this.Html.AntiForgeryToken()
+						@this.Html.HiddenFor(m => m.Id)
+						<div class="row">
+							<div class="col">
+								<div class="form-group mb-3">
+									@this.Html.LabelFor(m => m.Title, new { @class = "form-label" }):
+									@this.Html.DisplayFor(m => m.Title, new { @class = "form-control" })
+								</div>
+								<div class="form-group mb-3">
+									@this.Html.LabelFor(m => m.Description, new { @class = "form-label" }):
+									@this.Html.DisplayFor(m => m.Description, new { @class = "form-control" })
+								</div>
+								@if (this.User.IsInRole("Student")) {
+									@this.Html.HiddenFor(m => m.GuideId)
+									<div class="form-group mb-3">
+										@this.Html.LabelFor(m => m.GuideName, new { @class = "form-label" }):
+										@this.Html.DisplayFor(m => m.GuideName, new { @class = "form-control" })
+									</div>
+									<div class="form-group mb-3">
+										@this.Html.LabelFor(m => m.GuideEmail, new { @class = "form-label" }):
+										@this.Html.DisplayFor(m => m.GuideEmail, new { @class = "form-control" })
+									</div>
+									<div class="form-group mb-3">
+										@this.Html.LabelFor(m => m.Office, new { @class = "form-label" }):
+										@this.Html.DisplayFor(m => m.Office, new { @class = "form-control" })
+									</div>
+									<div class="form-group mb-3">
+										@this.Html.LabelFor(m => m.Schedule, new { @class = "form-label" }):
+										@this.Html.DisplayFor(m => m.Schedule, new { @class = "form-control" })
+									</div>
+									<div class="form-group mb-3">
+										@this.Html.LabelFor(m => m.Specialization, new { @class = "form-label" }):
+										@this.Html.DisplayFor(m => m.Specialization, new { @class = "form-control" })
+									</div>
+									@if (this.Model.WhoRejected != string.Empty && this.Model.Reason != string.Empty) {
+										<div class="form-group mb-3">
+											@this.Html.LabelFor(m => m.WhoRejected, new { @class = "form-label" }):
+											@this.Html.DisplayFor(m => m.WhoRejected, new { @class = "form-control" })
+										</div>
+										<div class="form-group mb-3">
+											@this.Html.LabelFor(m => m.Reason, new { @class = "form-label" }):
+											@this.Html.DisplayFor(m => m.Reason, new { @class = "form-control" })
+										</div>
+									}
+								} else if (this.User.IsInRole("Guide")) {
+									<div class="form-group mb-3">
+										@this.Html.LabelFor(m => m.Requirements, new { @class = "form-label" }):
+										@this.Html.DisplayFor(m => m.Requirements, new { @class = "form-control" })
+									</div>
+									@if (this.Model.MemoristId != string.Empty) {
+										@this.Html.HiddenFor(m => m.MemoristId)
+										<div class="form-group mb-3">
+											@this.Html.LabelFor(m => m.MemoristName, new { @class = "form-label" }):
+											@this.Html.DisplayFor(m => m.MemoristName, new { @class = "form-control" })
+										</div>
+										<div class="form-group mb-3">
+											@this.Html.LabelFor(m => m.UniversityId, new { @class = "form-label" }):
+											@this.Html.DisplayFor(m => m.UniversityId, new { @class = "form-control" })
+										</div>
+										<div class="form-group mb-3">
+											@this.Html.LabelFor(m => m.RemainingCourses, new { @class = "form-label" }):
+											@this.Html.DisplayFor(m => m.RemainingCourses, new { @class = "form-control" })
+										</div>
+										<div class="form-group mb-3">
+											@this.Html.LabelFor(m => m.IsDoingThePractice, new { @class = "form-label" }):
+											@if (this.Model.IsDoingThePractice is true) {
+												<b class="text-info">Sí</b>
+											} else {
+												<b>No</b>
+											}
+										</div>
+										<div class="form-group mb-3">
+											@this.Html.LabelFor(m => m.IsWorking, new { @class = "form-label" }):
+											@if (this.Model.IsWorking is true) {
+												<b class="text-info">Sí</b>
+											} else {
+												<b>No</b>
+											}
+										</div>
+									}
+								}
+								@if (this.Model.Assistants!.Any()) {
+									<div class="form-group mb-3">
+										@this.Html.LabelFor(m => m.Assistants, new { @class = "form-label" }):
+										<ul>
+											@foreach (var assistant in this.Model.Assistants!) {
+												<li>@this.Html.DisplayFor(m => assistant, new { @class = "form-control" })</li>
+											}
+										</ul>
+									</div>
+								}
+								<hr />
+								<div class="form-group mb-3 text-muted">
+									@this.Html.LabelFor(m => m.CreatedAt, new { @class = "form-label" }):
+									@this.Html.DisplayFor(m => m.CreatedAt, new { @class = "form-control" })
+								</div>
+								<div class="form-group mb-3 text-muted">
+									@this.Html.LabelFor(m => m.UpdatedAt, new { @class = "form-label" }):
+									@this.Html.DisplayFor(m => m.UpdatedAt, new { @class = "form-control" })
+								</div>
+							</div>
+						</div>
+						<div class="row text-center">
+							<div class="col">
+								<div class="btn-group">
+									@this.Html.ActionLink("Volver", "Index", "Proposal", new { area = "University" }, new { @class = "btn btn-secondary" })
+									@if (this.User.IsInRole("Student")) {
+										@if (this.Model.Phase == "ApprovedByGuide") {
+											@this.Html.ActionLink("Convertir", "View", "Proposal", new { area = "University", id = this.Model.Id }, new { @class = "btn btn-success mb-3"})
+										} else if (this.Model.Phase == "RejectedByGuide") {
+											@this.Html.ActionLink("Corregir", "Edit", "Proposal", new { area = "University", id = this.Model.Id }, new { @class = "btn btn-danger mb-3"})
+										}
+									} else if (this.User.IsInRole("Guide")) {
+										@if (this.Model.Phase == "SentToGuide") {
+											@this.Html.ActionLink("Rechazar", "Reject", "Proposal", new { area = "University", id = this.Model.Id }, new { @class = "btn btn-danger" })
+											@this.Html.ActionLink("Aceptar", "Approve", "Proposal", new { area = "University", id = this.Model.Id }, new { @class = "btn btn-success" })
+										} else if (this.Model.Phase == "ReadyByGuide") {
+											@this.Html.ActionLink("Convertir", "Convert", "Proposal", new { area = "University", id = this.Model.Id }, new { @class = "btn btn-success mb-3"})
+										}
+									}
+								</div>
+							</div>
+						</div>
+					}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

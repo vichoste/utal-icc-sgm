@@ -313,6 +313,9 @@ public class ProposalController : Controller {
 				memoir.Requirements = input.Requirements;
 			}
 			memoir.Assistants = assistants;
+			if (memoir.Phase == Phase.RejectedByGuide) {
+				memoir.Phase = Phase.SentToGuide;
+			}
 			memoir.UpdatedAt = DateTimeOffset.Now;
 			_ = this._dbContext.Memoirs!.Update(memoir);
 			_ = await this._dbContext.SaveChangesAsync();
@@ -483,14 +486,14 @@ public class ProposalController : Controller {
 				.Where(m => m.Memorist!.Id == this._userManager.GetUserId(this.User))
 				.Include(m => m.Guide)
 				.Include(m => m.Assistants).AsNoTracking()
-				.FirstOrDefaultAsync(m => m.Id == id && m.Phase == Phase.SentToGuide);
+				.FirstOrDefaultAsync(m => m.Id == id && (m.Phase == Phase.SentToGuide || m.Phase == Phase.ApprovedByGuide || m.Phase == Phase.RejectedByGuide));
 		} else if (this.User.IsInRole("Guide")) {
 			memoir = await this._dbContext.Memoirs!
 				.Include(m => m.Guide)
 				.Where(m => m.Guide!.Id == this._userManager.GetUserId(this.User))
 				.Include(m => m.Memorist)
 				.Include(m => m.Assistants).AsNoTracking()
-				.FirstOrDefaultAsync(m => m.Id == id && m.Phase == Phase.PublishedByGuide);
+				.FirstOrDefaultAsync(m => m.Id == id && (m.Phase == Phase.PublishedByGuide || m.Phase == Phase.ReadyByGuide));
 		}
 		if (memoir is null) {
 			this.TempData["ErrorMessage"] = "La propuesta no existe.";
@@ -502,6 +505,7 @@ public class ProposalController : Controller {
 				Id = id,
 				Title = memoir.Title,
 				Description = memoir.Description,
+				Phase = memoir.Phase.ToString(),
 				GuideId = memoir.Guide!.Id,
 				GuideName = $"{memoir.Guide.FirstName} {memoir.Guide.LastName}",
 				GuideEmail = memoir.Guide.Email,
@@ -511,7 +515,7 @@ public class ProposalController : Controller {
 				Assistants = memoir.Assistants!.Select(a => $"{a!.FirstName} {a.LastName}").ToList(),
 				CreatedAt = memoir.CreatedAt,
 				UpdatedAt = memoir.UpdatedAt,
-				WhoRejected = memoir.WhoRejected is null ? "Memoria aún no rechazada" : $"{memoir.WhoRejected.FirstName} {memoir.WhoRejected.LastName}",
+				WhoRejected = memoir.WhoRejected is null ? string.Empty : $"{memoir.WhoRejected.FirstName} {memoir.WhoRejected.LastName}",
 				Reason = memoir.Reason
 			};
 		} else if (this.User.IsInRole("Guide")) {
@@ -519,12 +523,13 @@ public class ProposalController : Controller {
 				Id = id,
 				Title = memoir.Title,
 				Description = memoir.Description,
+				Phase = memoir.Phase.ToString(),
 				Requirements = memoir.Requirements,
 				MemoristId = memoir.Memorist is null ? string.Empty : memoir.Memorist.Id,
-				MemoristName = memoir.Memorist is null ? "Sin memorista asignado" : $"{memoir.Memorist.FirstName} {memoir.Memorist.LastName}",
-				MemoristEmail = memoir.Memorist is null ? "Sin memorista asignado" : memoir.Memorist.Email,
-				UniversityId = memoir.Memorist is null ? "Sin memorista asignado" : memoir.Memorist.UniversityId,
-				RemainingCourses = memoir.Memorist is null ? "Sin memorista asignado" : memoir.Memorist.RemainingCourses,
+				MemoristName = memoir.Memorist is null ? string.Empty : $"{memoir.Memorist.FirstName} {memoir.Memorist.LastName}",
+				MemoristEmail = memoir.Memorist is null ? string.Empty : memoir.Memorist.Email,
+				UniversityId = memoir.Memorist is null ? string.Empty : memoir.Memorist.UniversityId,
+				RemainingCourses = memoir.Memorist is null ? string.Empty : memoir.Memorist.RemainingCourses,
 				IsDoingThePractice = memoir.Memorist is not null && memoir.Memorist.IsDoingThePractice,
 				IsWorking = memoir.Memorist is not null && memoir.Memorist.IsWorking,
 				Assistants = memoir.Assistants!.Select(a => $"{a!.FirstName} {a.LastName}").ToList(),
@@ -533,10 +538,6 @@ public class ProposalController : Controller {
 			};
 		}
 		return this.View(output);
-	}
-
-	public async Task<IActionResult> Select(string proposalId, string studentId) {
-		var proposal
 	}
 	#endregion
 }
