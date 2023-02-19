@@ -13,26 +13,20 @@
 			<div class="card">
 				<div class="card-header text-center">@this.ViewData["Title"]</div>
 				<div class="card-body">
-					@using (this.Html.BeginForm("BatchCreateStudents", "User", new { area = "University" },
-							FormMethod.Post,
-							true, new { @enctype = "multipart/form-data" }))
-					{
+					@using (this.Html.BeginForm("BatchCreateStudents", "User", new { area = "University" }, FormMethod.Post, true, new { @enctype = "multipart/form-data" })) {
 						<div class="row">
 							<div class="col">
 								<div class="mb-3">
 									@this.Html.LabelFor(m => m.CsvFile, new { @class = "form-label" })
 									@this.Html.TextBoxFor(m => m.CsvFile, new { @class = "form-control", @type = "file" })
-									@this.Html.ValidationMessageFor(m => m.CsvFile, "Archivo CSV requerido", new { @class =
-								"invalid-feedback" })
+									@this.Html.ValidationMessageFor(m => m.CsvFile, "Archivo CSV requerido", new { @class = "invalid-feedback" })
 								</div>
 							</div>
 						</div>
 						<div class="row text-center">
 							<div class="col">
 								<div class="btn-group">
-									@this.Html.ActionLink("Cancelar", "List", "User", new { area = "University" }, new {
-								@class
-								= "btn btn-secondary" })
+									@this.Html.ActionLink("Cancelar", "List", "User", new { area = "University" }, new { @class = "btn btn-secondary" })
 									<button type="submit" class="btn btn-teal">Importar</button>
 								</div>
 							</div>

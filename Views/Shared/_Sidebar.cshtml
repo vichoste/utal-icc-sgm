@@ -1,20 +1,16 @@
 ﻿<div id="sidebar" class="app-sidebar">
 	<div class="app-sidebar-content" data-scrollbar="true" data-height="100%">
 		<div class="menu">
-			@if (this.User.Identity!.IsAuthenticated)
-			{
+			@if (this.User.Identity!.IsAuthenticated) {
 				<div class="menu-header">
 					Mis roles y herramientas
 				</div>
-			}
-			else
-			{
+			} else {
 				<div class="menu-header">
 					Debes iniciar sesión para visualizar tus roles y herramientas
 				</div>
 			}
-			@if (this.User.IsInRole("Director"))
-			{
+			@if (this.User.IsInRole("Director")) {
 				<div class="menu-item has-sub">
 					<a href="#" class="menu-link">
 						<span class="menu-icon"><i class="fa fa-University"></i></span>
@@ -40,8 +36,7 @@
 					</div>
 				</div>
 			}
-			@if (this.User.IsInRole("Committee"))
-			{
+			@if (this.User.IsInRole("Committee")) {
 				<div class="menu-item has-sub">
 					<a href="#" class="menu-link">
 						<span class="menu-icon"><i class="fa fa-people-line"></i></span>
@@ -62,8 +57,7 @@
 					</div>
 				</div>
 			}
-			@if (this.User.IsInRole("Course"))
-			{
+			@if (this.User.IsInRole("Course")) {
 				<div class="menu-item has-sub">
 					<a href="#" class="menu-link">
 						<span class="menu-icon"><i class="fa fa-person-chalkboard"></i></span>
@@ -79,8 +73,7 @@
 					</div>
 				</div>
 			}
-			@if (this.User.IsInRole("Guide"))
-			{
+			@if (this.User.IsInRole("Guide")) {
 				<div class="menu-item has-sub">
 					<a href="#" class="menu-link">
 						<span class="menu-icon"><i class="fa fa-user-tie"></i></span>
@@ -94,28 +87,24 @@
 							</a>
 						</div>
 						<div class="menu-item">
-							<a href="@this.Url.Action("MyProposal", "Memoir", new { area = "University" })"
-								class="menu-link">
+							<a href="@this.Url.Action("MyProposal", "Memoir", new { area = "University" })" class="menu-link">
 								<span class="menu-text">Mis propuestas</span>
 							</a>
 						</div>
 						<div class="menu-item">
-							<a href="@this.Url.Action("OurRequest", "Memoir", new { area = "University" })"
-								class="menu-link">
+							<a href="@this.Url.Action("OurRequest", "Memoir", new { area = "University" })" class="menu-link">
 								<span class="menu-text">Nuestras solicitudes</span>
 							</a>
 						</div>
 						<div class="menu-item">
-							<a href="@this.Url.Action("MyStudent", "Memoir", new { area = "University" })"
-								class="menu-link">
+							<a href="@this.Url.Action("MyStudent", "Memoir", new { area = "University" })" class="menu-link">
 								<span class="menu-text">Mis memoristas</span>
 							</a>
 						</div>
 					</div>
 				</div>
 			}
-			@if (this.User.IsInRole("Assistant"))
-			{
+			@if (this.User.IsInRole("Assistant")) {
 				<div class="menu-item has-sub">
 					<a href="#" class="menu-link">
 						<span class="menu-icon"><i class="fa fa-user-tie"></i></span>
@@ -131,8 +120,7 @@
 					</div>
 				</div>
 			}
-			@if (this.User.IsInRole("Engineer"))
-			{
+			@if (this.User.IsInRole("Engineer")) {
 				<div class="menu-item">
 					<a href="#" class="menu-link">
 						<span class="menu-icon"><i class="fa fa-user-graduate"></i></span>
@@ -140,8 +128,7 @@
 					</a>
 				</div>
 			}
-			@if (this.User.IsInRole("Completed"))
-			{
+			@if (this.User.IsInRole("Completed")) {
 				<div class="menu-item">
 					<a href="#" class="menu-link">
 						<span class="menu-icon"><i class="fa fa-user-graduate"></i></span>
@@ -149,8 +136,7 @@
 					</a>
 				</div>
 			}
-			@if (this.User.IsInRole("Memorist"))
-			{
+			@if (this.User.IsInRole("Memorist")) {
 				<div class="menu-item has-sub">
 					<a href="#" class="menu-link">
 						<span class="menu-icon"><i class="fa fa-user-graduate"></i></span>
@@ -171,8 +157,7 @@
 					</div>
 				</div>
 			}
-			@if (this.User.IsInRole("Student") && !this.User.IsInRole("Memorist"))
-			{
+			@if (this.User.IsInRole("Student") && !this.User.IsInRole("Memorist")) {
 				<div class="menu-item has-sub">
 					<a href="#" class="menu-link">
 						<span class="menu-icon"><i class="fa fa-user-graduate"></i></span>
@@ -181,8 +166,7 @@
 					</a>
 					<div class="menu-submenu">
 						<div class="menu-item">
-							<a href="@this.Url.Action("MyProposal", "Memoir", new { area = "University" }) class="
-								menu-link">
+							<a href="@this.Url.Action("MyProposal", "Memoir", new { area = "University" }) class=" menu-link">
 								<span class="menu-text">Mis propuestas</span>
 							</a>
 						</div>
@@ -192,14 +176,12 @@
 							</a>
 						</div>
 						<div class="menu-item">
-							<a href="@this.Url.Action("Application", "Memoir", new { area = "University" })"
-								class="menu-link">
+							<a href="@this.Url.Action("Application", "Memoir", new { area = "University" })" class="menu-link">
 								<span class="menu-text">Mis postulaciones</span>
 							</a>
 						</div>
 						<div class="menu-item">
-							<a href="@this.Url.Action("OurRequest", "Memoir", new { area = "University" })"
-								class="menu-link">
+							<a href="@this.Url.Action("OurRequest", "Memoir", new { area = "University" })" class="menu-link">
 								<span class="menu-text">Nuestras solicitudes</span>
 							</a>
 						</div>

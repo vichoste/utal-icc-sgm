@@ -13,8 +13,7 @@
 			<div class="card">
 				<div class="card-header text-center">@this.ViewData["Title"]</div>
 				<div class="card-body">
-					@using (this.Html.BeginForm("Edit", "User", new { area = "University" }))
-					{
+					@using (this.Html.BeginForm("Edit", "User", new { area = "University" })) {
 						@this.Html.AntiForgeryToken()
 						@this.Html.HiddenFor(m => m.Id)
 						<div class="row">
@@ -27,8 +26,7 @@
 									@this.Html.LabelFor(m => m.LastName, new { @class = "form-label" })
 									@this.Html.TextBoxFor(m => m.LastName, new { @class = "form-control" })
 								</div>
-								@if (this.User.IsInRole("Student"))
-								{
+								@if (this.User.IsInRole("Student")) {
 									<div class="form-group mb-3">
 										@this.Html.LabelFor(m => m.UniversityId, new { @class = "form-label" })
 										@this.Html.TextBoxFor(m => m.UniversityId, new { @class = "form-control" })
@@ -42,8 +40,7 @@
 									@this.Html.LabelFor(m => m.Email, new { @class = "form-label" })
 									@this.Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
 								</div>
-								@if (this.User.IsInRole("Teacher"))
-								{
+								@if (this.User.IsInRole("Teacher")) {
 									<p><strong>Roles</strong></p>
 									<div class="form-check mb-3">
 										@this.Html.LabelFor(m => m.IsGuide, new { @class = "form-check-label" })
@@ -78,9 +75,7 @@
 						<div class="row text-center">
 							<div class="col">
 								<div class="btn-group">
-									@this.Html.ActionLink("Cancelar", "List", "User", new { area = "University" }, new {
-								@class
-								= "btn btn-secondary" })
+									@this.Html.ActionLink("Cancelar", "List", "User", new { area = "University" }, new { @class = "btn btn-secondary" })
 									<button type="submit" class="btn btn-yellow">Editar</button>
 								</div>
 							</div>

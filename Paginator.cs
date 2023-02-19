@@ -24,7 +24,7 @@ public class Paginator<T> : List<T> where T : ApplicationViewModel {
 		return new Paginator<T>(items, count, pageIndex, pageSize, parameters);
 	}
 
-	public IEnumerable<T> Filter(string searchString) {
+	public void Filter(string searchString) {
 		var result = new List<T>();
 		foreach (var parameter in this.Parameters!) {
 			var partials = this

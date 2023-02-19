@@ -13,8 +13,7 @@
 			<div class="card">
 				<div class="card-header text-center">@this.ViewData["Title"]</div>
 				<div class="card-body">
-					@using (this.Html.BeginForm("Index", "SignIn", new { area = "Account" }))
-					{
+					@using (this.Html.BeginForm("Index", "SignIn", new { area = "Account" })) {
 						@this.Html.AntiForgeryToken()
 						<div class="row">
 							<div class="col">

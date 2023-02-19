@@ -13,8 +13,7 @@
 			<div class="card">
 				<div class="card-header text-center">@this.ViewData["Title"]</div>
 				<div class="card-body">
-					@using (this.Html.BeginForm())
-					{
+					@using (this.Html.BeginForm()) {
 						<div class="form-group mb-3">
 							@this.Html.LabelFor(m => m.FirstName, new { @class = "form-label" }):
 							@this.Html.DisplayFor(m => m.FirstName, new { @class = "form-control" })

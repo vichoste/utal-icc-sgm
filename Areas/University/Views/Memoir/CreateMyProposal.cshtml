@@ -13,8 +13,7 @@
 			<div class="card">
 				<div class="card-header text-center">@this.ViewData["Title"]</div>
 				<div class="card-body">
-					@using (this.Html.BeginForm("CreateMyProposal", "Memoir", new { area = "University" }))
-					{
+					@using (this.Html.BeginForm("CreateMyProposal", "Memoir", new { area = "University" })) {
 						@this.Html.AntiForgeryToken()
 						<div class="row">
 							<div class="col">
@@ -26,8 +25,7 @@
 									@this.Html.LabelFor(m => m.Description, new { @class = "form-label" })
 									@this.Html.TextBoxFor(m => m.Description, new { @class = "form-control" })
 								</div>
-								@if (this.User.IsInRole("Student"))
-								{
+								@if (this.User.IsInRole("Student")) {
 									<div class="form-group mb-3">
 										@this.Html.LabelFor(m => m.GuideName, new { @class = "form-label" }):
 										@this.Html.HiddenFor(m => m.GuideId)
@@ -50,9 +48,7 @@
 										@this.Html.DisplayFor(m => m.Specialization, new { @class = "form-control"
 								})
 									</div>
-								}
-								else if (this.User.IsInRole("Guide"))
-								{
+								} else if (this.User.IsInRole("Guide")) {
 									<div class="form-group mb-3">
 										@this.Html.LabelFor(m => m.Requirements, new { @class = "form-label" }):
 										@this.Html.TextBoxFor(m => m.Requirements, new { @class = "form-control" })
@@ -60,24 +56,17 @@
 								}
 								<div class="form-group mb-3">
 									@this.Html.LabelFor(m => m.Assistants, new { @class = "form-label" }):
-									@this.Html.ListBoxFor(m => m.Assistants, new
-								MultiSelectList((IEnumerable<SelectListItem>)this.ViewData[$"Assistants"]!,
-								"Value", "Text"), new { @class = "form-select", @multiple = "multiple" })
+									@this.Html.ListBoxFor(m => m.Assistants, new MultiSelectList((IEnumerable<SelectListItem>)this.ViewData[$"Assistants"]!, "Value", "Text"), new { @class = "form-select", @multiple = "multiple" })
 								</div>
 							</div>
 						</div>
 						<div class="row text-center">
 							<div class="col">
 								<div class="btn-group">
-									@if (this.User.IsInRole("Student"))
-									{
-										@this.Html.ActionLink("Volver", "GuideMyProposal", "Memoir", new { area = "University"},
-								new { @class = "btn btn-secondary" })
-									}
-									else if (this.User.IsInRole("Guide"))
-									{
-										@this.Html.ActionLink("Volver", "MyProposal", "Memoir", new { area = "University"},
-								new { @class = "btn btn-secondary" })
+									@if (this.User.IsInRole("Student")) {
+										@this.Html.ActionLink("Volver", "GuideMyProposal", "Memoir", new { area = "University"}, new { @class = "btn btn-secondary" })
+									} else if (this.User.IsInRole("Guide")) {
+										@this.Html.ActionLink("Volver", "MyProposal", "Memoir", new { area = "University"}, new { @class = "btn btn-secondary" })
 									}
 									<button type="submit" class="btn btn-success">Crear</button>
 								</div>

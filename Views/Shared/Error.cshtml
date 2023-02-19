@@ -9,7 +9,6 @@
 <h1 class="text-danger">@this.ViewData["Title"]</h1>
 <h2 class="text-danger">Ocurrió un error mientras se procesaba la petición.</h2>
 
-@if (this.Model.ShowRequestId)
-{
+@if (this.Model.ShowRequestId) {
 	<p><strong>ID de la petición:</strong> <code>@this.Model.RequestId</code></p>
 }
