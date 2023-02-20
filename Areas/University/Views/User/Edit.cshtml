@@ -1,9 +1,19 @@
+@using Microsoft.AspNetCore.Identity
+
+@using Utal.Icc.Sgm.Models
 @using Utal.Icc.Sgm.ViewModels
 
 @model ApplicationUserViewModel
 
+@inject UserManager<ApplicationUser> _userManager
+
 @{
-	this.ViewData["Title"] = "Editar profesor";
+	if (this.ViewData["Role"] as string == "Student") {
+		this.ViewData["Title"] = "Editar estudiante";
+	}
+	if (this.ViewData["Role"] as string == "Teacher") {
+		this.ViewData["Title"] = "Editar profesor";
+	}
 }
 
 <div class="container">
@@ -26,7 +36,7 @@
 									@this.Html.LabelFor(m => m.LastName, new { @class = "form-label" })
 									@this.Html.TextBoxFor(m => m.LastName, new { @class = "form-control" })
 								</div>
-								@if (this.User.IsInRole("Student")) {
+								@if (await this._userManager.IsInRoleAsync((await this._userManager.FindByIdAsync(this.Model.Id!))!, "Student")) {
 									<div class="form-group mb-3">
 										@this.Html.LabelFor(m => m.UniversityId, new { @class = "form-label" })
 										@this.Html.TextBoxFor(m => m.UniversityId, new { @class = "form-control" })
@@ -40,7 +50,7 @@
 									@this.Html.LabelFor(m => m.Email, new { @class = "form-label" })
 									@this.Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
 								</div>
-								@if (this.User.IsInRole("Teacher")) {
+								@if (await this._userManager.IsInRoleAsync((await this._userManager.FindByIdAsync(this.Model.Id!))!, "Teacher")) {
 									<p><strong>Roles</strong></p>
 									<div class="form-check mb-3">
 										@this.Html.LabelFor(m => m.IsGuide, new { @class = "form-check-label" })
@@ -75,7 +85,11 @@
 						<div class="row text-center">
 							<div class="col">
 								<div class="btn-group">
-									@this.Html.ActionLink("Cancelar", "List", "User", new { area = "University" }, new { @class = "btn btn-secondary" })
+									@if (await this._userManager.IsInRoleAsync((await this._userManager.FindByIdAsync(this.Model.Id!))!, "Student")) {
+										@this.Html.ActionLink("Cancelar", "Students", "User", new { area = "University" }, new { @class = "btn btn-secondary" })
+									} else if (await this._userManager.IsInRoleAsync((await this._userManager.FindByIdAsync(this.Model.Id!))!, "Teacher")) {
+										@this.Html.ActionLink("Cancelar", "Teachers", "User", new { area = "University" }, new { @class = "btn btn-secondary" })
+									}
 									<button type="submit" class="btn btn-yellow">Editar</button>
 								</div>
 							</div>

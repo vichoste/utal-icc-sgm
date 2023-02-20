@@ -5,7 +5,6 @@ using CsvHelper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 using Utal.Icc.Sgm.Areas.University.Helpers;
 using Utal.Icc.Sgm.Areas.University.ViewModels.User;
@@ -27,8 +26,8 @@ public class UserController : Controller {
 	}
 
 	[Authorize(Roles = "Director")]
-	public async Task<IActionResult> Student(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
-		this.TempData["Role"] = "Student";
+	public async Task<IActionResult> Students(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
+		this.ViewData["Role"] = "Student";
 		var parameters = new[] { "FirstName", "LastName", "UniversityId", "Rut", "Email" };
 		foreach (var parameter in parameters) {
 			this.ViewData[$"{parameter}SortParam"] = sortOrder == parameter ? $"{parameter}Desc" : parameter;
@@ -40,8 +39,7 @@ public class UserController : Controller {
 			searchString = currentFilter;
 		}
 		this.ViewData["CurrentFilter"] = searchString;
-		var users = await this._userManager.GetUsersInRoleAsync("Student");
-		var paginator = Paginator<ApplicationUserViewModel>.Create(users.Select(u => new ApplicationUserViewModel {
+		var users = (await this._userManager.GetUsersInRoleAsync("Student")).Select(u => new ApplicationUserViewModel {
 			Id = u.Id,
 			FirstName = u.FirstName,
 			LastName = u.LastName,
@@ -49,19 +47,20 @@ public class UserController : Controller {
 			Rut = u.Rut,
 			Email = u.Email,
 			IsDeactivated = u.IsDeactivated,
-		}).AsQueryable(), pageNumber ?? 1, 10);
+		}).AsQueryable();
+		var paginator = Paginator<ApplicationUserViewModel>.Create(users, pageNumber ?? 1, 10);
 		if (!string.IsNullOrEmpty(sortOrder)) {
-			paginator.Sort(sortOrder);
+			paginator = Paginator<ApplicationUserViewModel>.Sort(users, sortOrder, pageNumber ?? 1, 6, parameters);
 		}
 		if (!string.IsNullOrEmpty(currentFilter)) {
-			paginator.Filter(currentFilter);
+			paginator = Paginator<ApplicationUserViewModel>.Filter(users, searchString, pageNumber ?? 1, 6, parameters);
 		}
 		return this.View(paginator);
 	}
 
 	[Authorize(Roles = "Director")]
-	public async Task<IActionResult> Teacher(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
-		this.TempData["Role"] = "Teacher";
+	public async Task<IActionResult> Teachers(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
+		this.ViewData["Role"] = "Teacher";
 		var parameters = new[] { "FirstName", "LastName", "Rut", "Email" };
 		foreach (var parameter in parameters) {
 			this.ViewData[$"{parameter}SortParam"] = sortOrder == parameter ? $"{parameter}Desc" : parameter;
@@ -73,20 +72,20 @@ public class UserController : Controller {
 			searchString = currentFilter;
 		}
 		this.ViewData["CurrentFilter"] = searchString;
-		var users = await this._userManager.Users.ToListAsync();
-		var paginator = Paginator<ApplicationUserViewModel>.Create(users.Select(u => new ApplicationUserViewModel {
+		var users = (await this._userManager.GetUsersInRoleAsync("Teacher")).Select(u => new ApplicationUserViewModel {
 			Id = u.Id,
 			FirstName = u.FirstName,
 			LastName = u.LastName,
 			Rut = u.Rut,
 			Email = u.Email,
 			IsDeactivated = u.IsDeactivated,
-		}).AsQueryable(), pageNumber ?? 1, 10);
+		}).AsQueryable();
+		var paginator = Paginator<ApplicationUserViewModel>.Create(users, pageNumber ?? 1, 10);
 		if (!string.IsNullOrEmpty(sortOrder)) {
-			paginator.Sort(sortOrder);
+			paginator = Paginator<ApplicationUserViewModel>.Sort(users, sortOrder, pageNumber ?? 1, 6, parameters);
 		}
 		if (!string.IsNullOrEmpty(currentFilter)) {
-			paginator.Filter(currentFilter);
+			paginator = Paginator<ApplicationUserViewModel>.Filter(users, searchString, pageNumber ?? 1, 6, parameters);
 		}
 		return this.View(paginator);
 	}
@@ -172,10 +171,10 @@ public class UserController : Controller {
 	public async Task<IActionResult> Edit(string id) {
 		var user = await this._userManager.FindByIdAsync(id);
 		if (user is null) {
-			if (this.TempData["Role"] as string == "Student") {
+			if (this.ViewData["Role"] as string == "Student") {
 				this.TempData["ErrorMessage"] = "Error al obtener al estudiante.";
 				return this.RedirectToAction("Students", "User", new { area = "University" });
-			} else if (this.TempData["Role"] as string == "Teacher") {
+			} else if (this.ViewData["Role"] as string == "Teacher") {
 				this.TempData["ErrorMessage"] = "Error al obtener al profesor.";
 				return this.RedirectToAction("Teachers", "User", new { area = "University" });
 			}
@@ -200,12 +199,22 @@ public class UserController : Controller {
 				Email = user.Email,
 				CreatedAt = user.CreatedAt,
 				UpdatedAt = user.UpdatedAt,
+				IsAssistant = await this._userManager.IsInRoleAsync(user, "Assistant"),
+				IsCommittee = await this._userManager.IsInRoleAsync(user, "Committee"),
+				IsCourse = await this._userManager.IsInRoleAsync(user, "Course"),
+				IsGuide = await this._userManager.IsInRoleAsync(user, "Guide")
 			},
 			_ => null
 		};
 		if (output is null) {
-			this.TempData["ErrorMessage"] = "Error al obtener al usuario.";
-			return this.RedirectToAction("Users", "User", new { area = "University" });
+			if (this.ViewData["Role"] as string == "Student") {
+				this.TempData["ErrorMessage"] = "Error al obtener al estudiante.";
+				return this.RedirectToAction("Students", "User", new { area = "University" });
+			} else if (this.ViewData["Role"] as string == "Teacher") {
+				this.TempData["ErrorMessage"] = "Error al obtener al profesor.";
+				return this.RedirectToAction("Teachers", "User", new { area = "University" });
+			}
+			return this.RedirectToAction("Students", "User", new { area = "University" });
 		}
 		return this.View(output);
 	}
@@ -214,10 +223,10 @@ public class UserController : Controller {
 	public async Task<IActionResult> Edit([FromForm] ApplicationUserViewModel input) {
 		var user = await this._userManager.FindByIdAsync(input.Id!);
 		if (user is null) {
-			if (this.TempData["Role"] as string == "Student") {
+			if (this.ViewData["Role"] as string == "Student") {
 				this.TempData["ErrorMessage"] = "Error al obtener al estudiante.";
 				return this.RedirectToAction("Students", "User", new { area = "University" });
-			} else if (this.TempData["Role"] as string == "Teacher") {
+			} else if (this.ViewData["Role"] as string == "Teacher") {
 				this.TempData["ErrorMessage"] = "Error al obtener al profesor.";
 				return this.RedirectToAction("Teachers", "User", new { area = "University" });
 			}
@@ -271,7 +280,14 @@ public class UserController : Controller {
 			output.IsCourse = await this._userManager.IsInRoleAsync(user, "Course");
 			output.IsGuide = await this._userManager.IsInRoleAsync(user, "Guide");
 		}
-		this.TempData["SuccessMessage"] = "Usuario editado correctamente.";
+		if (this.ViewData["Role"] as string == "Student") {
+			this.ViewBag.SuccessMessage = "Estudiante editado correctamente.";
+			return this.View(output);
+		}
+		if (this.ViewData["Role"] as string == "Teacher") {
+			this.ViewBag.SuccessMessage = "Profesor editado correctamente.";
+			return this.View(output);
+		}
 		return this.View(output);
 	}
 
@@ -279,10 +295,10 @@ public class UserController : Controller {
 	public async Task<IActionResult> Toggle(string id) {
 		var user = await this._userManager.FindByIdAsync(id);
 		if (user is null) {
-			if (this.TempData["Role"] as string == "Student") {
+			if (this.ViewData["Role"] as string == "Student") {
 				this.TempData["ErrorMessage"] = "Error al obtener al estudiante.";
 				return this.RedirectToAction("Students", "User", new { area = "University" });
-			} else if (this.TempData["Role"] as string == "Teacher") {
+			} else if (this.ViewData["Role"] as string == "Teacher") {
 				this.TempData["ErrorMessage"] = "Error al obtener al profesor.";
 				return this.RedirectToAction("Teachers", "User", new { area = "University" });
 			}
@@ -290,17 +306,17 @@ public class UserController : Controller {
 		}
 		if (user.Id == this._userManager.GetUserId(this.User)) {
 			this.TempData["ErrorMessage"] = "No te puedes desactivar a tí mismo.";
-			if (this.TempData["Role"] as string == "Student") {
+			if (this.ViewData["Role"] as string == "Student") {
 				return this.RedirectToAction("Students", "User", new { area = "University" });
-			} else if (this.TempData["Role"] as string == "Teacher") {
+			} else if (this.ViewData["Role"] as string == "Teacher") {
 				return this.RedirectToAction("Teachers", "User", new { area = "University" });
 			}
 			return this.RedirectToAction("Students", "User", new { area = "University" });
 		} else if ((await this._userManager.GetRolesAsync(user)).Contains("Director")) {
 			this.TempData["ErrorMessage"] = "No puedes desactivar al director de carrera actual.";
-			if (this.TempData["Role"] as string == "Student") {
+			if (this.ViewData["Role"] as string == "Student") {
 				return this.RedirectToAction("Students", "User", new { area = "University" });
-			} else if (this.TempData["Role"] as string == "Teacher") {
+			} else if (this.ViewData["Role"] as string == "Teacher") {
 				return this.RedirectToAction("Teachers", "User", new { area = "University" });
 			}
 			return this.RedirectToAction("Students", "User", new { area = "University" });
@@ -317,10 +333,10 @@ public class UserController : Controller {
 	public async Task<IActionResult> Toggle([FromForm] ApplicationUserViewModel input) {
 		var user = await this._userManager.FindByIdAsync(input.Id!);
 		if (user is null) {
-			if (this.TempData["Role"] as string == "Student") {
+			if (this.ViewData["Role"] as string == "Student") {
 				this.TempData["ErrorMessage"] = "Error al obtener al estudiante.";
 				return this.RedirectToAction("Students", "User", new { area = "University" });
-			} else if (this.TempData["Role"] as string == "Teacher") {
+			} else if (this.ViewData["Role"] as string == "Teacher") {
 				this.TempData["ErrorMessage"] = "Error al obtener al profesor.";
 				return this.RedirectToAction("Teachers", "User", new { area = "University" });
 			}
@@ -328,17 +344,17 @@ public class UserController : Controller {
 		}
 		if (user.Id == this._userManager.GetUserId(this.User)) {
 			this.TempData["ErrorMessage"] = "No te puedes desactivar a tí mismo.";
-			if (this.TempData["Role"] as string == "Student") {
+			if (this.ViewData["Role"] as string == "Student") {
 				return this.RedirectToAction("Students", "User", new { area = "University" });
-			} else if (this.TempData["Role"] as string == "Teacher") {
+			} else if (this.ViewData["Role"] as string == "Teacher") {
 				return this.RedirectToAction("Teachers", "User", new { area = "University" });
 			}
 			return this.RedirectToAction("Students", "User", new { area = "University" });
 		} else if ((await this._userManager.GetRolesAsync(user)).Contains("Director")) {
 			this.TempData["ErrorMessage"] = "No puedes desactivar al director de carrera actual.";
-			if (this.TempData["Role"] as string == "Student") {
+			if (this.ViewData["Role"] as string == "Student") {
 				return this.RedirectToAction("Students", "User", new { area = "University" });
-			} else if (this.TempData["Role"] as string == "Teacher") {
+			} else if (this.ViewData["Role"] as string == "Teacher") {
 				return this.RedirectToAction("Teachers", "User", new { area = "University" });
 			}
 			return this.RedirectToAction("Students", "User", new { area = "University" });
@@ -346,10 +362,10 @@ public class UserController : Controller {
 		user.IsDeactivated = !user.IsDeactivated;
 		user.UpdatedAt = DateTimeOffset.Now;
 		_ = await this._userManager.UpdateAsync(user);
-		if (this.TempData["Role"] as string == "Student") {
+		if (this.ViewData["Role"] as string == "Student") {
 			this.TempData["SuccessMessage"] = user.IsDeactivated ? "Estudiante desactivado correctamente." : "Estudiante activado correctamente.";
 			return this.RedirectToAction("Students", "User", new { area = "University" });
-		} else if (this.TempData["Role"] as string == "Teacher") {
+		} else if (this.ViewData["Role"] as string == "Teacher") {
 			this.TempData["SuccessMessage"] = user.IsDeactivated ? "Profesor desactivado correctamente." : "Profesor activado correctamente.";
 			return this.RedirectToAction("Teachers", "User", new { area = "University" });
 		}

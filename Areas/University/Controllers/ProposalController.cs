@@ -45,20 +45,20 @@ public class ProposalController : Controller {
 			searchString = currentFilter;
 		}
 		this.ViewData["CurrentFilter"] = searchString;
-		var users = await this._userManager.GetUsersInRoleAsync("Guide");
-		var paginator = Paginator<ApplicationViewModel>.Create(users.Where(u => !u.IsDeactivated).Select(u => new ApplicationUserViewModel {
+		var users = (await this._userManager.GetUsersInRoleAsync("Guide")).Where(u => !u.IsDeactivated).Select(u => new ApplicationUserViewModel {
 			Id = u.Id,
 			FirstName = u.FirstName,
 			LastName = u.LastName,
 			Rut = u.Rut,
 			Email = u.Email,
 			Specialization = u.Specialization,
-		}).AsQueryable(), pageNumber ?? 1, 10);
+		}).AsQueryable();
+		var paginator = Paginator<ApplicationUserViewModel>.Create(users, pageNumber ?? 1, 6);
 		if (!string.IsNullOrEmpty(sortOrder)) {
-			paginator.Sort(sortOrder);
+			paginator = Paginator<ApplicationUserViewModel>.Sort(users, sortOrder, pageNumber ?? 1, 6, parameters);
 		}
 		if (!string.IsNullOrEmpty(currentFilter)) {
-			paginator.Filter(currentFilter);
+			paginator = Paginator<ApplicationUserViewModel>.Filter(users, searchString, pageNumber ?? 1, 6, parameters);
 		}
 		return this.View(paginator);
 	}
@@ -78,18 +78,18 @@ public class ProposalController : Controller {
 			searchString = currentFilter;
 		}
 		this.ViewData["CurrentFilter"] = searchString;
-		var candidates = memoir!.Candidates!.AsEnumerable();
-		var paginator = Paginator<ApplicationViewModel>.Create(candidates.Where(u => !u!.IsDeactivated).Select(u => new ApplicationUserViewModel {
+		var candidates = memoir!.Candidates!.Where(u => !u!.IsDeactivated).Select(u => new ApplicationUserViewModel {
 			Id = u!.Id,
 			FirstName = u.FirstName,
 			LastName = u.LastName,
 			Email = u.Email,
-		}).AsQueryable(), pageNumber ?? 1, 10);
+		}).AsQueryable();
+		var paginator = Paginator<ApplicationViewModel>.Create(candidates, pageNumber ?? 1, 10);
 		if (!string.IsNullOrEmpty(sortOrder)) {
-			paginator.Sort(sortOrder);
+			paginator = Paginator<ApplicationViewModel>.Sort(candidates, sortOrder, pageNumber ?? 1, 6, parameters);
 		}
 		if (!string.IsNullOrEmpty(currentFilter)) {
-			paginator.Filter(currentFilter);
+			paginator = Paginator<ApplicationViewModel>.Filter(candidates, searchString, pageNumber ?? 1, 6, parameters);
 		}
 		return this.View(paginator);
 	}
@@ -138,10 +138,10 @@ public class ProposalController : Controller {
 		}
 		var paginator = Paginator<MemoirViewModel>.Create(memoirs, pageNumber ?? 1, 6);
 		if (!string.IsNullOrEmpty(sortOrder)) {
-			paginator.Sort(sortOrder);
+			paginator = Paginator<MemoirViewModel>.Sort(memoirs, sortOrder, pageNumber ?? 1, 6, parameters);
 		}
 		if (!string.IsNullOrEmpty(currentFilter)) {
-			paginator.Filter(currentFilter);
+			paginator = Paginator<MemoirViewModel>.Filter(memoirs, searchString, pageNumber ?? 1, 6, parameters);
 		}
 		return this.View(paginator);
 	}
@@ -188,10 +188,10 @@ public class ProposalController : Controller {
 		}
 		var paginator = Paginator<MemoirViewModel>.Create(memoirs, pageNumber ?? 1, 6);
 		if (!string.IsNullOrEmpty(sortOrder)) {
-			paginator.Sort(sortOrder);
+			paginator = Paginator<MemoirViewModel>.Sort(memoirs, sortOrder, pageNumber ?? 1, 6, parameters);
 		}
 		if (!string.IsNullOrEmpty(currentFilter)) {
-			paginator.Filter(currentFilter);
+			paginator = Paginator<MemoirViewModel>.Filter(memoirs, searchString, pageNumber ?? 1, 6, parameters);
 		}
 		return this.View(paginator);
 	}
@@ -223,10 +223,10 @@ public class ProposalController : Controller {
 		);
 		var paginator = Paginator<MemoirViewModel>.Create(memoirs, pageNumber ?? 1, 6);
 		if (!string.IsNullOrEmpty(sortOrder)) {
-			paginator.Sort(sortOrder);
+			paginator = Paginator<MemoirViewModel>.Sort(memoirs, sortOrder, pageNumber ?? 1, 6, parameters);
 		}
 		if (!string.IsNullOrEmpty(currentFilter)) {
-			paginator.Filter(currentFilter);
+			paginator = Paginator<MemoirViewModel>.Filter(memoirs, searchString, pageNumber ?? 1, 6, parameters);
 		}
 		return this.View(paginator);
 	}

@@ -27,8 +27,6 @@ var userStore = services.GetRequiredService<IUserStore<ApplicationUser>>();
 var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
 await StartupSeeder.SeedRolesAsync(roleManager);
 await StartupSeeder.SeedDirectorTeacherAsync(directorTeacherEmail!, directorTeacherPassword!, directorTeacherFirstName!, directorTeacherLastName!, directorTeacherRut!, userManager, userStore);
-await TestApplicationUserSeeder.SeedStudentsAsync(userManager, userStore);
-await TestApplicationUserSeeder.SeedTeachersAsync(userManager, userStore);
 _ = app.UseStaticFiles();
 _ = app.UseRouting();
 _ = app.UseAuthentication();
@@ -36,12 +34,12 @@ _ = app.UseAuthorization();
 _ = app.MapAreaControllerRoute(
 	name: "Account",
 	areaName: "Account",
-	pattern: "{Account}/{controller=SignIn}/{action=Index}/{id?}"
+	pattern: "Account/{controller=SignIn}/{action=Index}/{id?}"
 );
 _ = app.MapAreaControllerRoute(
 	name: "University",
 	areaName: "University",
-	pattern: "{University}/{controller=Memoir}/{action=Index}/{id?}"
+	pattern: "University/{controller=Memoir}/{action=Index}/{id?}"
 );
 _ = app.MapControllerRoute(
 	name: "default",
