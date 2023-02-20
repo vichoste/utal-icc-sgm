@@ -66,7 +66,7 @@
 								<td>
 									@if (this.User.IsInRole("Student")) {
 										@switch (item.Phase) {
-											case "Draft":
+											case "DraftByStudent":
 												<span class="badge bg-secondary">Borrador</span>
 												break;
 											case "SentToGuide":
@@ -81,7 +81,7 @@
 										}
 									} else if (this.User.IsInRole("Guide")) {
 										@switch (item.Phase) {
-											case "Draft":
+											case "DraftByGuide":
 												<span class="badge bg-secondary">Borrador</span>
 												break;
 											case "PublishedByGuide":
@@ -95,7 +95,7 @@
 								</td>
 								<td>
 									@if (this.User.IsInRole("Student")) {
-										@if (item.Phase == "Draft") {
+										@if (item.Phase == "DraftByStudent") {
 											@this.Html.ActionLink("Editar", "Edit", "Proposal", new { area = "University", id = item.Id }, new { @class = "btn btn-yellow mb-3"})
 											@this.Html.ActionLink("Eliminar", "Delete", "Proposal", new { area = "University", id = item.Id }, new { @class = "btn btn-danger mb-3"})
 											@this.Html.ActionLink("Enviar", "Send", "Proposal", new { area = "University", id = item.Id }, new { @class = "btn btn-primary mb-3"})
@@ -103,7 +103,7 @@
 											@this.Html.ActionLink("Ver", "View", "Proposal", new { area = "University", id = item.Id }, new { @class = "btn btn-primary mb-3"})
 										}
 									} else if (this.User.IsInRole("Guide")) {
-										@if (item.Phase == "Draft") {
+										@if (item.Phase == "DraftByGuide") {
 											@this.Html.ActionLink("Editar", "Edit", "Proposal", new { area = "University", id = item.Id }, new { @class = "btn btn-yellow mb-3"})
 											@this.Html.ActionLink("Eliminar", "Delete", "Proposal", new { area = "University", id = item.Id }, new { @class = "btn btn-danger mb-3"})
 											@this.Html.ActionLink("Publicar", "Send", "Proposal", new { area = "University", id = item.Id }, new { @class = "btn btn-primary mb-3"})

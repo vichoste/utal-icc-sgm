@@ -18,7 +18,7 @@
 			@this.Html.ActionLink("Volver", "Index", "Proposal", new { area = "University" }, new { @class = "btn btn-secondary"})
 		</div>
 		<div class="col-12 mb-3">
-			<partial name="_Filter", model=@(new FilterPartialViewModel("Guide", "Proposal", "University")) />
+			<partial name="_Filter", model=@(new FilterPartialViewModel("Guides", "Proposal", "University")) />
 		</div>
 	</div>
 	<div class="row justify-content-center">
@@ -28,22 +28,22 @@
 					<thead class="table-dark">
 						<tr>
 							<th>
-								<a asp-action="Guide" asp-route-sortOrder="@this.ViewData[$"FirstNameSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+								<a asp-action="Guides" asp-route-sortOrder="@this.ViewData[$"FirstNameSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
 									Nombre
 								</a>
 							</th>
 							<th>
-								<a asp-action="Guide" asp-route-sortOrder="@this.ViewData[$"LastNameSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+								<a asp-action="Guides" asp-route-sortOrder="@this.ViewData[$"LastNameSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
 									Apellido
 								</a>
 							</th>
 							<th>
-								<a asp-action="Guide" asp-route-sortOrder="@this.ViewData[$"EmailSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+								<a asp-action="Guides" asp-route-sortOrder="@this.ViewData[$"EmailSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
 									E-mail
 								</a>
 							</th>
 							<th>
-								<a asp-action="Guide" asp-route-sortOrder="@this.ViewData[$"SpecializationSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+								<a asp-action="Guides" asp-route-sortOrder="@this.ViewData[$"SpecializationSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
 									Especialización
 								</a>
 							</th>
@@ -58,13 +58,13 @@
 								<td>@item.Email</td>
 								<td>@item.Specialization</td>
 								<td>
-									@this.Html.ActionLink("Seleccionar", "Create", "Proposal", new { area = "University", id = item.Id }, new { @class = "btn btn-success mb-3"})
+									@this.Html.ActionLink("Seleccionar", "CreateWithGuide", "Proposal", new { area = "University", id = item.Id }, new { @class = "btn btn-success mb-3"})
 								</td>
 							</tr>
 						}
 					</tbody>
 				</table>
-				<partial name="_Paginator" , model=@(new PaginatorPartialViewModel("Index", this.Model.PageIndex, this.Model.TotalPages, this.Model.HasPreviousPage, this.Model.HasNextPage)) />
+				<partial name="_Paginator" , model=@(new PaginatorPartialViewModel("Guides", this.Model.PageIndex, this.Model.TotalPages, this.Model.HasPreviousPage, this.Model.HasNextPage)) />
 			</div>
 		</div>
 	</div>

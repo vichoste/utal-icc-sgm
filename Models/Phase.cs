@@ -1,7 +1,8 @@
 namespace Utal.Icc.Sgm.Models;
 
 public enum Phase {
-	Draft,
+	DraftByStudent,
+	DraftByGuide,
 	SentToGuide,
 	PublishedByGuide,
 	RejectedByGuide,

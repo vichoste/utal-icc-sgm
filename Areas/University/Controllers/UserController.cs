@@ -49,9 +49,9 @@ public class UserController : Controller {
 		}).AsQueryable();
 		var paginator = Paginator<ApplicationUserViewModel>.Create(users, pageNumber ?? 1, 10);
 		if (!string.IsNullOrEmpty(sortOrder)) {
-			paginator = Paginator<ApplicationUserViewModel>.Sort(users, sortOrder, pageNumber ?? 1, 6, parameters);
+			paginator = Paginator<ApplicationUserViewModel>.Sort(paginator.AsQueryable(), sortOrder, pageNumber ?? 1, 6, parameters);
 		}
-		if (!string.IsNullOrEmpty(currentFilter)) {
+		if (!string.IsNullOrEmpty(searchString)) {
 			paginator = Paginator<ApplicationUserViewModel>.Filter(paginator.AsQueryable(), searchString, pageNumber ?? 1, 6, parameters);
 		}
 		return this.View(paginator);
@@ -80,10 +80,10 @@ public class UserController : Controller {
 		}).AsQueryable();
 		var paginator = Paginator<ApplicationUserViewModel>.Create(users, pageNumber ?? 1, 10);
 		if (!string.IsNullOrEmpty(sortOrder)) {
-			paginator = Paginator<ApplicationUserViewModel>.Sort(users, sortOrder, pageNumber ?? 1, 6, parameters);
+			paginator = Paginator<ApplicationUserViewModel>.Sort(paginator.AsQueryable(), sortOrder, pageNumber ?? 1, 6, parameters);
 		}
-		if (!string.IsNullOrEmpty(currentFilter)) {
-			paginator = Paginator<ApplicationUserViewModel>.Filter(users, searchString, pageNumber ?? 1, 6, parameters);
+		if (!string.IsNullOrEmpty(searchString)) {
+			paginator = Paginator<ApplicationUserViewModel>.Filter(paginator.AsQueryable(), searchString, pageNumber ?? 1, 6, parameters);
 		}
 		return this.View(paginator);
 	}

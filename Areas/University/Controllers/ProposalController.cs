@@ -55,10 +55,10 @@ public class ProposalController : Controller {
 		}).AsQueryable();
 		var paginator = Paginator<ApplicationUserViewModel>.Create(users, pageNumber ?? 1, 6);
 		if (!string.IsNullOrEmpty(sortOrder)) {
-			paginator = Paginator<ApplicationUserViewModel>.Sort(users, sortOrder, pageNumber ?? 1, 6, parameters);
+			paginator = Paginator<ApplicationUserViewModel>.Sort(paginator.AsQueryable(), sortOrder, pageNumber ?? 1, 6, parameters);
 		}
-		if (!string.IsNullOrEmpty(currentFilter)) {
-			paginator = Paginator<ApplicationUserViewModel>.Filter(users, searchString, pageNumber ?? 1, 6, parameters);
+		if (!string.IsNullOrEmpty(searchString)) {
+			paginator = Paginator<ApplicationUserViewModel>.Filter(paginator.AsQueryable(), searchString, pageNumber ?? 1, 6, parameters);
 		}
 		return this.View(paginator);
 	}
@@ -86,10 +86,10 @@ public class ProposalController : Controller {
 		}).AsQueryable();
 		var paginator = Paginator<ApplicationViewModel>.Create(candidates, pageNumber ?? 1, 10);
 		if (!string.IsNullOrEmpty(sortOrder)) {
-			paginator = Paginator<ApplicationViewModel>.Sort(candidates, sortOrder, pageNumber ?? 1, 6, parameters);
+			paginator = Paginator<ApplicationViewModel>.Sort(paginator.AsQueryable(), sortOrder, pageNumber ?? 1, 6, parameters);
 		}
-		if (!string.IsNullOrEmpty(currentFilter)) {
-			paginator = Paginator<ApplicationViewModel>.Filter(candidates, searchString, pageNumber ?? 1, 6, parameters);
+		if (!string.IsNullOrEmpty(searchString)) {
+			paginator = Paginator<ApplicationViewModel>.Filter(paginator.AsQueryable(), searchString, pageNumber ?? 1, 6, parameters);
 		}
 		return this.View(paginator);
 	}
@@ -138,10 +138,10 @@ public class ProposalController : Controller {
 		}
 		var paginator = Paginator<MemoirViewModel>.Create(memoirs, pageNumber ?? 1, 6);
 		if (!string.IsNullOrEmpty(sortOrder)) {
-			paginator = Paginator<MemoirViewModel>.Sort(memoirs, sortOrder, pageNumber ?? 1, 6, parameters);
+			paginator = Paginator<MemoirViewModel>.Sort(paginator.AsQueryable(), sortOrder, pageNumber ?? 1, 6, parameters);
 		}
-		if (!string.IsNullOrEmpty(currentFilter)) {
-			paginator = Paginator<MemoirViewModel>.Filter(memoirs, searchString, pageNumber ?? 1, 6, parameters);
+		if (!string.IsNullOrEmpty(searchString)) {
+			paginator = Paginator<MemoirViewModel>.Filter(paginator.AsQueryable(), searchString, pageNumber ?? 1, 6, parameters);
 		}
 		return this.View(paginator);
 	}
@@ -188,10 +188,10 @@ public class ProposalController : Controller {
 		}
 		var paginator = Paginator<MemoirViewModel>.Create(memoirs, pageNumber ?? 1, 6);
 		if (!string.IsNullOrEmpty(sortOrder)) {
-			paginator = Paginator<MemoirViewModel>.Sort(memoirs, sortOrder, pageNumber ?? 1, 6, parameters);
+			paginator = Paginator<MemoirViewModel>.Sort(paginator.AsQueryable(), sortOrder, pageNumber ?? 1, 6, parameters);
 		}
-		if (!string.IsNullOrEmpty(currentFilter)) {
-			paginator = Paginator<MemoirViewModel>.Filter(memoirs, searchString, pageNumber ?? 1, 6, parameters);
+		if (!string.IsNullOrEmpty(searchString)) {
+			paginator = Paginator<MemoirViewModel>.Filter(paginator.AsQueryable(), searchString, pageNumber ?? 1, 6, parameters);
 		}
 		return this.View(paginator);
 	}
@@ -223,10 +223,10 @@ public class ProposalController : Controller {
 		);
 		var paginator = Paginator<MemoirViewModel>.Create(memoirs, pageNumber ?? 1, 6);
 		if (!string.IsNullOrEmpty(sortOrder)) {
-			paginator = Paginator<MemoirViewModel>.Sort(memoirs, sortOrder, pageNumber ?? 1, 6, parameters);
+			paginator = Paginator<MemoirViewModel>.Sort(paginator.AsQueryable(), sortOrder, pageNumber ?? 1, 6, parameters);
 		}
-		if (!string.IsNullOrEmpty(currentFilter)) {
-			paginator = Paginator<MemoirViewModel>.Filter(memoirs, searchString, pageNumber ?? 1, 6, parameters);
+		if (!string.IsNullOrEmpty(searchString)) {
+			paginator = Paginator<MemoirViewModel>.Filter(paginator.AsQueryable(), searchString, pageNumber ?? 1, 6, parameters);
 		}
 		return this.View(paginator);
 	}
@@ -239,7 +239,7 @@ public class ProposalController : Controller {
 	}
 
 	[Authorize(Roles = "Student")]
-	public async Task<IActionResult> Create(string id) {
+	public async Task<IActionResult> CreateWithGuide(string id) {
 		var guideTeacher = await this._userManager.FindByIdAsync(id);
 		if (guideTeacher is null) {
 			this.TempData["ErrorMessage"] = "El profesor guía no existe.";
@@ -282,7 +282,6 @@ public class ProposalController : Controller {
 			Id = Guid.NewGuid().ToString(),
 			Title = input.Title,
 			Description = input.Description,
-			Phase = Phase.Draft,
 			Guide = guide,
 			Assistants = assistants,
 			CreatedAt = DateTimeOffset.Now,
@@ -290,8 +289,10 @@ public class ProposalController : Controller {
 		};
 		if (this.User.IsInRole("Student")) {
 			memoir.Memorist = await this._userManager.GetUserAsync(this.User);
+			memoir.Phase = Phase.DraftByStudent;
 		} else if (this.User.IsInRole("Guide")) {
 			memoir.Requirements = input.Requirements;
+			memoir.Phase = Phase.DraftByGuide;
 		}
 		_ = await this._dbContext.Memoirs!.AddAsync(memoir);
 		_ = await this._dbContext.SaveChangesAsync();
@@ -308,13 +309,13 @@ public class ProposalController : Controller {
 				.Where(m => m.Memorist!.Id == this._userManager.GetUserId(this.User))
 				.Include(m => m.Guide)
 				.Include(m => m.Assistants).AsNoTracking()
-				.FirstOrDefaultAsync(m => m.Id == id && (m.Phase == Phase.Draft || m.Phase == Phase.RejectedByGuide || m.Phase == Phase.RejectedByCommittee));
+				.FirstOrDefaultAsync(m => m.Id == id && (m.Phase == Phase.DraftByStudent || m.Phase == Phase.RejectedByGuide || m.Phase == Phase.RejectedByCommittee));
 		} else if (this.User.IsInRole("Guide")) {
 			memoir = await this._dbContext.Memoirs!
 				.Include(m => m.Guide)
 				.Where(m => m.Guide!.Id == this._userManager.GetUserId(this.User))
 				.Include(m => m.Assistants).AsNoTracking()
-				.FirstOrDefaultAsync(m => m.Id == id && (m.Phase == Phase.Draft || m.Phase == Phase.RejectedByGuide || m.Phase == Phase.RejectedByCommittee));
+				.FirstOrDefaultAsync(m => m.Id == id && (m.Phase == Phase.DraftByGuide || m.Phase == Phase.RejectedByGuide || m.Phase == Phase.RejectedByCommittee));
 		}
 		if (memoir is null) {
 			this.TempData["ErrorMessage"] = "La propuesta no existe.";
@@ -364,13 +365,13 @@ public class ProposalController : Controller {
 				.Where(m => m.Memorist!.Id == this._userManager.GetUserId(this.User))
 				.Include(m => m.Guide)
 				.Include(m => m.Assistants)
-				.FirstOrDefaultAsync(m => m.Id == input.Id && (m.Phase == Phase.Draft || m.Phase == Phase.RejectedByGuide || m.Phase == Phase.RejectedByCommittee));
+				.FirstOrDefaultAsync(m => m.Id == input.Id && (m.Phase == Phase.DraftByStudent || m.Phase == Phase.RejectedByGuide || m.Phase == Phase.RejectedByCommittee));
 		} else if (this.User.IsInRole("Guide")) {
 			memoir = await this._dbContext.Memoirs!
 				.Include(m => m.Guide)
 				.Where(m => m.Guide!.Id == this._userManager.GetUserId(this.User))
 				.Include(m => m.Assistants)
-				.FirstOrDefaultAsync(m => m.Id == input.Id && (m.Phase == Phase.Draft || m.Phase == Phase.RejectedByGuide || m.Phase == Phase.RejectedByCommittee));
+				.FirstOrDefaultAsync(m => m.Id == input.Id && (m.Phase == Phase.DraftByGuide || m.Phase == Phase.RejectedByGuide || m.Phase == Phase.RejectedByCommittee));
 		}
 		if (memoir is null) {
 			this.TempData["ErrorMessage"] = "La propuesta no existe.";
@@ -435,19 +436,19 @@ public class ProposalController : Controller {
 		return this.View(output);
 	}
 
-	[Authorize(Roles = "Student,Guide"), HttpPost, ValidateAntiForgeryToken]
+	[Authorize(Roles = "Student,Guide")]
 	public async Task<IActionResult> Delete(string id) {
 		Memoir? memoir = null!;
 		if (this.User.IsInRole("Student")) {
 			memoir = await this._dbContext.Memoirs!
 				.Include(m => m.Memorist)
 				.Where(m => m.Memorist!.Id == this._userManager.GetUserId(this.User)).AsNoTracking()
-				.FirstOrDefaultAsync(m => m.Id == id && m.Phase == Phase.Draft);
+				.FirstOrDefaultAsync(m => m.Id == id && m.Phase == Phase.DraftByStudent);
 		} else if (this.User.IsInRole("Guide")) {
 			memoir = await this._dbContext.Memoirs!
 				.Include(m => m.Guide)
 				.Where(m => m.Guide!.Id == this._userManager.GetUserId(this.User)).AsNoTracking()
-				.FirstOrDefaultAsync(m => m.Id == id && m.Phase == Phase.Draft);
+				.FirstOrDefaultAsync(m => m.Id == id && m.Phase == Phase.DraftByGuide);
 		}
 		if (memoir is null) {
 			this.TempData["ErrorMessage"] = "La propuesta no existe.";
@@ -467,12 +468,12 @@ public class ProposalController : Controller {
 			memoir = await this._dbContext.Memoirs!
 				.Include(m => m.Memorist)
 				.Where(m => m.Memorist!.Id == this._userManager.GetUserId(this.User))
-				.FirstOrDefaultAsync(m => m.Id == input.Id && m.Phase == Phase.Draft);
+				.FirstOrDefaultAsync(m => m.Id == input.Id && m.Phase == Phase.DraftByStudent);
 		} else if (this.User.IsInRole("Guide")) {
 			memoir = await this._dbContext.Memoirs!
 				.Include(m => m.Guide)
 				.Where(m => m.Guide!.Id == this._userManager.GetUserId(this.User))
-				.FirstOrDefaultAsync(m => m.Id == input.Id && m.Phase == Phase.Draft);
+				.FirstOrDefaultAsync(m => m.Id == input.Id && m.Phase == Phase.DraftByGuide);
 		}
 		if (memoir is null) {
 			this.TempData["ErrorMessage"] = "La propuesta no existe.";
@@ -492,12 +493,12 @@ public class ProposalController : Controller {
 				.Include(m => m.Memorist)
 				.Where(m => m.Memorist!.Id == this._userManager.GetUserId(this.User))
 				.Include(m => m.Guide).AsNoTracking()
-				.FirstOrDefaultAsync(m => m.Id == id && m.Phase == Phase.Draft);
+				.FirstOrDefaultAsync(m => m.Id == id && m.Phase == Phase.DraftByStudent);
 		} else if (this.User.IsInRole("Guide")) {
 			memoir = await this._dbContext.Memoirs!
 				.Include(m => m.Guide)
 				.Where(m => m.Guide!.Id == this._userManager.GetUserId(this.User)).AsNoTracking()
-				.FirstOrDefaultAsync(m => m.Id == id && m.Phase == Phase.Draft);
+				.FirstOrDefaultAsync(m => m.Id == id && m.Phase == Phase.DraftByGuide);
 		}
 		if (memoir is null) {
 			this.TempData["ErrorMessage"] = "La propuesta no existe.";
@@ -530,12 +531,13 @@ public class ProposalController : Controller {
 			memoir = await this._dbContext.Memoirs!
 				.Include(m => m.Memorist)
 				.Where(m => m.Memorist!.Id == this._userManager.GetUserId(this.User))
-				.FirstOrDefaultAsync(m => m.Id == input.Id && m.Phase == Phase.Draft);
+				.Include(m => m.Guide)
+				.FirstOrDefaultAsync(m => m.Id == input.Id && m.Phase == Phase.DraftByStudent);
 		} else if (this.User.IsInRole("Guide")) {
 			memoir = await this._dbContext.Memoirs!
 				.Include(m => m.Guide)
 				.Where(m => m.Guide!.Id == this._userManager.GetUserId(this.User))
-				.FirstOrDefaultAsync(m => m.Id == input.Id && m.Phase == Phase.Draft);
+				.FirstOrDefaultAsync(m => m.Id == input.Id && m.Phase == Phase.DraftByGuide);
 		}
 		if (memoir is null) {
 			this.TempData["ErrorMessage"] = "La propuesta no existe.";
