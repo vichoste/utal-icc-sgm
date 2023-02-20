@@ -27,7 +27,6 @@ public class UserController : Controller {
 
 	[Authorize(Roles = "Director")]
 	public async Task<IActionResult> Students(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
-		this.ViewData["Role"] = "Student";
 		var parameters = new[] { "FirstName", "LastName", "UniversityId", "Rut", "Email" };
 		foreach (var parameter in parameters) {
 			this.ViewData[$"{parameter}SortParam"] = sortOrder == parameter ? $"{parameter}Desc" : parameter;
@@ -60,7 +59,6 @@ public class UserController : Controller {
 
 	[Authorize(Roles = "Director")]
 	public async Task<IActionResult> Teachers(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
-		this.ViewData["Role"] = "Teacher";
 		var parameters = new[] { "FirstName", "LastName", "Rut", "Email" };
 		foreach (var parameter in parameters) {
 			this.ViewData[$"{parameter}SortParam"] = sortOrder == parameter ? $"{parameter}Desc" : parameter;
@@ -171,13 +169,7 @@ public class UserController : Controller {
 	public async Task<IActionResult> Edit(string id) {
 		var user = await this._userManager.FindByIdAsync(id);
 		if (user is null) {
-			if (this.ViewData["Role"] as string == "Student") {
-				this.TempData["ErrorMessage"] = "Error al obtener al estudiante.";
-				return this.RedirectToAction("Students", "User", new { area = "University" });
-			} else if (this.ViewData["Role"] as string == "Teacher") {
-				this.TempData["ErrorMessage"] = "Error al obtener al profesor.";
-				return this.RedirectToAction("Teachers", "User", new { area = "University" });
-			}
+			this.TempData["ErrorMessage"] = "Error al obtener al usuario.";
 			return this.RedirectToAction("Students", "User", new { area = "University" });
 		}
 		var output = user switch {
@@ -206,16 +198,6 @@ public class UserController : Controller {
 			},
 			_ => null
 		};
-		if (output is null) {
-			if (this.ViewData["Role"] as string == "Student") {
-				this.TempData["ErrorMessage"] = "Error al obtener al estudiante.";
-				return this.RedirectToAction("Students", "User", new { area = "University" });
-			} else if (this.ViewData["Role"] as string == "Teacher") {
-				this.TempData["ErrorMessage"] = "Error al obtener al profesor.";
-				return this.RedirectToAction("Teachers", "User", new { area = "University" });
-			}
-			return this.RedirectToAction("Students", "User", new { area = "University" });
-		}
 		return this.View(output);
 	}
 
@@ -223,13 +205,7 @@ public class UserController : Controller {
 	public async Task<IActionResult> Edit([FromForm] ApplicationUserViewModel input) {
 		var user = await this._userManager.FindByIdAsync(input.Id!);
 		if (user is null) {
-			if (this.ViewData["Role"] as string == "Student") {
-				this.TempData["ErrorMessage"] = "Error al obtener al estudiante.";
-				return this.RedirectToAction("Students", "User", new { area = "University" });
-			} else if (this.ViewData["Role"] as string == "Teacher") {
-				this.TempData["ErrorMessage"] = "Error al obtener al profesor.";
-				return this.RedirectToAction("Teachers", "User", new { area = "University" });
-			}
+			this.TempData["ErrorMessage"] = "Error al obtener al usuario.";
 			return this.RedirectToAction("Students", "User", new { area = "University" });
 		}
 		await this._userStore.SetUserNameAsync(user, input.Email, CancellationToken.None);
@@ -280,14 +256,7 @@ public class UserController : Controller {
 			output.IsCourse = await this._userManager.IsInRoleAsync(user, "Course");
 			output.IsGuide = await this._userManager.IsInRoleAsync(user, "Guide");
 		}
-		if (this.ViewData["Role"] as string == "Student") {
-			this.ViewBag.SuccessMessage = "Estudiante editado correctamente.";
-			return this.View(output);
-		}
-		if (this.ViewData["Role"] as string == "Teacher") {
-			this.ViewBag.SuccessMessage = "Profesor editado correctamente.";
-			return this.View(output);
-		}
+		this.ViewBag.SuccessMessage = "Usuario editado correctamente.";
 		return this.View(output);
 	}
 
@@ -295,31 +264,20 @@ public class UserController : Controller {
 	public async Task<IActionResult> Toggle(string id) {
 		var user = await this._userManager.FindByIdAsync(id);
 		if (user is null) {
-			if (this.ViewData["Role"] as string == "Student") {
-				this.TempData["ErrorMessage"] = "Error al obtener al estudiante.";
-				return this.RedirectToAction("Students", "User", new { area = "University" });
-			} else if (this.ViewData["Role"] as string == "Teacher") {
-				this.TempData["ErrorMessage"] = "Error al obtener al profesor.";
-				return this.RedirectToAction("Teachers", "User", new { area = "University" });
-			}
+			this.TempData["ErrorMessage"] = "Error al obtener al usuario.";
 			return this.RedirectToAction("Students", "User", new { area = "University" });
 		}
 		if (user.Id == this._userManager.GetUserId(this.User)) {
 			this.TempData["ErrorMessage"] = "No te puedes desactivar a tí mismo.";
-			if (this.ViewData["Role"] as string == "Student") {
+			if (await this._userManager.IsInRoleAsync((await this._userManager.FindByIdAsync(id))!, "Student")) {
 				return this.RedirectToAction("Students", "User", new { area = "University" });
-			} else if (this.ViewData["Role"] as string == "Teacher") {
+			} else if (await this._userManager.IsInRoleAsync((await this._userManager.FindByIdAsync(id))!, "Teacher")) {
 				return this.RedirectToAction("Teachers", "User", new { area = "University" });
 			}
 			return this.RedirectToAction("Students", "User", new { area = "University" });
 		} else if ((await this._userManager.GetRolesAsync(user)).Contains("Director")) {
 			this.TempData["ErrorMessage"] = "No puedes desactivar al director de carrera actual.";
-			if (this.ViewData["Role"] as string == "Student") {
-				return this.RedirectToAction("Students", "User", new { area = "University" });
-			} else if (this.ViewData["Role"] as string == "Teacher") {
-				return this.RedirectToAction("Teachers", "User", new { area = "University" });
-			}
-			return this.RedirectToAction("Students", "User", new { area = "University" });
+			return this.RedirectToAction("Teachers", "User", new { area = "University" });
 		}
 		var output = new ApplicationUserViewModel {
 			Id = user.Id,
@@ -333,39 +291,28 @@ public class UserController : Controller {
 	public async Task<IActionResult> Toggle([FromForm] ApplicationUserViewModel input) {
 		var user = await this._userManager.FindByIdAsync(input.Id!);
 		if (user is null) {
-			if (this.ViewData["Role"] as string == "Student") {
-				this.TempData["ErrorMessage"] = "Error al obtener al estudiante.";
-				return this.RedirectToAction("Students", "User", new { area = "University" });
-			} else if (this.ViewData["Role"] as string == "Teacher") {
-				this.TempData["ErrorMessage"] = "Error al obtener al profesor.";
-				return this.RedirectToAction("Teachers", "User", new { area = "University" });
-			}
+			this.TempData["ErrorMessage"] = "Error al obtener al usuario.";
 			return this.RedirectToAction("Students", "User", new { area = "University" });
 		}
 		if (user.Id == this._userManager.GetUserId(this.User)) {
 			this.TempData["ErrorMessage"] = "No te puedes desactivar a tí mismo.";
-			if (this.ViewData["Role"] as string == "Student") {
+			if (await this._userManager.IsInRoleAsync((await this._userManager.FindByIdAsync(input.Id!))!, "Student")) {
 				return this.RedirectToAction("Students", "User", new { area = "University" });
-			} else if (this.ViewData["Role"] as string == "Teacher") {
+			} else if (await this._userManager.IsInRoleAsync((await this._userManager.FindByIdAsync(input.Id!))!, "Teacher")) {
 				return this.RedirectToAction("Teachers", "User", new { area = "University" });
 			}
 			return this.RedirectToAction("Students", "User", new { area = "University" });
 		} else if ((await this._userManager.GetRolesAsync(user)).Contains("Director")) {
 			this.TempData["ErrorMessage"] = "No puedes desactivar al director de carrera actual.";
-			if (this.ViewData["Role"] as string == "Student") {
-				return this.RedirectToAction("Students", "User", new { area = "University" });
-			} else if (this.ViewData["Role"] as string == "Teacher") {
-				return this.RedirectToAction("Teachers", "User", new { area = "University" });
-			}
-			return this.RedirectToAction("Students", "User", new { area = "University" });
+			return this.RedirectToAction("Teachers", "User", new { area = "University" });
 		}
 		user.IsDeactivated = !user.IsDeactivated;
 		user.UpdatedAt = DateTimeOffset.Now;
 		_ = await this._userManager.UpdateAsync(user);
-		if (this.ViewData["Role"] as string == "Student") {
+		if (await this._userManager.IsInRoleAsync((await this._userManager.FindByIdAsync(input.Id!))!, "Student")) {
 			this.TempData["SuccessMessage"] = user.IsDeactivated ? "Estudiante desactivado correctamente." : "Estudiante activado correctamente.";
 			return this.RedirectToAction("Students", "User", new { area = "University" });
-		} else if (this.ViewData["Role"] as string == "Teacher") {
+		} else if (await this._userManager.IsInRoleAsync((await this._userManager.FindByIdAsync(input.Id!))!, "Teacher")) {
 			this.TempData["SuccessMessage"] = user.IsDeactivated ? "Profesor desactivado correctamente." : "Profesor activado correctamente.";
 			return this.RedirectToAction("Teachers", "User", new { area = "University" });
 		}

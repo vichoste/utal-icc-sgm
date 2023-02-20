@@ -8,10 +8,10 @@
 @inject UserManager<ApplicationUser> _userManager
 
 @{
-	if (this.ViewData["Role"] as string == "Student") {
+	if (await this._userManager.IsInRoleAsync((await this._userManager.FindByIdAsync(this.Model.Id!))!, "Student")) {
 		this.ViewData["Title"] = "Editar estudiante";
 	}
-	if (this.ViewData["Role"] as string == "Teacher") {
+	if (await this._userManager.IsInRoleAsync((await this._userManager.FindByIdAsync(this.Model.Id!))!, "Teacher")) {
 		this.ViewData["Title"] = "Editar profesor";
 	}
 }
