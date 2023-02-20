@@ -57,7 +57,7 @@
 						<div class="row text-center">
 							<div class="col">
 								<div class="btn-group">
-									@this.Html.ActionLink("Cancelar", "Students", "Proposal", new { area = "University" }, new { @class = "btn btn-secondary" })
+									@this.Html.ActionLink("Cancelar", "Students", "Proposal", new { area = "University", id = this.Model.Id }, new { @class = "btn btn-secondary" })
 									<button type="submit" class="btn btn-primary">Seleccionar</button>
 								</div>
 							</div>

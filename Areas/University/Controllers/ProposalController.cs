@@ -247,7 +247,7 @@ public class ProposalController : Controller {
 		var memoirs = this._dbContext.Memoirs!
 			.Include(m => m.Memorist)
 			.Where(m => (m!.Candidates!.Contains(user) || m.Memorist == user)
-				&& (m.Phase == Phase.PublishedByGuide || m.Phase == Phase.ApprovedByGuide || m.Phase == Phase.RejectedByGuide))
+				&& (m.Phase == Phase.PublishedByGuide || m.Phase == Phase.ReadyByGuide))
 			.Include(m => m.Guide).AsNoTracking()
 			.Select(m => new MemoirViewModel {
 				Id = m.Id,
@@ -815,13 +815,13 @@ public class ProposalController : Controller {
 	}
 
 	[Authorize(Roles = "Guide")]
-	public async Task<IActionResult> Select(string memoirId, string studentId) {
+	public async Task<IActionResult> Select(string memoirId, string memoristId) {
 		var user = await this._userManager.GetUserAsync(this.User);
 		if (user!.IsDeactivated) {
 			this.TempData["ErrorMessage"] = "Tu cuenta está desactivada.";
 			return this.RedirectToAction("Index", "Home", new { area = "" });
 		}
-		var student = await this._userManager.FindByIdAsync(studentId);
+		var student = await this._userManager.FindByIdAsync(memoristId);
 		if (user is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener al estudiante";
 			return this.RedirectToAction("Students", "Proposal", new { area = "University" });
@@ -830,7 +830,7 @@ public class ProposalController : Controller {
 			.Where(m => m.Owner == user
 				&& m.Phase == Phase.PublishedByGuide)
 			.Include(m => m.Candidates)
-			.Where(m => m.Candidates!.Any(s => s!.Id == studentId)).AsNoTracking()
+			.Where(m => m.Candidates!.Any(s => s!.Id == memoristId)).AsNoTracking()
 			.FirstOrDefaultAsync(m => m.Id == memoirId);
 		if (memoir is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta.";
@@ -838,7 +838,7 @@ public class ProposalController : Controller {
 		}
 		var output = new MemoirViewModel {
 			Id = memoirId,
-			MemoristId = studentId,
+			MemoristId = memoristId,
 			MemoristName = $"{student!.FirstName} {student.LastName}",
 			MemoristEmail = student.Email,
 			UniversityId = student.UniversityId,

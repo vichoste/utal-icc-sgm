@@ -53,7 +53,7 @@
 								<td>@item.LastName</td>
 								<td>@item.Email</td>
 								<td>
-									@this.Html.ActionLink("Seleccionar", "Select", "Proposal", new { area = "University" , proposalId = (this.ViewData["Memoir"] as Memoir)!.Id, studentId = item.Id }, new { @class = "btn btn-primary mb-3"})
+									@this.Html.ActionLink("Seleccionar", "Select", "Proposal", new { area = "University" , memoirId = (this.ViewData["Memoir"] as Memoir)!.Id, memoristId = item.Id }, new { @class = "btn btn-primary mb-3"})
 								</td>
 							</tr>
 						}
