@@ -12,7 +12,7 @@ using Utal.Icc.Sgm.Data;
 namespace Utal.Icc.Sgm.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230220000847_Init")]
+    [Migration("20230220185730_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -309,6 +309,9 @@ namespace Utal.Icc.Sgm.Migrations
                     b.Property<string>("MemoristId")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("OwnerId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<int?>("Phase")
                         .HasColumnType("int");
 
@@ -337,6 +340,8 @@ namespace Utal.Icc.Sgm.Migrations
                     b.HasIndex("GuideId");
 
                     b.HasIndex("MemoristId");
+
+                    b.HasIndex("OwnerId");
 
                     b.HasIndex("WhoRejectedId");
 
@@ -434,6 +439,10 @@ namespace Utal.Icc.Sgm.Migrations
                         .WithMany("Doing")
                         .HasForeignKey("MemoristId");
 
+                    b.HasOne("Utal.Icc.Sgm.Models.ApplicationUser", "Owner")
+                        .WithMany("Owning")
+                        .HasForeignKey("OwnerId");
+
                     b.HasOne("Utal.Icc.Sgm.Models.ApplicationUser", "WhoRejected")
                         .WithMany("Rejections")
                         .HasForeignKey("WhoRejectedId");
@@ -441,6 +450,8 @@ namespace Utal.Icc.Sgm.Migrations
                     b.Navigation("Guide");
 
                     b.Navigation("Memorist");
+
+                    b.Navigation("Owner");
 
                     b.Navigation("WhoRejected");
                 });
@@ -450,6 +461,8 @@ namespace Utal.Icc.Sgm.Migrations
                     b.Navigation("Doing");
 
                     b.Navigation("Guiding");
+
+                    b.Navigation("Owning");
 
                     b.Navigation("Rejections");
                 });

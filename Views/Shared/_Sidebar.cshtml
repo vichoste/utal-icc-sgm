@@ -1,7 +1,17 @@
-﻿<div id="sidebar" class="app-sidebar">
+﻿@using Microsoft.AspNetCore.Identity
+
+@using Utal.Icc.Sgm.Models
+
+@inject UserManager<ApplicationUser> _userManager
+
+@{
+	var user = await _userManager.GetUserAsync(this.User);
+}
+
+<div id="sidebar" class="app-sidebar">
 	<div class="app-sidebar-content" data-scrollbar="true" data-height="100%">
 		<div class="menu">
-			@if (this.User.Identity!.IsAuthenticated) {
+			@if (this.User.Identity!.IsAuthenticated && !user!.IsDeactivated) {
 				<div class="menu-header">
 					Mis roles y herramientas
 				</div>

@@ -9,6 +9,7 @@ public class Memoir {
 	public string? Title { get; set; }
 	public string? Description { get; set; }
 	public Phase? Phase { get; set; }
+	public ApplicationUser? Owner { get; set; }
 	public DateTimeOffset? CreatedAt { get; set; }
 	public DateTimeOffset? UpdatedAt { get; set; }
 	[Timestamp]

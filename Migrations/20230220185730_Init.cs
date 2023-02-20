@@ -177,6 +177,7 @@ namespace Utal.Icc.Sgm.Migrations
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Phase = table.Column<int>(type: "int", nullable: true),
+                    OwnerId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     CreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
                     UpdatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
                     RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: true),
@@ -197,6 +198,11 @@ namespace Utal.Icc.Sgm.Migrations
                     table.ForeignKey(
                         name: "FK_Memoirs_AspNetUsers_MemoristId",
                         column: x => x.MemoristId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Memoirs_AspNetUsers_OwnerId",
+                        column: x => x.OwnerId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id");
                     table.ForeignKey(
@@ -312,6 +318,11 @@ namespace Utal.Icc.Sgm.Migrations
                 name: "IX_Memoirs_MemoristId",
                 table: "Memoirs",
                 column: "MemoristId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Memoirs_OwnerId",
+                table: "Memoirs",
+                column: "OwnerId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Memoirs_WhoRejectedId",

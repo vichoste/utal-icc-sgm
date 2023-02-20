@@ -1,11 +1,19 @@
+@using Microsoft.AspNetCore.Identity
+
 @using Utal.Icc.Sgm
+@using Utal.Icc.Sgm.Data
+@using Utal.Icc.Sgm.Models
 @using Utal.Icc.Sgm.ViewModels
 @using Utal.Icc.Sgm.ViewModels.Shared
 
 @model Paginator<MemoirViewModel>
 
+@inject ApplicationDbContext _dbContext
+@inject UserManager<ApplicationUser> _userManager
+
 @{
 	this.ViewData["Title"] = "Mis postulaciones";
+	var user = await this._userManager.GetUserAsync(this.User);
 }
 
 <div class="container">
@@ -42,22 +50,17 @@
 						@foreach (var item in this.Model) {
 							<tr>
 								<td>@item.Title</td>
-								@if (this.User.IsInRole("Student")) {
-									@item.GuideName
-								} else if (this.User.IsInRole("Guide")) {
-									@item.MemoristName
-								}
+								<td>@item.GuideName</td>
 								<td>
-									@switch (item.Phase) {
-										case "ApprovedByGuide":
-											<span class="badge bg-success">Aprobada</span>
-											break;
-										case "RejectedByGuide":
-											<span class="badge bg-danger">Rechazada</span>
-											break;
-										default:
-											<span class="badge bg-primary">Postulado</span>
-											break;
+									@{
+										var memoir = this._dbContext.Memoirs!.FirstOrDefault(m => m.Id == item.Id);
+									}
+									@if (memoir!.Candidates!.Contains(user)) {
+										<span class="badge bg-primary">Postulado</span>
+									} else if (memoir.Memorist!.Id == user!.Id) {
+										<span class="badge bg-success">Aprobada</span>
+									} else {
+										<span class="badge bg-danger">Rechazada</span>
 									}
 								</td>
 								<td>

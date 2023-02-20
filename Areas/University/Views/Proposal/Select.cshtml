@@ -1,0 +1,70 @@
+﻿@using Utal.Icc.Sgm.ViewModels
+
+@model MemoirViewModel
+
+@{
+	this.ViewData["Title"] = "Seleccionar estudiante";
+}
+
+<div class="container">
+	<partial name="_Alerts" />
+	<div class="row justify-content-center">
+		<div class="col-10">
+			<div class="card">
+				<div class="card-header text-center">@this.ViewData["Title"]</div>
+				<div class="card-body">
+					@using (this.Html.BeginForm("Select", "Proposal", new { area = "University" })) {
+						@this.Html.AntiForgeryToken()
+						@this.Html.HiddenFor(m => m.Id)
+						<div class="row">
+							<div class="col">
+								@this.Html.HiddenFor(m => m.MemoristId)
+								<div class="form-group mb-3">
+									@this.Html.LabelFor(m => m.MemoristName, new { @class = "form-label" }):
+									@this.Html.HiddenFor(m => m.MemoristName)
+									@this.Html.DisplayFor(m => m.MemoristName, new { @class = "form-control" })
+								</div>
+								<div class="form-group mb-3">
+									@this.Html.LabelFor(m => m.UniversityId, new { @class = "form-label" }):
+									@this.Html.HiddenFor(m => m.UniversityId)
+									@this.Html.DisplayFor(m => m.UniversityId, new { @class = "form-control" })
+								</div>
+								<div class="form-group mb-3">
+									@this.Html.LabelFor(m => m.RemainingCourses, new { @class = "form-label" }):
+									@this.Html.HiddenFor(m => m.RemainingCourses)
+									@this.Html.DisplayFor(m => m.RemainingCourses, new { @class = "form-control" })
+								</div>
+								<div class="form-group mb-3">
+									@this.Html.LabelFor(m => m.IsDoingThePractice, new { @class = "form-label" }):
+									@this.Html.HiddenFor(m => m.IsDoingThePractice)
+									@if (this.Model.IsDoingThePractice is true) {
+										<b class="text-info">Sí</b>
+									} else {
+										<b>No</b>
+									}
+								</div>
+								<div class="form-group mb-3">
+									@this.Html.LabelFor(m => m.IsWorking, new { @class = "form-label" }):
+									@this.Html.HiddenFor(m => m.IsWorking)
+									@if (this.Model.IsWorking is true) {
+										<b class="text-info">Sí</b>
+									} else {
+										<b>No</b>
+									}
+								</div>
+							</div>
+						</div>
+						<div class="row text-center">
+							<div class="col">
+								<div class="btn-group">
+									@this.Html.ActionLink("Cancelar", "Students", "Proposal", new { area = "University" }, new { @class = "btn btn-secondary" })
+									<button type="submit" class="btn btn-primary">Seleccionar</button>
+								</div>
+							</div>
+						</div>
+					}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

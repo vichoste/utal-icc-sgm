@@ -10,6 +10,8 @@ public class ApplicationUser : IdentityUser {
 	public string? LastName { get; set; }
 	public string? Rut { get; set; }
 	public bool IsDeactivated { get; set; }
+	[InverseProperty("Owner")]
+	public virtual ICollection<Memoir?>? Owning { get; set; } = new HashSet<Memoir?>();
 	public DateTimeOffset CreatedAt { get; set; }
 	public DateTimeOffset? UpdatedAt { get; set; }
 	#endregion
