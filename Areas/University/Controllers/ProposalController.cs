@@ -623,4 +623,60 @@ public class ProposalController : Controller {
 		}
 		return this.View(output);
 	}
+
+	[Authorize(Roles = "Student"), HttpPost, ValidateAntiForgeryToken]
+	public async Task<IActionResult> Apply([FromForm] MemoirViewModel input) {
+		var proposal = await this._dbContext.Memoirs!
+			.Where(p => p.Phase == Phase.PublishedByGuide)
+			.FirstOrDefaultAsync(p => p.Id == input.Id);
+		if (proposal is null) {
+			this.TempData["ErrorMessage"] = "La propuesta no existe.";
+			return this.RedirectToAction("Applications", "Proposal", new { area = "University" });
+		}
+		var user = await this._userManager.GetUserAsync(this.User);
+		proposal.Candidates!.Add(user);
+		proposal.UpdatedAt = DateTimeOffset.Now;
+		_ = this._dbContext.Memoirs!.Update(proposal);
+		_ = await this._dbContext.SaveChangesAsync();
+		this.TempData["SuccessMessage"] = "Has postulado a la propuesta correctamente.";
+		return this.RedirectToAction("Applications", "Proposal", new { area = "University" });
+	}
+
+	[Authorize(Roles = "Guide"), HttpPost, ValidateAntiForgeryToken]
+	public async Task<IActionResult> Reject([FromForm] MemoirViewModel input) {
+		var user = await this._userManager.GetUserAsync(this.User);
+		var proposal = await this._dbContext.Memoirs!
+			.Where(p => p.Guide == user && p.Phase == Phase.SentToGuide)
+			.FirstOrDefaultAsync(p => p.Id == input.Id);
+		if (proposal is null) {
+			this.TempData["ErrorMessage"] = "La propuesta no existe.";
+			return this.RedirectToAction("List", "Proposal", new { area = "University" });
+		}
+		proposal.Phase = Phase.RejectedByGuide;
+		proposal.WhoRejected = user;
+		proposal.Reason = input.Reason;
+		proposal.UpdatedAt = DateTimeOffset.Now;
+		_ = this._dbContext.Memoirs!.Update(proposal);
+		_ = await this._dbContext.SaveChangesAsync();
+		this.TempData["SuccessMessage"] = "La propuesta ha sido rechazada correctamente.";
+		return this.RedirectToAction("List", "Proposal", new { area = "University" });
+	}
+
+	[Authorize(Roles = "Guide"), HttpPost, ValidateAntiForgeryToken]
+	public async Task<IActionResult> Approve([FromForm] MemoirViewModel input) {
+		var user = await this._userManager.GetUserAsync(this.User);
+		var proposal = await this._dbContext.Memoirs!
+			.Where(p => p.Guide == user && p.Phase == Phase.SentToGuide)
+			.FirstOrDefaultAsync(p => p.Id == input.Id);
+		if (proposal is null) {
+			this.TempData["ErrorMessage"] = "La propuesta no existe.";
+			return this.RedirectToAction("List", "Proposal", new { area = "University" });
+		}
+		proposal.Phase = Phase.ApprovedByGuide;
+		proposal.UpdatedAt = DateTimeOffset.Now;
+		_ = this._dbContext.Memoirs!.Update(proposal);
+		_ = await this._dbContext.SaveChangesAsync();
+		this.TempData["SuccessMessage"] = "La propuesta ha sido aprobada correctamente.";
+		return this.RedirectToAction("List", "Proposal", new { area = "University" });
+	}
 }
