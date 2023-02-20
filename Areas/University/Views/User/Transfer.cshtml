@@ -1,0 +1,35 @@
+﻿@using Utal.Icc.Sgm.Areas.University.ViewModels.User
+
+@model TransferViewModel
+
+@{
+	this.ViewData["Title"] = "Transferir rol del director de carrera";
+}
+
+<div class="container">
+	<partial name="_Alerts" />
+	<div class="row justify-content-center">
+		<div class="col-10">
+			<div class="card">
+				<div class="card-header text-center">@this.ViewData["Title"]</div>
+				<div class="card-body text-center">
+					<p>¿Deseas <b class="text-info">transferir</b> el rol de <b>director de carrera</b> al usuario <b>@this.Html.DisplayFor(m => m.NewDirectorTeacherName)</b>?</p>
+					@using (this.Html.BeginForm("Transfer", "User", new { area = "University" })) {
+						@this.Html.AntiForgeryToken()
+						@this.Html.HiddenFor(m => m.CurrentDirectorTeacherId)
+						@this.Html.HiddenFor(m => m.NewDirectorTeacherId)
+						@this.Html.HiddenFor(m => m.NewDirectorTeacherName)
+						<div class="row text-center">
+							<div class="col">
+								<div class="btn-group">
+									@this.Html.ActionLink("No", "Teachers", "User", new { area = "University" }, new { @class = "btn btn-secondary" })
+									<button type="submit" class="btn btn-info">Sí</button>
+								</div>
+							</div>
+						</div>
+					}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

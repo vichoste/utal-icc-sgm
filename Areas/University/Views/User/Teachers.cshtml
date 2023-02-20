@@ -74,9 +74,9 @@
 									<td>
 										@this.Html.ActionLink("Editar", "Edit", "User", new { area = "University", id = item.Id }, new { @class = "btn btn-yellow mb-3" })
 										@this.Html.ActionLink("Desactivar", "Toggle", "User", new { area = "University", id = item.Id }, new { @class = "btn btn-danger mb-3" })
-										@if (this.User.IsInRole("Teacher") && this.User.IsInRole("Director")) {
+										@if (await this._userManager.IsInRoleAsync((await this._userManager.FindByIdAsync(item!.Id!))!, "Director")) {
 											<a asp-action="Teachers" asp-route-sortOrder="@this.ViewData["CurrentSort"]" asp-route-pageNumber="@(this.Model.PageIndex)" asp-route-currentFilter="@this.ViewData["CurrentFilter"]" class="btn btn-info mb-3">Es director de carrera</a>
-										} else if (this.User.IsInRole("Teacher")) {
+										} else {
 											@this.Html.ActionLink("No es director de carrera", "Transfer", "User", new { area = "University", currentDirectorTeacherId = this._userManager.GetUserId(this.User), newDirectorTeacherId = item.Id }, new { @class = "btn btn-default mb-3" })
 										}
 									</td>

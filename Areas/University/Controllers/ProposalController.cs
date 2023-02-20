@@ -205,7 +205,9 @@ public class ProposalController : Controller {
 				});
 		} else if (this.User.IsInRole("Guide")) {
 			memoirs = this._dbContext.Memoirs!
-				.Where(m => m.Phase == Phase.SentToGuide || m.Phase == Phase.ApprovedByGuide)
+				.Include(m => m.Guide)
+				.Where(m => m.Guide!.Id == user.Id
+					&& (m.Phase == Phase.SentToGuide || m.Phase == Phase.ApprovedByGuide))
 				.Include(m => m.Memorist).AsNoTracking()
 				.Select(m => new MemoirViewModel {
 					Id = m.Id,
@@ -656,17 +658,15 @@ public class ProposalController : Controller {
 		if (this.User.IsInRole("Student")) {
 			memoir = await this._dbContext.Memoirs!
 				.Include(m => m.Owner)
-				.Where(m => m.Owner!.Id == this._userManager.GetUserId(this.User))
 				.Include(m => m.Guide)
 				.Include(m => m.Assistants).AsNoTracking()
-				.FirstOrDefaultAsync(m => m.Id == id && (m.Phase == Phase.SentToGuide || m.Phase == Phase.ApprovedByGuide || m.Phase == Phase.RejectedByGuide));
+				.FirstOrDefaultAsync(m => m.Id == id);
 		} else if (this.User.IsInRole("Guide")) {
 			memoir = await this._dbContext.Memoirs!
 				.Include(m => m.Owner)
-				.Where(m => m.Owner!.Id == this._userManager.GetUserId(this.User))
 				.Include(m => m.Memorist)
 				.Include(m => m.Assistants).AsNoTracking()
-				.FirstOrDefaultAsync(m => m.Id == id && (m.Phase == Phase.PublishedByGuide || m.Phase == Phase.ReadyByGuide));
+				.FirstOrDefaultAsync(m => m.Id == id);
 		}
 		if (memoir is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta";
@@ -735,7 +735,7 @@ public class ProposalController : Controller {
 		return this.RedirectToAction("Applications", "Proposal", new { area = "University" });
 	}
 
-	[Authorize(Roles = "Guide"), HttpPost, ValidateAntiForgeryToken]
+	[Authorize(Roles = "Guide")]
 	public async Task<IActionResult> Reject([FromForm] MemoirViewModel input) {
 		var user = await this._userManager.GetUserAsync(this.User);
 		if (user!.IsDeactivated) {

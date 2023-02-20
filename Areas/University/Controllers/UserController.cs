@@ -321,9 +321,9 @@ public class UserController : Controller {
 	}
 
 	[Authorize(Roles = "Director")]
-	public async Task<IActionResult> Transfer(string currentId, string @newId) {
-		var current = await this._userManager.FindByIdAsync(currentId);
-		var @new = await this._userManager.FindByIdAsync(@newId);
+	public async Task<IActionResult> Transfer(string currentDirectorTeacherId, string newDirectorTeacherId) {
+		var current = await this._userManager.FindByIdAsync(currentDirectorTeacherId);
+		var @new = await this._userManager.FindByIdAsync(newDirectorTeacherId);
 		var check = current is not null && @new is not null;
 		check = check && (await this._userManager.GetRolesAsync(current!)).Contains("Director");
 		check = check && (await this._userManager.GetRolesAsync(@new!)).Contains("Teacher");
