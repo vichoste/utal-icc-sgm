@@ -38,18 +38,13 @@
 									Título
 								</a>
 							</th>
-							<th>
 								@if (this.User.IsInRole("Student")) {
-									<a asp-action="Index" asp-route-sortOrder="@this.ViewData["GuideNameSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
-										<span>Profesor guía</span>
-									</a>
-								} else if (this.User.IsInRole("Guide")) {
-									<a asp-action="Index" asp-route-sortOrder="@this.ViewData["MemoristNameSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
-										<span>Estudiante</span>
-									</a>
+									<th>
+										<a asp-action="Index" asp-route-sortOrder="@this.ViewData["GuideNameSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+											<span>Profesor guía</span>
+										</a>
+									</th>
 								}
-
-							</th>
 							<th>Estado</th>
 							<th>Acciones</th>
 						</tr>
@@ -60,8 +55,6 @@
 								<td>@item.Title</td>
 								@if (this.User.IsInRole("Student")) {
 									<td>@item.GuideName</td>
-								} else if (this.User.IsInRole("Guide")) {
-									<td>@item.MemoristName</td>
 								}
 								<td>
 									@if (this.User.IsInRole("Student")) {

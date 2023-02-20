@@ -1,9 +1,18 @@
-﻿@using Utal.Icc.Sgm.ViewModels
+﻿@using Microsoft.AspNetCore.Identity
+@using Microsoft.EntityFrameworkCore
+
+@using Utal.Icc.Sgm.Data
+@using Utal.Icc.Sgm.Models
+@using Utal.Icc.Sgm.ViewModels
 
 @model MemoirViewModel
 
+@inject ApplicationDbContext _dbContext
+@inject UserManager<ApplicationUser> _userManager
+
 @{
 	this.ViewData["Title"] = "Ver propuesta";
+	var user = await this._userManager.GetUserAsync(this.User);
 }
 
 <div class="container">
@@ -119,10 +128,13 @@
 						<div class="row text-center">
 							<div class="col">
 								<div class="btn-group">
-									@this.Html.ActionLink("Volver", "Index", "Proposal", new { area = "University" }, new { @class = "btn btn-secondary" })
+									@{
+										var memoir = this._dbContext.Memoirs!.Include(m => m.Memorist).Include(m => m.Candidates).FirstOrDefault(m => m.Id == this.Model.Id);
+									}
+									@this.Html.ActionLink("Volver", "Index", "Proposal", new { area = "University" }, new { @class = "btn btn-secondary mb-3" })
 									@if (this.User.IsInRole("Student")) {
-										@if (this.Model.Phase == "PublishedByGuide") {
-											@this.Html.ActionLink("Postular", "Apply", "Proposal", new { area = "University", id = this.Model.Id }, new { @class = "btn btn-primary" })
+										@if (this.Model.Phase == "PublishedByGuide" && !memoir!.Candidates!.Any(u => u!.Id == user!.Id)) {
+											@this.Html.ActionLink("Postular", "Apply", "Proposal", new { area = "University", id = this.Model.Id }, new { @class = "btn btn-primary mb-3" })
 										}
 										@if (this.Model.Phase == "ApprovedByGuide") {
 											@this.Html.ActionLink("Convertir", "Convert", "Proposal", new { area = "University", id = this.Model.Id }, new { @class = "btn btn-success mb-3"})
@@ -131,8 +143,8 @@
 										}
 									} else if (this.User.IsInRole("Guide")) {
 										@if (this.Model.Phase == "SentToGuide") {
-											@this.Html.ActionLink("Rechazar", "Reject", "Proposal", new { area = "University", id = this.Model.Id }, new { @class = "btn btn-danger" })
-											@this.Html.ActionLink("Aceptar", "Approve", "Proposal", new { area = "University", id = this.Model.Id }, new { @class = "btn btn-success" })
+											@this.Html.ActionLink("Rechazar", "Reject", "Proposal", new { area = "University", id = this.Model.Id }, new { @class = "btn btn-danger mb-3" })
+											@this.Html.ActionLink("Aceptar", "Approve", "Proposal", new { area = "University", id = this.Model.Id }, new { @class = "btn btn-success mb-3" })
 										} else if (this.Model.Phase == "ReadyByGuide") {
 											@this.Html.ActionLink("Convertir", "Convert", "Proposal", new { area = "University", id = this.Model.Id }, new { @class = "btn btn-success mb-3"})
 										}

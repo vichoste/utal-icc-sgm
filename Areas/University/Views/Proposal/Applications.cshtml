@@ -1,4 +1,5 @@
 @using Microsoft.AspNetCore.Identity
+@using Microsoft.EntityFrameworkCore
 
 @using Utal.Icc.Sgm
 @using Utal.Icc.Sgm.Data
@@ -53,11 +54,11 @@
 								<td>@item.GuideName</td>
 								<td>
 									@{
-										var memoir = this._dbContext.Memoirs!.FirstOrDefault(m => m.Id == item.Id);
+										var memoir = this._dbContext.Memoirs!.Include(m => m.Memorist).Include(m => m.Candidates).FirstOrDefault(m => m.Id == item.Id);
 									}
-									@if (memoir!.Candidates!.Contains(user)) {
+									@if (memoir!.Candidates!.Any(u => u!.Id == user!.Id)) {
 										<span class="badge bg-primary">Postulado</span>
-									} else if (memoir.Memorist!.Id == user!.Id) {
+									} else if (memoir.Memorist is not null && memoir.Memorist.Id == user!.Id) {
 										<span class="badge bg-success">Aprobada</span>
 									} else {
 										<span class="badge bg-danger">Rechazada</span>
