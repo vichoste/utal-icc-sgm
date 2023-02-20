@@ -52,7 +52,7 @@ public class UserController : Controller {
 			paginator = Paginator<ApplicationUserViewModel>.Sort(users, sortOrder, pageNumber ?? 1, 6, parameters);
 		}
 		if (!string.IsNullOrEmpty(currentFilter)) {
-			paginator = Paginator<ApplicationUserViewModel>.Filter(users, searchString, pageNumber ?? 1, 6, parameters);
+			paginator = Paginator<ApplicationUserViewModel>.Filter(paginator.AsQueryable(), searchString, pageNumber ?? 1, 6, parameters);
 		}
 		return this.View(paginator);
 	}

@@ -57,6 +57,6 @@ public class Paginator<T> : List<T> where T : ApplicationViewModel {
 		}
 		var count = result.Count;
 		var items = result.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToList();
-		return new Paginator<T>(result, count, pageIndex, pageSize);
+		return new Paginator<T>(items, count, pageIndex, pageSize);
 	}
 }
