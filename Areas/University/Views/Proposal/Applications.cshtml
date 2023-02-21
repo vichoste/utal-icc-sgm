@@ -56,7 +56,7 @@
 									@{
 										var memoir = this._dbContext.Memoirs!.Include(m => m.Memorist).Include(m => m.Candidates).FirstOrDefault(m => m.Id == item.Id);
 									}
-									@if (memoir.Phase == Phase.PublishedByGuide && memoir!.Candidates!.Any(u => u!.Id == user!.Id)) {
+									@if (memoir!.Phase == Phase.PublishedByGuide && memoir!.Candidates!.Any(u => u!.Id == user!.Id)) {
 										<span class="badge bg-primary">Postulado</span>
 									} else if (memoir.Memorist is not null && memoir.Memorist.Id == user!.Id) {
 										<span class="badge bg-success">Aprobada</span>

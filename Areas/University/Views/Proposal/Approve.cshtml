@@ -1,0 +1,34 @@
+﻿@using Utal.Icc.Sgm.ViewModels
+
+@model MemoirViewModel
+
+@{
+	this.ViewData["Title"] = "Aprobar propuesta";
+}
+
+<div class="container">
+	<partial name="_Alerts" />
+	<div class="row justify-content-center">
+		<div class="col-10">
+			<div class="card">
+				<div class="card-header text-center">@this.ViewData["Title"]</div>
+				<div class="card-body text-center">
+					@using (this.Html.BeginForm("Approve", "Proposal", new { area = "University" })) {
+						@this.Html.AntiForgeryToken()
+						@this.Html.HiddenFor(m => m.Id)
+						<h5 class="card-title mb-3">¿Deseas <b class="text-success">aprobar</b> la propuesta del estudiante <b>@this.Html.DisplayFor(m => m.MemoristName)</b>?</h5>
+						<h6 class="card-subtitle mb-3 text-muted text-center">@this.Html.DisplayFor(m => m.Title)</h6>
+						<div class="row text-center">
+							<div class="col">
+								<div class="btn-group">
+									@this.Html.ActionLink("No", "View", "Proposal", new { area = "University", id = this.Model.Id }, new { @class = "btn btn-secondary" })
+									<button type="submit" class="btn btn-success">Sí</button>
+								</div>
+							</div>
+						</div>
+					}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

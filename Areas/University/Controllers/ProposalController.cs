@@ -726,7 +726,30 @@ public class ProposalController : Controller {
 		}
 		var memoir = await this._dbContext.Memoirs!
 			.Where(m => m.Phase == Phase.PublishedByGuide)
+			.Include(p => p.Guide)
 			.FirstOrDefaultAsync(m => m.Id == id);
+		if (memoir is null) {
+			this.TempData["ErrorMessage"] = "Error al obtener la propuesta";
+			return this.RedirectToAction("Applications", "Proposal", new { area = "University" });
+		}
+		var output = new MemoirViewModel {
+			Id = id,
+			Title = memoir.Title,
+			GuideName = $"{memoir.Guide!.FirstName} {memoir.Guide.LastName}"
+		};
+		return this.View(output);
+	}
+
+	[Authorize(Roles = "Student"), HttpPost, ValidateAntiForgeryToken]
+	public async Task<IActionResult> Apply([FromForm] MemoirViewModel input) {
+		var user = await this._userManager.GetUserAsync(this.User);
+		if (user!.IsDeactivated) {
+			this.TempData["ErrorMessage"] = "Tu cuenta está desactivada.";
+			return this.RedirectToAction("Index", "Home", new { area = "" });
+		}
+		var memoir = await this._dbContext.Memoirs!
+			.Where(m => m.Phase == Phase.PublishedByGuide)
+			.FirstOrDefaultAsync(m => m.Id == input.Id);
 		if (memoir is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta";
 			return this.RedirectToAction("Applications", "Proposal", new { area = "University" });
@@ -801,7 +824,32 @@ public class ProposalController : Controller {
 			.Include(m => m.Guide)
 			.Where(m => m.Guide!.Id == user.Id
 				&& m.Phase == Phase.SentToGuide)
+			.Include(m => m.Memorist)
 			.FirstOrDefaultAsync(m => m.Id == id);
+		if (memoir is null) {
+			this.TempData["ErrorMessage"] = "Error al obtener la propuesta";
+			return this.RedirectToAction("List", "Proposal", new { area = "University" });
+		}
+		var output = new MemoirViewModel {
+			Id = id,
+			Title = memoir.Title,
+			MemoristName = $"{memoir.Memorist!.FirstName} {memoir.Memorist.LastName}"
+		};
+		return this.View(output);
+	}
+
+	[Authorize(Roles = "Guide"), HttpPost, ValidateAntiForgeryToken]
+	public async Task<IActionResult> Approve([FromForm] MemoirViewModel input) {
+		var user = await this._userManager.GetUserAsync(this.User);
+		if (user!.IsDeactivated) {
+			this.TempData["ErrorMessage"] = "Tu cuenta está desactivada.";
+			return this.RedirectToAction("Index", "Home", new { area = "" });
+		}
+		var memoir = await this._dbContext.Memoirs!
+			.Include(m => m.Guide)
+			.Where(m => m.Guide!.Id == user.Id
+				&& m.Phase == Phase.SentToGuide)
+			.FirstOrDefaultAsync(m => m.Id == input.Id);
 		if (memoir is null) {
 			this.TempData["ErrorMessage"] = "Error al obtener la propuesta";
 			return this.RedirectToAction("List", "Proposal", new { area = "University" });
