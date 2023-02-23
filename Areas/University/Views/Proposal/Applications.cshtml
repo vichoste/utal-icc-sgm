@@ -24,7 +24,7 @@
 			<h2>@this.ViewData["Title"]</h2>
 		</div>
 		<div class="col-12 mb-3">
-			<partial name="_Filter", model=@(new FilterPartialViewModel("Applications", "Proposal", "University")) />
+			<partial name="_Filter" , model=@(new FilterPartialViewModel("Applications", "Proposal", "University")) />
 		</div>
 	</div>
 	<div class="row justify-content-center">
@@ -59,9 +59,9 @@
 									@if (memoir!.Phase == Phase.PublishedByGuide && memoir!.Candidates!.Any(u => u!.Id == user!.Id)) {
 										<span class="badge bg-primary">Postulado</span>
 									} else if (memoir.Memorist is not null && memoir.Memorist.Id == user!.Id) {
-										<span class="badge bg-success">Aprobada</span>
+										<span class="badge bg-success">Aprobado por profesor guía</span>
 									} else {
-										<span class="badge bg-danger">Rechazada</span>
+										<span class="badge bg-danger">Rechazado por profesor guía</span>
 									}
 								</td>
 								<td>
@@ -71,7 +71,7 @@
 						}
 					</tbody>
 				</table>
-				<partial name="_Paginator", model=@(new PaginatorPartialViewModel("Applications", this.Model.PageIndex, this.Model.TotalPages, this.Model.HasPreviousPage, this.Model.HasNextPage)) />
+				<partial name="_Paginator" , model=@(new PaginatorPartialViewModel("Applications", this.Model.PageIndex, this.Model.TotalPages, this.Model.HasPreviousPage, this.Model.HasNextPage)) />
 			</div>
 		</div>
 	</div>

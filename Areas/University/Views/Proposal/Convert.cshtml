@@ -16,13 +16,13 @@
 					@using (this.Html.BeginForm("Convert", "Proposal", new { area = "University" })) {
 						@this.Html.AntiForgeryToken()
 						@this.Html.HiddenFor(m => m.Id)
-						<h5 class="card-title mb-3">¿Deseas <b class="text-success">enviar</b> la propuesta al <b>comité</b> para su <b>evaluación</b>?</h5>
+						<h5 class="card-title mb-3">¿Deseas <b class="text-primary">enviar</b> la propuesta al <b>comité</b> para su <b>evaluación</b>?</h5>
 						<h6 class="card-subtitle mb-3 text-muted text-center">@this.Html.DisplayFor(m => m.Title)</h6>
 						<div class="row text-center">
 							<div class="col">
 								<div class="btn-group">
 									@this.Html.ActionLink("No", "View", "Proposal", new { area = "University", id = this.Model.Id }, new { @class = "btn btn-secondary" })
-									<button type="submit" class="btn btn-success">Sí</button>
+									<button type="submit" class="btn btn-primary">Sí</button>
 								</div>
 							</div>
 						</div>

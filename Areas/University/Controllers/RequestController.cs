@@ -19,19 +19,14 @@ public class RequestController : Controller {
 		this._userManager = userManager;
 	}
 
-	[Authorize(Roles = "Student,Guide,Committee")]
+	[Authorize(Roles = "Committee,Director")]
 	public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
 		var user = await this._userManager.GetUserAsync(this.User);
 		if (user!.IsDeactivated) {
 			this.TempData["ErrorMessage"] = "Tu cuenta está desactivada.";
 			return this.RedirectToAction("Index", "Home", new { area = "" });
 		}
-		string[]? parameters = null;
-		if (this.User.IsInRole("Student")) {
-			parameters = new[] { "Title", "GuideName" };
-		} else if (this.User.IsInRole("Guide")) {
-			parameters = new[] { "Title", "MemoristName" };
-		}
+		var parameters = new[] { "Title", "MemoristName", "GuideName" };
 		foreach (var parameter in parameters!) {
 			this.ViewData[$"{parameter}SortParam"] = sortOrder == parameter ? $"{parameter}Desc" : parameter;
 		}
@@ -43,21 +38,24 @@ public class RequestController : Controller {
 		}
 		this.ViewData["CurrentFilter"] = searchString;
 		IQueryable<MemoirViewModel> memoirs = null!;
-		if (this.User.IsInRole("Student")) {
+		if (this.User.IsInRole("Student") || this.User.IsInRole("Guide")) {
 			memoirs = this._dbContext.Memoirs!
 				.Include(m => m.Owner)
-				.Where(m => m.Owner!.Id == this._userManager.GetUserId(this.User))
+				.Where(m => m.Owner!.Id == this._userManager.GetUserId(this.User)
+					&& m.Phase == Phase.SentToCommittee)
 				.Include(m => m.Guide).AsNoTracking()
 				.Select(m => new MemoirViewModel {
 					Id = m.Id,
 					Title = m.Title,
 					Phase = m.Phase.ToString(),
+					MemoristName = $"{m.Memorist!.FirstName} {m.Memorist!.LastName}",
 					GuideName = $"{m.Guide!.FirstName} {m.Guide!.LastName}"
 				});
-		} else if (this.User.IsInRole("Guide")) {
+		} else if (this.User.IsInRole("Guide") || this.User.IsInRole("Director")) {
 			memoirs = this._dbContext.Memoirs!
 				.Include(m => m.Owner)
-				.Where(m => m.Owner!.Id == this._userManager.GetUserId(this.User))
+				.Where(m => m.Phase == Phase.SentToCommittee
+					|| m.Phase == Phase.ApprovedByCommittee)
 				.Include(m => m.Memorist).AsNoTracking()
 				.Select(m => new MemoirViewModel {
 					Id = m.Id,

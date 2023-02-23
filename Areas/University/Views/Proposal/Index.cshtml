@@ -24,7 +24,7 @@
 			</div>
 		}
 		<div class="col-12 mb-3">
-			<partial name="_Filter", model=@(new FilterPartialViewModel("Index", "Proposal", "University")) />
+			<partial name="_Filter" , model=@(new FilterPartialViewModel("Index", "Proposal", "University")) />
 		</div>
 	</div>
 	<div class="row justify-content-center">
@@ -38,13 +38,13 @@
 									Título
 								</a>
 							</th>
-								@if (this.User.IsInRole("Student")) {
-									<th>
-										<a asp-action="Index" asp-route-sortOrder="@this.ViewData["GuideNameSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
-											<span>Profesor guía</span>
-										</a>
-									</th>
-								}
+							@if (this.User.IsInRole("Student")) {
+								<th>
+									<a asp-action="Index" asp-route-sortOrder="@this.ViewData["GuideNameSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+										<span>Profesor guía</span>
+									</a>
+								</th>
+							}
 							<th>Estado</th>
 							<th>Acciones</th>
 						</tr>
@@ -63,13 +63,22 @@
 												<span class="badge bg-secondary">Borrador</span>
 												break;
 											case "SentToGuide":
-												<span class="badge bg-primary">Enviada</span>
+												<span class="badge bg-primary">Enviada al profesor guía</span>
 												break;
 											case "ApprovedByGuide":
-												<span class="badge bg-success">Aprobada</span>
+												<span class="badge bg-success">Aprobada por profesor guía</span>
 												break;
 											case "RejectedByGuide":
-												<span class="badge bg-danger">Rechazada</span>
+												<span class="badge bg-danger">Rechazada por profesor guía</span>
+												break;
+											case "SentToCommittee":
+												<span class="badge bg-primary">Enviada al comité</span>
+												break;
+											case "ApprovedByCommittee":
+												<span class="badge bg-success">Aprobada por comité</span>
+												break;
+											case "RejectedByCommittee":
+												<span class="badge bg-danger">Rechazada por comité</span>
 												break;
 										}
 									} else if (this.User.IsInRole("Guide")) {
@@ -82,6 +91,15 @@
 												break;
 											case "ReadyByGuide":
 												<span class="badge bg-success">Lista</span>
+												break;
+											case "SentToCommittee":
+												<span class="badge bg-primary">Enviada al comité</span>
+												break;
+											case "ApprovedByCommittee":
+												<span class="badge bg-success">Aprobada por comité</span>
+												break;
+											case "RejectedByCommittee":
+												<span class="badge bg-danger">Rechazada por comité</span>
 												break;
 										}
 									}
@@ -112,7 +130,7 @@
 						}
 					</tbody>
 				</table>
-				<partial name="_Paginator", model=@(new PaginatorPartialViewModel("Index", this.Model.PageIndex, this.Model.TotalPages, this.Model.HasPreviousPage, this.Model.HasNextPage)) />
+				<partial name="_Paginator" , model=@(new PaginatorPartialViewModel("Index", this.Model.PageIndex, this.Model.TotalPages, this.Model.HasPreviousPage, this.Model.HasNextPage)) />
 			</div>
 		</div>
 	</div>

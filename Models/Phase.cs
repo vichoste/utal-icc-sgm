@@ -10,7 +10,7 @@ public enum Phase {
 	ReadyByGuide,
 	SentToCommittee,
 	RejectedByCommittee,
-	AcceptedByCommittee,
+	ApprovedByCommittee,
 	InProgress,
 	Abandoned,
 	Completed
