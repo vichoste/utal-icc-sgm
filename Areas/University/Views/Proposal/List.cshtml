@@ -39,8 +39,10 @@
 										<span>Estudiante</span>
 									</a>
 								}
-
 							</th>
+							@if (this.User.IsInRole("Guide")) {
+								<th>Estado</th>
+							}
 							<th>Acciones</th>
 						</tr>
 					</thead>
@@ -52,6 +54,18 @@
 									<td>@item.GuideName</td>
 								} else if (this.User.IsInRole("Guide")) {
 									<td>@item.MemoristName</td>
+								}
+								@if (this.User.IsInRole("Guide")) {
+									<td>
+										@switch (item.Phase) {
+											case "SentToGuide":
+												<span class="badge bg-yellow">Revisar</span>
+												break;
+											case "ApprovedByGuide":
+												<span class="badge bg-success">Aprobada</span>
+												break;
+										}
+									</td>
 								}
 								<td>
 									@this.Html.ActionLink("Ver", "View", "Proposal", new { area = "University", id = item.Id }, new { @class = "btn btn-primary mb-3"})

@@ -19,7 +19,7 @@ public class RequestController : Controller {
 		this._userManager = userManager;
 	}
 
-	[Authorize(Roles = "Committee,Director")]
+	[Authorize(Roles = "Student,Guide,Committee,Director")]
 	public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? pageNumber) {
 		var user = await this._userManager.GetUserAsync(this.User);
 		if (user!.IsDeactivated) {
@@ -42,7 +42,8 @@ public class RequestController : Controller {
 			memoirs = this._dbContext.Memoirs!
 				.Include(m => m.Owner)
 				.Where(m => m.Owner!.Id == this._userManager.GetUserId(this.User)
-					&& m.Phase == Phase.SentToCommittee)
+					&& (m.Phase == Phase.SentToCommittee || m.Phase == Phase.ApprovedByCommittee
+						|| m.Phase == Phase.RejectedByCommittee))
 				.Include(m => m.Guide).AsNoTracking()
 				.Select(m => new MemoirViewModel {
 					Id = m.Id,
@@ -54,14 +55,14 @@ public class RequestController : Controller {
 		} else if (this.User.IsInRole("Guide") || this.User.IsInRole("Director")) {
 			memoirs = this._dbContext.Memoirs!
 				.Include(m => m.Owner)
-				.Where(m => m.Phase == Phase.SentToCommittee
-					|| m.Phase == Phase.ApprovedByCommittee)
-				.Include(m => m.Memorist).AsNoTracking()
+				.Where(m => m.Phase == Phase.SentToCommittee || m.Phase == Phase.ApprovedByCommittee)
+				.Include(m => m.Guide).AsNoTracking()
 				.Select(m => new MemoirViewModel {
 					Id = m.Id,
 					Title = m.Title,
 					Phase = m.Phase.ToString(),
-					MemoristName = $"{m.Memorist!.FirstName} {m.Memorist!.LastName}"
+					MemoristName = $"{m.Memorist!.FirstName} {m.Memorist!.LastName}",
+					GuideName = $"{m.Guide!.FirstName} {m.Guide!.LastName}"
 				});
 		}
 		var paginator = Paginator<MemoirViewModel>.Create(memoirs, pageNumber ?? 1, 6);
@@ -72,5 +73,79 @@ public class RequestController : Controller {
 			paginator = Paginator<MemoirViewModel>.Filter(paginator.AsQueryable(), searchString, pageNumber ?? 1, 6, parameters);
 		}
 		return this.View(paginator);
+	}
+
+	[Authorize(Roles = "Student,Guide,Committee,Director")]
+	public new async Task<IActionResult> View(string id) {
+		var user = await this._userManager.GetUserAsync(this.User);
+		if (user!.IsDeactivated) {
+			this.TempData["ErrorMessage"] = "Tu cuenta está desactivada.";
+			return this.RedirectToAction("Index", "Home", new { area = "" });
+		}
+		Memoir? memoir = null!;
+		if (this.User.IsInRole("Student")) {
+			memoir = await this._dbContext.Memoirs!
+				.Where(m => m.Phase == Phase.SentToCommittee || m.Phase == Phase.ApprovedByCommittee
+						|| m.Phase == Phase.RejectedByCommittee)
+				.Include(m => m.Owner)
+				.Include(m => m.Guide)
+				.Include(m => m.WhoRejected)
+				.Include(m => m.Assistants).AsNoTracking()
+				.FirstOrDefaultAsync(m => m.Id == id);
+		} else if (this.User.IsInRole("Guide")) {
+			memoir = await this._dbContext.Memoirs!
+				.Where(m => m.Phase == Phase.SentToCommittee || m.Phase == Phase.ApprovedByCommittee
+						|| m.Phase == Phase.RejectedByCommittee)
+				.Include(m => m.Owner)
+				.Include(m => m.Memorist)
+				.Include(m => m.Assistants).AsNoTracking()
+				.FirstOrDefaultAsync(m => m.Id == id);
+		} else if (this.User.IsInRole("Committee") || this.User.IsInRole("Director")) {
+			memoir = await this._dbContext.Memoirs!
+				.Where(m => m.Phase == Phase.SentToCommittee || m.Phase == Phase.ApprovedByCommittee)
+				.Include(m => m.Owner)
+				.Include(m => m.Memorist)
+				.Include(m => m.Guide)
+				.Include(m => m.WhoRejected)
+				.Include(m => m.Assistants).AsNoTracking()
+				.FirstOrDefaultAsync(m => m.Id == id);
+		}
+		if (memoir is null) {
+			this.TempData["ErrorMessage"] = "Error al obtener la propuesta";
+			return this.RedirectToAction("Index", "Proposal", new { area = "University" });
+		}
+		var output = new MemoirViewModel {
+			Id = id,
+			Title = memoir.Title,
+			Description = memoir.Description,
+			Phase = memoir.Phase.ToString(),
+			CreatedAt = memoir.CreatedAt,
+			UpdatedAt = memoir.UpdatedAt,
+			Assistants = memoir.Assistants!.Select(a => $"{a!.FirstName} {a.LastName}").ToList(),
+			WhoRejected = memoir.WhoRejected is null ? string.Empty : $"{memoir.WhoRejected.FirstName} {memoir.WhoRejected.LastName}",
+			Reason = memoir.Reason
+		};
+		if (this.User.IsInRole("Student") || this.User.IsInRole("Committee") || this.User.IsInRole("Director")) {
+			output = new MemoirViewModel {
+				GuideId = memoir.Guide!.Id,
+				GuideName = $"{memoir.Guide.FirstName} {memoir.Guide.LastName}",
+				GuideEmail = memoir.Guide.Email,
+				Office = memoir.Guide.Office,
+				Schedule = memoir.Guide.Schedule,
+				Specialization = memoir.Guide.Specialization
+			};
+		} else if (this.User.IsInRole("Guide") || this.User.IsInRole("Committee") || this.User.IsInRole("Director")) {
+			output = new MemoirViewModel {
+				Requirements = memoir.Requirements,
+				MemoristId = memoir.Memorist is null ? string.Empty : memoir.Memorist.Id,
+				MemoristName = memoir.Memorist is null ? string.Empty : $"{memoir.Memorist.FirstName} {memoir.Memorist.LastName}",
+				MemoristEmail = memoir.Memorist is null ? string.Empty : memoir.Memorist.Email,
+				UniversityId = memoir.Memorist is null ? string.Empty : memoir.Memorist.UniversityId,
+				RemainingCourses = memoir.Memorist is null ? string.Empty : memoir.Memorist.RemainingCourses,
+				IsDoingThePractice = memoir.Memorist is not null && memoir.Memorist.IsDoingThePractice,
+				IsWorking = memoir.Memorist is not null && memoir.Memorist.IsWorking
+			};
+		}
+		return this.View(output);
 	}
 }

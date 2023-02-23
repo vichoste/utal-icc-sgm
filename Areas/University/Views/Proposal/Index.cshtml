@@ -63,22 +63,13 @@
 												<span class="badge bg-secondary">Borrador</span>
 												break;
 											case "SentToGuide":
-												<span class="badge bg-primary">Enviada al profesor guía</span>
+												<span class="badge bg-primary">Enviada</span>
 												break;
 											case "ApprovedByGuide":
-												<span class="badge bg-success">Aprobada por profesor guía</span>
+												<span class="badge bg-success">Aprobada</span>
 												break;
 											case "RejectedByGuide":
-												<span class="badge bg-danger">Rechazada por profesor guía</span>
-												break;
-											case "SentToCommittee":
-												<span class="badge bg-primary">Enviada al comité</span>
-												break;
-											case "ApprovedByCommittee":
-												<span class="badge bg-success">Aprobada por comité</span>
-												break;
-											case "RejectedByCommittee":
-												<span class="badge bg-danger">Rechazada por comité</span>
+												<span class="badge bg-danger">Rechazada</span>
 												break;
 										}
 									} else if (this.User.IsInRole("Guide")) {
@@ -91,15 +82,6 @@
 												break;
 											case "ReadyByGuide":
 												<span class="badge bg-success">Lista</span>
-												break;
-											case "SentToCommittee":
-												<span class="badge bg-primary">Enviada al comité</span>
-												break;
-											case "ApprovedByCommittee":
-												<span class="badge bg-success">Aprobada por comité</span>
-												break;
-											case "RejectedByCommittee":
-												<span class="badge bg-danger">Rechazada por comité</span>
 												break;
 										}
 									}
