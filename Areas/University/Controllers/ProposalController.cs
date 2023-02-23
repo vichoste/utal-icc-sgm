@@ -932,4 +932,69 @@ public class ProposalController : Controller {
 		this.TempData["SuccessMessage"] = "El estudiante ha sido seleccionado a la propuesta correctamente.";
 		return this.RedirectToAction("Index", "Proposal", new { area = "University" });
 	}
+
+	[Authorize(Roles = "Student,Guide")]
+	public async Task<IActionResult> Convert(string id) {
+		var user = await this._userManager.GetUserAsync(this.User);
+		if (user!.IsDeactivated) {
+			this.TempData["ErrorMessage"] = "Tu cuenta está desactivada.";
+			return this.RedirectToAction("Index", "Home", new { area = "" });
+		}
+		Memoir? memoir = null!;
+		if (this.User.IsInRole("Student")) {
+			memoir = await this._dbContext.Memoirs!
+				.Include(m => m.Memorist)
+				.Where(m => m.Memorist!.Id == user.Id
+					&& m.Phase == Phase.ApprovedByGuide)
+				.FirstOrDefaultAsync(m => m.Id == id);
+		} else if (this.User.IsInRole("Teacher")) {
+			memoir = await this._dbContext.Memoirs!
+				.Include(m => m.Guide)
+				.Where(m => m.Guide!.Id == user.Id
+					&& m.Phase == Phase.ReadyByGuide)
+				.FirstOrDefaultAsync(m => m.Id == id);
+		}
+		if (memoir is null) {
+			this.TempData["ErrorMessage"] = "Error al obtener la propuesta";
+			return this.RedirectToAction("List", "Proposal", new { area = "University" });
+		}
+		var output = new MemoirViewModel {
+			Id = id,
+			Title = memoir.Title
+		};
+		return this.View(output);
+	}
+
+	[Authorize(Roles = "Student,Guide"), HttpPost, ValidateAntiForgeryToken]
+	public async Task<IActionResult> Convert([FromForm] MemoirViewModel input) {
+		var user = await this._userManager.GetUserAsync(this.User);
+		if (user!.IsDeactivated) {
+			this.TempData["ErrorMessage"] = "Tu cuenta está desactivada.";
+			return this.RedirectToAction("Index", "Home", new { area = "" });
+		}
+		Memoir? memoir = null!;
+		if (this.User.IsInRole("Student")) {
+			memoir = await this._dbContext.Memoirs!
+				.Include(m => m.Memorist)
+				.Where(m => m.Memorist!.Id == user.Id
+					&& m.Phase == Phase.ApprovedByGuide)
+				.FirstOrDefaultAsync(m => m.Id == input.Id);
+		} else if (this.User.IsInRole("Teacher")) {
+			memoir = await this._dbContext.Memoirs!
+				.Include(m => m.Guide)
+				.Where(m => m.Guide!.Id == user.Id
+					&& m.Phase == Phase.ReadyByGuide)
+				.FirstOrDefaultAsync(m => m.Id == input.Id);
+		}
+		if (memoir is null) {
+			this.TempData["ErrorMessage"] = "Error al obtener la propuesta";
+			return this.RedirectToAction("List", "Proposal", new { area = "University" });
+		}
+		memoir.Phase = Phase.SentToCommittee;
+		memoir.UpdatedAt = DateTimeOffset.Now;
+		_ = this._dbContext.Memoirs!.Update(memoir);
+		_ = await this._dbContext.SaveChangesAsync();
+		this.TempData["SuccessMessage"] = "La propuesta ha sido aprobada correctamente.";
+		return this.RedirectToAction("List", "Proposal", new { area = "University" });
+	}
 }
