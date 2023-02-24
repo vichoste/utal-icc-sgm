@@ -142,7 +142,7 @@
 									} else if (this.User.IsInRole("Guide")) {
 										@if (this.Model.Phase == "SentToGuide") {
 											@this.Html.ActionLink("Rechazar", "Reject", "Proposal", new { area = "University", id = this.Model.Id }, new { @class = "btn btn-danger mb-3" })
-											@this.Html.ActionLink("Aceptar", "Approve", "Proposal", new { area = "University", id = this.Model.Id }, new { @class = "btn btn-success mb-3" })
+											@this.Html.ActionLink("Aprobar", "Approve", "Proposal", new { area = "University", id = this.Model.Id }, new { @class = "btn btn-success mb-3" })
 										} else if (this.Model.Phase == "ReadyByGuide") {
 											@this.Html.ActionLink("Convertir", "Convert", "Proposal", new { area = "University", id = this.Model.Id }, new { @class = "btn btn-primary mb-3"})
 										}

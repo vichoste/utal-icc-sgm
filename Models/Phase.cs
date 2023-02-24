@@ -11,6 +11,8 @@ public enum Phase {
 	SentToCommittee,
 	RejectedByCommittee,
 	ApprovedByCommittee,
+	RejectedByDirector,
+	ApprovedByDirector,
 	InProgress,
 	Abandoned,
 	Completed

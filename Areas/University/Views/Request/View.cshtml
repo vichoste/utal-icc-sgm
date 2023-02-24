@@ -133,10 +133,17 @@
 										} else if (this.Model.Phase == "RejectedByCommittee") {
 											@this.Html.ActionLink("Corregir", "Edit", "Request", new { area = "University", id = this.Model.Id }, new { @class = "btn btn-danger mb-3"})
 										}
-									} else if (this.User.IsInRole("Committee") || this.User.IsInRole("Director")) {
-										@if (this.Model.Phase == "SentToCommittee") {
-											@this.Html.ActionLink("Rechazar", "Reject", "Request", new { area = "University", id = this.Model.Id }, new { @class = "btn btn-danger mb-3" })
-											@this.Html.ActionLink("Aceptar", "Approve", "Request", new { area = "University", id = this.Model.Id }, new { @class = "btn btn-success mb-3" })
+									} else {
+										@if (this.User.IsInRole("Committee")) {
+											@if (this.Model.Phase == "SentToCommittee") {
+												@this.Html.ActionLink("Votar", "Vote", "Request", new { area = "University", id = this.Model.Id }, new { @class = "btn btn-primary mb-3" })
+											}
+										}
+										@if (this.User.IsInRole("Director")) {
+											@if (this.Model.Phase == "SentToCommittee") {
+												@this.Html.ActionLink("Rechazar", "Reject", "Request", new { area = "University", id = this.Model.Id }, new { @class = "btn btn-danger mb-3" })
+												@this.Html.ActionLink("Aprobar", "Approve", "Request", new { area = "University", id = this.Model.Id }, new { @class = "btn btn-success mb-3" })
+											}
 										}
 									}
 								</div>

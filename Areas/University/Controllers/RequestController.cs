@@ -43,7 +43,8 @@ public class RequestController : Controller {
 				.Include(m => m.Owner)
 				.Where(m => m.Owner!.Id == this._userManager.GetUserId(this.User)
 					&& (m.Phase == Phase.SentToCommittee || m.Phase == Phase.ApprovedByCommittee
-						|| m.Phase == Phase.RejectedByCommittee))
+						|| m.Phase == Phase.RejectedByCommittee || m.Phase == Phase.ApprovedByDirector
+						|| m.Phase == Phase.RejectedByDirector))
 				.Include(m => m.Guide).AsNoTracking()
 				.Select(m => new MemoirViewModel {
 					Id = m.Id,
@@ -55,7 +56,8 @@ public class RequestController : Controller {
 		} else if (this.User.IsInRole("Guide") || this.User.IsInRole("Director")) {
 			memoirs = this._dbContext.Memoirs!
 				.Include(m => m.Owner)
-				.Where(m => m.Phase == Phase.SentToCommittee || m.Phase == Phase.ApprovedByCommittee)
+				.Where(m => m.Phase == Phase.SentToCommittee || m.Phase == Phase.ApprovedByCommittee
+					|| m.Phase == Phase.ApprovedByDirector)
 				.Include(m => m.Guide).AsNoTracking()
 				.Select(m => new MemoirViewModel {
 					Id = m.Id,
@@ -86,7 +88,8 @@ public class RequestController : Controller {
 		if (this.User.IsInRole("Student")) {
 			memoir = await this._dbContext.Memoirs!
 				.Where(m => m.Phase == Phase.SentToCommittee || m.Phase == Phase.ApprovedByCommittee
-						|| m.Phase == Phase.RejectedByCommittee)
+						|| m.Phase == Phase.RejectedByCommittee || m.Phase == Phase.ApprovedByDirector
+						|| m.Phase == Phase.RejectedByDirector)
 				.Include(m => m.Owner)
 				.Include(m => m.Guide)
 				.Include(m => m.WhoRejected)
@@ -95,14 +98,16 @@ public class RequestController : Controller {
 		} else if (this.User.IsInRole("Guide")) {
 			memoir = await this._dbContext.Memoirs!
 				.Where(m => m.Phase == Phase.SentToCommittee || m.Phase == Phase.ApprovedByCommittee
-						|| m.Phase == Phase.RejectedByCommittee)
+						|| m.Phase == Phase.RejectedByCommittee || m.Phase == Phase.ApprovedByDirector
+						|| m.Phase == Phase.RejectedByDirector)
 				.Include(m => m.Owner)
 				.Include(m => m.Memorist)
 				.Include(m => m.Assistants).AsNoTracking()
 				.FirstOrDefaultAsync(m => m.Id == id);
 		} else if (this.User.IsInRole("Committee") || this.User.IsInRole("Director")) {
 			memoir = await this._dbContext.Memoirs!
-				.Where(m => m.Phase == Phase.SentToCommittee || m.Phase == Phase.ApprovedByCommittee)
+				.Where(m => m.Phase == Phase.SentToCommittee || m.Phase == Phase.ApprovedByCommittee
+					|| m.Phase == Phase.ApprovedByDirector)
 				.Include(m => m.Owner)
 				.Include(m => m.Memorist)
 				.Include(m => m.Guide)
