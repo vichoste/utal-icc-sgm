@@ -128,7 +128,7 @@
 						<div class="row text-center">
 							<div class="col">
 								<div class="btn-group">
-									@this.Html.ActionLink("Volver", "Index", "Proposal", new { area = "University" }, new { @class = "btn btn-secondary mb-3" })
+									@this.Html.ActionLink("Volver", null, null, null, new { @class = "btn btn-secondary mb-3", @href = "javascript:history.back()" })
 									@if (this.User.IsInRole("Student")) {
 										var memoir = this._dbContext.Memoirs!.Include(m => m.Memorist).Include(m => m.Candidates).FirstOrDefault(m => m.Id == this.Model.Id);
 										@if (this.Model.Phase == "PublishedByGuide" && !memoir!.Candidates!.Any(u => u!.Id == user!.Id)) {

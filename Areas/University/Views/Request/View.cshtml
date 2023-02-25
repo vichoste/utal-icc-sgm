@@ -126,7 +126,7 @@
 						<div class="row text-center">
 							<div class="col">
 								<div class="btn-group">
-									@this.Html.ActionLink("Volver", "Index", "Request", new { area = "University" }, new { @class = "btn btn-secondary mb-3" })
+									@this.Html.ActionLink("Volver", null, null, null, new { @class = "btn btn-secondary mb-3", @href = "javascript:history.back()" })
 									@if (this.User.IsInRole("Student") || this.User.IsInRole("Guide")) {
 										@if (this.Model.Phase == "ApprovedByCommittee") {
 											@this.Html.ActionLink("Iniciar", "Convert", "Request", new { area = "University", id = this.Model.Id }, new { @class = "btn btn-primary mb-3"})
