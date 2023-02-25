@@ -12,6 +12,8 @@ public class ApplicationUser : IdentityUser {
 	public bool IsDeactivated { get; set; }
 	[InverseProperty("Owner")]
 	public virtual ICollection<Memoir?>? Owning { get; set; } = new HashSet<Memoir?>();
+	[InverseProperty("WhoVoted")]
+	public virtual ICollection<Vote?>? Votes { get; set; } = new HashSet<Vote?>();
 	public DateTimeOffset CreatedAt { get; set; }
 	public DateTimeOffset? UpdatedAt { get; set; }
 	#endregion

@@ -345,6 +345,32 @@ namespace Utal.Icc.Sgm.Migrations
                     b.ToTable("Memoirs");
                 });
 
+            modelBuilder.Entity("Utal.Icc.Sgm.Models.Vote", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<bool>("IsApproved")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("MemoirId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Reason")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("WhoVotedId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MemoirId");
+
+                    b.HasIndex("WhoVotedId");
+
+                    b.ToTable("Vote");
+                });
+
             modelBuilder.Entity("ApplicationUserMemoir", b =>
                 {
                     b.HasOne("Utal.Icc.Sgm.Models.ApplicationUser", null)
@@ -453,6 +479,21 @@ namespace Utal.Icc.Sgm.Migrations
                     b.Navigation("WhoRejected");
                 });
 
+            modelBuilder.Entity("Utal.Icc.Sgm.Models.Vote", b =>
+                {
+                    b.HasOne("Utal.Icc.Sgm.Models.Memoir", "Memoir")
+                        .WithMany("Votes")
+                        .HasForeignKey("MemoirId");
+
+                    b.HasOne("Utal.Icc.Sgm.Models.ApplicationUser", "WhoVoted")
+                        .WithMany("Votes")
+                        .HasForeignKey("WhoVotedId");
+
+                    b.Navigation("Memoir");
+
+                    b.Navigation("WhoVoted");
+                });
+
             modelBuilder.Entity("Utal.Icc.Sgm.Models.ApplicationUser", b =>
                 {
                     b.Navigation("Doing");
@@ -462,6 +503,13 @@ namespace Utal.Icc.Sgm.Migrations
                     b.Navigation("Owning");
 
                     b.Navigation("Rejections");
+
+                    b.Navigation("Votes");
+                });
+
+            modelBuilder.Entity("Utal.Icc.Sgm.Models.Memoir", b =>
+                {
+                    b.Navigation("Votes");
                 });
 #pragma warning restore 612, 618
         }

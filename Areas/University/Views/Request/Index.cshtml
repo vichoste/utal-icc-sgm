@@ -5,7 +5,11 @@
 @model Paginator<MemoirViewModel>
 
 @{
-	this.ViewData["Title"] = "Mis solicitudes";
+	if (this.User.IsInRole("Student") || this.User.IsInRole("Guide")) {
+		this.ViewData["Title"] = "Mis solicitudes";
+	} else if (this.User.IsInRole("Committee") || this.User.IsInRole("Director")) {
+		this.ViewData["Title"] = "Solicitudes";
+	}
 }
 
 <div class="container">
@@ -75,7 +79,14 @@
 												break;
 										}
 									} else if (this.User.IsInRole("Committee") || this.User.IsInRole("Director")) {
-										
+										@switch (item.Phase) {
+											case "SentToCommittee":
+												<span class="badge bg-yellow">Revisar</span>
+												break;
+											case "ApprovedByCommittee":
+												<span class="badge bg-success">Aprobada</span>
+												break;
+										}
 									}
 								</td>
 								<td>

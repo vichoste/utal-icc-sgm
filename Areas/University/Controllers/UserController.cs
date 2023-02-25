@@ -172,32 +172,23 @@ public class UserController : Controller {
 			this.TempData["ErrorMessage"] = "Error al obtener al usuario.";
 			return this.RedirectToAction("Students", "User", new { area = "University" });
 		}
-		var output = user switch {
-			_ when await this._userManager.IsInRoleAsync(user, "Student") => new ApplicationUserViewModel {
-				Id = user.Id,
-				FirstName = user.FirstName,
-				LastName = user.LastName,
-				Rut = user.Rut,
-				Email = user.Email,
-				CreatedAt = user.CreatedAt,
-				UpdatedAt = user.UpdatedAt,
-				UniversityId = user.UniversityId
-			},
-			_ when await this._userManager.IsInRoleAsync(user, "Teacher") => new ApplicationUserViewModel {
-				Id = user.Id,
-				FirstName = user.FirstName,
-				LastName = user.LastName,
-				Rut = user.Rut,
-				Email = user.Email,
-				CreatedAt = user.CreatedAt,
-				UpdatedAt = user.UpdatedAt,
-				IsAssistant = await this._userManager.IsInRoleAsync(user, "Assistant"),
-				IsCommittee = await this._userManager.IsInRoleAsync(user, "Committee"),
-				IsCourse = await this._userManager.IsInRoleAsync(user, "Course"),
-				IsGuide = await this._userManager.IsInRoleAsync(user, "Guide")
-			},
-			_ => null
+		var output = new ApplicationUserViewModel {
+			Id = user.Id,
+			FirstName = user.FirstName,
+			LastName = user.LastName,
+			Rut = user.Rut,
+			Email = user.Email,
+			CreatedAt = user.CreatedAt,
+			UpdatedAt = user.UpdatedAt,
 		};
+		if (await this._userManager.IsInRoleAsync(user, "Student")) {
+			output.UniversityId = user.UniversityId;
+		} else if (await this._userManager.IsInRoleAsync(user, "Teacher")) {
+			output.IsAssistant = await this._userManager.IsInRoleAsync(user, "Assistant");
+			output.IsCommittee = await this._userManager.IsInRoleAsync(user, "Committee");
+			output.IsCourse = await this._userManager.IsInRoleAsync(user, "Course");
+			output.IsGuide = await this._userManager.IsInRoleAsync(user, "Guide");
+		}
 		return this.View(output);
 	}
 
@@ -213,11 +204,9 @@ public class UserController : Controller {
 		user.FirstName = input.FirstName;
 		user.LastName = input.LastName;
 		user.Rut = input.Rut;
-		user.UpdatedAt = DateTimeOffset.Now;
 		if (await this._userManager.IsInRoleAsync(user, "Student")) {
 			user.UniversityId = input.UniversityId;
 		}
-		_ = await this._userManager.UpdateAsync(user);
 		if (await this._userManager.IsInRoleAsync(user, "Teacher")) {
 			var roles = (await this._userManager.GetRolesAsync(user)).ToList();
 			if (roles.Contains("Teacher")) {
@@ -241,6 +230,8 @@ public class UserController : Controller {
 			}
 			_ = await this._userManager.AddToRolesAsync(user, rankRoles);
 		}
+		user.UpdatedAt = DateTimeOffset.Now;
+		_ = await this._userManager.UpdateAsync(user);
 		var output = new ApplicationUserViewModel {
 			Id = user.Id,
 			FirstName = user.FirstName,

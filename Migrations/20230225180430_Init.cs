@@ -260,6 +260,31 @@ namespace Utal.Icc.Sgm.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Vote",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    IsApproved = table.Column<bool>(type: "bit", nullable: false),
+                    Reason = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    WhoVotedId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    MemoirId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Vote", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Vote_AspNetUsers_WhoVotedId",
+                        column: x => x.WhoVotedId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Vote_Memoirs_MemoirId",
+                        column: x => x.MemoirId,
+                        principalTable: "Memoirs",
+                        principalColumn: "Id");
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_ApplicationUserMemoir_AssistingId",
                 table: "ApplicationUserMemoir",
@@ -328,6 +353,16 @@ namespace Utal.Icc.Sgm.Migrations
                 name: "IX_Memoirs_WhoRejectedId",
                 table: "Memoirs",
                 column: "WhoRejectedId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Vote_MemoirId",
+                table: "Vote",
+                column: "MemoirId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Vote_WhoVotedId",
+                table: "Vote",
+                column: "WhoVotedId");
         }
 
         /// <inheritdoc />
@@ -355,10 +390,13 @@ namespace Utal.Icc.Sgm.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Memoirs");
+                name: "Vote");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
+                name: "Memoirs");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
