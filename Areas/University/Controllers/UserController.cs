@@ -215,6 +215,7 @@ public class UserController : Controller {
 			if (roles.Contains("Director")) {
 				_ = roles.Remove("Director");
 			}
+			_ = await this._userManager.RemoveFromRolesAsync(user, roles);
 			var rankRoles = new List<string>();
 			if (input.IsGuide) {
 				rankRoles.Add("Guide");
