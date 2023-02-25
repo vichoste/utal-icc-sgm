@@ -49,7 +49,8 @@ public class RequestController : Controller {
 					Title = m.Title,
 					Phase = m.Phase.ToString(),
 					MemoristName = $"{m.Memorist!.FirstName} {m.Memorist!.LastName}",
-					GuideName = $"{m.Guide!.FirstName} {m.Guide!.LastName}"
+					GuideName = $"{m.Guide!.FirstName} {m.Guide!.LastName}",
+					UpdatedAt = m.UpdatedAt
 				});
 		var paginator = Paginator<MemoirViewModel>.Create(memoirs, pageNumber ?? 1, 6);
 		if (!string.IsNullOrEmpty(sortOrder)) {
@@ -89,7 +90,8 @@ public class RequestController : Controller {
 					Title = m.Title,
 					Phase = m.Phase.ToString(),
 					MemoristName = $"{m.Memorist!.FirstName} {m.Memorist!.LastName}",
-					GuideName = $"{m.Guide!.FirstName} {m.Guide!.LastName}"
+					GuideName = $"{m.Guide!.FirstName} {m.Guide!.LastName}",
+					UpdatedAt = m.UpdatedAt
 				});
 		var paginator = Paginator<MemoirViewModel>.Create(memoirs, pageNumber ?? 1, 6);
 		if (!string.IsNullOrEmpty(sortOrder)) {

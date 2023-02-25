@@ -149,7 +149,8 @@ public class ProposalController : Controller {
 					Id = m.Id,
 					Title = m.Title,
 					Phase = m.Phase.ToString(),
-					GuideName = $"{m.Guide!.FirstName} {m.Guide!.LastName}"
+					GuideName = $"{m.Guide!.FirstName} {m.Guide!.LastName}",
+					UpdatedAt = m.UpdatedAt
 				});
 		} else if (this.User.IsInRole("Guide")) {
 			memoirs = this._dbContext.Memoirs!
@@ -165,7 +166,8 @@ public class ProposalController : Controller {
 					Id = m.Id,
 					Title = m.Title,
 					Phase = m.Phase.ToString(),
-					MemoristName = $"{m.Memorist!.FirstName} {m.Memorist!.LastName}"
+					MemoristName = $"{m.Memorist!.FirstName} {m.Memorist!.LastName}",
+					UpdatedAt = m.UpdatedAt
 				});
 		}
 		var paginator = Paginator<MemoirViewModel>.Create(memoirs, pageNumber ?? 1, 6);
@@ -187,9 +189,9 @@ public class ProposalController : Controller {
 		}
 		string[]? parameters = null;
 		if (this.User.IsInRole("Student")) {
-			parameters = new[] { "UpdatedAt", "Title", "GuideName" };
+			parameters = new[] { "Title", "GuideName", "UpdatedAt" };
 		} else if (this.User.IsInRole("Guide")) {
-			parameters = new[] { "UpdatedAt", "Title", "MemoristName" };
+			parameters = new[] { "Title", "MemoristName", "UpdatedAt" };
 		}
 		foreach (var parameter in parameters!) {
 			this.ViewData[$"{parameter}SortParam"] = sortOrder == parameter ? $"{parameter}Desc" : parameter;
@@ -210,7 +212,8 @@ public class ProposalController : Controller {
 					Id = m.Id,
 					Title = m.Title,
 					Phase = m.Phase.ToString(),
-					GuideName = $"{m.Guide!.FirstName} {m.Guide!.LastName}"
+					GuideName = $"{m.Guide!.FirstName} {m.Guide!.LastName}",
+					UpdatedAt = m.UpdatedAt
 				});
 		} else if (this.User.IsInRole("Guide")) {
 			memoirs = this._dbContext.Memoirs!
@@ -222,7 +225,8 @@ public class ProposalController : Controller {
 					Id = m.Id,
 					Title = m.Title,
 					Phase = m.Phase.ToString(),
-					MemoristName = $"{m.Memorist!.FirstName} {m.Memorist!.LastName}"
+					MemoristName = $"{m.Memorist!.FirstName} {m.Memorist!.LastName}",
+					UpdatedAt = m.UpdatedAt
 				});
 		}
 		var paginator = Paginator<MemoirViewModel>.Create(memoirs, pageNumber ?? 1, 6);
@@ -266,7 +270,8 @@ public class ProposalController : Controller {
 				Id = m.Id,
 				Title = m.Title,
 				Phase = m.Phase.ToString(),
-				GuideName = $"{m.Guide!.FirstName} {m.Guide!.LastName}"
+				GuideName = $"{m.Guide!.FirstName} {m.Guide!.LastName}",
+				UpdatedAt = m.UpdatedAt
 			}
 		);
 		var paginator = Paginator<MemoirViewModel>.Create(memoirs, pageNumber ?? 1, 6);
