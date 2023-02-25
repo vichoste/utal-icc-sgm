@@ -114,22 +114,39 @@ public class RequestController : Controller {
 			return this.RedirectToAction("Index", "Home", new { area = "" });
 		}
 		Memoir? memoir = null!;
-		if (this.User.IsInRole("Student") || this.User.IsInRole("Committee") || this.User.IsInRole("Director")) {
+		if (this.User.IsInRole("Student")) {
+			memoir = await this._dbContext.Memoirs!
+				.Where(m => m.Phase == Phase.SentToCommittee || m.Phase == Phase.ApprovedByCommittee
+						|| m.Phase == Phase.RejectedByCommittee || m.Phase == Phase.ApprovedByDirector
+						|| m.Phase == Phase.RejectedByDirector)
+				.Include(m => m.Owner)
+				.Include(m => m.Memorist)
+				.Where(m => m.Owner!.Id == this._userManager.GetUserId(this.User)
+					|| m.Memorist!.Id == this._userManager.GetUserId(this.User))
+				.Include(m => m.Guide)
+				.Include(m => m.WhoRejected)
+				.Include(m => m.Assistants).AsNoTracking()
+				.FirstOrDefaultAsync(m => m.Id == id);
+		} else if (this.User.IsInRole("Guide")) {
 			memoir = await this._dbContext.Memoirs!
 				.Where(m => m.Phase == Phase.SentToCommittee || m.Phase == Phase.ApprovedByCommittee
 						|| m.Phase == Phase.RejectedByCommittee || m.Phase == Phase.ApprovedByDirector
 						|| m.Phase == Phase.RejectedByDirector)
 				.Include(m => m.Owner)
 				.Include(m => m.Guide)
-				.Include(m => m.WhoRejected)
+				.Where(m => m.Owner!.Id == this._userManager.GetUserId(this.User)
+					|| m.Guide!.Id == this._userManager.GetUserId(this.User))
+				.Include(m => m.Memorist)
 				.Include(m => m.Assistants).AsNoTracking()
 				.FirstOrDefaultAsync(m => m.Id == id);
-		} else if (this.User.IsInRole("Guide") || this.User.IsInRole("Committee") || this.User.IsInRole("Director")) {
+		}
+		if (this.User.IsInRole("Committee") || this.User.IsInRole("Director")) {
 			memoir = await this._dbContext.Memoirs!
 				.Where(m => m.Phase == Phase.SentToCommittee || m.Phase == Phase.ApprovedByCommittee
 						|| m.Phase == Phase.RejectedByCommittee || m.Phase == Phase.ApprovedByDirector
 						|| m.Phase == Phase.RejectedByDirector)
 				.Include(m => m.Owner)
+				.Include(m => m.Guide)
 				.Include(m => m.Memorist)
 				.Include(m => m.Assistants).AsNoTracking()
 				.FirstOrDefaultAsync(m => m.Id == id);
