@@ -39,11 +39,14 @@ public class RequestController : Controller {
 		this.ViewData["CurrentFilter"] = searchString;
 		var memoirs = this._dbContext.Memoirs!
 				.Include(m => m.Owner)
-				.Where(m => m.Owner!.Id == this._userManager.GetUserId(this.User)
+				.Include(m => m.Guide)
+				.Include(m => m.Memorist)
+				.Where(m => (m.Owner!.Id == this._userManager.GetUserId(this.User)
+					|| m.Guide!.Id == this._userManager.GetUserId(this.User)
+					|| m.Memorist!.Id == this._userManager.GetUserId(this.User))
 					&& (m.Phase == Phase.SentToCommittee || m.Phase == Phase.ApprovedByCommittee
 						|| m.Phase == Phase.RejectedByCommittee || m.Phase == Phase.ApprovedByDirector
-						|| m.Phase == Phase.RejectedByDirector))
-				.Include(m => m.Guide).AsNoTracking()
+						|| m.Phase == Phase.RejectedByDirector)).AsNoTracking()
 				.Select(m => new MemoirViewModel {
 					Id = m.Id,
 					Title = m.Title,
