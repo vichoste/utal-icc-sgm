@@ -65,9 +65,9 @@
 									@if (memoir!.Phase == Phase.PublishedByGuide && memoir!.Candidates!.Any(u => u!.Id == user!.Id)) {
 										<span class="badge bg-primary">Postulado</span>
 									} else if (memoir.Memorist is not null && memoir.Memorist.Id == user!.Id) {
-										<span class="badge bg-success">Aprobado por profesor guía</span>
+										<span class="badge bg-success">Aprobado</span>
 									} else {
-										<span class="badge bg-danger">Rechazado por profesor guía</span>
+										<span class="badge bg-danger">Rechazado</span>
 									}
 								</td>
 								<td>

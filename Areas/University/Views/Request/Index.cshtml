@@ -39,6 +39,11 @@
 									<span>Profesor guía</span>
 								</a>
 							</th>
+							<th>
+								<a asp-action="Index" asp-route-sortOrder="@this.ViewData["UpdatedAtSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+									<span>Fecha de actualización</span>
+								</a>
+							</th>
 							<th>Estado</th>
 							<th>Acciones</th>
 						</tr>
@@ -49,6 +54,7 @@
 								<td>@item.Title</td>
 								<td>@item.MemoristName</td>
 								<td>@item.GuideName</td>
+								<td>@item.UpdatedAt</td>
 								<td>
 									@switch (item.Phase) {
 										case "SentToCommittee":

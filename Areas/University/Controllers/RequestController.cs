@@ -111,7 +111,7 @@ public class RequestController : Controller {
 			return this.RedirectToAction("Index", "Home", new { area = "" });
 		}
 		Memoir? memoir = null!;
-		if (this.User.IsInRole("Student")) {
+		if (this.User.IsInRole("Student") || this.User.IsInRole("Committee") || this.User.IsInRole("Director")) {
 			memoir = await this._dbContext.Memoirs!
 				.Where(m => m.Phase == Phase.SentToCommittee || m.Phase == Phase.ApprovedByCommittee
 						|| m.Phase == Phase.RejectedByCommittee || m.Phase == Phase.ApprovedByDirector
@@ -121,23 +121,13 @@ public class RequestController : Controller {
 				.Include(m => m.WhoRejected)
 				.Include(m => m.Assistants).AsNoTracking()
 				.FirstOrDefaultAsync(m => m.Id == id);
-		} else if (this.User.IsInRole("Guide")) {
+		} else if (this.User.IsInRole("Guide") || this.User.IsInRole("Committee") || this.User.IsInRole("Director")) {
 			memoir = await this._dbContext.Memoirs!
 				.Where(m => m.Phase == Phase.SentToCommittee || m.Phase == Phase.ApprovedByCommittee
 						|| m.Phase == Phase.RejectedByCommittee || m.Phase == Phase.ApprovedByDirector
 						|| m.Phase == Phase.RejectedByDirector)
 				.Include(m => m.Owner)
 				.Include(m => m.Memorist)
-				.Include(m => m.Assistants).AsNoTracking()
-				.FirstOrDefaultAsync(m => m.Id == id);
-		} else if (this.User.IsInRole("Committee") || this.User.IsInRole("Director")) {
-			memoir = await this._dbContext.Memoirs!
-				.Where(m => m.Phase == Phase.SentToCommittee || m.Phase == Phase.ApprovedByCommittee
-					|| m.Phase == Phase.ApprovedByDirector)
-				.Include(m => m.Owner)
-				.Include(m => m.Memorist)
-				.Include(m => m.Guide)
-				.Include(m => m.WhoRejected)
 				.Include(m => m.Assistants).AsNoTracking()
 				.FirstOrDefaultAsync(m => m.Id == id);
 		}
@@ -157,25 +147,21 @@ public class RequestController : Controller {
 			Reason = memoir.Reason
 		};
 		if (this.User.IsInRole("Student") || this.User.IsInRole("Committee") || this.User.IsInRole("Director")) {
-			output = new MemoirViewModel {
-				GuideId = memoir.Guide!.Id,
-				GuideName = $"{memoir.Guide.FirstName} {memoir.Guide.LastName}",
-				GuideEmail = memoir.Guide.Email,
-				Office = memoir.Guide.Office,
-				Schedule = memoir.Guide.Schedule,
-				Specialization = memoir.Guide.Specialization
-			};
+			output.GuideId = memoir.Guide!.Id;
+			output.GuideName = $"{memoir.Guide.FirstName} {memoir.Guide.LastName}";
+			output.GuideEmail = memoir.Guide.Email;
+			output.Office = memoir.Guide.Office;
+			output.Schedule = memoir.Guide.Schedule;
+			output.Specialization = memoir.Guide.Specialization;
 		} else if (this.User.IsInRole("Guide") || this.User.IsInRole("Committee") || this.User.IsInRole("Director")) {
-			output = new MemoirViewModel {
-				Requirements = memoir.Requirements,
-				MemoristId = memoir.Memorist is null ? string.Empty : memoir.Memorist.Id,
-				MemoristName = memoir.Memorist is null ? string.Empty : $"{memoir.Memorist.FirstName} {memoir.Memorist.LastName}",
-				MemoristEmail = memoir.Memorist is null ? string.Empty : memoir.Memorist.Email,
-				UniversityId = memoir.Memorist is null ? string.Empty : memoir.Memorist.UniversityId,
-				RemainingCourses = memoir.Memorist is null ? string.Empty : memoir.Memorist.RemainingCourses,
-				IsDoingThePractice = memoir.Memorist is not null && memoir.Memorist.IsDoingThePractice,
-				IsWorking = memoir.Memorist is not null && memoir.Memorist.IsWorking
-			};
+			output.Requirements = memoir.Requirements;
+			output.MemoristId = memoir.Memorist is null ? string.Empty : memoir.Memorist.Id;
+			output.MemoristName = memoir.Memorist is null ? string.Empty : $"{memoir.Memorist.FirstName} {memoir.Memorist.LastName}";
+			output.MemoristEmail = memoir.Memorist is null ? string.Empty : memoir.Memorist.Email;
+			output.UniversityId = memoir.Memorist is null ? string.Empty : memoir.Memorist.UniversityId;
+			output.RemainingCourses = memoir.Memorist is null ? string.Empty : memoir.Memorist.RemainingCourses;
+			output.IsDoingThePractice = memoir.Memorist is not null && memoir.Memorist.IsDoingThePractice;
+			output.IsWorking = memoir.Memorist is not null && memoir.Memorist.IsWorking;
 		}
 		return this.View(output);
 	}

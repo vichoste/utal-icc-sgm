@@ -121,9 +121,9 @@ public class ProposalController : Controller {
 		}
 		string[]? parameters = null;
 		if (this.User.IsInRole("Student")) {
-			parameters = new[] { "Title", "GuideName", "UpdatedAt", };
+			parameters = new[] { "Title", "GuideName", "UpdatedAt" };
 		} else if (this.User.IsInRole("Guide")) {
-			parameters = new[] { "Title", "MemoristName", "UpdatedAt", };
+			parameters = new[] { "Title", "MemoristName", "UpdatedAt" };
 		}
 		foreach (var parameter in parameters!) {
 			this.ViewData[$"{parameter}SortParam"] = sortOrder == parameter ? $"{parameter}Desc" : parameter;
@@ -140,10 +140,10 @@ public class ProposalController : Controller {
 			memoirs = this._dbContext.Memoirs!
 				.Include(m => m.Owner)
 				.Where(m => m.Owner!.Id == this._userManager.GetUserId(this.User)
-					&& (m.Phase != Phase.SentToCommittee || m.Phase != Phase.RejectedByCommittee
-						|| m.Phase != Phase.ApprovedByCommittee || m.Phase != Phase.InProgress
-						|| m.Phase != Phase.Abandoned || m.Phase != Phase.Completed
-						|| m.Phase != Phase.RejectedByDirector || m.Phase != Phase.ApprovedByDirector))
+					&& m.Phase != Phase.SentToCommittee && m.Phase != Phase.RejectedByCommittee
+					&& m.Phase != Phase.ApprovedByCommittee && m.Phase != Phase.InProgress
+					&& m.Phase != Phase.Abandoned && m.Phase != Phase.Completed
+					&& m.Phase != Phase.RejectedByDirector && m.Phase != Phase.ApprovedByDirector)
 				.Include(m => m.Guide).AsNoTracking()
 				.Select(m => new MemoirViewModel {
 					Id = m.Id,
@@ -156,10 +156,10 @@ public class ProposalController : Controller {
 			memoirs = this._dbContext.Memoirs!
 				.Include(m => m.Owner)
 				.Where(m => m.Owner!.Id == this._userManager.GetUserId(this.User)
-					&& (m.Phase != Phase.SentToCommittee || m.Phase != Phase.RejectedByCommittee
-						|| m.Phase != Phase.ApprovedByCommittee || m.Phase != Phase.InProgress
-						|| m.Phase != Phase.Abandoned || m.Phase != Phase.Completed
-						|| m.Phase != Phase.RejectedByDirector || m.Phase != Phase.ApprovedByDirector))
+					&& m.Phase != Phase.SentToCommittee && m.Phase != Phase.RejectedByCommittee
+					&& m.Phase != Phase.ApprovedByCommittee && m.Phase != Phase.InProgress
+					&& m.Phase != Phase.Abandoned && m.Phase != Phase.Completed
+					&& m.Phase != Phase.RejectedByDirector && m.Phase != Phase.ApprovedByDirector)
 				.Include(m => m.Guide)
 				.Include(m => m.Memorist).AsNoTracking()
 				.Select(m => new MemoirViewModel {
@@ -261,10 +261,10 @@ public class ProposalController : Controller {
 			.Include(m => m.Memorist)
 			.Where(m => (m!.Candidates!.Contains(user) || m.Memorist == user)
 				&& (m.Phase == Phase.PublishedByGuide || m.Phase == Phase.ReadyByGuide)
-				&& (m.Phase != Phase.SentToCommittee || m.Phase != Phase.RejectedByCommittee
-					|| m.Phase != Phase.ApprovedByCommittee || m.Phase != Phase.InProgress
-					|| m.Phase != Phase.Abandoned || m.Phase != Phase.Completed
-					|| m.Phase != Phase.RejectedByDirector || m.Phase != Phase.ApprovedByDirector))
+				&& m.Phase != Phase.SentToCommittee && m.Phase != Phase.RejectedByCommittee
+				&& m.Phase != Phase.ApprovedByCommittee && m.Phase != Phase.InProgress
+				&& m.Phase != Phase.Abandoned && m.Phase != Phase.Completed
+				&& m.Phase != Phase.RejectedByDirector && m.Phase != Phase.ApprovedByDirector)
 			.Include(m => m.Guide).AsNoTracking()
 			.Select(m => new MemoirViewModel {
 				Id = m.Id,
@@ -380,10 +380,10 @@ public class ProposalController : Controller {
 			memoir = await this._dbContext.Memoirs!
 				.Include(m => m.Owner)
 				.Where(m => m.Owner!.Id == this._userManager.GetUserId(this.User)
-					&& (m.Phase != Phase.SentToCommittee || m.Phase != Phase.RejectedByCommittee
-						|| m.Phase != Phase.ApprovedByCommittee || m.Phase != Phase.InProgress
-						|| m.Phase != Phase.Abandoned || m.Phase != Phase.Completed
-						|| m.Phase != Phase.RejectedByDirector || m.Phase != Phase.ApprovedByDirector))
+					&& m.Phase != Phase.SentToCommittee && m.Phase != Phase.RejectedByCommittee
+					&& m.Phase != Phase.ApprovedByCommittee && m.Phase != Phase.InProgress
+					&& m.Phase != Phase.Abandoned && m.Phase != Phase.Completed
+					&& m.Phase != Phase.RejectedByDirector && m.Phase != Phase.ApprovedByDirector)
 				.Include(m => m.Guide)
 				.Include(m => m.Assistants).AsNoTracking()
 				.FirstOrDefaultAsync(m => m.Id == id && (m.Phase == Phase.DraftByStudent || m.Phase == Phase.RejectedByGuide));
@@ -391,10 +391,10 @@ public class ProposalController : Controller {
 			memoir = await this._dbContext.Memoirs!
 				.Include(m => m.Owner)
 				.Where(m => m.Owner!.Id == this._userManager.GetUserId(this.User)
-					&& (m.Phase != Phase.SentToCommittee || m.Phase != Phase.RejectedByCommittee
-						|| m.Phase != Phase.ApprovedByCommittee || m.Phase != Phase.InProgress
-						|| m.Phase != Phase.Abandoned || m.Phase != Phase.Completed
-						|| m.Phase != Phase.RejectedByDirector || m.Phase != Phase.ApprovedByDirector))
+					&& m.Phase != Phase.SentToCommittee && m.Phase != Phase.RejectedByCommittee
+					&& m.Phase != Phase.ApprovedByCommittee && m.Phase != Phase.InProgress
+					&& m.Phase != Phase.Abandoned && m.Phase != Phase.Completed
+					&& m.Phase != Phase.RejectedByDirector && m.Phase != Phase.ApprovedByDirector)
 				.Include(m => m.Guide)
 				.Include(m => m.Assistants).AsNoTracking()
 				.FirstOrDefaultAsync(m => m.Id == id && (m.Phase == Phase.DraftByGuide || m.Phase == Phase.RejectedByGuide));
@@ -441,10 +441,10 @@ public class ProposalController : Controller {
 			memoir = await this._dbContext.Memoirs!
 				.Include(m => m.Owner)
 				.Where(m => m.Owner!.Id == this._userManager.GetUserId(this.User)
-					&& (m.Phase != Phase.SentToCommittee || m.Phase != Phase.RejectedByCommittee
-						|| m.Phase != Phase.ApprovedByCommittee || m.Phase != Phase.InProgress
-						|| m.Phase != Phase.Abandoned || m.Phase != Phase.Completed
-						|| m.Phase != Phase.RejectedByDirector || m.Phase != Phase.ApprovedByDirector))
+					&& m.Phase != Phase.SentToCommittee && m.Phase != Phase.RejectedByCommittee
+					&& m.Phase != Phase.ApprovedByCommittee && m.Phase != Phase.InProgress
+					&& m.Phase != Phase.Abandoned && m.Phase != Phase.Completed
+					&& m.Phase != Phase.RejectedByDirector && m.Phase != Phase.ApprovedByDirector)
 				.Include(m => m.Guide)
 				.Include(m => m.Assistants)
 				.FirstOrDefaultAsync(m => m.Id == input.Id && (m.Phase == Phase.DraftByStudent || m.Phase == Phase.RejectedByGuide));
@@ -452,10 +452,10 @@ public class ProposalController : Controller {
 			memoir = await this._dbContext.Memoirs!
 				.Include(m => m.Owner)
 				.Where(m => m.Owner!.Id == this._userManager.GetUserId(this.User)
-					&& (m.Phase != Phase.SentToCommittee || m.Phase != Phase.RejectedByCommittee
-						|| m.Phase != Phase.ApprovedByCommittee || m.Phase != Phase.InProgress
-						|| m.Phase != Phase.Abandoned || m.Phase != Phase.Completed
-						|| m.Phase != Phase.RejectedByDirector || m.Phase != Phase.ApprovedByDirector))
+					&& m.Phase != Phase.SentToCommittee && m.Phase != Phase.RejectedByCommittee
+					&& m.Phase != Phase.ApprovedByCommittee && m.Phase != Phase.InProgress
+					&& m.Phase != Phase.Abandoned && m.Phase != Phase.Completed
+					&& m.Phase != Phase.RejectedByDirector && m.Phase != Phase.ApprovedByDirector)
 				.Include(m => m.Assistants)
 				.FirstOrDefaultAsync(m => m.Id == input.Id && (m.Phase == Phase.DraftByGuide || m.Phase == Phase.RejectedByGuide));
 		}
@@ -588,20 +588,20 @@ public class ProposalController : Controller {
 			memoir = await this._dbContext.Memoirs!
 				.Include(m => m.Owner)
 				.Where(m => m.Owner!.Id == this._userManager.GetUserId(this.User)
-					&& (m.Phase != Phase.SentToCommittee || m.Phase != Phase.RejectedByCommittee
-						|| m.Phase != Phase.ApprovedByCommittee || m.Phase != Phase.InProgress
-						|| m.Phase != Phase.Abandoned || m.Phase != Phase.Completed
-						|| m.Phase != Phase.RejectedByDirector || m.Phase != Phase.ApprovedByDirector))
+					&& m.Phase != Phase.SentToCommittee && m.Phase != Phase.RejectedByCommittee
+					&& m.Phase != Phase.ApprovedByCommittee && m.Phase != Phase.InProgress
+					&& m.Phase != Phase.Abandoned && m.Phase != Phase.Completed
+					&& m.Phase != Phase.RejectedByDirector && m.Phase != Phase.ApprovedByDirector)
 				.Include(m => m.Guide).AsNoTracking()
 				.FirstOrDefaultAsync(m => m.Id == id && m.Phase == Phase.DraftByStudent);
 		} else if (this.User.IsInRole("Guide")) {
 			memoir = await this._dbContext.Memoirs!
 				.Include(m => m.Owner)
 				.Where(m => m.Owner!.Id == this._userManager.GetUserId(this.User)
-					&& (m.Phase != Phase.SentToCommittee || m.Phase != Phase.RejectedByCommittee
-						|| m.Phase != Phase.ApprovedByCommittee || m.Phase != Phase.InProgress
-						|| m.Phase != Phase.Abandoned || m.Phase != Phase.Completed
-						|| m.Phase != Phase.RejectedByDirector || m.Phase != Phase.ApprovedByDirector))
+					&& m.Phase != Phase.SentToCommittee && m.Phase != Phase.RejectedByCommittee
+					&& m.Phase != Phase.ApprovedByCommittee && m.Phase != Phase.InProgress
+					&& m.Phase != Phase.Abandoned && m.Phase != Phase.Completed
+					&& m.Phase != Phase.RejectedByDirector && m.Phase != Phase.ApprovedByDirector)
 				.Include(m => m.Guide).AsNoTracking()
 				.FirstOrDefaultAsync(m => m.Id == id && m.Phase == Phase.DraftByGuide);
 		}
@@ -613,18 +613,12 @@ public class ProposalController : Controller {
 			this.TempData["ErrorMessage"] = "El profesor guía está desactivado.";
 			return this.RedirectToAction("Index", "Proposal", new { area = "University" });
 		}
-		MemoirViewModel? output = null!;
+		var output = new MemoirViewModel {
+			Id = id,
+			Title = memoir.Title,
+		};
 		if (this.User.IsInRole("Student")) {
-			output = new MemoirViewModel {
-				Id = id,
-				Title = memoir.Title,
-				GuideName = $"{memoir.Guide!.FirstName} {memoir.Guide!.LastName}",
-			};
-		} else if (this.User.IsInRole("Guide")) {
-			output = new MemoirViewModel {
-				Id = id,
-				Title = memoir.Title
-			};
+			output.GuideName = $"{memoir.Guide!.FirstName} {memoir.Guide!.LastName}";
 		}
 		return this.View(output);
 	}
@@ -641,20 +635,20 @@ public class ProposalController : Controller {
 			memoir = await this._dbContext.Memoirs!
 				.Include(m => m.Owner)
 				.Where(m => m.Owner!.Id == this._userManager.GetUserId(this.User)
-					&& (m.Phase != Phase.SentToCommittee || m.Phase != Phase.RejectedByCommittee
-						|| m.Phase != Phase.ApprovedByCommittee || m.Phase != Phase.InProgress
-						|| m.Phase != Phase.Abandoned || m.Phase != Phase.Completed
-						|| m.Phase != Phase.RejectedByDirector || m.Phase != Phase.ApprovedByDirector))
+					&& m.Phase != Phase.SentToCommittee && m.Phase != Phase.RejectedByCommittee
+					&& m.Phase != Phase.ApprovedByCommittee && m.Phase != Phase.InProgress
+					&& m.Phase != Phase.Abandoned && m.Phase != Phase.Completed
+					&& m.Phase != Phase.RejectedByDirector && m.Phase != Phase.ApprovedByDirector)
 				.Include(m => m.Guide)
 				.FirstOrDefaultAsync(m => m.Id == input.Id && m.Phase == Phase.DraftByStudent);
 		} else if (this.User.IsInRole("Guide")) {
 			memoir = await this._dbContext.Memoirs!
 				.Include(m => m.Owner)
 				.Where(m => m.Owner!.Id == this._userManager.GetUserId(this.User)
-					&& (m.Phase != Phase.SentToCommittee || m.Phase != Phase.RejectedByCommittee
-						|| m.Phase != Phase.ApprovedByCommittee || m.Phase != Phase.InProgress
-						|| m.Phase != Phase.Abandoned || m.Phase != Phase.Completed
-						|| m.Phase != Phase.RejectedByDirector || m.Phase != Phase.ApprovedByDirector))
+					&& m.Phase != Phase.SentToCommittee && m.Phase != Phase.RejectedByCommittee
+					&& m.Phase != Phase.ApprovedByCommittee && m.Phase != Phase.InProgress
+					&& m.Phase != Phase.Abandoned && m.Phase != Phase.Completed
+					&& m.Phase != Phase.RejectedByDirector && m.Phase != Phase.ApprovedByDirector)
 				.Include(m => m.Guide)
 				.FirstOrDefaultAsync(m => m.Id == input.Id && m.Phase == Phase.DraftByGuide);
 		}
@@ -695,10 +689,10 @@ public class ProposalController : Controller {
 		if (this.User.IsInRole("Student")) {
 			memoir = await this._dbContext.Memoirs!
 				.Where(m => m.Phase != Phase.SentToCommittee
-					|| m.Phase != Phase.RejectedByCommittee || m.Phase != Phase.ApprovedByCommittee
-					|| m.Phase != Phase.InProgress || m.Phase != Phase.Abandoned
-					|| m.Phase != Phase.Completed || m.Phase != Phase.RejectedByDirector
-					|| m.Phase != Phase.ApprovedByDirector)
+					&& m.Phase != Phase.RejectedByCommittee && m.Phase != Phase.ApprovedByCommittee
+					&& m.Phase != Phase.InProgress && m.Phase != Phase.Abandoned
+					&& m.Phase != Phase.Completed && m.Phase != Phase.RejectedByDirector
+					&& m.Phase != Phase.ApprovedByDirector)
 				.Include(m => m.Owner)
 				.Include(m => m.Guide)
 				.Include(m => m.WhoRejected)
@@ -707,10 +701,10 @@ public class ProposalController : Controller {
 		} else if (this.User.IsInRole("Guide")) {
 			memoir = await this._dbContext.Memoirs!
 				.Where(m => m.Phase != Phase.SentToCommittee
-					|| m.Phase != Phase.RejectedByCommittee || m.Phase != Phase.ApprovedByCommittee
-					|| m.Phase != Phase.InProgress || m.Phase != Phase.Abandoned
-					|| m.Phase != Phase.Completed || m.Phase != Phase.RejectedByDirector
-					|| m.Phase != Phase.ApprovedByDirector)
+					&& m.Phase != Phase.RejectedByCommittee && m.Phase != Phase.ApprovedByCommittee
+					&& m.Phase != Phase.InProgress && m.Phase != Phase.Abandoned
+					&& m.Phase != Phase.Completed && m.Phase != Phase.RejectedByDirector
+					&& m.Phase != Phase.ApprovedByDirector)
 				.Include(m => m.Owner)
 				.Include(m => m.Memorist)
 				.Include(m => m.Assistants).AsNoTracking()
@@ -760,10 +754,10 @@ public class ProposalController : Controller {
 		}
 		var memoir = await this._dbContext.Memoirs!
 			.Where(m => m.Phase != Phase.SentToCommittee
-				|| m.Phase != Phase.RejectedByCommittee || m.Phase != Phase.ApprovedByCommittee
-				|| m.Phase != Phase.InProgress || m.Phase != Phase.Abandoned
-				|| m.Phase != Phase.Completed || m.Phase != Phase.RejectedByDirector
-				|| m.Phase != Phase.ApprovedByDirector)
+				&& m.Phase != Phase.RejectedByCommittee && m.Phase != Phase.ApprovedByCommittee
+				&& m.Phase != Phase.InProgress && m.Phase != Phase.Abandoned
+				&& m.Phase != Phase.Completed && m.Phase != Phase.RejectedByDirector
+				&& m.Phase != Phase.ApprovedByDirector)
 			.Include(p => p.Guide).AsNoTracking()
 			.FirstOrDefaultAsync(m => m.Id == id
 				&& m.Phase == Phase.PublishedByGuide);
@@ -788,10 +782,10 @@ public class ProposalController : Controller {
 		}
 		var memoir = await this._dbContext.Memoirs!
 			.Where(m => m.Phase != Phase.SentToCommittee
-				|| m.Phase != Phase.RejectedByCommittee || m.Phase != Phase.ApprovedByCommittee
-				|| m.Phase != Phase.InProgress || m.Phase != Phase.Abandoned
-				|| m.Phase != Phase.Completed || m.Phase != Phase.RejectedByDirector
-				|| m.Phase != Phase.ApprovedByDirector)
+				&& m.Phase != Phase.RejectedByCommittee && m.Phase != Phase.ApprovedByCommittee
+				&& m.Phase != Phase.InProgress && m.Phase != Phase.Abandoned
+				&& m.Phase != Phase.Completed && m.Phase != Phase.RejectedByDirector
+				&& m.Phase != Phase.ApprovedByDirector)
 			.Include(p => p.Guide)
 			.FirstOrDefaultAsync(m => m.Id == input.Id
 				&& m.Phase == Phase.PublishedByGuide);
@@ -817,11 +811,11 @@ public class ProposalController : Controller {
 		var memoir = await this._dbContext.Memoirs!
 			.Include(m => m.Guide)
 			.Where(m => m.Guide!.Id == user.Id
-				&& (m.Phase != Phase.SentToCommittee
-					|| m.Phase != Phase.RejectedByCommittee || m.Phase != Phase.ApprovedByCommittee
-					|| m.Phase != Phase.InProgress || m.Phase != Phase.Abandoned
-					|| m.Phase != Phase.Completed || m.Phase != Phase.RejectedByDirector
-					|| m.Phase != Phase.ApprovedByDirector))
+				&& m.Phase != Phase.SentToCommittee
+				&& m.Phase != Phase.RejectedByCommittee && m.Phase != Phase.ApprovedByCommittee
+				&& m.Phase != Phase.InProgress && m.Phase != Phase.Abandoned
+				&& m.Phase != Phase.Completed && m.Phase != Phase.RejectedByDirector
+				&& m.Phase != Phase.ApprovedByDirector)
 			.Include(m => m.Memorist).AsNoTracking()
 			.FirstOrDefaultAsync(m => m.Id == id
 				&& m.Phase == Phase.SentToGuide);
@@ -847,11 +841,11 @@ public class ProposalController : Controller {
 		var memoir = await this._dbContext.Memoirs!
 			.Include(m => m.Guide)
 			.Where(m => m.Guide!.Id == user.Id
-				&& (m.Phase != Phase.SentToCommittee
-					|| m.Phase != Phase.RejectedByCommittee || m.Phase != Phase.ApprovedByCommittee
-					|| m.Phase != Phase.InProgress || m.Phase != Phase.Abandoned
-					|| m.Phase != Phase.Completed || m.Phase != Phase.RejectedByDirector
-					|| m.Phase != Phase.ApprovedByDirector))
+				&& m.Phase != Phase.SentToCommittee
+				&& m.Phase != Phase.RejectedByCommittee && m.Phase != Phase.ApprovedByCommittee
+				&& m.Phase != Phase.InProgress && m.Phase != Phase.Abandoned
+				&& m.Phase != Phase.Completed && m.Phase != Phase.RejectedByDirector
+				&& m.Phase != Phase.ApprovedByDirector)
 			.Include(m => m.Memorist)
 			.FirstOrDefaultAsync(m => m.Id == input.Id
 				&& m.Phase == Phase.SentToGuide);
@@ -879,11 +873,11 @@ public class ProposalController : Controller {
 		var memoir = await this._dbContext.Memoirs!
 			.Include(m => m.Guide)
 			.Where(m => m.Guide!.Id == user.Id
-				&& (m.Phase != Phase.SentToCommittee
-					|| m.Phase != Phase.RejectedByCommittee || m.Phase != Phase.ApprovedByCommittee
-					|| m.Phase != Phase.InProgress || m.Phase != Phase.Abandoned
-					|| m.Phase != Phase.Completed || m.Phase != Phase.RejectedByDirector
-					|| m.Phase != Phase.ApprovedByDirector))
+				&& m.Phase != Phase.SentToCommittee
+				&& m.Phase != Phase.RejectedByCommittee && m.Phase != Phase.ApprovedByCommittee
+				&& m.Phase != Phase.InProgress && m.Phase != Phase.Abandoned
+				&& m.Phase != Phase.Completed && m.Phase != Phase.RejectedByDirector
+				&& m.Phase != Phase.ApprovedByDirector)
 			.Include(m => m.Memorist).AsNoTracking()
 			.FirstOrDefaultAsync(m => m.Id == id
 				&& m.Phase == Phase.SentToGuide);
@@ -909,11 +903,11 @@ public class ProposalController : Controller {
 		var memoir = await this._dbContext.Memoirs!
 			.Include(m => m.Guide)
 			.Where(m => m.Guide!.Id == user.Id
-				&& (m.Phase != Phase.SentToCommittee
-					|| m.Phase != Phase.RejectedByCommittee || m.Phase != Phase.ApprovedByCommittee
-					|| m.Phase != Phase.InProgress || m.Phase != Phase.Abandoned
-					|| m.Phase != Phase.Completed || m.Phase != Phase.RejectedByDirector
-					|| m.Phase != Phase.ApprovedByDirector))
+				&& m.Phase != Phase.SentToCommittee
+				&& m.Phase != Phase.RejectedByCommittee && m.Phase != Phase.ApprovedByCommittee
+				&& m.Phase != Phase.InProgress && m.Phase != Phase.Abandoned
+				&& m.Phase != Phase.Completed && m.Phase != Phase.RejectedByDirector
+				&& m.Phase != Phase.ApprovedByDirector)
 			.Include(m => m.Memorist)
 			.FirstOrDefaultAsync(m => m.Id == input.Id
 				&& m.Phase == Phase.SentToGuide);
@@ -943,11 +937,11 @@ public class ProposalController : Controller {
 		}
 		var memoir = await this._dbContext.Memoirs!
 			.Where(m => m.Owner == user
-				&& (m.Phase != Phase.SentToCommittee
-					|| m.Phase != Phase.RejectedByCommittee || m.Phase != Phase.ApprovedByCommittee
-					|| m.Phase != Phase.InProgress || m.Phase != Phase.Abandoned
-					|| m.Phase != Phase.Completed || m.Phase != Phase.RejectedByDirector
-					|| m.Phase != Phase.ApprovedByDirector))
+				&& m.Phase != Phase.SentToCommittee
+				&& m.Phase != Phase.RejectedByCommittee && m.Phase != Phase.ApprovedByCommittee
+				&& m.Phase != Phase.InProgress && m.Phase != Phase.Abandoned
+				&& m.Phase != Phase.Completed && m.Phase != Phase.RejectedByDirector
+				&& m.Phase != Phase.ApprovedByDirector)
 			.Include(m => m.Candidates)
 			.Where(m => m.Candidates!.Any(s => s!.Id == memoristId)).AsNoTracking()
 			.FirstOrDefaultAsync(m => m.Id == memoirId
@@ -978,11 +972,11 @@ public class ProposalController : Controller {
 		}
 		var memoir = await this._dbContext.Memoirs!
 			.Where(m => m.Owner == user
-				&& (m.Phase != Phase.SentToCommittee
-					|| m.Phase != Phase.RejectedByCommittee || m.Phase != Phase.ApprovedByCommittee
-					|| m.Phase != Phase.InProgress || m.Phase != Phase.Abandoned
-					|| m.Phase != Phase.Completed || m.Phase != Phase.RejectedByDirector
-					|| m.Phase != Phase.ApprovedByDirector))
+				&& m.Phase != Phase.SentToCommittee
+				&& m.Phase != Phase.RejectedByCommittee && m.Phase != Phase.ApprovedByCommittee
+				&& m.Phase != Phase.InProgress && m.Phase != Phase.Abandoned
+				&& m.Phase != Phase.Completed && m.Phase != Phase.RejectedByDirector
+				&& m.Phase != Phase.ApprovedByDirector)
 			.Include(m => m.Candidates)
 			.Where(m => m.Candidates!.Any(s => s!.Id == input.MemoristId))
 			.FirstOrDefaultAsync(m => m.Id == input.Id
@@ -1023,10 +1017,10 @@ public class ProposalController : Controller {
 				.Include(m => m.Memorist)
 				.Where(m => m.Memorist!.Id == user.Id
 					&& (m.Phase != Phase.SentToCommittee
-						|| m.Phase != Phase.RejectedByCommittee || m.Phase != Phase.ApprovedByCommittee
-						|| m.Phase != Phase.InProgress || m.Phase != Phase.Abandoned
-						|| m.Phase != Phase.Completed || m.Phase != Phase.RejectedByDirector
-						|| m.Phase != Phase.ApprovedByDirector)).AsNoTracking()
+					&& m.Phase != Phase.RejectedByCommittee && m.Phase != Phase.ApprovedByCommittee
+					&& m.Phase != Phase.InProgress && m.Phase != Phase.Abandoned
+					&& m.Phase != Phase.Completed && m.Phase != Phase.RejectedByDirector
+					&& m.Phase != Phase.ApprovedByDirector)).AsNoTracking()
 				.FirstOrDefaultAsync(m => m.Id == id
 					&& m.Phase == Phase.ApprovedByGuide);
 		} else if (this.User.IsInRole("Teacher")) {
@@ -1034,10 +1028,10 @@ public class ProposalController : Controller {
 				.Include(m => m.Guide)
 				.Where(m => m.Guide!.Id == user.Id
 					&& (m.Phase != Phase.SentToCommittee
-						|| m.Phase != Phase.RejectedByCommittee || m.Phase != Phase.ApprovedByCommittee
-						|| m.Phase != Phase.InProgress || m.Phase != Phase.Abandoned
-						|| m.Phase != Phase.Completed || m.Phase != Phase.RejectedByDirector
-						|| m.Phase != Phase.ApprovedByDirector)).AsNoTracking()
+					&& m.Phase != Phase.RejectedByCommittee && m.Phase != Phase.ApprovedByCommittee
+					&& m.Phase != Phase.InProgress && m.Phase != Phase.Abandoned
+					&& m.Phase != Phase.Completed && m.Phase != Phase.RejectedByDirector
+					&& m.Phase != Phase.ApprovedByDirector)).AsNoTracking()
 				.FirstOrDefaultAsync(m => m.Id == id
 					&& m.Phase == Phase.ReadyByGuide);
 		}
@@ -1065,10 +1059,10 @@ public class ProposalController : Controller {
 				.Include(m => m.Memorist)
 				.Where(m => m.Memorist!.Id == user.Id
 					&& (m.Phase != Phase.SentToCommittee
-						|| m.Phase != Phase.RejectedByCommittee || m.Phase != Phase.ApprovedByCommittee
-						|| m.Phase != Phase.InProgress || m.Phase != Phase.Abandoned
-						|| m.Phase != Phase.Completed || m.Phase != Phase.RejectedByDirector
-						|| m.Phase != Phase.ApprovedByDirector))
+					&& m.Phase != Phase.RejectedByCommittee && m.Phase != Phase.ApprovedByCommittee
+					&& m.Phase != Phase.InProgress && m.Phase != Phase.Abandoned
+					&& m.Phase != Phase.Completed && m.Phase != Phase.RejectedByDirector
+					&& m.Phase != Phase.ApprovedByDirector))
 				.FirstOrDefaultAsync(m => m.Id == input.Id
 					&& m.Phase == Phase.ApprovedByGuide);
 		} else if (this.User.IsInRole("Teacher")) {
@@ -1076,10 +1070,10 @@ public class ProposalController : Controller {
 				.Include(m => m.Guide)
 				.Where(m => m.Guide!.Id == user.Id
 					&& (m.Phase != Phase.SentToCommittee
-						|| m.Phase != Phase.RejectedByCommittee || m.Phase != Phase.ApprovedByCommittee
-						|| m.Phase != Phase.InProgress || m.Phase != Phase.Abandoned
-						|| m.Phase != Phase.Completed || m.Phase != Phase.RejectedByDirector
-						|| m.Phase != Phase.ApprovedByDirector))
+					&& m.Phase != Phase.RejectedByCommittee && m.Phase != Phase.ApprovedByCommittee
+					&& m.Phase != Phase.InProgress && m.Phase != Phase.Abandoned
+					&& m.Phase != Phase.Completed && m.Phase != Phase.RejectedByDirector
+					&& m.Phase != Phase.ApprovedByDirector))
 				.FirstOrDefaultAsync(m => m.Id == input.Id
 					&& m.Phase == Phase.ReadyByGuide);
 		}
