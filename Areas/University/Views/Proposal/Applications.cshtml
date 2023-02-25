@@ -43,6 +43,11 @@
 									<span>Profesor guía</span>
 								</a>
 							</th>
+							<th>
+								<a asp-action="Applications" asp-route-sortOrder="@this.ViewData["UpdatedAtSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+									<span>Fecha de actualización</span>
+								</a>
+							</th>
 							<th>Estado</th>
 							<th>Acciones</th>
 						</tr>
@@ -52,6 +57,7 @@
 							<tr>
 								<td>@item.Title</td>
 								<td>@item.GuideName</td>
+								<td>@item.UpdatedAt</td>
 								<td>
 									@{
 										var memoir = this._dbContext.Memoirs!.Include(m => m.Memorist).Include(m => m.Candidates).FirstOrDefault(m => m.Id == item.Id);

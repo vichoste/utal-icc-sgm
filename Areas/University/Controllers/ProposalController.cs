@@ -121,9 +121,9 @@ public class ProposalController : Controller {
 		}
 		string[]? parameters = null;
 		if (this.User.IsInRole("Student")) {
-			parameters = new[] { "Title", "GuideName" };
+			parameters = new[] { "Title", "GuideName", "UpdatedAt", };
 		} else if (this.User.IsInRole("Guide")) {
-			parameters = new[] { "Title", "MemoristName" };
+			parameters = new[] { "Title", "MemoristName", "UpdatedAt", };
 		}
 		foreach (var parameter in parameters!) {
 			this.ViewData[$"{parameter}SortParam"] = sortOrder == parameter ? $"{parameter}Desc" : parameter;
@@ -187,9 +187,9 @@ public class ProposalController : Controller {
 		}
 		string[]? parameters = null;
 		if (this.User.IsInRole("Student")) {
-			parameters = new[] { "Title", "GuideName" };
+			parameters = new[] { "UpdatedAt", "Title", "GuideName" };
 		} else if (this.User.IsInRole("Guide")) {
-			parameters = new[] { "Title", "MemoristName" };
+			parameters = new[] { "UpdatedAt", "Title", "MemoristName" };
 		}
 		foreach (var parameter in parameters!) {
 			this.ViewData[$"{parameter}SortParam"] = sortOrder == parameter ? $"{parameter}Desc" : parameter;
@@ -242,7 +242,7 @@ public class ProposalController : Controller {
 			this.TempData["ErrorMessage"] = "Tu cuenta está desactivada.";
 			return this.RedirectToAction("Index", "Home", new { area = "" });
 		}
-		var parameters = new[] { "Title", "GuideName" };
+		var parameters = new[] { "Title", "GuideName", "UpdatedAt" };
 		foreach (var parameter in parameters!) {
 			this.ViewData[$"{parameter}SortParam"] = sortOrder == parameter ? $"{parameter}Desc" : parameter;
 		}

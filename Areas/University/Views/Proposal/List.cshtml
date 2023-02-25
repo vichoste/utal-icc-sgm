@@ -40,6 +40,11 @@
 									</a>
 								}
 							</th>
+							<th>
+								<a asp-action="List" asp-route-sortOrder="@this.ViewData["UpdatedAtSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+									Fecha de actualización
+								</a>
+							</th>
 							@if (this.User.IsInRole("Guide")) {
 								<th>Estado</th>
 							}
@@ -55,6 +60,7 @@
 								} else if (this.User.IsInRole("Guide")) {
 									<td>@item.MemoristName</td>
 								}
+								<td>@item.UpdatedAt</td>
 								@if (this.User.IsInRole("Guide")) {
 									<td>
 										@switch (item.Phase) {

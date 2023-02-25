@@ -5,7 +5,7 @@
 @model Paginator<MemoirViewModel>
 
 @{
-	this.ViewData["Title"] = "Mis solicitudes";
+	this.ViewData["Title"] = "Solicitudes";
 }
 
 <div class="container">
@@ -15,7 +15,7 @@
 			<h2>@this.ViewData["Title"]</h2>
 		</div>
 		<div class="col-12 mb-3">
-			<partial name="_Filter" , model=@(new FilterPartialViewModel("Index", "Request", "University")) />
+			<partial name="_Filter" , model=@(new FilterPartialViewModel("List", "Request", "University")) />
 		</div>
 	</div>
 	<div class="row justify-content-center">
@@ -25,18 +25,23 @@
 					<thead class="table-dark">
 						<tr>
 							<th>
-								<a asp-action="Index" asp-route-sortOrder="@this.ViewData["TitleSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+								<a asp-action="List" asp-route-sortOrder="@this.ViewData["TitleSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
 									Título
 								</a>
 							</th>
 							<th>
-								<a asp-action="Index" asp-route-sortOrder="@this.ViewData["MemoristNameSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+								<a asp-action="List" asp-route-sortOrder="@this.ViewData["MemoristNameSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
 									<span>Estudiante</span>
 								</a>
 							</th>
 							<th>
-								<a asp-action="Index" asp-route-sortOrder="@this.ViewData["GuideNameSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+								<a asp-action="List" asp-route-sortOrder="@this.ViewData["GuideNameSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
 									<span>Profesor guía</span>
+								</a>
+							</th>
+							<th>
+								<a asp-action="List" asp-route-sortOrder="@this.ViewData["UpdatedAtSortParam"]" asp-route-currentFilter="@this.ViewData["CurrentFilter"]">
+									<span>Fecha de actualización</span>
 								</a>
 							</th>
 							<th>Estado</th>
@@ -49,16 +54,14 @@
 								<td>@item.Title</td>
 								<td>@item.MemoristName</td>
 								<td>@item.GuideName</td>
+								<td>@item.UpdatedAt</td>
 								<td>
 									@switch (item.Phase) {
 										case "SentToCommittee":
-											<span class="badge bg-primary">Enviada</span>
+											<span class="badge bg-yellow">Revisar</span>
 											break;
 										case "ApprovedByCommittee":
 											<span class="badge bg-success">Aprobada</span>
-											break;
-										case "RejectedByCommittee":
-											<span class="badge bg-danger">Rechazada</span>
 											break;
 									}
 								</td>
@@ -69,7 +72,7 @@
 						}
 					</tbody>
 				</table>
-				<partial name="_Paginator" , model=@(new PaginatorPartialViewModel("Index", this.Model.PageIndex, this.Model.TotalPages, this.Model.HasPreviousPage, this.Model.HasNextPage)) />
+				<partial name="_Paginator" , model=@(new PaginatorPartialViewModel("List", this.Model.PageIndex, this.Model.TotalPages, this.Model.HasPreviousPage, this.Model.HasNextPage)) />
 			</div>
 		</div>
 	</div>
