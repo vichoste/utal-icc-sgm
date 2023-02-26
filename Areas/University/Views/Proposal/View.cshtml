@@ -66,6 +66,15 @@
 											@this.Html.LabelFor(m => m.Reason, new { @class = "form-label" }):
 											@this.Html.DisplayFor(m => m.Reason, new { @class = "form-control" })
 										</div>
+									} else if (this.Model.WhoRejected == string.Empty && this.Model.Reason != string.Empty) {
+										<div class="form-group mb-3">
+											<p class="form-label">¿Quién rechazó la propuesta?:</p>
+											<p>Comité</p>
+										</div>
+										<div class="form-group mb-3">
+											@this.Html.LabelFor(m => m.Reason, new { @class = "form-label" }):
+											@this.Html.DisplayFor(m => m.Reason, new { @class = "form-control" })
+										</div>
 									}
 								} else if (this.User.IsInRole("Guide") || this.User.IsInRole("Committee") || this.User.IsInRole("Director")) {
 									<div class="form-group mb-3">

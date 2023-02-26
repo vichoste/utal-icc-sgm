@@ -148,6 +148,7 @@ public class RequestController : Controller {
 				.Include(m => m.Owner)
 				.Include(m => m.Guide)
 				.Include(m => m.Memorist)
+				.Include(m => m.WhoRejected)
 				.Include(m => m.Assistants).AsNoTracking()
 				.FirstOrDefaultAsync(m => m.Id == id);
 		}
@@ -163,7 +164,7 @@ public class RequestController : Controller {
 			CreatedAt = memoir.CreatedAt,
 			UpdatedAt = memoir.UpdatedAt,
 			Assistants = memoir.Assistants!.Select(a => $"{a!.FirstName} {a.LastName}").ToList(),
-			WhoRejected = memoir.WhoRejected is null ? string.Empty : $"{memoir.WhoRejected.FirstName} {memoir.WhoRejected.LastName}",
+			WhoRejected = memoir.WhoRejected is null && !memoir.WasTheCommittee ? string.Empty : $"{memoir.WhoRejected!.FirstName} {memoir.WhoRejected.LastName}",
 			Reason = memoir.Reason
 		};
 		if (this.User.IsInRole("Student") || this.User.IsInRole("Committee") || this.User.IsInRole("Director")) {
@@ -185,4 +186,9 @@ public class RequestController : Controller {
 		}
 		return this.View(output);
 	}
+
+	//[Authorize(Roles = "Committee")]
+	//public async Task<IActionResult> Vote(string id) {
+
+	//}
 }

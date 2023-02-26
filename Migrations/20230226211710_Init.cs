@@ -184,8 +184,9 @@ namespace Utal.Icc.Sgm.Migrations
                     MemoristId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     GuideId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     Requirements = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    WhoRejectedId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    Reason = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    WasTheCommittee = table.Column<bool>(type: "bit", nullable: false),
+                    Reason = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    WhoRejectedId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
                 {

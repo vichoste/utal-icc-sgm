@@ -30,7 +30,8 @@ public class Memoir {
 	public virtual ICollection<ApplicationUser?>? Assistants { get; set; } = new HashSet<ApplicationUser?>();
 	#endregion
 	#region Rejection
-	public virtual ApplicationUser? WhoRejected { get; set; }
+	public bool WasTheCommittee { get; set; }
 	public string? Reason { get; set; }
+	public virtual ApplicationUser? WhoRejected { get; set; }
 	#endregion
 }

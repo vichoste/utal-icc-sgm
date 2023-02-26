@@ -730,7 +730,7 @@ public class ProposalController : Controller {
 			output.Office = memoir.Guide.Office;
 			output.Schedule = memoir.Guide.Schedule;
 			output.Specialization = memoir.Guide.Specialization;
-			output.WhoRejected = memoir.WhoRejected is null ? string.Empty : $"{memoir.WhoRejected.FirstName} {memoir.WhoRejected.LastName}";
+			output.WhoRejected = memoir.WhoRejected is null && !memoir.WasTheCommittee ? string.Empty : $"{memoir.WhoRejected!.FirstName} {memoir.WhoRejected.LastName}";
 			output.Reason = memoir.Reason;
 		} else if (this.User.IsInRole("Guide")) {
 			output.Requirements = memoir.Requirements;
