@@ -137,6 +137,7 @@ public class RequestController : Controller {
 				.Where(m => m.Owner!.Id == this._userManager.GetUserId(this.User)
 					|| m.Guide!.Id == this._userManager.GetUserId(this.User))
 				.Include(m => m.Memorist)
+				.Include(m => m.WhoRejected)
 				.Include(m => m.Assistants).AsNoTracking()
 				.FirstOrDefaultAsync(m => m.Id == id);
 		}
@@ -153,7 +154,7 @@ public class RequestController : Controller {
 				.FirstOrDefaultAsync(m => m.Id == id);
 		}
 		if (memoir is null) {
-			this.TempData["ErrorMessage"] = "Error al obtener la propuesta";
+			this.TempData["ErrorMessage"] = "Error al obtener la solicitud";
 			return this.RedirectToAction("Index", "Proposal", new { area = "University" });
 		}
 		var output = new MemoirViewModel {
@@ -187,8 +188,29 @@ public class RequestController : Controller {
 		return this.View(output);
 	}
 
-	//[Authorize(Roles = "Committee")]
-	//public async Task<IActionResult> Vote(string id) {
-
-	//}
+	[Authorize(Roles = "Committee")]
+	public async Task<IActionResult> Vote(string id) {
+		var user = await this._userManager.GetUserAsync(this.User);
+		if (user!.IsDeactivated) {
+			this.TempData["ErrorMessage"] = "Tu cuenta está desactivada.";
+			return this.RedirectToAction("Index", "Home", new { area = "" });
+		}
+		var memoir = await this._dbContext.Memoirs!
+				.Where(m => m.Phase == Phase.SentToCommittee)
+				.Include(m => m.Owner)
+				.Include(m => m.Guide)
+				.Include(m => m.Memorist)
+				.Include(m => m.WhoRejected)
+				.Include(m => m.Assistants).AsNoTracking()
+				.FirstOrDefaultAsync(m => m.Id == id);
+		if (memoir is null) {
+			this.TempData["ErrorMessage"] = "Error al obtener la solicitud";
+			return this.RedirectToAction("Index", "Proposal", new { area = "University" });
+		}
+		var output = new MemoirViewModel {
+			Id = id,
+			Title = memoir.Title
+		};
+		return this.View(output);
+	}
 }

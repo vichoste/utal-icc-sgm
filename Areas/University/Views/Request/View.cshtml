@@ -1,16 +1,11 @@
-﻿@using Microsoft.AspNetCore.Identity
-@using Microsoft.EntityFrameworkCore
+﻿@using Microsoft.EntityFrameworkCore
 
-@using Utal.Icc.Sgm.Models
 @using Utal.Icc.Sgm.ViewModels
 
 @model MemoirViewModel
 
-@inject UserManager<ApplicationUser> _userManager
-
 @{
 	this.ViewData["Title"] = "Ver solicitud";
-	var user = await this._userManager.GetUserAsync(this.User);
 }
 
 <div class="container">

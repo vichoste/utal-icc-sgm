@@ -1,0 +1,37 @@
+﻿@using Microsoft.EntityFrameworkCore
+
+@using Utal.Icc.Sgm.ViewModels
+
+@model MemoirViewModel
+
+@{
+	this.ViewData["Title"] = "Votar";
+}
+
+<div class="container">
+	<partial name="_Alerts" />
+	<div class="row justify-content-center">
+		<div class="col-10">
+			<div class="card">
+				<div class="card-header text-center">@this.ViewData["Title"]</div>
+				<div class="card-body">
+					@using (this.Html.BeginForm()) {
+						@this.Html.AntiForgeryToken()
+						@this.Html.HiddenFor(m => m.Id)
+						<h5 class="card-title mb-3">Haz click en una de las dos opciones para <b class="text-primary">votar</b> sobre la propuesta.</h5>
+						<h6 class="card-subtitle mb-3 text-muted text-center">@this.Html.DisplayFor(m => m.Title)</h6>
+						<div class="row text-center">
+							<div class="col">
+								<div class="btn-group">
+									@this.Html.ActionLink("Volver", null, null, null, new { @class = "btn btn-secondary mb-3", @href = "javascript:history.back()" })
+									@this.Html.ActionLink("Rechazar", "Reject", "Request", new { area = "University", id = this.Model.Id }, new { @class = "btn btn-danger mb-3" })
+									@this.Html.ActionLink("Aprobar", "Approve", "Request", new { area = "University", id = this.Model.Id }, new { @class = "btn btn-success mb-3" })
+								</div>
+							</div>
+						</div>
+					}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
