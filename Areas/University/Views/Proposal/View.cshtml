@@ -35,7 +35,7 @@
 									@this.Html.LabelFor(m => m.Description, new { @class = "form-label" }):
 									@this.Html.DisplayFor(m => m.Description, new { @class = "form-control" })
 								</div>
-								@if (this.User.IsInRole("Student") || this.User.IsInRole("Committee") || this.User.IsInRole("Director")) {
+								@if (this.User.IsInRole("Student")) {
 									@this.Html.HiddenFor(m => m.GuideId)
 									<div class="form-group mb-3">
 										@this.Html.LabelFor(m => m.GuideName, new { @class = "form-label" }):
@@ -76,7 +76,7 @@
 											@this.Html.DisplayFor(m => m.Reason, new { @class = "form-control" })
 										</div>
 									}
-								} else if (this.User.IsInRole("Guide") || this.User.IsInRole("Committee") || this.User.IsInRole("Director")) {
+								} else if (this.User.IsInRole("Guide")) {
 									<div class="form-group mb-3">
 										@this.Html.LabelFor(m => m.Requirements, new { @class = "form-label" }):
 										@this.Html.DisplayFor(m => m.Requirements, new { @class = "form-control" })
