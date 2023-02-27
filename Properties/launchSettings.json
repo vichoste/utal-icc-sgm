@@ -1,12 +1,11 @@
 {
 	"profiles": {
 		"Utal.Icc.Sgm": {
-			"applicationUrl": "https://localhost:5000;http://localhost:5001",
+			"applicationUrl": "http://0.0.0.0:5001",
 			"commandName": "Project",
 			"environmentVariables": {
 				"ASPNETCORE_ENVIRONMENT": "Development"
-			},
-			"launchBrowser": true
+			}
 		}
 	}
 }

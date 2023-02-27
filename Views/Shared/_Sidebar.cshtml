@@ -11,7 +11,11 @@
 <div id="sidebar" class="app-sidebar">
 	<div class="app-sidebar-content" data-scrollbar="true" data-height="100%">
 		<div class="menu">
-			@if (user is null || this.User.Identity!.IsAuthenticated && !user!.IsDeactivated) {
+			@if (user is null) {
+				<div class="menu-header">
+					Debes iniciar sesión para visualizar tus roles y herramientas
+				</div>
+			} else if (this.User.Identity!.IsAuthenticated && !user!.IsDeactivated) {
 				<div class="menu-header">
 					Mis roles y herramientas
 				</div>
